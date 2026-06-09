@@ -6,7 +6,10 @@
 - Kennt Notion-Basics, MCP-Tools, Telegram-Bot-Befehle
 
 ## Offene Fragen
-- Wie soll die Verbindung Projekt→Tagesorganizer technisch aussehen? (Notion-Relation vs. Bot-Workflow)
-- Welches Projekt soll als erstes Beispiel dienen?
+- (keine mehr nach Lektion 3)
+
+## Entscheidungen
+- Verbindung Projekt→Tagesorganizer: select-Properties "Projekt" + "Epic" im Tagesorganizer (nicht eigene Tasks-DB, nicht relation) — einfacher im Alltag, Bot kann genauso filtern
+- Beispielprojekt: DartTrainingsApp
 
 ## Arbeitsnotizen

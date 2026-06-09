@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 03 – Tasks &amp; Tagesorganizer verbinden</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .card.warning { border-color: var(--warn); }
+  .card.warning strong { color: var(--warn); }
+  .card.highlight { border-color: var(--accent); }
+  .card.highlight strong { color: var(--accent); }
+  .card.example { border-color: var(--accent2); }
+  .decision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 600px) { .decision-grid { grid-template-columns: 1fr; } }
+  .option-card {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 1.1rem 1.3rem;
+    border: 2px solid var(--border);
+  }
+  .option-card.good { border-color: var(--success); }
+  .option-card.bad { border-color: var(--danger); opacity: .75; }
+  .option-card .label {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    margin-bottom: .5rem;
+  }
+  .option-card.good .label { color: var(--success); }
+  .option-card.bad .label { color: var(--danger); }
+  .option-card h3 { margin-top: 0; color: var(--text); }
+  .option-card ul { color: var(--muted); font-size: .88rem; padding-left: 1.2rem; margin-top: .4rem; }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: .6rem 1rem;
+    font-size: .88rem;
+    font-weight: 600;
+  }
+  .flow-box.proj { border: 2px solid var(--accent); color: var(--accent); }
+  .flow-box.epic { border: 2px solid var(--accent2); color: var(--accent2); }
+  .flow-box.torg { border: 2px solid var(--success); color: var(--success); }
+  .flow-box.new-prop { border: 2px solid var(--warn); color: var(--warn); }
+  .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+  .flow-label { font-size: .75rem; color: var(--muted); text-align: center; margin-top: .2rem; }
+  .props-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  .props-table th {
+    text-align: left;
+    padding: .5rem .8rem;
+    border-bottom: 2px solid var(--border);
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+  }
+  .props-table td {
+    padding: .5rem .8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .props-table tr.new-row td { background: #1a2010; }
+  .props-table tr.new-row td:first-child { border-left: 3px solid var(--warn); }
+  .values { color: var(--muted); font-size: .85rem; }
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    padding: .1rem .45rem;
+    font-size: .75rem;
+    font-weight: 600;
+    margin-left: .3rem;
+  }
+  .badge.new { background: #2a200a; color: var(--warn); border: 1px solid var(--warn); }
+  .badge.exist { background: #1a2a1a; color: var(--success); border: 1px solid var(--success); }
+  .code-prompt {
+    background: #0d0d14;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 1.8rem 1.2rem 1rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .88rem;
+    color: var(--accent2);
+    white-space: pre-wrap;
+    margin: .8rem 0;
+    position: relative;
+  }
+  .code-prompt .label {
+    position: absolute;
+    top: 0;
+    left: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    border-radius: 0 0 4px 4px;
+    padding: .1rem .5rem;
+    letter-spacing: .04em;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin: 1rem 0;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+  }
+  .step .num {
+    background: var(--accent);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .example-task {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem 1rem;
+    margin: .4rem 0;
+    font-size: .9rem;
+  }
+  .example-task .tag {
+    display: inline-block;
+    border-radius: 4px;
+    padding: .1rem .4rem;
+    font-size: .72rem;
+    font-weight: 700;
+    margin-right: .3rem;
+  }
+  .tag.epic { background: #1a2a3a; color: var(--accent2); border: 1px solid var(--accent2); }
+  .tag.proj { background: #2a2040; color: var(--accent); border: 1px solid var(--accent); }
+  .tag.prio-h { background: #2a1010; color: var(--danger); border: 1px solid var(--danger); }
+  .tag.prio-m { background: #2a2010; color: var(--warn); border: 1px solid var(--warn); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 03</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Tasks &amp; Tagesorganizer: Die Verbindung herstellen</h1>
+<p class="meta">Lektion 3 von ~6 &middot; Dauer: ~25 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Du hast Projekte und Epics in Notion. Jetzt kommt die entscheidende Frage: <strong>Wo landen die konkreten Tasks?</strong> Und wie kommen sie in deinen t&auml;glichen Workflow?</p>
+<p>Heute treffen wir eine Design-Entscheidung &mdash; und setzen sie um.</p>
+
+<h2>Die Designfrage: Eigene Tasks-Datenbank?</h2>
+<p>Es gibt zwei naheliegende Ans&auml;tze. Lass uns beide anschauen:</p>
+
+<div class="decision-grid">
+  <div class="option-card bad">
+    <div class="label">&#10008; NICHT EMPFOHLEN</div>
+    <h3>Eigene Tasks-DB</h3>
+    <ul>
+      <li>Neue DB: Tasks &#8594; Epics &#8594; Projekte</li>
+      <li>Tasks manuell in Tagesorganizer kopieren</li>
+      <li>Zwei Systeme parallel pflegen</li>
+      <li>Doppelarbeit bei Status-Updates</li>
+    </ul>
+  </div>
+  <div class="option-card good">
+    <div class="label">&#10004; EMPFOHLEN</div>
+    <h3>Tagesorganizer = Task-Ebene</h3>
+    <ul>
+      <li>Tagesorganizer bekommt "Projekt" + "Epic"</li>
+      <li>Tasks landen direkt im bestehenden System</li>
+      <li>Ein einziger Ort f&uuml;r alles</li>
+      <li>Bot-Befehle funktionieren ohne &Auml;nderung</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card highlight">
+  <strong>Kernprinzip:</strong> Der Tagesorganizer ist bereits deine Tasks-Datenbank. Er hat Status, Datum, Priorit&auml;t &mdash; alles was ein Task braucht. Wir m&uuml;ssen ihn nur um eine Verbindung zu Projekten erweitern.
+</div>
+
+<h2>Was sich &auml;ndert</h2>
+<p>Wir f&uuml;gen dem Tagesorganizer <strong>zwei neue Properties</strong> hinzu:</p>
+
+<table class="props-table">
+  <thead>
+    <tr><th>Property</th><th>Typ</th><th>Zweck</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Name</td><td>title</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr><td>Status</td><td>status</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr><td>Priorit&auml;t</td><td>select</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr><td>Datum</td><td>date</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr><td>Bereich</td><td>select</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr><td>Notiz</td><td>rich_text</td><td class="values"><span class="badge exist">vorhanden</span></td></tr>
+    <tr class="new-row">
+      <td><strong>Projekt</strong> <span class="badge new">neu</span></td>
+      <td>select</td>
+      <td class="values">Welches Projekt? z.B. "Dart-App", "Notion-Bot"</td>
+    </tr>
+    <tr class="new-row">
+      <td><strong>Epic</strong> <span class="badge new">neu</span></td>
+      <td>select</td>
+      <td class="values">Welcher Themenbereich? z.B. "User Login", "Statistik"</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="card warning">
+  <strong>Warum select statt relation?</strong> Eine Relation w&auml;re sauberer, macht aber jede Task-Erstellung aufw&auml;ndiger (du musst den richtigen Epic in einer anderen DB suchen). Ein Select-Feld ist schneller im Alltag &mdash; und der Bot kann genauso danach filtern.
+</div>
+
+<h2>Die neue Verbindung im &Uuml;berblick</h2>
+
+<div class="flow">
+  <div>
+    <div class="flow-box proj">&#128193; Projekte-DB</div>
+    <div class="flow-label">Zielregister</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div>
+    <div class="flow-box epic">&#129513; Epics-DB</div>
+    <div class="flow-label">Themenbereiche</div>
+  </div>
+  <div class="flow-arrow">&#8594;</div>
+  <div>
+    <div class="flow-box torg">&#9989; Tagesorganizer</div>
+    <div class="flow-label">Tasks (heute)</div>
+  </div>
+  <div class="flow-arrow">&#8592;</div>
+  <div>
+    <div class="flow-box new-prop">Projekt + Epic</div>
+    <div class="flow-label">neue Properties</div>
+  </div>
+</div>
+
+<p>Der Tagesorganizer bleibt dein Tages-Hub. Die neuen Properties geben jedem Task seinen Projektkontext &mdash; ohne zweites System.</p>
+
+<h2>Schritt 1: Properties hinzuf&uuml;gen</h2>
+<p>Nutze diesen Prompt in Claude Code:</p>
+
+<div class="code-prompt"><span class="label">Claude Code &rarr; eingeben</span>F&uuml;ge der Notion-Datenbank mit data_source_id "c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0" (Tagesorganizer) zwei neue Properties hinzu:
+1. "Projekt" (select): Dart-App, Notion-Bot
+2. "Epic" (select): (leer lassen &mdash; ich f&uuml;lle die Werte manuell)</div>
+
+<div class="card example">
+  <strong>Hinweis:</strong> Notion-MCP kann Properties zu bestehenden Datenbanken hinzuf&uuml;gen. Bestehende Tasks bleiben unber&uuml;hrt &mdash; sie bekommen die neuen Felder einfach leer.
+</div>
+
+<h2>Schritt 2: Erste Projekt-Tasks anlegen</h2>
+<p>Sobald die Properties existieren, lege Tasks f&uuml;r deine Dart-App-Epics an. So sehen fertige Tasks aus:</p>
+
+<div class="example-task">
+  <span class="tag epic">User Login</span>
+  <span class="tag proj">Dart-App</span>
+  <span class="tag prio-h">Hoch</span>
+  Login-Screen implementieren &mdash; Datum: heute &mdash; Status: Not started
+</div>
+<div class="example-task">
+  <span class="tag epic">Statistik</span>
+  <span class="tag proj">Dart-App</span>
+  <span class="tag prio-m">Mittel</span>
+  W&uuml;rfe-Daten in Datenbank speichern &mdash; Datum: morgen &mdash; Status: Not started
+</div>
+
+<p>Prompt f&uuml;r den ersten Task:</p>
+
+<div class="code-prompt"><span class="label">Claude Code &rarr; eingeben</span>Lege im Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0) einen neuen Task an:
+- Name: "Login-Screen implementieren"
+- Status: Not started
+- Priorit&auml;t: Hoch
+- Datum: 2026-06-10
+- Bereich: Arbeit
+- Projekt: Dart-App
+- Epic: User Login</div>
+
+<h2>Warum dieser Aufbau funktioniert</h2>
+
+<div class="steps">
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <strong>Morgen-Workflow bleibt unver&auml;ndert</strong><br>
+      <span style="color:var(--muted);font-size:.9rem;">Bot liest Tagesorganizer wie gehabt. Projekt-Tasks tauchen automatisch mit auf.</span>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      <strong>Bot kann nach Projekt filtern</strong><br>
+      <span style="color:var(--muted);font-size:.9rem;">Befehl <code>dart: zeig offene Tasks</code> &rarr; Bot filtert Tagesorganizer auf Projekt = "Dart-App".</span>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      <strong>Epic-Kontext bleibt erhalten</strong><br>
+      <span style="color:var(--muted);font-size:.9rem;">Du siehst beim Task direkt, zu welchem Themenbereich er geh&ouml;rt &mdash; ohne in die Epics-DB zu wechseln.</span>
+    </div>
+  </div>
+</div>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <p>F&uuml;hre diese drei Schritte durch:</p>
+  <ul>
+    <li><strong>Schritt 1:</strong> Properties "Projekt" und "Epic" zum Tagesorganizer hinzuf&uuml;gen (Prompt oben nutzen)</li>
+    <li><strong>Schritt 2:</strong> 2&ndash;3 Tasks f&uuml;r deine Dart-App-Epics anlegen &mdash; mit Datum heute</li>
+    <li><strong>Schritt 3:</strong> Morgen-Workflow testen: <code>moin</code> an den Bot &mdash; tauchen die neuen Tasks auf?</li>
+  </ul>
+  <p style="margin-top:.8rem;color:var(--muted);font-size:.88rem;">Ziel: Mindestens ein Projekt-Task im Tagesorganizer, sichtbar im Morgen-Workflow.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Warum nutzen wir "select" f&uuml;r Projekt/Epic statt "relation"?</p>
+  <p class="quiz-hint">Tipp: Denk an die t&auml;gliche Nutzungsgeschwindigkeit.</p>
+
+  <p class="quiz-q">2. Dein Bot-Befehl <code>fokus: Arbeit</code> filtert nach Bereich = "Arbeit". Wie w&uuml;rde ein neuer Befehl <code>dart:</code> technisch filtern?</p>
+  <p class="quiz-hint">Tipp: Schau dir den neuen Property-Namen an.</p>
+
+  <p class="quiz-q">3. Du hast mehrere Epics in der Dart-App. Wie entscheidest du, f&uuml;r welche du heute Tasks anlegst?</p>
+  <p class="quiz-hint">Tipp: Was hast du &uuml;ber Priorit&auml;t in Lektion 1 gelernt?</p>
+</div>
+
+<div class="next-box">
+  <strong>N&auml;chste Lektion:</strong> Bot-Befehle f&uuml;r Projekte &mdash; <code>dart: zeig Tasks</code> und <code>dart: neuer Task</code>. Der Bot lernt, den Tagesorganizer nach Projekt zu filtern und Tasks mit Projektkontext anzulegen.<br><br>
+  <span style="color:var(--muted);font-size:.9rem;">Welche Fragen hast du? Und: Hat der Morgen-Workflow deine Projekt-Tasks gezeigt?</span>
+</div>
+
+</body>
+</html>
