@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 02 – Notion-Datenbanken anlegen: Projekte &amp; Epics</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.example { border-left: 3px solid var(--success); }
+  .card.warning { border-left: 3px solid var(--warn); }
+  .props-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .9rem;
+  }
+  .props-table th {
+    text-align: left;
+    padding: .5rem .8rem;
+    background: #1a1a2e;
+    color: var(--accent2);
+    border-bottom: 1px solid var(--border);
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .props-table td {
+    padding: .55rem .8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .props-table tr:last-child td { border-bottom: none; }
+  .props-table td:first-child { color: var(--accent2); font-weight: 600; width: 28%; }
+  .props-table td:nth-child(2) { color: var(--muted); width: 18%; font-size: .85rem; }
+  .props-table .values { color: var(--text); font-size: .83rem; }
+  .code-prompt {
+    background: #111118;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: .88rem;
+    color: #c9d1d9;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .code-prompt .label {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: .75rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: .6rem;
+    display: block;
+  }
+  .relation-visual {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .rel-box {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: .7rem 1rem;
+    font-size: .88rem;
+    font-weight: 600;
+  }
+  .rel-box.proj { border: 2px solid var(--accent); color: var(--accent); }
+  .rel-box.epic { border: 2px solid var(--accent2); color: var(--accent2); }
+  .rel-arrow {
+    color: var(--muted);
+    font-size: 1.2rem;
+  }
+  .rel-label {
+    font-size: .78rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin: 1rem 0;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+  }
+  .step .num {
+    background: var(--accent);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q {
+    margin: 1rem 0 .4rem;
+    font-weight: 600;
+  }
+  .quiz-hint {
+    font-size: .83rem;
+    color: var(--muted);
+    margin-top: .2rem;
+    font-style: italic;
+  }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    padding: .1rem .45rem;
+    font-size: .75rem;
+    font-weight: 600;
+    margin-left: .3rem;
+  }
+  .badge.req { background: #2a1a2a; color: #c084fc; border: 1px solid #c084fc; }
+  .badge.opt { background: #1a2a1a; color: var(--success); border: 1px solid var(--success); }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 02</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Notion-Datenbanken anlegen: Projekte &amp; Epics</h1>
+<p class="meta">Lektion 2 von ~6 &middot; Dauer: ~25 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Du kennst das 3-Ebenen-Modell. Jetzt bauen wir die erste H&auml;lfte des Systems in Notion: eine <strong>Projekte-Datenbank</strong> und eine <strong>Epics-Datenbank</strong>, verkn&uuml;pft &uuml;ber eine Notion-Relation.</p>
+
+<h2>Designprinzip: Properties bewusst w&auml;hlen</h2>
+<p>Jede Property kostet Pflege. Nur Properties anlegen, die du aktiv nutzt &mdash; lieber drei gezielte Felder als zehn halbgare.</p>
+
+<div class="card warning">
+  <strong>Goldene Regel:</strong> Eine Datenbank, die zu komplex ist, wird nicht genutzt. Start simple &mdash; Properties k&ouml;nnen sp&auml;ter immer noch hinzugef&uuml;gt werden.
+</div>
+
+<h2>Projekte-Datenbank: Properties</h2>
+<p>Was braucht eine Projekte-DB wirklich? F&uuml;nf Properties reichen:</p>
+
+<table class="props-table">
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Typ</th>
+      <th>Werte / Zweck</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Name <span class="badge req">Pflicht</span></td>
+      <td>title</td>
+      <td class="values">z.B. "Dart-Trainings-App"</td>
+    </tr>
+    <tr>
+      <td>Status <span class="badge req">Pflicht</span></td>
+      <td>status</td>
+      <td class="values">Idee &middot; Aktiv &middot; Pausiert &middot; Abgeschlossen</td>
+    </tr>
+    <tr>
+      <td>Bereich <span class="badge req">Pflicht</span></td>
+      <td>select</td>
+      <td class="values">Arbeit &middot; Privat &middot; Lernen<br><span style="color: var(--muted); font-size:.83rem;">Gleiche Werte wie im Tagesorganizer &rarr; sp&auml;ter einfacher filtern</span></td>
+    </tr>
+    <tr>
+      <td>Zieldatum <span class="badge opt">optional</span></td>
+      <td>date</td>
+      <td class="values">Wann soll das Projekt fertig sein?</td>
+    </tr>
+    <tr>
+      <td>Beschreibung <span class="badge opt">optional</span></td>
+      <td>rich_text</td>
+      <td class="values">Ein Satz "Warum" &mdash; hilfreich bei sp&auml;terem R&uuml;ckblick</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Projekte-DB anlegen: Prompt f&uuml;r Claude Code</h2>
+<p>Kopiere diesen Prompt in Claude Code (oder den Telegram-Bot):</p>
+
+<div class="code-prompt"><span class="label">Claude Code &rarr; eingeben</span>Erstelle in Notion eine neue Datenbank "Projekte" auf einer neuen Seite im Workspace.
+Properties:
+- Name (title)
+- Status (status): Idee, Aktiv, Pausiert, Abgeschlossen
+- Bereich (select): Arbeit, Privat, Lernen
+- Zieldatum (date)
+- Beschreibung (rich_text)</div>
+
+<div class="card example">
+  <h3>Was passiert danach</h3>
+  <p>Claude nutzt das Notion-MCP um die Datenbank anzulegen. Du bekommst die <code>database_id</code> zur&uuml;ck &mdash; <strong>notiere sie</strong>, du brauchst sie sp&auml;ter f&uuml;r den Bot.</p>
+</div>
+
+<h2>Epics-Datenbank: Properties</h2>
+<p>Epics brauchen eine <strong>Relation</strong> zur Projekte-DB. Das ist der entscheidende Unterschied zu einer normalen Datenbank: Ein Epic geh&ouml;rt immer zu genau einem Projekt.</p>
+
+<div class="relation-visual">
+  <div>
+    <div class="rel-box proj">&#128193; Projekte</div>
+    <div class="rel-label">1 Projekt</div>
+  </div>
+  <div class="rel-arrow">&#8596;</div>
+  <div>
+    <div class="rel-box epic">&#129513; Epics</div>
+    <div class="rel-label">n Epics</div>
+  </div>
+</div>
+
+<p>Eine Relation in Notion ist ein Zeiger: Das Feld "Projekt" in einem Epic zeigt auf einen Eintrag in der Projekte-DB. Notion zeigt dann auf beiden Seiten die Verkn&uuml;pfung.</p>
+
+<table class="props-table">
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Typ</th>
+      <th>Werte / Zweck</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Name <span class="badge req">Pflicht</span></td>
+      <td>title</td>
+      <td class="values">z.B. "User Login", "Statistik"</td>
+    </tr>
+    <tr>
+      <td>Projekt <span class="badge req">Pflicht</span></td>
+      <td>relation</td>
+      <td class="values">Zeigt auf Projekte-DB<br><span style="color: var(--muted); font-size:.83rem;">Jedes Epic geh&ouml;rt zu einem Projekt</span></td>
+    </tr>
+    <tr>
+      <td>Status <span class="badge req">Pflicht</span></td>
+      <td>status</td>
+      <td class="values">Offen &middot; In Arbeit &middot; Fertig</td>
+    </tr>
+    <tr>
+      <td>Priorit&auml;t <span class="badge req">Pflicht</span></td>
+      <td>select</td>
+      <td class="values">Hoch &middot; Mittel &middot; Niedrig</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Epics-DB anlegen: Prompt f&uuml;r Claude Code</h2>
+
+<div class="code-prompt"><span class="label">Claude Code &rarr; eingeben (nach Projekte-DB anlegen)</span>Erstelle in Notion eine neue Datenbank "Projekt-Epics" auf einer neuen Seite im Workspace.
+Properties:
+- Name (title)
+- Projekt (relation zur "Projekte"-Datenbank)
+- Status (status): Offen, In Arbeit, Fertig
+- Priorität (select): Hoch, Mittel, Niedrig</div>
+
+<div class="card highlight">
+  <strong>Hinweis zur Relation:</strong> Claude Code sucht automatisch nach der Projekte-DB per Notion-MCP. Falls es mehrere Datenbanken mit &auml;hnlichem Namen gibt, gib die <code>database_id</code> der Projekte-DB direkt an.
+</div>
+
+<h2>Das Resultat: deine neue Struktur</h2>
+
+<div class="steps">
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <strong>Projekte-DB</strong> &mdash; dein &uuml;bergeordnetes Zielregister<br>
+      <span style="color: var(--muted); font-size: .9rem;">z.B. "Dart-Trainings-App" (Aktiv, Arbeit)</span>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      <strong>Epics-DB</strong> &mdash; Themencluster, verkn&uuml;pft mit Projekten<br>
+      <span style="color: var(--muted); font-size: .9rem;">z.B. "User Login" (Projekt: Dart-App, Priorit&auml;t: Hoch)</span>
+    </div>
+  </div>
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      <strong>Verkn&uuml;pfung</strong> &mdash; Epic kennt sein Projekt<br>
+      <span style="color: var(--muted); font-size: .9rem;">In Notion siehst du beim Projekt alle zugeh&ouml;rigen Epics</span>
+    </div>
+  </div>
+</div>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <p>F&uuml;hre diese vier Schritte jetzt durch:</p>
+  <ul>
+    <li><strong>Schritt 1:</strong> Projekte-DB in Claude Code anlegen (Prompt oben nutzen)</li>
+    <li><strong>Schritt 2:</strong> Epics-DB anlegen (zweiten Prompt nutzen)</li>
+    <li><strong>Schritt 3:</strong> Dein erstes Projekt eintragen &mdash; z.B. "Dart-Trainings-App" oder ein eigenes</li>
+    <li><strong>Schritt 4:</strong> 2&ndash;3 Epics f&uuml;r das Projekt anlegen und mit dem Projekt verkn&uuml;pfen</li>
+  </ul>
+  <p style="margin-top: .8rem; color: var(--muted); font-size: .88rem;">Ziel: Beide Datenbanken existieren in Notion, mindestens ein Projekt mit zugeh&ouml;rigen Epics ist eingetragen.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Warum hat die Epics-DB eine Relation zur Projekte-DB, aber nicht umgekehrt?</p>
+  <p class="quiz-hint">Tipp: Welche Ebene "geh&ouml;rt zu" welcher?</p>
+
+  <p class="quiz-q">2. Du willst sp&auml;ter im Bot "alle offenen Epics von Projekt X" abfragen. Welche Property braucht dein Query-Filter?</p>
+  <p class="quiz-hint">Tipp: Du hast sie gerade angelegt.</td>
+
+  <p class="quiz-q">3. Welches echte Projekt tr&auml;gst du ein? Und welche Epics hat es?</p>
+  <p class="quiz-hint">Das wird dein Beispiel f&uuml;r die n&auml;chsten Lektionen.</p>
+</div>
+
+<div class="next-box">
+  <strong>N&auml;chste Lektion:</strong> Projekt-Tasks anlegen &mdash; die dritte Ebene. Tasks bekommen eine Relation zu Epics, ein Datum und landen so im Morgen-Workflow des Bots.<br><br>
+  <span style="color: var(--muted); font-size: .9rem;">Welche Fragen hast du? Und: Welches Projekt und welche Epics hast du angelegt?</span>
+</div>
+
+</body>
+</html>
