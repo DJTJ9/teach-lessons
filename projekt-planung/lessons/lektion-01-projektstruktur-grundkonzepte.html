@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 01 – Projektstruktur: Grundkonzepte</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin: 1rem 0;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.example { border-left: 3px solid var(--success); }
+  .card.warning { border-left: 3px solid var(--warn); }
+  .levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .level-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .level-card .emoji { font-size: 1.6rem; margin-bottom: .4rem; }
+  .level-card .name { font-weight: 600; color: var(--accent2); font-size: .95rem; }
+  .level-card .desc { font-size: .82rem; color: var(--muted); margin-top: .3rem; }
+  .level-card .example-tag { font-size: .78rem; color: var(--text); margin-top: .5rem; }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin: 1rem 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+  }
+  .flow-step .num {
+    background: var(--accent);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q {
+    margin: 1rem 0 .5rem;
+    font-weight: 600;
+  }
+  .quiz-hint {
+    font-size: .83rem;
+    color: var(--muted);
+    margin-top: .3rem;
+    font-style: italic;
+  }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .roadmap-visual {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 1rem 0;
+    align-items: center;
+  }
+  .tag {
+    border-radius: 6px;
+    padding: .3rem .7rem;
+    font-size: .83rem;
+    font-weight: 600;
+  }
+  .tag.projekt { background: #2a2040; color: var(--accent); border: 1px solid var(--accent); }
+  .tag.epic { background: #1a2a3a; color: var(--accent2); border: 1px solid var(--accent2); }
+  .tag.task { background: #1a2a1a; color: var(--success); border: 1px solid var(--success); }
+  .tag.daily { background: #2a2010; color: var(--warn); border: 1px solid var(--warn); }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 01</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Projektstruktur: Grundkonzepte</h1>
+<p class="meta">Lektion 1 von ~6 &middot; Dauer: ~20 min &middot; 2026-06-09</p>
+
+<h2>Was du heute lernst</h2>
+<p>Bevor wir Notion-Datenbanken anlegen, brauchen wir ein gemeinsames Vokabular: Was ist ein Projekt, was sind Epics, was sind Tasks &mdash; und warum diese drei Ebenen?</p>
+
+<h2>Das 3-Ebenen-Modell</h2>
+<p>Gute Projektplanung arbeitet mit drei Abstraktionsebenen. Jede Ebene beantwortet eine andere Frage:</p>
+
+<div class="levels">
+  <div class="level-card">
+    <div class="emoji">&#128506;</div>
+    <div class="name">Projekt</div>
+    <div class="desc">Was bauen wir? Das Ziel auf h&ouml;chster Ebene.</div>
+    <div class="example-tag">z.B. "Dart-Trainings-App"</div>
+  </div>
+  <div class="level-card">
+    <div class="emoji">&#129513;</div>
+    <div class="name">Epic</div>
+    <div class="desc">Welche gro&szlig;en Bereiche hat das Projekt? Thematische Cluster.</div>
+    <div class="example-tag">z.B. "User Login", "Statistik", "UI Redesign"</div>
+  </div>
+  <div class="level-card">
+    <div class="emoji">&#9989;</div>
+    <div class="name">Task</div>
+    <div class="desc">Was tue ich heute konkret? Erledigt in 1&ndash;4 Stunden.</div>
+    <div class="example-tag">z.B. "Login-Screen bauen", "API-Endpoint testen"</div>
+  </div>
+</div>
+
+<div class="card warning">
+  <strong>H&auml;ufiger Fehler:</strong> Direkt mit Tasks starten, ohne Epics zu definieren. Dann verliert man den &Uuml;berblick, welche Tasks zusammengeh&ouml;ren &mdash; und welche Bereiche noch gar nicht angefasst wurden.
+</div>
+
+<h2>Warum diese Trennung?</h2>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="num">1</div>
+    <div>
+      <strong>Fokus im Alltag</strong><br>
+      <span style="color: var(--muted); font-size: .9rem;">Tasks sind klein genug, um heute erledigt zu werden. Sie landen direkt in deinem Tagesorganizer.</span>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="num">2</div>
+    <div>
+      <strong>&Uuml;berblick auf Epic-Ebene</strong><br>
+      <span style="color: var(--muted); font-size: .9rem;">Epics zeigen, welche Bereiche weit fortgeschritten sind und wo Arbeit fehlt &mdash; ohne in Details zu versinken.</span>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="num">3</div>
+    <div>
+      <strong>Ziel-Tracking auf Projekt-Ebene</strong><br>
+      <span style="color: var(--muted); font-size: .9rem;">Das Projekt gibt Antwort auf &ldquo;Warum mache ich das?&rdquo; &mdash; hilfreich wenn man 3 Wochen sp&auml;ter zur&uuml;ckschaut.</span>
+    </div>
+  </div>
+</div>
+
+<h2>Deine zuk&uuml;nftige Notion-Struktur</h2>
+<p>Am Ende dieses Kurses hast du folgende Datenbanken in Notion:</p>
+
+<div class="roadmap-visual">
+  <span class="tag projekt">&#128193; Projekte</span>
+  <span style="color: var(--muted)">&rarr;</span>
+  <span class="tag epic">&#129513; Epics</span>
+  <span style="color: var(--muted)">&rarr;</span>
+  <span class="tag task">&#9989; Projekt-Tasks</span>
+  <span style="color: var(--muted)">&rarr;</span>
+  <span class="tag daily">&#128197; Tagesorganizer</span>
+</div>
+
+<div class="card example">
+  <h3>Konkretes Beispiel: Spiel-App planen</h3>
+  <p><strong>Projekt:</strong> "2D Plattformer in Unity"</p>
+  <ul>
+    <li><strong>Epic:</strong> Player-Movement
+      <ul style="margin-top: .3rem;">
+        <li>Task: Sprung-Physik implementieren</li>
+        <li>Task: Kollisionserkennung testen</li>
+      </ul>
+    </li>
+    <li><strong>Epic:</strong> Level-Design
+      <ul style="margin-top: .3rem;">
+        <li>Task: Tilemap-System aufsetzen</li>
+        <li>Task: Level 1 bauen</li>
+      </ul>
+    </li>
+  </ul>
+  <p style="margin-top: .8rem; color: var(--muted); font-size: .88rem;">Der Task "Sprung-Physik implementieren" kann dann als heutige Aufgabe in deinen Tagesorganizer wandern.</p>
+</div>
+
+<h2>Was macht einen guten Task aus?</h2>
+<div class="card">
+  <ul>
+    <li><strong>Konkret:</strong> "Login-Button stylen" &#10003; &nbsp;|&nbsp; "UI verbessern" &#10007;</li>
+    <li><strong>Erledigt in einem Sitz:</strong> max. 4 Stunden &mdash; sonst in Sub-Tasks aufteilen</li>
+    <li><strong>Klares Fertig-Kriterium:</strong> Wann ist es done? Vorher definieren.</li>
+    <li><strong>Einem Epic zugeordnet:</strong> Isolierte Tasks verwaisen leicht.</li>
+  </ul>
+</div>
+
+<h2>Verbindung zum Tagesorganizer</h2>
+<p>Dein Tagesorganizer ist f&uuml;r <em>was passiert heute</em>. Projekt-Tasks sind f&uuml;r <em>was geh&ouml;rt zu welchem Projekt</em>. Die Verbindung schaffst du so:</p>
+
+<div class="card highlight">
+  <p><strong>Strategie A &ndash; Notion Relation:</strong> Projekt-Task-Datenbank hat eine Relation zum Tagesorganizer. Ein Task erscheint in beiden.</p>
+  <p style="margin-top: .6rem;"><strong>Strategie B &ndash; Bot-Workflow:</strong> Morgens fragt der Bot &ldquo;Welche Projekt-Tasks planst du heute?&rdquo; und kopiert sie als neue Eintr&auml;ge in den Tagesorganizer.</p>
+  <p style="margin-top: .8rem; font-size: .85rem; color: var(--muted);">Lektion 4 behandelt beide Strategien im Detail.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Du willst eine Web-App bauen. Ordne zu:<br>
+  <em>"Navbar responsive machen"</em>, <em>"User-Authentifizierung"</em>, <em>"Portfolio-Website"</em></p>
+  <p class="quiz-hint">Tipp: Welcher ist gro&szlig; genug f&uuml;r ein Projekt? Welcher ist ein Themenbereich? Welcher ist heute erledigt?</p>
+
+  <p class="quiz-q">2. Ein Freund hat 40 Tasks in Notion, aber keinen &Uuml;berblick. Was fehlt vermutlich?</p>
+  <p class="quiz-hint">Tipp: Schau auf die drei Ebenen.</p>
+
+  <p class="quiz-q">3. Was w&auml;re dein erstes echtes Projekt, das du hier planen m&ouml;chtest?</p>
+  <p class="quiz-hint">Das wird unser Beispiel in den n&auml;chsten Lektionen.</p>
+</div>
+
+<div class="next-box">
+  <strong>N&auml;chste Lektion:</strong> Notion-Datenbank f&uuml;r Projekte &amp; Epics anlegen &mdash; wir erstellen die Struktur direkt in deinem Notion-Workspace &uuml;ber MCP.<br><br>
+  <span style="color: var(--muted); font-size: .9rem;">Welche Fragen hast du? Und: Was w&auml;re dein erstes Beispiel-Projekt?</span>
+</div>
+
+</body>
+</html>
