@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 05 – Morgen-Workflow im Bot</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.warning { border-color: var(--warn); }
+  .card.success { border-color: var(--success); }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  pre {
+    background: #14141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-size: .87rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    display: flex;
+    gap: .8rem;
+    align-items: flex-start;
+    margin-bottom: .7rem;
+  }
+  .step-num {
+    background: var(--accent);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: .15rem;
+  }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin-bottom: 1rem;
+  }
+  .ba-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .ba-box .label { font-size: .75rem; font-weight: 700; margin-bottom: .5rem; }
+  .ba-box.before .label { color: var(--danger); }
+  .ba-box.after .label { color: var(--success); }
+  .output-preview {
+    background: #101018;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-size: .88rem;
+    line-height: 1.7;
+    font-family: 'Consolas', monospace;
+    margin-bottom: 1rem;
+    color: #ccc;
+  }
+  .output-preview .section { color: var(--accent2); font-weight: 700; }
+  .output-preview .proj { color: var(--accent); font-size: .82rem; }
+  .output-preview .prio-hoch { color: var(--danger); }
+  .output-preview .prio-mittel { color: var(--warn); }
+  .output-preview .prio-niedrig { color: var(--muted); }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .diff-add { color: var(--success); }
+  .diff-ctx { color: var(--muted); }
+  .prompt-block {
+    background: #0d1520;
+    border: 1px solid var(--accent2);
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    font-size: .86rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
+  }
+  @media (max-width: 520px) { .before-after { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 05</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Morgen-Workflow im Bot</h1>
+<p class="meta">Lektion 5 von ~6 &middot; Dauer: ~25 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Bisher gibst du <code>morgen</code> als freien Freitext an Claude &mdash; Claude rät sich durch den Kontext. Mit einem dedizierten <code>morgen</code>-Befehl im Bot passiert das gezielt und zeigt jetzt auch <strong>Projekt + Epic</strong> pro Task &mdash; damit siehst du auf einen Blick, was normaler Tages-Task ist und was Teil eines laufenden Projekts.</p>
+
+<h2>Das Problem</h2>
+
+<div class="before-after">
+  <div class="ba-box before">
+    <div class="label">&times; JETZT</div>
+    <p style="font-size:.88rem;">Freitext wie "zeig mir meine Tasks f&uuml;r heute" &mdash; Claude antwortet, aber ohne Projektzuordnung in der Ausgabe.</p>
+  </div>
+  <div class="ba-box after">
+    <div class="label">&#10003; ZIEL</div>
+    <p style="font-size:.88rem;"><code>morgen</code> &rarr; exakter Notion-Filter, sortiert nach Priorit&auml;t, mit Projekt/Epic-Label direkt in der Zeile.</p>
+  </div>
+</div>
+
+<h2>Wie der Output aussehen soll</h2>
+
+<div class="output-preview">
+<span class="section">🌅 Heute, 10.06.2026 – 5 Tasks</span>
+
+<span class="section">Arbeit</span>
+· <span class="prio-hoch">Hoch</span>  API-Endpoint fertigstellen  <span class="proj">[Dart-App / Backend]</span>
+· <span class="prio-mittel">Mittel</span>  Code-Review vorbereiten
+
+<span class="section">Lernen</span>
+· <span class="prio-mittel">Mittel</span>  Lektion 5 lesen  <span class="proj">[Notion-Bot / Kurs]</span>
+
+<span class="section">Privat</span>
+· <span class="prio-niedrig">Niedrig</span>  Einkaufen
+· <span class="prio-niedrig">Niedrig</span>  Sport
+</div>
+
+<p>Projekt und Epic erscheinen nur wenn gesetzt &mdash; Tasks ohne Projektzuordnung bleiben sauber wie bisher.</p>
+
+<h2>Der System-Prompt</h2>
+
+<p>Das Herzst&uuml;ck ist <code>MORGEN_SYSTEM_PROMPT</code>. Er gibt Claude genaue Anweisungen was zu filtern und wie zu formatieren ist:</p>
+
+<div class="prompt-block">MORGEN_SYSTEM_PROMPT = """Du bist ein Notion-Tagesassistent.
+Lies den Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Zeige alle Tasks mit Datum = heute ODER ohne Datum, Status nicht Done.
+Sortiere nach Priorität (Hoch zuerst), innerhalb Priorität nach Bereich.
+Gruppiere nach Bereich.
+
+Format:
+Erste Zeile: "🌅 Heute, DD.MM.YYYY – N Tasks"
+Pro Bereich: Bereichsname als Abschnittskopf
+Pro Task: · [Priorität]  [Name]  [Projekt / Epic falls gesetzt in eckigen Klammern]
+
+Kein Markdown. Kein Sternchen. Kein Fett."""</div>
+
+<div class="card highlight">
+  <strong>Schl&uuml;sselprinzip:</strong> Das Projekt-Label ist <em>optional</em> &mdash; <code>[Projekt / Epic falls gesetzt]</code>. Tasks ohne Projekt tauchen sauber auf, Tasks mit Projekt bekommen den Kontext. Kein zweites System, kein Extra-Befehl n&ouml;tig.
+</div>
+
+<h2>Die &Auml;nderung in bot.py</h2>
+
+<p>Zwei Stellen in <code>bot.py</code> anpassen:</p>
+
+<h3>1. System-Prompt hinzuf&uuml;gen (nach VERSCHIEBEN_SYSTEM_PROMPT, Zeile ~68)</h3>
+
+<pre><span class="diff-add">MORGEN_SYSTEM_PROMPT = """Du bist ein Notion-Tagesassistent.
+Lies den Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Zeige alle Tasks mit Datum = heute ODER ohne Datum, Status nicht Done.
+Sortiere nach Priorität (Hoch zuerst), innerhalb Priorität nach Bereich.
+Gruppiere nach Bereich.
+
+Format:
+Erste Zeile: "🌅 Heute, DD.MM.YYYY – N Tasks"
+Pro Bereich: Bereichsname als Abschnittskopf
+Pro Task: · [Priorität]  [Name]  [Projekt / Epic falls gesetzt in eckigen Klammern]
+
+Kein Markdown. Kein Sternchen. Kein Fett."""</span></pre>
+
+<h3>2. Routing-Block erweitern (vor dem else-Zweig, Zeile ~211)</h3>
+
+<pre><span class="diff-ctx">        elif text.lower().startswith("verschieben:"):</span>
+<span class="diff-ctx">            ...</span>
+<span class="diff-add">        elif text.lower() == "morgen":
+            response = run_claude(f"Heute ist {today}.", system_prompt=MORGEN_SYSTEM_PROMPT)</span>
+<span class="diff-ctx">        else:</span>
+<span class="diff-ctx">            response = run_claude(text, cwd=project_cwd)</span></pre>
+
+<p>Das ist alles &mdash; ein neuer System-Prompt und zwei Zeilen im Routing.</p>
+
+<h2>Warum vor dem else-Zweig?</h2>
+
+<p>Das Routing in <code>bot.py</code> arbeitet mit <code>if/elif/else</code> &mdash; der erste passende Zweig gewinnt. <code>morgen</code> kommt nach allen spezifischen Befehlen und vor dem allgemeinen <code>else</code>-Zweig (freier Claude-Chat). W&uuml;rde <code>morgen</code> <em>nach</em> dem <code>else</code> stehen, k&auml;me es nie dran &mdash; <code>else</code> hat kein Elif-Fallthrough.</p>
+
+<div class="task-box">
+  <h2>Aufgabe</h2>
+  <ol class="step-list">
+    <li>
+      <span class="step-num">1</span>
+      <div>&Ouml;ffne <code>bot.py</code> und f&uuml;ge <code>MORGEN_SYSTEM_PROMPT</code> nach <code>VERSCHIEBEN_SYSTEM_PROMPT</code> ein.</div>
+    </li>
+    <li>
+      <span class="step-num">2</span>
+      <div>F&uuml;ge den <code>elif text.lower() == "morgen":</code>-Zweig vor dem <code>else:</code> ein.</div>
+    </li>
+    <li>
+      <span class="step-num">3</span>
+      <div>Bot neu starten (alten Prozess beenden, <code>python bot.py</code> ausf&uuml;hren).</div>
+    </li>
+    <li>
+      <span class="step-num">4</span>
+      <div>Schick <code>morgen</code> im Telegram-Chat. Siehst du deine Tasks f&uuml;r heute?</div>
+    </li>
+    <li>
+      <span class="step-num">5</span>
+      <div>Lege einen Test-Task mit <code>dart: task: Testaufgabe heute</code> an, dann schick nochmal <code>morgen</code> &mdash; der Task sollte mit <code>[Dart-App]</code> erscheinen.</div>
+    </li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <p class="quiz-q">1. Der Prompt filtert "Datum = heute ODER ohne Datum". Warum auch Tasks ohne Datum?</p>
+  <p class="quiz-hint">Tipp: Was passiert mit Tasks die du schnell ohne Datum anlegst?</p>
+
+  <p class="quiz-q">2. Ein Task hat Projekt = "Dart-App" und Epic = "" (leer). Wie soll er im Output erscheinen?</p>
+  <p class="quiz-hint">Tipp: "falls gesetzt" &mdash; was macht Claude wenn Epic leer ist?</p>
+
+  <p class="quiz-q">3. Du m&ouml;chtest dass Tasks mit Priorit&auml;t "Hoch" ganz oben stehen, <em>egal</em> in welchem Bereich. Der aktuelle Prompt sortiert erst nach Priorit&auml;t, dann gruppiert nach Bereich. Ist das dasselbe?</p>
+  <p class="quiz-hint">Tipp: Denk an einen Arbeit-Task mit Mittel und einen Privat-Task mit Hoch.</p>
+</div>
+
+<div class="next-box">
+  <h2 style="color: var(--success); border: none; margin-top: 0;">Was kommt als n&auml;chstes?</h2>
+  <p><strong>Lektion 6: Abend-Workflow &amp; Wochenabschluss</strong> &mdash; Der <code>abend</code>-Befehl zeigt erledigte Tasks des Tages inkl. Projektfortschritt und fragt ob offene Tasks verschoben werden sollen. Damit ist das vollst&auml;ndige Tages-System fertig.</p>
+  <p style="margin-top:.8rem;">Welche Fragen hast du zu dieser Lektion? Was war unerwartet?</p>
+</div>
+
+</body>
+</html>
