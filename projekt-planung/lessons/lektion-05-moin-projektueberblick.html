@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 05 – Morgen-Workflow mit Projektüberblick</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.warning { border-color: var(--warn); }
+  .card.success { border-color: var(--success); }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  pre {
+    background: #14141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-size: .87rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    display: flex;
+    gap: .8rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  .step-num {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .45rem .9rem;
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .flow-box.msg { border-color: var(--accent2); color: var(--accent2); }
+  .flow-box.bot { border-color: var(--accent); color: var(--accent); }
+  .flow-box.new { border-color: var(--warn); color: var(--warn); background: #1a1500; }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+  .output-box {
+    background: #0d1a10;
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .88rem;
+    line-height: 1.7;
+    margin: 1rem 0;
+    white-space: pre-wrap;
+  }
+  .example-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    background: #1a1a2a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+  }
+  .example-msg .icon { font-size: 1.2rem; flex-shrink: 0; }
+  .example-msg .label { color: var(--muted); font-size: .78rem; }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .compare-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .compare-box .label { font-size: .75rem; font-weight: 700; margin-bottom: .5rem; }
+  .compare-box.before .label { color: var(--muted); }
+  .compare-box.after .label { color: var(--success); }
+  @media (max-width: 520px) { .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 05</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Morgen-Workflow mit Projektüberblick</h1>
+<p class="meta">Lektion 5 von ~6 &middot; Dauer: ~25 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Du hast jetzt Projekt-Tasks im Tagesorganizer. Beim <code>moin</code>-Befehl werden sie aber wie alle anderen Tasks angezeigt &mdash; ohne Hinweis auf das Projekt. Heute erweiterst du den Morgen-Workflow um einen <strong>kompakten Projektüberblick</strong>: welche Projekte haben heute Tasks, und wie viele?</p>
+
+<h2>Das heutige Ziel</h2>
+
+<div class="compare">
+  <div class="compare-box before">
+    <div class="label">BISHER: moin (allgemein)</div>
+    <div style="font-size:.85rem;line-height:1.7;">
+      &#127749; Guten Morgen! 5 Tasks<br>
+      &middot; &#128308; Login-Screen implementieren<br>
+      &middot; &#128993; Einkaufen<br>
+      &middot; &#128993; Würfe-Daten speichern<br>
+      &middot; &#128994; Hauptmenü polieren<br>
+      &middot; &#128994; Sport
+    </div>
+  </div>
+  <div class="compare-box after">
+    <div class="label">NEU: mit Projektüberblick</div>
+    <div style="font-size:.85rem;line-height:1.7;">
+      &#127749; Guten Morgen! 5 Tasks<br>
+      &#128193; Dart-App (3) &middot; Notion-Bot (0)<br>
+      <br>
+      &middot; &#128308; &#8594;Dart-App Login-Screen<br>
+      &middot; &#128993; Einkaufen<br>
+      &middot; &#128993; &#8594;Dart-App Würfe-Daten<br>
+      &middot; &#128994; &#8594;Dart-App Hauptmenü<br>
+      &middot; &#128994; Sport
+    </div>
+  </div>
+</div>
+
+<div class="card highlight">
+  <strong>Ein Blick, zwei Informationen:</strong> Der Projektpräfix <code>&#8594;Dart-App</code> zeigt sofort, welche Tasks Projektarbeit sind &mdash; ohne die Liste aufzuteilen. Du siehst Priorität und Projektkontext gemeinsam.
+</div>
+
+<h2>Warum nicht zwei getrennte Listen?</h2>
+
+<p>Man könnte Projekt-Tasks und normale Tasks trennen. Das klingt ordentlich, hat aber einen Nachteil: <strong>Prioritäten gehen verloren</strong>. Ein "Hoch"-Projekt-Task verschwindet hinter einer separaten Sektion &mdash; obwohl er dringender ist als alle "Mittel"-Privat-Tasks.</p>
+
+<p>Besser: <em>eine</em> nach Priorität sortierte Liste, mit optionalem Projekt-Label inline. Die Überblick-Zeile oben zeigt Projektvolumen kompakt auf einer Zeile.</p>
+
+<h2>Der neue System-Prompt</h2>
+
+<pre>
+MOIN_SYSTEM_PROMPT = """Du bist ein Notion-Morgen-Assistent.
+Lies den Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Zeige alle Tasks mit Datum = heute ODER ohne Datum, Status Not started oder In progress.
+
+Format:
+Zeile 1: "&#127749; Guten Morgen! [N] Tasks heute"
+Zeile 2 (nur wenn Projekt-Tasks vorhanden): "&#128193; " + je Projekt "[Name] ([N])" mit " · " getrennt
+Leerzeile
+Je Task: "· [Prio-Icon] [&#8594;Projekt falls gesetzt] [Name]"
+Prio-Icons: Hoch=&#128308; Mittel=&#128993; Niedrig=&#128994;
+
+Sortiere nach Priorität (Hoch zuerst), dann alphabetisch.
+Kein Markdown. Kein Datum in der Task-Liste."""
+</pre>
+
+<div class="card warning">
+  <strong>Detail: "Datum = heute ODER ohne Datum"</strong><br>
+  Genau wie beim bisherigen Morgen-Workflow. Tasks ohne Datum sind ungebundene Aufgaben, die täglich erscheinen sollen &mdash; z.B. "Sport" oder "E-Mails checken".
+</div>
+
+<h2>Routing hinzufügen</h2>
+
+<p>Bisher landet "moin" im allgemeinen <code>else</code>-Zweig und Claude antwortet frei. Neuer dedizierter elif-Zweig:</p>
+
+<pre>
+# Vor dem else-Block einfügen
+elif text.lower() in ("moin", "morgen", "guten morgen"):
+    response = run_claude(f"Heute ist {today}.", system_prompt=MOIN_SYSTEM_PROMPT)
+</pre>
+
+<div class="card success">
+  <strong>Warum <code>in ("moin", "morgen", "guten morgen")</code>?</strong><br>
+  Drei natürliche Varianten, eine Behandlung. Du musst nicht exakt tippen was der Prompt erwartet.
+</div>
+
+<h2>Vollständiger Ablauf</h2>
+
+<div class="flow">
+  <div class="flow-box msg">moin</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">elif moin/morgen</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box new">MOIN_SYSTEM_PROMPT</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">run_claude</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box">Notion-Abfrage</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box msg">Tagesplan</div>
+</div>
+
+<h2>Beispiel-Output</h2>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>moin</code></div>
+</div>
+
+<div class="output-box">&#127749; Guten Morgen! 6 Tasks heute
+&#128193; Dart-App (3) &middot; Notion-Bot (1)
+
+&middot; &#128308; &#8594;Dart-App Login-Screen implementieren
+&middot; &#128308; &#8594;Notion-Bot Deploy-Fehler fixen
+&middot; &#128993; Einkaufen
+&middot; &#128993; &#8594;Dart-App Würfe-Daten speichern
+&middot; &#128994; &#8594;Dart-App Hauptmenü polieren
+&middot; &#128994; Sport</div>
+
+<p>Auf einen Blick: 4 der 6 Tasks sind Projektarbeit. Der dringendste Task ist Dart-App-Login. Einkaufen und Sport sind privat ohne Projektkontext.</p>
+
+<h2>Was sich <em>nicht</em> ändert</h2>
+
+<ul>
+  <li><code>dart: tasks</code> bleibt wie in Lektion 4 &mdash; zeigt nur Dart-App-Tasks</li>
+  <li><code>task: ...</code> bleibt &mdash; legt Task ohne Projektkontext an</li>
+  <li><code>woche</code> bleibt &mdash; Wochenrückblick ohne Projektfilter</li>
+  <li>Der allgemeine <code>else</code>-Zweig für freie Fragen bleibt</li>
+</ul>
+
+<div class="card highlight">
+  <strong>Schlüsselprinzip: Additive Erweiterung.</strong> Du fügst einen neuen elif-Zweig hinzu, ohne bestehende zu ändern. Jeder Befehl bleibt isoliert &mdash; kein Risiko, alte Funktionen zu brechen.
+</div>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <ul>
+    <li><strong>Schritt 1:</strong> <code>MOIN_SYSTEM_PROMPT</code> in bot.py hinzufügen (bei den anderen System-Prompts)</li>
+    <li><strong>Schritt 2:</strong> elif-Zweig für <code>moin</code>/<code>morgen</code> einfügen (vor dem <code>else</code>-Block)</li>
+    <li><strong>Schritt 3:</strong> Bot neu starten</li>
+    <li><strong>Schritt 4:</strong> <code>moin</code> senden &rarr; prüfen ob Projektüberblick-Zeile erscheint</li>
+    <li><strong>Schritt 5:</strong> Dart-App-Task für heute anlegen (<code>dart: task: Test Lektion 5</code>), dann nochmal <code>moin</code> &rarr; er muss mit <code>&#8594;Dart-App</code> auftauchen</li>
+  </ul>
+  <p style="margin-top:.8rem;color:var(--muted);font-size:.88rem;">Ziel: <code>moin</code> zeigt Projektüberblick-Zeile und Tasks mit Projektpräfix, sortiert nach Priorität.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Warum landet <code>moin</code> ohne den neuen elif-Zweig im <code>else</code>-Block &mdash; und was wäre der Unterschied in der Antwort?</p>
+  <p class="quiz-hint">Tipp: Der else-Zweig ruft <code>run_claude(text)</code> ohne System-Prompt auf.</p>
+
+  <p class="quiz-q">2. Du hast heute 2 Tasks ohne Datum und 4 mit Datum = heute. Wie viele erscheinen im <code>moin</code>-Output?</p>
+  <p class="quiz-hint">Tipp: Lies die Filterbedingung im MOIN_SYSTEM_PROMPT nochmal.</p>
+
+  <p class="quiz-q">3. Ein Task hat Projekt = "Dart-App" und Datum = morgen. Erscheint er bei <code>moin</code>?</p>
+  <p class="quiz-hint">Tipp: Was filtert MOIN_SYSTEM_PROMPT nach Datum?</p>
+</div>
+
+<div class="next-box">
+  <strong>Nächste Lektion:</strong> Abschluss &amp; Ausblick &mdash; was hast du gebaut, wie geht es weiter? Wir schauen auf den vollständigen Bot-Code, offene Ideen (z.B. <code>verschieben</code>, Multi-Projekt-Epics) und wie du den Workflow im Alltag stabilisierst.<br><br>
+  <span style="color:var(--muted);font-size:.9rem;">Welche Fragen hast du? Hat <code>moin</code> die Projektüberblick-Zeile korrekt angezeigt?</span>
+</div>
+
+</body>
+</html>
