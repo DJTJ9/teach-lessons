@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 04 – Bot-Befehle für Projekte</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.warning { border-color: var(--warn); }
+  .card.success { border-color: var(--success); }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  pre {
+    background: #14141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-size: .87rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    display: flex;
+    gap: .8rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  .step-num {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: .1rem;
+  }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .45rem .9rem;
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .flow-box.msg { border-color: var(--accent2); color: var(--accent2); }
+  .flow-box.bot { border-color: var(--accent); color: var(--accent); }
+  .flow-box.new { border-color: var(--warn); color: var(--warn); background: #1a1500; }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+  .gap-box {
+    background: #1a0f0f;
+    border: 1px solid var(--danger);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .gap-box h3 { color: var(--danger); margin-top: 0; }
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .ba-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .ba-box .label { font-size: .75rem; font-weight: 700; margin-bottom: .5rem; }
+  .ba-box.before .label { color: var(--danger); }
+  .ba-box.after .label { color: var(--success); }
+  .example-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    background: #1a1a2a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+  }
+  .example-msg .icon { font-size: 1.2rem; flex-shrink: 0; }
+  .example-msg .label { color: var(--muted); font-size: .78rem; }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 520px) { .before-after { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 04</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Bot-Befehle f&uuml;r Projekte</h1>
+<p class="meta">Lektion 4 von ~6 &middot; Dauer: ~30 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Der Tagesorganizer hat jetzt die Properties <strong>Projekt</strong> und <strong>Epic</strong>. Aber der Bot kennt sie noch nicht wirklich &mdash; <code>dart: ...</code> leitet nur ins richtige Verzeichnis um. Heute bringst du dem Bot bei, <strong>gezielt nach Projekt-Tasks zu filtern</strong> und Tasks mit Projektkontext anzulegen.</p>
+
+<h2>Das aktuelle Problem</h2>
+
+<div class="gap-box">
+  <h3>Die L&uuml;cke im Routing</h3>
+  <p>Wenn du <code>dart: zeig meine Tasks</code> schickst, passiert folgendes:</p>
+  <div class="flow">
+    <div class="flow-box msg">dart: zeig Tasks</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box bot">prefix erkannt</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box bot">cwd = DartApp</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-box">Claude allgemein</div>
+  </div>
+  <p style="margin-top:.8rem;">Claude antwortet aus dem DartApp-Ordner &mdash; aber <strong>ohne den Tagesorganizer nach Projekt zu filtern</strong>.</p>
+</div>
+
+<div class="before-after">
+  <div class="ba-box before">
+    <div class="label">&times; JETZT</div>
+    <code>dart: zeig Tasks</code>
+    <p style="margin-top:.6rem;font-size:.88rem;">&rarr; Claude im DartApp-Ordner, freie Antwort ohne Notion-Filter</p>
+  </div>
+  <div class="ba-box after">
+    <div class="label">&#10003; ZIEL</div>
+    <code>dart: tasks</code>
+    <p style="margin-top:.6rem;font-size:.88rem;">&rarr; Tagesorganizer: Projekt="Dart-App", offen, sortiert &mdash; pr&auml;zise Liste</p>
+  </div>
+</div>
+
+<h2>Die L&ouml;sung: Zwei neue Befehle</h2>
+
+<ul>
+  <li><code>dart: tasks</code> &mdash; zeige offene Tasks im Tagesorganizer wo Projekt = "Dart-App"</li>
+  <li><code>dart: task: <em>Text</em></code> &mdash; lege Task an und setze Projekt automatisch auf "Dart-App"</li>
+</ul>
+
+<div class="card highlight">
+  <strong>Schl&uuml;sselerkenntnis:</strong> Das Pr&auml;fix liefert nicht nur das Arbeitsverzeichnis &mdash; es liefert auch den <em>Projektnamen f&uuml;r Notion</em>. <code>dart:</code> &rarr; notion_name = "Dart-App".
+</div>
+
+<h2>Schritt 1: PROJECTS auf Dict-of-Dicts umstellen</h2>
+
+<pre>
+# Vorher
+PROJECTS = {
+    "notion": r"C:\Projekte\telegram-notion-bot",
+    "dart":   r"C:\Unity\Aktuelle Projekte\DartTrainingsApp",
+}
+
+# Nachher
+PROJECTS = {
+    "notion": {"path": r"C:\Projekte\telegram-notion-bot",         "notion_name": "Notion-Bot"},
+    "dart":   {"path": r"C:\Unity\Aktuelle Projekte\DartTrainingsApp", "notion_name": "Dart-App"},
+}
+</pre>
+
+<div class="card warning">
+  <strong>Wichtig:</strong> <code>notion_name</code> muss exakt mit dem Select-Wert im Tagesorganizer &uuml;bereinstimmen &mdash; also "Dart-App", nicht "dart" oder "DartApp".
+</div>
+
+<p>Der bestehende <code>projekte</code>-Befehl liest Pfade aus &mdash; er muss auf <code>info["path"]</code> angepasst werden:</p>
+
+<pre>
+if text.lower() == "projekte":
+    lines = ["&#128193; Verf&uuml;gbare Projekte:"]
+    for name, info in PROJECTS.items():
+        lines.append(f"  {name}: &rarr; {info['path']}")
+    lines.append("\nNutzung: &lt;name&gt;: &lt;frage&gt;")
+    send_message(chat_id, "\n".join(lines))
+    continue
+</pre>
+
+<h2>Schritt 2: Zwei neue System-Prompts</h2>
+
+<pre>
+PROJEKT_TASKS_SYSTEM_PROMPT = """Du bist ein Notion-Projektassistent.
+Lies den Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Zeige alle Tasks wo Property "Projekt" = dem angegebenen Projektnamen,
+Status Not started oder In progress.
+Sortiere nach Priorit&auml;t (Hoch zuerst), dann Datum.
+Format:
+Erste Zeile: "&#128193; [Projektname] &ndash; [N] offene Tasks"
+Je Task: &middot; [Epic falls gesetzt] [Priorit&auml;t] [Name] &mdash; [Datum]
+Falls keine Tasks: "&#128193; [Projektname] &ndash; keine offenen Tasks."
+Kein Markdown."""
+
+PROJEKT_TASK_SYSTEM_PROMPT = """Du bist ein Notion-Task-Assistent.
+Lege einen Task im Tagesorganizer an (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Der Projektname wird vorgegeben &mdash; setze ihn als Property "Projekt".
+Leite aus dem Text ab: Name, Datum (heute falls nicht angegeben),
+Priorit&auml;t (Hoch/Mittel/Niedrig, Mittel falls nicht angegeben),
+Bereich (Arbeit/Privat/Lernen/Gesundheit, Arbeit falls Projekt gesetzt).
+Epic: setze es falls im Text erkennbar, sonst leer lassen.
+Antworte NUR mit: &#10003; Task angelegt: [Name] &middot; [Projekt] &middot; [Priorit&auml;t] &middot; [Datum]"""
+</pre>
+
+<h2>Schritt 3: Routing anpassen</h2>
+
+<pre>
+# Pr&auml;fix-Erkennung &mdash; ersetzt bisherige Variante
+project_cwd = None
+project_notion_name = None
+for name, info in PROJECTS.items():
+    prefix = f"{name}:"
+    if text.lower().startswith(prefix):
+        project_cwd = info["path"]
+        project_notion_name = info["notion_name"]
+        text = text[len(prefix):].strip()
+        break
+
+# Neue Zweige VOR dem bisherigen "task:" check
+if project_notion_name and text.lower() == "tasks":
+    prompt = f"Heute ist {today}. Projektname: {project_notion_name}"
+    response = run_claude(prompt, system_prompt=PROJEKT_TASKS_SYSTEM_PROMPT)
+elif project_notion_name and text.lower().startswith("task:"):
+    task_text = text[5:].strip()
+    prompt = f"Heute ist {today}. Projektname: {project_notion_name}. Aufgabe: {task_text}"
+    response = run_claude(prompt, system_prompt=PROJEKT_TASK_SYSTEM_PROMPT)
+elif text.lower().startswith("task:"):
+    # bisheriger Zweig ohne Projektkontext
+    task_text = text[5:].strip()
+    prompt = f"Heute ist {today}. Aufgabe: {task_text}"
+    response = run_claude(prompt, system_prompt=TASK_SYSTEM_PROMPT, cwd=project_cwd)
+elif text.lower() == "woche":
+    response = run_claude(f"Heute ist {today}.", system_prompt=WOCHE_SYSTEM_PROMPT)
+# ... weitere elif wie bisher ...
+</pre>
+
+<div class="card success">
+  <strong>Warum die Reihenfolge wichtig ist:</strong> <code>project_notion_name and text == "tasks"</code> muss <em>vor</em> dem allgemeinen <code>text.lower().startswith("task:")</code> kommen &mdash; sonst trifft nie der neue Zweig.
+</div>
+
+<h2>Wie die Befehle aussehen</h2>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>dart: tasks</code></div>
+</div>
+<div class="example-msg">
+  <div class="icon">&#129302;</div>
+  <div>
+    <div class="label">Bot antwortet:</div>
+    &#128193; Dart-App &ndash; 3 offene Tasks<br>
+    &middot; User Login &middot; Hoch &middot; Login-Screen implementieren &mdash; 2026-06-10<br>
+    &middot; Statistik &middot; Mittel &middot; W&uuml;rfe-Daten speichern &mdash; 2026-06-11<br>
+    &middot; UI &middot; Niedrig &middot; Hauptmen&uuml; polieren &mdash; 2026-06-12
+  </div>
+</div>
+
+<div class="example-msg" style="margin-top:1.2rem;">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>dart: task: Highscore-Anzeige, Priorit&auml;t Hoch</code></div>
+</div>
+<div class="example-msg">
+  <div class="icon">&#129302;</div>
+  <div>
+    <div class="label">Bot antwortet:</div>
+    &#10003; Task angelegt: Highscore-Anzeige &middot; Dart-App &middot; Hoch &middot; 2026-06-10
+  </div>
+</div>
+
+<h2>Warum dieser Aufbau skaliert</h2>
+
+<ul class="step-list">
+  <li>
+    <div class="step-num">1</div>
+    <div><strong>Neues Projekt = eine Zeile</strong> &mdash; einfach <code>"unity": {"path": ..., "notion_name": "Unity-Game"}</code> in <code>PROJECTS</code> erg&auml;nzen. Alle Befehle funktionieren automatisch.</div>
+  </li>
+  <li>
+    <div class="step-num">2</div>
+    <div><strong>Pr&auml;zise Notion-Filter</strong> &mdash; System-Prompts geben Claude den genauen Property-Namen und Wert. Kein Raten, kein Halluzinieren.</div>
+  </li>
+  <li>
+    <div class="step-num">3</div>
+    <div><strong>Morgen-Workflow bleibt unver&auml;ndert</strong> &mdash; <code>moin</code> zeigt weiter alle Tasks inkl. Projekt-Tasks, weil sie im Tagesorganizer liegen.</div>
+  </li>
+</ul>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <ul>
+    <li><strong>Schritt 1:</strong> <code>PROJECTS</code>-Dict auf <code>path</code> + <code>notion_name</code> umstellen</li>
+    <li><strong>Schritt 2:</strong> <code>projekte</code>-Befehl auf <code>info["path"]</code> anpassen</li>
+    <li><strong>Schritt 3:</strong> Beide neue System-Prompts hinzuf&uuml;gen</li>
+    <li><strong>Schritt 4:</strong> Routing-Block wie oben &auml;ndern (neue elif-Zweige)</li>
+    <li><strong>Schritt 5:</strong> Bot neu starten &rarr; <code>dart: tasks</code> testen</li>
+    <li><strong>Schritt 6:</strong> <code>dart: task: Test-Task Lektion 4</code> senden &rarr; in Notion pr&uuml;fen ob Projekt = "Dart-App" gesetzt ist</li>
+  </ul>
+  <p style="margin-top:.8rem;color:var(--muted);font-size:.88rem;">Ziel: Beide Befehle antworten korrekt, Task in Notion hat das richtige Projektfeld.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Du f&uuml;gst ein drittes Projekt "unity" hinzu. Welche <em>eine</em> Stelle im Code &auml;nderst du?</p>
+  <p class="quiz-hint">Tipp: Schau dir das neue PROJECTS-Dict an.</p>
+
+  <p class="quiz-q">2. Warum setzt <code>PROJEKT_TASK_SYSTEM_PROMPT</code> den Bereich auf "Arbeit" statt "Privat"?</p>
+  <p class="quiz-hint">Tipp: Was sagt ein Projektkontext &uuml;ber die Art der Aufgabe aus?</p>
+
+  <p class="quiz-q">3. Ein Nutzer schickt <code>dart: woche</code>. Welcher elif-Zweig trifft &mdash; und ist das korrekt?</p>
+  <p class="quiz-hint">Tipp: Nach dem Pr&auml;fix-Stripping ist text = "woche". Verfolge den Code-Pfad.</p>
+</div>
+
+<div class="next-box">
+  <strong>N&auml;chste Lektion:</strong> Morgen-Workflow mit Projekt&uuml;berblick &mdash; der <code>moin</code>-Befehl zeigt zus&auml;tzlich einen kompakten Projekt-Status: welche Projekte haben heute Tasks, was ist dringend?<br><br>
+  <span style="color:var(--muted);font-size:.9rem;">Welche Fragen hast du? Und: Hat <code>dart: tasks</code> die richtigen Tasks zur&uuml;ckgegeben?</span>
+</div>
+
+</body>
+</html>
