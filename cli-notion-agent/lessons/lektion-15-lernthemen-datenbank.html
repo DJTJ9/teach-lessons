@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lektion 14 – Lernthemen-Sammlung in Notion anlegen</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --accent: #e94560;
+      --accent2: #0f3460;
+      --text: #eaeaea;
+      --muted: #888;
+      --code-bg: #0d1117;
+      --success: #2d9e5f;
+      --warn: #e8a838;
+      --teal: #0d9488;
+      --tg: #2ca5e0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { color: var(--accent); font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+    h2 { color: #a0c4ff; margin: 2rem 0 0.8rem; font-size: 1.2rem; border-left: 3px solid var(--accent); padding-left: 0.7rem; }
+    p { margin-bottom: 0.9rem; }
+    code { background: var(--code-bg); color: #79c0ff; padding: 0.1rem 0.4rem; border-radius: 3px; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.9rem; }
+    pre { background: var(--code-bg); border: 1px solid #30363d; border-radius: 6px; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 1rem 0; font-size: 0.88rem; line-height: 1.8; }
+    pre code { background: none; padding: 0; color: #e6edf3; }
+    .hl { color: #f9c74f; }
+    .cm { color: #6e7681; }
+    .str { color: #a5d6ff; }
+    .kw { color: #ff7b72; }
+    .fn { color: #d2a8ff; }
+    .box { background: var(--surface); border: 1px solid #30363d; border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1.2rem 0; }
+    .box.warn { border-color: var(--warn); }
+    .box.quiz { border-color: var(--accent2); background: #0d1a2e; }
+    .box.teal { border-color: var(--teal); background: #0d1f1e; }
+    .box.success { border-color: var(--success); background: #0a1f12; }
+    .box.tg { border-color: var(--tg); background: #0a1a2e; }
+    .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+    .label.warn { color: var(--warn); }
+    .label.quiz { color: #79c0ff; }
+    .label.teal { color: #2dd4bf; }
+    .label.success { color: #4ade80; }
+    .label.tg { color: var(--tg); }
+    .table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+    .table th { background: var(--accent2); color: #a0c4ff; text-align: left; padding: 0.5rem 0.8rem; }
+    .table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #21262d; }
+    .table tr:hover td { background: #1a2540; }
+    .q { margin-bottom: 1rem; }
+    .q strong { color: #f9c74f; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid #21262d; padding-top: 1rem; }
+    ol, ul { margin-left: 1.5rem; margin-bottom: 0.9rem; }
+    li { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+
+<h1>Lektion 14 — Lernthemen-Sammlung in Notion anlegen</h1>
+<p class="meta">Kurs: CLI × Notion × Coding Agent &nbsp;|&nbsp; Heute: Neue Notion-Datenbank per CC Prompt + Eintrag via Bot</p>
+
+<h2>🎯 Lernziel</h2>
+<p>Du legst eine neue Notion-Datenbank <em>"Lernthemen"</em> an — mit passenden Properties — und kannst neue Einträge per Telegram-Prefix <code>Lern:</code> hinzufügen. Nach dieser Lektion hast du eine strukturierte Sammlung aller Themen, die du noch mit dem teach-Skill lernen willst.</p>
+
+<h2>Warum eigene Datenbank — nicht Tagesorganizer erweitern?</h2>
+
+<div class="box teal">
+  <div class="label teal">Design-Entscheidung</div>
+  <p>Der Tagesorganizer ist für <strong>tägliche Tasks mit Deadline und Status</strong>. Lernthemen sind anders: kein festes Datum, kein Bereich, dafür Kategorie und teach-Workspace. Separate DB = sauberere Abfragen und kein Properties-Chaos.</p>
+</div>
+
+<h2>Properties-Design: Lernthemen-DB</h2>
+
+<table class="table">
+  <tr><th>Property</th><th>Typ</th><th>Werte / Zweck</th></tr>
+  <tr><td><strong>Name</strong></td><td>title</td><td>z.B. "Rust Ownership", "Flutter Animations"</td></tr>
+  <tr><td><strong>Status</strong></td><td>status</td><td>Offen · In Bearbeitung · Abgeschlossen</td></tr>
+  <tr><td><strong>Kategorie</strong></td><td>select</td><td>Programmierung · Sprachen · Mathematik · Design · Sonstiges</td></tr>
+  <tr><td><strong>Priorität</strong></td><td>select</td><td>Hoch · Mittel · Niedrig</td></tr>
+  <tr><td><strong>Workspace</strong></td><td>rich_text</td><td>teach-Slug, z.B. "cli-notion-agent"</td></tr>
+  <tr><td><strong>Notiz</strong></td><td>rich_text</td><td>Warum lernen? Kontext, Links</td></tr>
+</table>
+
+<h2>Schritt 1: Parent-Seite finden</h2>
+<p>Die neue Datenbank muss unter einer Notion-Seite angelegt werden. Dein Organizer liegt auf Workspace-Level. So findest du die Page-ID:</p>
+
+<pre><code>Finde die Notion-Seite mit dem Namen "Organizer" und zeig mir ihre Page-ID.</code></pre>
+
+<p>Claude nutzt <code>notion_find</code> / <code>notion_search</code> und gibt dir die ID — sieht aus wie <code>abc12345-6789-...</code>. Diese ID brauchst du für Schritt 2.</p>
+
+<h2>Schritt 2: Datenbank anlegen — CC Prompt</h2>
+
+<pre><code>Erstelle eine neue Notion-Datenbank mit dem Titel "Lernthemen" als Unterseite
+der Organizer-Seite (parent_page_id: DEINE-PAGE-ID-HIER).
+
+Properties:
+- Name: title
+- Status: status (Optionen: Offen, In Bearbeitung, Abgeschlossen; Standard: Offen)
+- Kategorie: select (Optionen: Programmierung, Sprachen, Mathematik, Design, Sonstiges)
+- Priorität: select (Optionen: Hoch, Mittel, Niedrig)
+- Workspace: rich_text
+- Notiz: rich_text
+
+Zeige mir nach dem Anlegen die data_source_id der neuen Datenbank.</code></pre>
+
+<div class="box warn">
+  <div class="label warn">Wichtig nach dem Anlegen</div>
+  <p>Die <code>data_source_id</code> aus der Antwort merken und in <code>CLAUDE.md</code> eintragen — so kann Claude in Zukunft direkt auf die DB zugreifen ohne zu suchen.</p>
+</div>
+
+<h2>Schritt 3: Eintrag per Prompt anlegen</h2>
+<p>Test: Ersten Eintrag manuell via CC anlegen:</p>
+
+<pre><code>Lege einen neuen Eintrag in der Lernthemen-Datenbank an:
+- Name: "Rust Ownership & Borrowing"
+- Kategorie: Programmierung
+- Priorität: Hoch
+- Notiz: "Grundkonzept für Systems Programming, will ich nach dem Notion-Kurs angehen"</code></pre>
+
+<h2>Schritt 4: Bot-Prefix "Lern:" einbauen</h2>
+<p>Gleiche Technik wie <code>Task:</code> aus Lektion 13. Neuen System-Prompt + Routing in bot.py:</p>
+
+<pre><code><span class="hl">LERN_SYSTEM_PROMPT</span> = <span class="str">"""Du bist ein Lernthemen-Assistent. Der Nutzer nennt ein Thema, das er lernen möchte.
+Lege es in der Lernthemen-Datenbank an (data_source_id: DEINE-LERNTHEMEN-DB-ID).
+Leite aus dem Text ab: Name, Kategorie (Programmierung/Sprachen/Mathematik/Design/Sonstiges,
+Programmierung falls unklar), Priorität (Mittel falls nicht angegeben).
+Antworte NUR mit einer Zeile: 📚 Lernthema gespeichert: [Name] · [Kategorie] · [Priorität]"""</span>
+
+<span class="cm"># In der Routing-Logik (nach dem Task:-Block):</span>
+<span class="kw">elif</span> text.lower().<span class="fn">startswith</span>(<span class="str">"lern:"</span>):
+    lern_text = text[<span class="hl">5</span>:].<span class="fn">strip</span>()
+    response = <span class="fn">run_claude</span>(lern_text, system_prompt=<span class="hl">LERN_SYSTEM_PROMPT</span>)</code></pre>
+
+<div class="box teal">
+  <div class="label teal">Pattern: Ein System-Prompt pro Datenbank</div>
+  <p>Jede neue Notion-DB bekommt ihren eigenen System-Prompt + Bot-Prefix. Das Muster ist immer gleich: <strong>data_source_id</strong> fest im Prompt verankern, <strong>Defaults</strong> für optionale Felder, <strong>Output-Format</strong> für Telegram.</p>
+</div>
+
+<h2>🔬 Live-Aufgabe</h2>
+<div class="box quiz">
+  <div class="label quiz">4 Schritte</div>
+  <ol>
+    <li>Parent-Seite "Organizer" in CC suchen → Page-ID notieren</li>
+    <li>Datenbank "Lernthemen" per CC Prompt anlegen → <code>data_source_id</code> notieren</li>
+    <li>Ersten Eintrag anlegen: ein Thema, das du wirklich lernen willst</li>
+    <li>Bot-Prefix <code>Lern:</code> in bot.py einbauen, testen: <em>"Lern: Rust Ownership, Priorität Hoch"</em></li>
+  </ol>
+</div>
+
+<h2>Quiz</h2>
+<div class="box quiz">
+  <div class="label quiz">Fragen</div>
+  <div class="q"><strong>F1:</strong> Warum ist es besser, die <code>data_source_id</code> fest im System-Prompt zu verankern statt Claude sie jedes Mal suchen zu lassen?</div>
+  <div class="q"><strong>F2:</strong> Ein Lernthema soll mehrere Kategorien haben (z.B. "Rust" ist Programmierung <em>und</em> Sprachen). Welcher Property-Typ wäre dafür besser als <code>select</code>? (Vorschau auf Lektion 15)</div>
+  <div class="q"><strong>F3:</strong> Wie würdest du in Notion eine Verknüpfung zwischen einem Lernthema und dem dazugehörigen Tagesorganizer-Task herstellen? Welcher Property-Typ wäre das?</div>
+</div>
+
+<footer>Lektion 14 · CLI × Notion × Coding Agent · 2026-06-10</footer>
+</body>
+</html>

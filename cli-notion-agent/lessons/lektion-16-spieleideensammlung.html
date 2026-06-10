@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lektion 15 – Spieleideensammlung in Notion anlegen</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --surface: #16213e;
+      --accent: #e94560;
+      --accent2: #0f3460;
+      --text: #eaeaea;
+      --muted: #888;
+      --code-bg: #0d1117;
+      --success: #2d9e5f;
+      --warn: #e8a838;
+      --teal: #0d9488;
+      --tg: #2ca5e0;
+      --purple: #7c3aed;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { color: var(--accent); font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+    h2 { color: #a0c4ff; margin: 2rem 0 0.8rem; font-size: 1.2rem; border-left: 3px solid var(--accent); padding-left: 0.7rem; }
+    p { margin-bottom: 0.9rem; }
+    code { background: var(--code-bg); color: #79c0ff; padding: 0.1rem 0.4rem; border-radius: 3px; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.9rem; }
+    pre { background: var(--code-bg); border: 1px solid #30363d; border-radius: 6px; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 1rem 0; font-size: 0.88rem; line-height: 1.8; }
+    pre code { background: none; padding: 0; color: #e6edf3; }
+    .hl { color: #f9c74f; }
+    .cm { color: #6e7681; }
+    .str { color: #a5d6ff; }
+    .kw { color: #ff7b72; }
+    .fn { color: #d2a8ff; }
+    .box { background: var(--surface); border: 1px solid #30363d; border-radius: 8px; padding: 1.2rem 1.4rem; margin: 1.2rem 0; }
+    .box.warn { border-color: var(--warn); }
+    .box.quiz { border-color: var(--accent2); background: #0d1a2e; }
+    .box.teal { border-color: var(--teal); background: #0d1f1e; }
+    .box.success { border-color: var(--success); background: #0a1f12; }
+    .box.tg { border-color: var(--tg); background: #0a1a2e; }
+    .box.purple { border-color: var(--purple); background: #150a2e; }
+    .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+    .label.warn { color: var(--warn); }
+    .label.quiz { color: #79c0ff; }
+    .label.teal { color: #2dd4bf; }
+    .label.success { color: #4ade80; }
+    .label.tg { color: var(--tg); }
+    .label.purple { color: #a78bfa; }
+    .table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+    .table th { background: var(--accent2); color: #a0c4ff; text-align: left; padding: 0.5rem 0.8rem; }
+    .table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #21262d; }
+    .table tr:hover td { background: #1a2540; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { background: var(--code-bg); border: 1px solid #30363d; border-radius: 6px; padding: 0.8rem 1rem; }
+    .compare-box h3 { font-size: 0.85rem; margin-bottom: 0.5rem; }
+    .q { margin-bottom: 1rem; }
+    .q strong { color: #f9c74f; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid #21262d; padding-top: 1rem; }
+    ol, ul { margin-left: 1.5rem; margin-bottom: 0.9rem; }
+    li { margin-bottom: 0.3rem; }
+    .tag { display: inline-block; background: #1e3a5f; color: #a0c4ff; border-radius: 4px; padding: 0.1rem 0.5rem; font-size: 0.8rem; margin: 0.1rem; }
+    .tag.green { background: #1a3a1a; color: #4ade80; }
+    .tag.purple { background: #2a1a4a; color: #a78bfa; }
+  </style>
+</head>
+<body>
+
+<h1>Lektion 15 — Spieleideensammlung in Notion anlegen</h1>
+<p class="meta">Kurs: CLI × Notion × Coding Agent &nbsp;|&nbsp; Heute: Multi-Select Properties + Spieleideen per Bot festhalten</p>
+
+<h2>🎯 Lernziel</h2>
+<p>Du legst eine Notion-Datenbank <em>"Spieleideen"</em> an, die Ideen für neue Spiele, Game Mechanics, Erweiterungen zu bestehenden Spielen und Mods sammelt. Neue Einträge kommen per <code>Idee:</code> Prefix direkt aus Telegram.</p>
+
+<h2>Neues Konzept: multi_select statt select</h2>
+<p>Beim Tagesorganizer reicht <code>select</code> für Bereich (eine Aufgabe hat <em>einen</em> Bereich). Bei Spieleideen kann ein Spiel mehrere Genres haben. Dafür gibt es <code>multi_select</code>:</p>
+
+<div class="compare">
+  <div class="compare-box">
+    <h3 style="color: var(--warn);">select — eine Wahl</h3>
+    <p style="font-size:0.85rem;">Bereich: <span class="tag">Arbeit</span></p>
+    <p style="font-size:0.85rem; color: var(--muted);">Kann nur <em>einen</em> Wert halten.</p>
+  </div>
+  <div class="compare-box">
+    <h3 style="color: #4ade80;">multi_select — mehrere Wahlen</h3>
+    <p style="font-size:0.85rem;">Genre: <span class="tag green">Strategy</span><span class="tag green">Puzzle</span></p>
+    <p style="font-size:0.85rem; color: var(--muted);">Kann mehrere Werte halten.</p>
+  </div>
+</div>
+
+<div class="box teal">
+  <div class="label teal">Wann multi_select wählen?</div>
+  <p>Wenn eine Zeile sinnvollerweise <em>mehrere</em> Werte aus derselben Liste haben kann. Genre: ja. Typ (Neues Spiel / Mechanic): nein — eine Idee ist entweder das eine oder das andere.</p>
+</div>
+
+<h2>Properties-Design: Spieleideen-DB</h2>
+
+<table class="table">
+  <tr><th>Property</th><th>Typ</th><th>Werte / Zweck</th></tr>
+  <tr><td><strong>Name</strong></td><td>title</td><td>z.B. "Tower Defense mit Wetter-Mechanik"</td></tr>
+  <tr><td><strong>Typ</strong></td><td>select</td><td>Neues Spiel · Game Mechanic · Erweiterung · Mod</td></tr>
+  <tr><td><strong>Genre</strong></td><td>multi_select</td><td>Strategy · RPG · Puzzle · Action · Simulation · Idle · Horror · Platformer</td></tr>
+  <tr><td><strong>Plattform</strong></td><td>select</td><td>PC · Mobile · Web · Konsole · Cross-Platform</td></tr>
+  <tr><td><strong>Status</strong></td><td>select</td><td>Idee · Prototyp · In Entwicklung · Pausiert · Fertig</td></tr>
+  <tr><td><strong>Beschreibung</strong></td><td>rich_text</td><td>Kernkonzept, Inspiration, Details</td></tr>
+</table>
+
+<div class="box purple">
+  <div class="label purple">Warum Status als select, nicht als notion status-type?</div>
+  <p>Der Notion <code>status</code>-Typ (wie im Tagesorganizer) ist für Workflow-Zustände mit "Done"-Semantik optimiert. Spielentwicklungs-Status ist anders — "Fertig" ist nicht dasselbe wie "erledigt". <code>select</code> gibt dir mehr Flexibilität ohne den Notion-Workflow-Mechanismus aufzuzwingen.</p>
+</div>
+
+<h2>CC Prompt: Datenbank anlegen</h2>
+
+<pre><code>Erstelle eine neue Notion-Datenbank mit dem Titel "Spieleideen" als Unterseite
+der Organizer-Seite (parent_page_id: DEINE-PAGE-ID-HIER).
+
+Properties:
+- Name: title
+- Typ: select (Optionen: Neues Spiel, Game Mechanic, Erweiterung, Mod)
+- Genre: multi_select (Optionen: Strategy, RPG, Puzzle, Action, Simulation, Idle, Horror, Platformer)
+- Plattform: select (Optionen: PC, Mobile, Web, Konsole, Cross-Platform)
+- Status: select (Optionen: Idee, Prototyp, In Entwicklung, Pausiert, Fertig; Standard: Idee)
+- Beschreibung: rich_text
+
+Zeige mir nach dem Anlegen die data_source_id der neuen Datenbank.</code></pre>
+
+<h2>CC Prompt: Eintrag anlegen</h2>
+
+<pre><code>Lege einen neuen Eintrag in der Spieleideen-Datenbank an
+(data_source_id: DEINE-SPIELEIDEEN-DB-ID):
+- Name: "Tower Defense mit dynamischem Wetter"
+- Typ: Neues Spiel
+- Genre: Strategy, Puzzle
+- Plattform: PC
+- Status: Idee
+- Beschreibung: "Wetter beeinflusst Tower-Reichweite und Feind-Bewegung. Regen verlangsamt
+  Feinde, Sturm verringert Schussreichweite. Inspiriert von Bloons TD und Frostpunk."</code></pre>
+
+<h2>Bot-Prefix "Idee:" einbauen</h2>
+
+<pre><code><span class="hl">IDEE_SYSTEM_PROMPT</span> = <span class="str">"""Du bist ein Spieleideen-Assistent. Der Nutzer beschreibt eine Spielidee.
+Lege sie in der Spieleideen-Datenbank an (data_source_id: DEINE-SPIELEIDEEN-DB-ID).
+Leite aus dem Text ab:
+- Name: kurzer prägnanter Titel
+- Typ: Neues Spiel / Game Mechanic / Erweiterung / Mod (Neues Spiel falls unklar)
+- Genre: ein oder mehrere aus: Strategy, RPG, Puzzle, Action, Simulation, Idle, Horror, Platformer
+- Plattform: PC falls nicht genannt
+- Status: immer "Idee"
+- Beschreibung: die vollständige Idee des Nutzers unverändert übernehmen
+Antworte NUR mit einer Zeile: 🎮 Spielidee gespeichert: [Name] · [Typ] · [Genre]"""</span>
+
+<span class="kw">elif</span> text.lower().<span class="fn">startswith</span>(<span class="str">"idee:"</span>):
+    idee_text = text[<span class="hl">5</span>:].<span class="fn">strip</span>()
+    response = <span class="fn">run_claude</span>(idee_text, system_prompt=<span class="hl">IDEE_SYSTEM_PROMPT</span>)</code></pre>
+
+<div class="box teal">
+  <div class="label teal">Beschreibung vollständig übernehmen</div>
+  <p>Im Gegensatz zu Tasks (wo Claude Felder ableitet) soll bei Spieleideen die <em>vollständige originale Beschreibung</em> erhalten bleiben. Der System-Prompt sagt daher explizit: "unverändert übernehmen" — kein Paraphrasieren, kein Kürzen.</p>
+</div>
+
+<h2>CLAUDE.md updaten</h2>
+<p>Nach dem Anlegen beider DBs: <code>CLAUDE.md</code> um die neuen data_source_ids erweitern:</p>
+
+<pre><code>## Lernthemen-Datenbank
+- data_source_id: `DEINE-LERNTHEMEN-DB-ID`
+
+## Spieleideen-Datenbank
+- data_source_id: `DEINE-SPIELEIDEEN-DB-ID`</code></pre>
+
+<h2>🔬 Live-Aufgabe</h2>
+<div class="box quiz">
+  <div class="label quiz">4 Schritte</div>
+  <ol>
+    <li>Datenbank "Spieleideen" per CC Prompt anlegen → <code>data_source_id</code> notieren</li>
+    <li>Ersten Eintrag anlegen: eine echte Spielidee, die du schon länger im Kopf hast</li>
+    <li>Bot-Prefix <code>Idee:</code> in bot.py einbauen (neben <code>Task:</code> und <code>Lern:</code>)</li>
+    <li>Test: <em>"Idee: Rogue-like Dungeon Crawler, wo jeder Tod die Welt permanent verändert, PC, Genre: RPG Action"</em></li>
+  </ol>
+</div>
+
+<h2>Quiz</h2>
+<div class="box quiz">
+  <div class="label quiz">Fragen</div>
+  <div class="q"><strong>F1:</strong> Was ist der Unterschied zwischen <code>select</code> und <code>multi_select</code> in Notion? Nenne ein Beispiel aus dieser Lektion wo du <em>nicht</em> multi_select wählen würdest.</div>
+  <div class="q"><strong>F2:</strong> Im System-Prompt für Spieleideen steht "Status: immer 'Idee'". Warum hard-coden statt ableiten lassen?</div>
+  <div class="q"><strong>F3:</strong> Du willst alle Spielideen mit Genre "Strategy" aus der DB abfragen. Wie würde der CC Prompt dafür aussehen?</div>
+</div>
+
+<div class="box success" style="margin-top:2rem;">
+  <div class="label success">Dein Notion-Workspace jetzt</div>
+  <p>Du hast drei Datenbanken:</p>
+  <p>📋 <strong>Tagesorganizer</strong> — tägliche Tasks mit Deadline &amp; Status<br>
+  📚 <strong>Lernthemen</strong> — teach-Themen mit Kategorie &amp; Priorität<br>
+  🎮 <strong>Spieleideen</strong> — Ideen, Mechanics, Erweiterungen mit Genre &amp; Typ</p>
+  <p style="margin-top:0.8rem; color:var(--muted);">Nächste Ausbaustufe: <code>moin</code> zeigt nicht nur Tasks sondern auch offene Lernthemen. Oder: Gallery-View für Spieleideen in Notion Desktop.</p>
+</div>
+
+<footer>Lektion 15 · CLI × Notion × Coding Agent · 2026-06-10</footer>
+</body>
+</html>
