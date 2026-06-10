@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 06 – Abend-Workflow mit Projekt-Kontext</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.warning { border-color: var(--warn); }
+  .card.success { border-color: var(--success); }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  pre {
+    background: #14141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-size: .87rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .45rem .9rem;
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .flow-box.msg { border-color: var(--accent2); color: var(--accent2); }
+  .flow-box.bot { border-color: var(--accent); color: var(--accent); }
+  .flow-box.new { border-color: var(--warn); color: var(--warn); background: #1a1500; }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+  .output-box {
+    background: #0d1a10;
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .88rem;
+    line-height: 1.7;
+    margin: 1rem 0;
+    white-space: pre-wrap;
+  }
+  .example-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    background: #1a1a2a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+  }
+  .example-msg .icon { font-size: 1.2rem; flex-shrink: 0; }
+  .example-msg .label { color: var(--muted); font-size: .78rem; }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .compare-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .compare-box .label { font-size: .75rem; font-weight: 700; margin-bottom: .5rem; }
+  .compare-box.before .label { color: var(--muted); }
+  .compare-box.after .label { color: var(--success); }
+  .three-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .col-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .9rem 1rem;
+    font-size: .88rem;
+  }
+  .col-box .label { font-size: .75rem; font-weight: 700; color: var(--muted); margin-bottom: .5rem; }
+  .col-box.moin .label { color: var(--accent2); }
+  .col-box.abend .label { color: var(--warn); }
+  .col-box.woche .label { color: var(--accent); }
+  @media (max-width: 520px) {
+    .compare { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 06</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Abend-Workflow mit Projekt-Kontext</h1>
+<p class="meta">Lektion 6 von 6 &middot; Dauer: ~20 min &middot; 2026-06-10</p>
+
+<h2>Was du heute lernst</h2>
+<p>Du hast <code>moin</code> f&#252;r den Morgen. Jetzt baust du den Abschluss des Tages: den <code>abend</code>-Befehl. Er zeigt was du erledigt hast, was noch offen ist &mdash; und welche <em>Projekte</em> heute Fortschritt gemacht haben versus welche stagniert sind.</p>
+
+<h2>Das Drei-Teiler-Prinzip</h2>
+
+<p>Ein guter Tagesabschluss braucht genau drei Informationen:</p>
+
+<div class="three-col">
+  <div class="col-box abend">
+    <div class="label">&#x2705; ERLEDIGT</div>
+    Was wurde heute abgehakt?<br>Zeigt Erfolge &mdash; auch kleine.
+  </div>
+  <div class="col-box abend">
+    <div class="label">&#x23F3; OFFEN</div>
+    Was bleibt liegen?<br>Entscheidungsgrundlage f&#252;r Verschieben.
+  </div>
+  <div class="col-box abend">
+    <div class="label">&#x1F4CA; PROJEKTE</div>
+    Welche Projekte kamen voran?<br>Welche hatten heute keinen Fortschritt?
+  </div>
+</div>
+
+<div class="card highlight">
+  <strong>Warum Projekt-Bilanz?</strong> Du siehst sofort: &ldquo;Dart-App hatte heute 0 erledigte Tasks &mdash; morgen priorisieren.&rdquo; Ohne diese Zeile w&#228;re Projekt-Stagnation unsichtbar.
+</div>
+
+<h2>Vergleich: moin vs. abend vs. woche</h2>
+
+<div class="three-col">
+  <div class="col-box moin">
+    <div class="label">moin (Morgen)</div>
+    <em>Was steht heute an?</em><br>
+    Filter: heute + ohne Datum<br>
+    Status: nicht Done<br>
+    Sortierung: Priorit&#228;t
+  </div>
+  <div class="col-box abend">
+    <div class="label">abend (Abschluss)</div>
+    <em>Was war heute?</em><br>
+    Filter: Datum = heute<br>
+    Status: Done + Offen<br>
+    + Projekt-Bilanz
+  </div>
+  <div class="col-box woche">
+    <div class="label">woche (R&#252;ckblick)</div>
+    <em>Was war diese Woche?</em><br>
+    Filter: letzte 7 Tage<br>
+    Status: Done + Offen<br>
+    Kein Projekt-Filter
+  </div>
+</div>
+
+<h2>Der ABEND_SYSTEM_PROMPT</h2>
+
+<pre>
+ABEND_SYSTEM_PROMPT = """Du bist ein Notion-Abend-Assistent.
+Lies den Tagesorganizer (data_source_id: c9d2abbe-5607-44c2-bbf4-9aa673e0c4a0).
+Zeige alle Tasks mit Datum = heute.
+
+Format:
+
+Zeile 1: "&#127769; Tagesabschluss [DD.MM.YYYY]"
+Leerzeile
+
+Abschnitt 1: "&#x2705; Heute erledigt ([N]):"
+Je Task: &middot; [&#8594;Projekt falls gesetzt] [Name]
+Falls keine: &middot; (nichts heute abgehakt)
+
+Leerzeile
+
+Abschnitt 2: "&#x23F3; Noch offen ([N]):"
+Je Task: &middot; [Prio-Icon] [&#8594;Projekt falls gesetzt] [Name]
+Prio-Icons: Hoch=&#128308; Mittel=&#128993; Niedrig=&#128994;
+Sortiere nach Priorit&#228;t (Hoch zuerst).
+Falls keine: &middot; (alles erledigt &#8212; gut gemacht!)
+
+Leerzeile
+
+Abschnitt 3: "&#x1F4CA; Projekt-Bilanz:"
+Je Projekt das heute Tasks hat:
+&middot; [Name]: [N_done] erledigt / [N_offen] offen
+Falls N_done = 0: f&#252;ge " &#8212; kein Fortschritt heute" hinzu.
+Falls keine Projekt-Tasks heute: &middot; (keine Projekt-Tasks heute)
+
+Leerzeile
+"&#x1F4A1; Offene Tasks verschieben? &#8594; verschieben: morgen"
+Kein Markdown."""
+</pre>
+
+<div class="card warning">
+  <strong>Detail: Datum = heute (nicht ODER ohne Datum)</strong><br>
+  Im Gegensatz zu <code>moin</code> zeigt <code>abend</code> nur Tasks <em>mit</em> Datum = heute. Tasks ohne Datum sind Daueraufgaben (Sport, E-Mails) &mdash; sie geh&#246;ren nicht in den Tagesabschluss, sonst erscheinen sie jeden Abend als &ldquo;offen&rdquo;.
+</div>
+
+<h2>Der elif-Zweig</h2>
+
+<pre>
+elif text.lower() in ("abend", "feierabend", "guten abend"):
+    response = run_claude(f"Heute ist {today}.", system_prompt=ABEND_SYSTEM_PROMPT)
+</pre>
+
+<p>Drei nat&#252;rliche Varianten &mdash; dasselbe Prinzip wie bei <code>moin</code>/<code>morgen</code>/<code>guten morgen</code>. Einf&#252;gen vor dem <code>else</code>-Block.</p>
+
+<h2>Vollst&#228;ndiger Ablauf</h2>
+
+<div class="flow">
+  <div class="flow-box msg">abend</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">elif abend/feierabend</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box new">ABEND_SYSTEM_PROMPT</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">run_claude</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box">Notion-Abfrage</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box msg">Tagesabschluss</div>
+</div>
+
+<h2>Beispiel-Output</h2>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>abend</code></div>
+</div>
+
+<div class="output-box">&#127769; Tagesabschluss 10.06.2026
+
+&#x2705; Heute erledigt (3):
+&middot; &#8594;Dart-App Login-Screen implementieren
+&middot; &#8594;Notion-Bot Deploy-Fehler fixen
+&middot; Einkaufen
+
+&#x23F3; Noch offen (2):
+&middot; &#128308; &#8594;Dart-App W&#252;rfe-Daten speichern
+&middot; &#128993; &#8594;Dart-App Hauptmen&#252; polieren
+
+&#x1F4CA; Projekt-Bilanz:
+&middot; Dart-App: 1 erledigt / 2 offen
+&middot; Notion-Bot: 1 erledigt / 0 offen
+
+&#x1F4A1; Offene Tasks verschieben? &#8594; verschieben: morgen</div>
+
+<p>Auf einen Blick: Notion-Bot hatte einen guten Tag (Done, kein R&#252;ckstand). Dart-App hat 2 offene Tasks &mdash; morgen Priorit&#228;t setzen.</p>
+
+<h2>Das Zusammenspiel mit <code>verschieben:</code></h2>
+
+<p>Der Hinweis am Ende des <code>abend</code>-Outputs ist kein Zufall: <code>verschieben: morgen</code> ist bereits als Befehl implementiert (seit Lektion 3). Der Abend-Workflow <em>f&#252;hrt direkt dazu hin</em> &mdash; ohne neuen Code.</p>
+
+<div class="compare">
+  <div class="compare-box before">
+    <div class="label">OHNE Abend-Workflow</div>
+    <div style="font-size:.85rem;line-height:1.7;">
+      Du wei&#223;t abends nicht,<br>
+      was offen geblieben ist.<br>
+      Du schreibst morgen &ldquo;moin&rdquo;<br>
+      und siehst gestrige Tasks<br>
+      mit gestriegem Datum.
+    </div>
+  </div>
+  <div class="compare-box after">
+    <div class="label">MIT Abend-Workflow</div>
+    <div style="font-size:.85rem;line-height:1.7;">
+      Du siehst was erledigt wurde.<br>
+      Du siehst offene Tasks.<br>
+      Du entscheidest: verschieben<br>
+      oder l&#246;schen oder morgen.<br>
+      &ldquo;moin&rdquo; startet sauber.
+    </div>
+  </div>
+</div>
+
+<h2>Was sich <em>nicht</em> &#228;ndert</h2>
+
+<ul>
+  <li><code>moin</code> bleibt unver&#228;ndert (zeigt auch Tasks ohne Datum)</li>
+  <li><code>verschieben: morgen</code> bleibt &mdash; der Abend-Workflow nutzt es, baut es nicht neu</li>
+  <li><code>woche</code> bleibt &mdash; ist der Wochenr&#252;ckblick, kein Tagesabschluss</li>
+  <li>Alle Projekt-Befehle bleiben unver&#228;ndert</li>
+</ul>
+
+<div class="card highlight">
+  <strong>Schl&#252;sselprinzip: Komposition.</strong> Der <code>abend</code>-Befehl ist neu. Aber er f&#252;hrt direkt zu <code>verschieben:</code> weiter &mdash; einem Befehl der schon existiert. Kein neues &ldquo;Verschieben-Feature&rdquo; n&#246;tig. Das System w&#228;chst durch Komposition, nicht durch Duplikation.
+</div>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <ul>
+    <li><strong>Schritt 1:</strong> <code>ABEND_SYSTEM_PROMPT</code> in bot.py hinzuf&#252;gen (bei den anderen System-Prompts)</li>
+    <li><strong>Schritt 2:</strong> elif-Zweig f&#252;r <code>abend</code>/<code>feierabend</code> einf&#252;gen (vor dem <code>else</code>-Block)</li>
+    <li><strong>Schritt 3:</strong> Bot neu starten</li>
+    <li><strong>Schritt 4:</strong> <code>abend</code> senden &rarr; pr&#252;fen ob alle drei Abschnitte erscheinen</li>
+    <li><strong>Schritt 5:</strong> Falls offene Tasks vorhanden: <code>verschieben: morgen</code> senden &rarr; pr&#252;fen ob Datum aktualisiert wird</li>
+  </ul>
+  <p style="margin-top:.8rem;color:var(--muted);font-size:.88rem;">Ziel: <code>abend</code> zeigt Erledigt + Offen + Projekt-Bilanz. <code>verschieben: morgen</code> r&#228;umt danach auf.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Du hast 3 Tasks ohne Datum (Sport, E-Mails, Vitamins) und 2 mit Datum = heute. Wie viele erscheinen bei <code>abend</code>, wie viele bei <code>moin</code>?</p>
+  <p class="quiz-hint">Tipp: Lies die Filterbedingungen beider Prompts. Der Unterschied ist genau eine Zeile.</p>
+
+  <p class="quiz-q">2. Dart-App hatte heute 0 erledigte Tasks aber 3 offene. Was zeigt die Projekt-Bilanz-Zeile?</p>
+  <p class="quiz-hint">Tipp: Schau dir das Format im ABEND_SYSTEM_PROMPT an &mdash; was passiert wenn N_done = 0?</p>
+
+  <p class="quiz-q">3. Du schreibst <code>feierabend</code> statt <code>abend</code>. Passiert dasselbe?</p>
+  <p class="quiz-hint">Tipp: Schau dir den elif-Ausdruck an &mdash; welche W&#246;rter sind darin enthalten?</p>
+</div>
+
+<div class="next-box">
+  <strong>Mission abgeschlossen.</strong> Du hast ein vollst&#228;ndiges Notion-Projektsystem mit Tages-Workflows gebaut:<br><br>
+  <ul style="margin-top:.5rem;list-style:none;padding:0;">
+    <li>&#x2705; Projekt-Datenbank mit Epics &amp; Tasks (Lektion 1&#8211;2)</li>
+    <li>&#x2705; Verbindung mit Tagesorganizer (Lektion 3)</li>
+    <li>&#x2705; <code>dart: tasks</code> / <code>dart: task:</code> (Lektion 4)</li>
+    <li>&#x2705; <code>moin</code> mit Projekt&#252;berblick (Lektion 5)</li>
+    <li>&#x2705; <code>abend</code> mit Projekt-Bilanz (Lektion 6)</li>
+  </ul>
+  <br>
+  <span style="color:var(--muted);font-size:.9rem;">Welche Fragen hast du? Hat die Projekt-Bilanz in <code>abend</code> korrekte Zahlen gezeigt?</span>
+</div>
+
+</body>
+</html>
