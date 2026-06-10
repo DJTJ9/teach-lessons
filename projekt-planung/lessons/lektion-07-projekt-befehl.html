@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 07 – Der projekt:-Befehl</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --surface: #1a1a1e;
+    --border: #2e2e36;
+    --accent: #7c6af5;
+    --accent2: #4fc3f7;
+    --text: #e2e2e8;
+    --muted: #888896;
+    --success: #66bb6a;
+    --warn: #ffa726;
+    --danger: #ef5350;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  h1 { font-size: 1.9rem; color: var(--accent); margin-bottom: .3rem; }
+  h2 { font-size: 1.25rem; color: var(--accent2); margin: 2rem 0 .6rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { font-size: 1rem; color: var(--warn); margin: 1.2rem 0 .4rem; }
+  p { margin-bottom: .8rem; }
+  .meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+  .mission-tag {
+    display: inline-block;
+    background: #2a2040;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: .78rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .card.highlight { border-color: var(--accent); }
+  .card.warning { border-color: var(--warn); }
+  .card.success { border-color: var(--success); }
+  code {
+    background: #252530;
+    border-radius: 4px;
+    padding: .1rem .35rem;
+    font-size: .88em;
+    color: var(--accent2);
+  }
+  pre {
+    background: #14141c;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    overflow-x: auto;
+    font-size: .87rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    white-space: pre;
+  }
+  ul { padding-left: 1.3rem; margin-bottom: .8rem; }
+  li { margin-bottom: .35rem; }
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .45rem .9rem;
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .flow-box.msg { border-color: var(--accent2); color: var(--accent2); }
+  .flow-box.bot { border-color: var(--accent); color: var(--accent); }
+  .flow-box.new { border-color: var(--warn); color: var(--warn); background: #1a1500; }
+  .flow-arrow { color: var(--muted); font-size: 1.1rem; }
+  .output-box {
+    background: #0d1a10;
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .88rem;
+    line-height: 1.7;
+    margin: 1rem 0;
+    white-space: pre-wrap;
+  }
+  .example-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    background: #1a1a2a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+  }
+  .example-msg .icon { font-size: 1.2rem; flex-shrink: 0; }
+  .example-msg .label { color: var(--muted); font-size: .78rem; }
+  .task-box {
+    background: #0f1a10;
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .task-box h2 { border-bottom-color: var(--success); color: var(--success); }
+  .quiz {
+    background: #1a1a2e;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-top: 2rem;
+  }
+  .quiz h2 { border: none; margin-top: 0; }
+  .quiz-q { margin: 1rem 0 .4rem; font-weight: 600; }
+  .quiz-hint { font-size: .83rem; color: var(--muted); margin-top: .2rem; font-style: italic; }
+  .next-box {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2rem;
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin: 1rem 0;
+  }
+  .compare-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .compare-box .label { font-size: .75rem; font-weight: 700; margin-bottom: .5rem; }
+  .compare-box.before .label { color: var(--muted); }
+  .compare-box.after .label { color: var(--success); }
+  .route-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .88rem;
+  }
+  .route-table th {
+    background: #252535;
+    color: var(--accent2);
+    text-align: left;
+    padding: .5rem .8rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  .route-table td {
+    padding: .5rem .8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .route-table tr:last-child td { border-bottom: none; }
+  .new-tag {
+    display: inline-block;
+    background: #1a1500;
+    border: 1px solid var(--warn);
+    color: var(--warn);
+    font-size: .72rem;
+    border-radius: 3px;
+    padding: .1rem .4rem;
+    vertical-align: middle;
+    margin-left: .3rem;
+  }
+  @media (max-width: 520px) {
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mission-tag">Kurs: Projekt-Planung in Notion</div>
+<h1>Lektion 07</h1>
+<h1 style="color: var(--text); font-size: 1.4rem; margin-top: .2rem;">Der <code>projekt:</code>-Befehl</h1>
+<p class="meta">Lektion 7 &middot; Dauer: ~20 min &middot; 2026-06-10</p>
+
+<h2>Was du heute baust</h2>
+<p>Du hast bereits <code>dart: tasks</code> und <code>notion: tasks</code>. Diese Befehle funktionieren &mdash; aber sie erfordern, dass du den <em>Code-Schl&#252;ssel</em> kennst (<code>dart</code>, <code>notion</code>). Heute f&#252;gst du einen universellen Befehl hinzu:</p>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>projekt: Dart-App</code></div>
+</div>
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Oder:</div><code>projekt: Mein-Website-Projekt</code></div>
+</div>
+
+<p>Kein Schl&#252;ssel n&#246;tig. Kein <code>PROJECTS</code>-Dict-Lookup. Du gibst den Notion-Anzeigenamen direkt an.</p>
+
+<h2>Das Problem mit <code>dart: tasks</code></h2>
+
+<p><code>dart: tasks</code> hat <strong>zwei Jobs gleichzeitig</strong>:</p>
+
+<div class="compare">
+  <div class="compare-box before">
+    <div class="label">JOB 1: Arbeitsverzeichnis</div>
+    <code>cwd = C:\Unity\...\DartApp</code><br>
+    <span style="font-size:.85rem;color:var(--muted);margin-top:.4rem;display:block;">Claude l&#228;uft im Dart-Projektordner. CLAUDE.md wird geladen. Code-Fragen k&#246;nnen beantwortet werden.</span>
+  </div>
+  <div class="compare-box before">
+    <div class="label">JOB 2: Notion-Filter</div>
+    <code>notion_name = "Dart-App"</code><br>
+    <span style="font-size:.85rem;color:var(--muted);margin-top:.4rem;display:block;">Der Tagesorganizer wird nach Tasks mit Projekt = "Dart-App" gefiltert.</span>
+  </div>
+</div>
+
+<p>F&#252;r <code>dart: tasks</code> braucht man <em>beide</em> Jobs. Aber f&#252;r eine reine Notion-Abfrage &mdash; "zeig mir alle offenen Tasks" &mdash; ist Job 1 (Arbeitsverzeichnis) &#252;berfl&#252;ssig. Kopplung ohne Mehrwert.</p>
+
+<div class="card warning">
+  <strong>Und was ist mit Projekten, die nicht im <code>PROJECTS</code>-Dict stehen?</strong><br>
+  Wenn du ein drittes Projekt anlegst (<code>Website</code>, <code>Buch</code>, <code>Bewerbung</code>), m&#252;sstest du jedes Mal bot.py editieren und neu starten, bevor du Tasks abfragen kannst. Der <code>projekt:</code>-Befehl funktioniert sofort mit jedem Notion-Projektnamen.
+</div>
+
+<h2>Die L&#246;sung: ein einziger elif-Zweig</h2>
+
+<pre>
+elif text.lower().startswith("projekt:"):
+    projektname = text[8:].strip()
+    if not projektname:
+        response = "Nutzung: projekt: &lt;Projektname&gt;  z.B. projekt: Dart-App"
+    else:
+        prompt = f"Heute ist {today}. Projektname: {projektname}"
+        response = run_claude(prompt, system_prompt=PROJEKT_TASKS_SYSTEM_PROMPT)
+</pre>
+
+<p>Das ist alles. Vier Zeilen. <code>text[8:]</code> schneidet <code>"projekt:"</code> (8 Zeichen) ab und gibt den Rest als Projektnamen weiter.</p>
+
+<h2>Wo einf&#252;gen?</h2>
+
+<p>Vor dem <code>else</code>-Block, nach den anderen Befehlen. Empfohlene Position: nach dem <code>elif text.lower().startswith("verschieben:"):</code>-Block und vor <code>elif text.lower().startswith("/teach")</code>.</p>
+
+<h2>Der Ablauf</h2>
+
+<div class="flow">
+  <div class="flow-box msg">projekt: Dart-App</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">elif projekt:</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box new">projektname = "Dart-App"</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box bot">PROJEKT_TASKS_SYSTEM_PROMPT</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box">Notion-Abfrage</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-box msg">&#128193; Dart-App &#8211; N Tasks</div>
+</div>
+
+<h2>Vergleich: alle Projekt-Befehle</h2>
+
+<table class="route-table">
+  <thead>
+    <tr>
+      <th>Befehl</th>
+      <th>Beispiel</th>
+      <th>Was passiert</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>dart: tasks</code></td>
+      <td><code>dart: tasks</code></td>
+      <td>Tasks via <code>PROJECTS</code>-Lookup: liefert Notion-Name <em>und</em> setzt cwd auf Dart-Verzeichnis</td>
+    </tr>
+    <tr>
+      <td><code>dart: task:</code></td>
+      <td><code>dart: task: Login fixen</code></td>
+      <td>Task anlegen mit Projekt-Label "Dart-App", cwd = Dart-Verzeichnis</td>
+    </tr>
+    <tr>
+      <td><code>projekt:</code> <span class="new-tag">NEU</span></td>
+      <td><code>projekt: Dart-App</code></td>
+      <td>Tasks direkt per Notion-Anzeigename &mdash; kein cwd, kein Dict-Lookup n&#246;tig</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Beispiel-Output</h2>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>projekt: Dart-App</code></div>
+</div>
+
+<div class="output-box">&#128193; Dart-App &#8211; 3 offene Tasks
+
+&#183; Login-Screen fertigstellen &#8212; 2026-06-11
+&#183; W&#252;rfe-Daten speichern &#8212; 2026-06-12
+&#183; Hauptmen&#252; polieren &#8212; 2026-06-15</div>
+
+<div class="example-msg">
+  <div class="icon">&#128241;</div>
+  <div><div class="label">Du schreibst:</div><code>projekt: Notion-Bot</code></div>
+</div>
+
+<div class="output-box">&#128193; Notion-Bot &#8211; 1 offene Tasks
+
+&#183; Deploy-Skript automatisieren &#8212; 2026-06-10</div>
+
+<h2>Was bleibt unver&#228;ndert</h2>
+
+<ul>
+  <li><code>dart: tasks</code> und <code>notion: tasks</code> bleiben &mdash; k&#252;rzere Schreibweise f&#252;r bekannte Projekte</li>
+  <li><code>PROJEKT_TASKS_SYSTEM_PROMPT</code> wird wiederverwendet &mdash; kein neuer Prompt n&#246;tig</li>
+  <li>Alle anderen Befehle (<code>moin</code>, <code>abend</code>, <code>task:</code>) bleiben unver&#228;ndert</li>
+</ul>
+
+<div class="card highlight">
+  <strong>Schl&#252;sselprinzip: Single Responsibility.</strong> <code>dart: tasks</code> hat zwei Zust&#228;ndigkeiten (cwd + Notion-Filter). Der neue <code>projekt:</code>-Befehl hat eine: Notion-Tasks nach Projektname anzeigen. Einfacher zu verstehen, einfacher zu erweitern.
+</div>
+
+<div class="task-box">
+  <h2>Praxis-Aufgabe</h2>
+  <ul>
+    <li><strong>Schritt 1:</strong> <code>elif text.lower().startswith("projekt:"):</code>-Block in bot.py einf&#252;gen (vor <code>/teach</code>-Block)</li>
+    <li><strong>Schritt 2:</strong> Bot neu starten (<code>restart</code> per Telegram oder Terminal)</li>
+    <li><strong>Schritt 3:</strong> <code>projekt: Dart-App</code> senden &rarr; offene Tasks erscheinen</li>
+    <li><strong>Schritt 4:</strong> <code>projekt: Notion-Bot</code> senden &rarr; anderes Projekt, gleicher Befehl</li>
+    <li><strong>Schritt 5:</strong> <code>projekt:</code> (leer) senden &rarr; Nutzungshinweis erscheint statt Fehler</li>
+  </ul>
+  <p style="margin-top:.8rem;color:var(--muted);font-size:.88rem;">Ziel: gleicher Output wie <code>dart: tasks</code>, aber mit Notion-Anzeigename statt Code-Schl&#252;ssel.</p>
+</div>
+
+<div class="quiz">
+  <h2>Quiz &ndash; Kurz nachdenken</h2>
+
+  <p class="quiz-q">1. Du f&#252;gst ein neues Projekt "Bewerbung" in Notion hinzu (kein Eintrag im <code>PROJECTS</code>-Dict). Welcher Befehl funktioniert sofort, welcher nicht?</p>
+  <p class="quiz-hint">Tipp: Schau welcher Befehl den <code>PROJECTS</code>-Dict braucht und welcher nicht.</p>
+
+  <p class="quiz-q">2. <code>text[8:]</code> schneidet 8 Zeichen ab. Warum 8?</p>
+  <p class="quiz-hint">Tipp: Z&#228;hle die Zeichen in <code>"projekt:"</code> &mdash; inklusive Doppelpunkt.</p>
+
+  <p class="quiz-q">3. Was gibt der Befehl <code>projekt: </code> (mit Leerzeichen, ohne Name) aus?</p>
+  <p class="quiz-hint">Tipp: <code>"projekt: ".strip()</code> ergibt was? Was passiert dann im if-Zweig?</p>
+</div>
+
+<div class="next-box">
+  <strong>Mission erf&#252;llt.</strong> Dein Bot kennt jetzt alle Projekt-Workflows:<br><br>
+  <ul style="margin-top:.5rem;list-style:none;padding:0;">
+    <li>&#x2705; <code>dart: tasks</code> / <code>notion: tasks</code> &mdash; schneller Zugriff per Code-Schl&#252;ssel</li>
+    <li>&#x2705; <code>dart: task: &lt;Text&gt;</code> &mdash; Task mit Projekt-Label anlegen</li>
+    <li>&#x2705; <code>moin</code> &mdash; Morgen-Workflow mit Projekt-&#220;berblick</li>
+    <li>&#x2705; <code>abend</code> &mdash; Tagesabschluss mit Projekt-Bilanz</li>
+    <li>&#x2705; <code>projekt: &lt;Name&gt;</code> &mdash; direkter Zugriff per Notion-Anzeigename</li>
+  </ul>
+  <br>
+  <span style="color:var(--muted);font-size:.9rem;">Welche Fragen hast du? Hat <code>projekt: Dart-App</code> die richtigen Tasks gezeigt?</span>
+</div>
+
+</body>
+</html>
