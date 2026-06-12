@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Grundlagen · Lektion 7 · Dateien, JSON &amp; Pfade</title>
+<style>
+:root{--bg:#0f1117;--card:#1a1d2e;--accent:#7c6af7;--green:#3ddc84;--yellow:#ffd86e;--text:#e8e9f3;--muted:#8b8fa8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem 1rem;max-width:820px;margin:0 auto}
+header{margin-bottom:2.5rem;border-bottom:1px solid #2a2d3e;padding-bottom:1.5rem}
+.badge{background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;padding:.2em .8em;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.lesson-num{color:var(--muted);font-size:.9rem;margin:.5rem 0}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.4rem}
+.subtitle{color:var(--muted);font-size:1rem}
+section{margin-bottom:2.2rem}
+h2{font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.04em}
+p{margin-bottom:.8rem}
+pre{background:#0d1117;border:1px solid #30363d;border-radius:.5rem;padding:1rem 1.25rem;overflow-x:auto;font-size:.86rem;line-height:1.6;margin:.8rem 0}
+code{font-family:'Cascadia Code','Fira Code','Consolas',monospace}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+@media(max-width:600px){.compare{grid-template-columns:1fr}}
+.compare>div{background:var(--card);border-radius:.5rem;padding:1rem}
+.compare h3{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.6rem}
+.botpy{background:var(--card);border-left:3px solid var(--green);border-radius:.5rem;padding:1.25rem;margin:1rem 0}
+.botpy h2{color:var(--green)}
+.quiz{background:var(--card);border-left:3px solid var(--yellow);border-radius:.5rem;padding:1.25rem}
+.quiz h2{color:var(--yellow)}
+.quiz ol{padding-left:1.4rem;margin-top:.6rem}
+.quiz li{margin-bottom:.5rem}
+.tip{background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.25);border-radius:.5rem;padding:.9rem 1rem;margin:.8rem 0;font-size:.9rem}
+.kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.cm{color:#6272a4;font-style:italic}.num{color:#bd93f9}
+footer{color:var(--muted);font-size:.88rem;margin-top:3rem;padding-top:1.5rem;border-top:1px solid #2a2d3e}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">Python Grundlagen</div>
+  <p class="lesson-num">Lektion 07 von 10</p>
+  <h1>Dateien, JSON &amp; Pfade</h1>
+  <p class="subtitle">open(), json-Modul, pathlib — und wie bot.py scheduled_plans.json verwaltet</p>
+</header>
+
+<section>
+  <h2>Dateien lesen und schreiben</h2>
+  <div class="compare">
+    <div>
+      <h3>C#</h3>
+      <pre><code><span class="cm">// Lesen</span>
+string text = File.ReadAllText(<span class="str">"file.txt"</span>);
+
+<span class="cm">// Schreiben</span>
+File.WriteAllText(<span class="str">"file.txt"</span>, text);</code></pre>
+    </div>
+    <div>
+      <h3>Python</h3>
+      <pre><code><span class="cm"># Lesen</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"file.txt"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    text = f.read()
+
+<span class="cm"># Schreiben</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"file.txt"</span>, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(text)</code></pre>
+    </div>
+  </div>
+  <p><code>with</code>-Statement schließt die Datei automatisch — wie C#s <code>using (var f = ...)</code>. Modi: <code>"r"</code> (read, default), <code>"w"</code> (write, überschreibt), <code>"a"</code> (append). Immer <code>encoding="utf-8"</code> angeben — sonst plattformabhängig.</p>
+</section>
+
+<section>
+  <h2>JSON — serialisieren und parsen</h2>
+  <pre><code><span class="kw">import</span> json
+
+<span class="cm"># Python-Objekt → JSON-String</span>
+daten = {<span class="str">"name"</span>: <span class="str">"Sport"</span>, <span class="str">"prio"</span>: <span class="str">"Hoch"</span>, <span class="str">"done"</span>: <span class="kw">False</span>}
+text = json.dumps(daten, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)
+
+<span class="cm"># JSON-String → Python-Objekt</span>
+daten = json.loads(text)
+
+<span class="cm"># Direkt aus/in Datei:</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"data.json"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    daten = json.load(f)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"data.json"</span>, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(daten, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)</code></pre>
+  <div class="tip"><code>ensure_ascii=False</code>: behält Umlaute (ä, ö, ü) als echte Zeichen. <code>indent=2</code>: lesbare Formatierung. C#-Äquivalent: <code>JsonSerializer.Serialize/Deserialize</code> aus <code>System.Text.Json</code>.</div>
+</section>
+
+<section>
+  <h2>pathlib — Pfade als Objekte</h2>
+  <pre><code><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+p = Path(<span class="str">r"C:\Projekte\bot"</span>)
+p / <span class="str">"settings.json"</span>   <span class="cm"># C:\Projekte\bot\settings.json</span>
+p.exists()            <span class="cm"># bool</span>
+p.is_file()           <span class="cm"># bool</span>
+p.stem                <span class="cm"># "bot" (ohne Extension)</span>
+p.suffix              <span class="cm"># leer (ist ein Verzeichnis)</span>
+p.parent              <span class="cm"># C:\Projekte</span>
+
+<span class="cm"># Alle .json-Dateien rekursiv:</span>
+<span class="kw">for</span> f <span class="kw">in</span> Path(<span class="str">"docs"</span>).glob(<span class="str">"**/*.json"</span>):
+    <span class="fn">print</span>(f)</code></pre>
+  <p>Path-Objekte sind plattformübergreifend — kein manuelles String-Konkatenieren mit <code>\\</code>. C#-Äquivalent: <code>System.IO.Path</code> und <code>FileInfo</code>.</p>
+</section>
+
+<section class="botpy">
+  <h2>🤖 bot.py erklärt — scheduled_plans.json und tempfile</h2>
+  <p><strong>scheduled_plans.json lesen:</strong></p>
+  <pre><code>PLANS_FILE = Path(WORK_DIR) / <span class="str">"scheduled_plans.json"</span>
+
+<span class="kw">def</span> <span class="fn">load_plans</span>() -> list:
+    <span class="kw">if not</span> PLANS_FILE.exists():
+        <span class="kw">return</span> []
+    <span class="kw">with</span> <span class="fn">open</span>(PLANS_FILE, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+        <span class="kw">return</span> json.load(f)
+
+<span class="cm"># Eintrag-Struktur:</span>
+<span class="cm"># {"slug": "suche-command",</span>
+<span class="cm">#  "plan_path": "docs/superpowers/plans/2026-06-12-suche-command.md",</span>
+<span class="cm">#  "scheduled_time": "02:00",</span>
+<span class="cm">#  "status": "pending"}</span></code></pre>
+  <p>Path-Objekte direkt an <code>open()</code> übergeben — keine String-Konversion. <code>Path(WORK_DIR) / "file.json"</code> ist idiomatischer als <code>os.path.join()</code>.</p>
+  <p><strong>Status-Update schreiben:</strong></p>
+  <pre><code><span class="kw">def</span> <span class="fn">mark_plan_done</span>(slug: str) -> <span class="kw">None</span>:
+    plans = <span class="fn">load_plans</span>()
+    <span class="kw">for</span> plan <span class="kw">in</span> plans:
+        <span class="kw">if</span> plan[<span class="str">"slug"</span>] == slug:
+            plan[<span class="str">"status"</span>] = <span class="str">"done"</span>
+    <span class="kw">with</span> <span class="fn">open</span>(PLANS_FILE, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+        json.dump(plans, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="num">2</span>)</code></pre>
+  <p>Pattern: lesen → in-memory mutieren → zurückschreiben. Für kleine JSON-Dateien ausreichend.</p>
+  <p><strong>Tempfile für große Claude-Übergaben:</strong></p>
+  <pre><code><span class="kw">import</span> tempfile
+
+<span class="kw">with</span> tempfile.NamedTemporaryFile(
+    mode=<span class="str">"w"</span>, suffix=<span class="str">".txt"</span>, delete=<span class="kw">False</span>, encoding=<span class="str">"utf-8"</span>
+) <span class="kw">as</span> tmp:
+    tmp.write(großer_text)
+    tmp_path = tmp.name
+
+<span class="cm"># Aufräumen:</span>
+Path(tmp_path).unlink(missing_ok=<span class="kw">True</span>)</code></pre>
+  <p>Kommandozeilenargumente haben eine Längenbeschränkung. bot.py schreibt lange Inhalte in Tempfiles und übergibt den Pfad an Claude. <code>delete=False</code> weil der Prozess die Datei noch nach dem <code>with</code>-Block lesen soll.</p>
+</section>
+
+<section class="quiz">
+  <h2>✏️ Aufgabe</h2>
+  <ol>
+    <li>Erstelle <code>tasks.json</code> mit 3 Tasks als Liste von Dicts (<code>name</code>, <code>done</code>). Lese und gib sie aus.</li>
+    <li>Füge einen vierten Task hinzu: lesen → append → zurückschreiben</li>
+    <li>Nutze pathlib: <code>Path(".").glob("*.json")</code> — liste alle JSON-Dateien im aktuellen Verzeichnis</li>
+    <li>Schreibe <code>load_json(path: str) -> list</code>: lädt JSON, gibt <code>[]</code> zurück bei <code>FileNotFoundError</code></li>
+  </ol>
+</section>
+
+<footer>Weiter: <strong>Lektion 08 — HTTP &amp; APIs mit requests</strong> · GET/POST, JSON-Responses, Telegram-API — das Rückgrat von bot.py</footer>
+</body>
+</html>
