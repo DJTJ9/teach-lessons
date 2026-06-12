@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 5 – Hugging Face & GGUF | Lokale KI</title>
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d2e;--border:#2d3155;--accent:#7c6af7;--accent2:#4ade80;--text:#e2e8f0;--muted:#94a3b8;--warn:#f59e0b;--danger:#ef4444;--code-bg:#0d1117}
+    *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+    .container{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+    header{border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:2rem}
+    .lesson-tag{display:inline-block;background:var(--accent);color:white;font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem}
+    h1{font-size:1.875rem;font-weight:800;line-height:1.2;margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:1rem}
+    h2{font-size:1.375rem;font-weight:700;margin:2rem 0 1rem;border-left:3px solid var(--accent);padding-left:.75rem}
+    h3{font-size:1.05rem;font-weight:600;margin:1.25rem 0 .5rem;color:var(--accent)}p{margin-bottom:1rem}
+    .callout{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:.5rem;padding:1rem 1.25rem;margin:1.5rem 0}
+    .callout.warn{border-left-color:var(--warn)}.callout.success{border-left-color:var(--accent2)}
+    .callout strong{color:var(--accent)}.callout.warn strong{color:var(--warn)}.callout.success strong{color:var(--accent2)}
+    table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+    th{background:var(--surface);border:1px solid var(--border);padding:.6rem .9rem;text-align:left;color:var(--accent);font-weight:700}
+    td{border:1px solid var(--border);padding:.6rem .9rem}tr:nth-child(even){background:var(--surface)}
+    pre{background:var(--code-bg);border:1px solid var(--border);border-radius:.5rem;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-size:.875rem;line-height:1.6}
+    code{font-family:'Cascadia Code','Fira Code',monospace;color:#a5d6ff}pre code{color:#e2e8f0}
+    .cmd{color:#4ade80}.comment{color:#64748b;font-style:italic}
+    .step{display:flex;gap:.75rem;margin:.75rem 0;align-items:flex-start}
+    .step-num{background:var(--accent);color:white;font-weight:700;font-size:.8rem;min-width:1.75rem;height:1.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.15rem}
+    .step-body{flex:1}
+    .quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2.5rem}
+    .quiz-section h2{border:none;padding:0;margin-top:0}.quiz-q{margin:1.5rem 0}.quiz-q p{font-weight:600;margin-bottom:.6rem}
+    .options{display:flex;flex-direction:column;gap:.4rem}
+    .option{background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.6rem 1rem;cursor:pointer;transition:border-color .15s;font-size:.9rem}
+    .option:hover{border-color:var(--accent)}.option.correct{border-color:var(--accent2);background:rgba(74,222,128,.08)}.option.wrong{border-color:var(--danger);background:rgba(239,68,68,.08)}.option.disabled{pointer-events:none}
+    .explanation{display:none;font-size:.875rem;color:var(--muted);padding:.6rem .75rem;border-left:2px solid var(--muted);margin-top:.6rem;line-height:1.6}.explanation.show{display:block}
+    .next-steps{background:linear-gradient(135deg,#1a1d2e,#1a2040);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2rem}
+    .next-steps h2{border:none;padding:0;margin-top:0}.next-steps ul{padding-left:1.25rem;margin-top:.75rem}.next-steps li{margin:.4rem 0}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;text-align:center}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="lesson-tag">Lektion 5 · Lokale KI Setup</div>
+    <h1>Hugging Face &amp; GGUF — Weitere Modelle finden</h1>
+    <p class="subtitle">Hugging Face navigieren, GGUF-Dateien verstehen, beliebige Modelle in Ollama laden</p>
+  </header>
+
+  <h2>1. Was ist Hugging Face?</h2>
+  <p>Hugging Face (huggingface.co) ist das GitHub der KI-Welt — eine Plattform mit Hunderttausenden Modellen, Datensätzen und Tools. Praktisch jedes relevante LLM wird dort veröffentlicht. Für lokale KI ist es die wichtigste Quelle für neue Modelle.</p>
+  <div class="callout">
+    <strong>Wichtigste Sektion:</strong> Models → Filter: <em>Text Generation</em> + <em>GGUF</em>. GGUF ist das Format, das Ollama direkt einlesen kann — quantisierte Modelle, optimiert für lokale Inferenz.
+  </div>
+
+  <h2>2. GGUF-Dateinamen lesen</h2>
+  <pre><code>Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+│              │  │         │
+│              │  │         └─ Quantisierungs-Format
+│              │  └─────────── Instruct = Chat/Anweisungen feinabgestimmt
+│              └────────────── Parameteranzahl (7 Milliarden)
+└───────────────────────────── Modell-Familie</code></pre>
+
+  <table>
+    <thead><tr><th>Suffix</th><th>Bedeutung</th></tr></thead>
+    <tbody>
+      <tr><td><code>-Instruct</code></td><td>Für Chat/Anweisungen trainiert — das willst du für interaktive Nutzung</td></tr>
+      <tr><td><code>-Base</code></td><td>Nur Pretrained — kein Chat, nur Text-Vervollständigung</td></tr>
+      <tr><td><code>-Chat</code></td><td>Wie Instruct, ältere Bezeichnung</td></tr>
+      <tr><td><code>-Code</code></td><td>Auf Code spezialisiert (ohne Instruct: Base-Modell)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Verlässliche Quantisierer</h2>
+  <p>Nicht alle GGUF-Versionen auf Hugging Face sind gleich gut. Diese Community-Mitglieder veröffentlichen hochwertige Quantisierungen:</p>
+  <table>
+    <thead><tr><th>Nutzer</th><th>Bekannt für</th></tr></thead>
+    <tbody>
+      <tr><td><strong>bartowski</strong></td><td>Aktivster Quantisierer (2024/2025), oft als erster verfügbar, gut dokumentiert</td></tr>
+      <tr><td><strong>TheBloke</strong></td><td>Veteran, sehr viele Modelle — etwas weniger aktiv seit Mitte 2024</td></tr>
+      <tr><td><strong>QuantFactory</strong></td><td>Weitere zuverlässige Quelle</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <strong>Kein offizielles Zertifikat:</strong> Vertrauen basiert auf Community-Reputation (Downloads, Reviews, r/LocalLLaMA). Immer von bekannten Nutzern laden, nicht von unbekannten Accounts.
+  </div>
+
+  <h2>4. Modell von Hugging Face in Ollama laden</h2>
+
+  <h3>Methode A: Direkt via Ollama (einfachste)</h3>
+  <pre><code><span class="comment"># Schema: ollama pull hf.co/[nutzer]/[repo]:[quantisierung]</span>
+<span class="cmd">ollama pull hf.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M</span></code></pre>
+
+  <h3>Methode B: Manuell herunterladen + Modelfile</h3>
+  <pre><code><span class="comment"># 1. Datei herunterladen (PowerShell)</span>
+<span class="cmd">Invoke-WebRequest `
+  -Uri "https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf" `
+  -OutFile "C:\Models\qwen2.5-7b-q4.gguf"</span>
+
+<span class="comment"># 2. Modelfile erstellen (Textdatei: C:\Models\Modelfile)</span>
+FROM C:\Models\qwen2.5-7b-q4.gguf
+SYSTEM "Du bist ein C#-Experte für Unity und s&box."
+PARAMETER temperature 0.3
+
+<span class="comment"># 3. In Ollama registrieren</span>
+<span class="cmd">ollama create mein-coder -f C:\Models\Modelfile</span>
+<span class="cmd">ollama run mein-coder</span></code></pre>
+
+  <h3>Methode C: huggingface-cli (für große Modelle mit Resume-Support)</h3>
+  <pre><code><span class="cmd">pip install huggingface_hub</span>
+<span class="cmd">huggingface-cli download bartowski/Qwen2.5-Coder-7B-Instruct-GGUF `
+  --include "*Q4_K_M*" `
+  --local-dir C:\Models\</span></code></pre>
+  <div class="callout success">
+    <strong>Empfehlung:</strong> Methode A für bekannte Modelle (Qwen, Llama, Mistral). Methode B/C für spezielle Modelle ohne Ollama-Eintrag oder bei langsamer Verbindung (CLI hat Resume-Support).
+  </div>
+
+  <h2>5. VRAM-Planung für zukünftige Upgrades</h2>
+  <table>
+    <thead><tr><th>Modell</th><th>Params</th><th>VRAM Q4</th><th>Braucht</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen2.5-Coder-7B</td><td>7B</td><td>~4,5 GB</td><td>Deine aktuelle GPU ✓</td></tr>
+      <tr><td>Qwen2.5-Coder-14B</td><td>14B</td><td>~9 GB</td><td>RTX 4070 (12GB) oder mehr</td></tr>
+      <tr><td>Qwen2.5-Coder-32B</td><td>32B</td><td>~20 GB</td><td>RTX 3090/4090 (24GB)</td></tr>
+      <tr><td>Llama 3.1 70B</td><td>70B</td><td>~43 GB</td><td>Apple Silicon 64GB oder Multi-GPU</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. Benchmarks richtig lesen</h2>
+  <table>
+    <thead><tr><th>Benchmark</th><th>Was er misst</th><th>Relevanz für C#/Unity</th></tr></thead>
+    <tbody>
+      <tr><td>HumanEval</td><td>Python Code-Completion (einfach)</td><td>Niedrig — misst Python</td></tr>
+      <tr><td>MBPP</td><td>Basic Python Programming</td><td>Niedrig</td></tr>
+      <tr><td>LiveCodeBench</td><td>Aktuelle, schwierigere Code-Aufgaben</td><td>Mittel</td></tr>
+      <tr><td>SWE-bench</td><td>Echte GitHub-Issues lösen</td><td>Hoch — misst echte Dev-Aufgaben</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <strong>Beste Evaluation:</strong> Eigene Unity/s&amp;box Test-Aufgaben — z.B. "Erstelle ein Inventory System", "Schreibe einen A*-Algorithmus für Unity" — und Modell-Antworten selbst vergleichen. Benchmarks messen Python, nicht C#.
+  </div>
+
+  <div class="quiz-section">
+    <h2>Quiz</h2>
+
+    <div class="quiz-q">
+      <p>1. Du siehst <code>Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf</code>. Was bedeutet "Instruct"?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Das Modell gibt nur Anweisungen, stellt keine Fragen</div>
+        <div class="option" onclick="answer(this,'correct')">B) Nach dem Pretrain auf Instruction-Following feinabgestimmt — geeignet für interaktiven Chat und Anweisungen</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Enthält Instruktions-Kommentare im Modell-Code</div>
+      </div>
+      <div class="explanation">"Instruct"-Modelle wurden nach dem Pretraining mit RLHF oder DPO auf Instruction-Following feinabgestimmt. Sie erwarten Chat-Format-Eingaben. "Base"-Modelle sind nur pretrained — gut für Text-Completion, nicht für Dialog.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. Du hast eine GGUF-Datei manuell heruntergeladen. Wie bringt man sie in Ollama?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) <code>ollama import datei.gguf</code></div>
+        <div class="option" onclick="answer(this,'correct')">B) Modelfile mit <code>FROM /pfad/datei.gguf</code> erstellen → <code>ollama create name -f Modelfile</code></div>
+        <div class="option" onclick="answer(this,'wrong')">C) GGUF-Datei in den Ollama-Installationsordner kopieren</div>
+      </div>
+      <div class="explanation">Ollama hat keinen direkten <code>import</code>-Befehl für lokale Dateien. Weg: 1) Modelfile mit <code>FROM /absoluter/pfad/zur/datei.gguf</code> erstellen. 2) <code>ollama create meinmodell -f Modelfile</code>. Danach erscheint es in <code>ollama list</code>.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>3. Warum sind HumanEval-Benchmarks für die C#/Unity-Entscheidung begrenzt nützlich?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) HumanEval ist veraltet und wird nicht mehr gepflegt</div>
+        <div class="option" onclick="answer(this,'correct')">B) HumanEval misst Python-Code-Completion — C# und Unity-spezifische Performance ist davon nicht direkt ableitbar</div>
+        <div class="option" onclick="answer(this,'wrong')">C) HumanEval funktioniert nur mit Base-Modellen, nicht mit Instruct</div>
+      </div>
+      <div class="explanation">Benchmarks werden fast ausschließlich in Python evaluiert. Ein Modell das gut in Python ist, wird auch in C# gut sein — aber die relative Rangfolge kann sich verschieben. Eigene Tests mit typischen Unity-Aufgaben sind aussagekräftiger als reine Benchmark-Zahlen.</div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>Nächste Schritte</h2>
+    <ul>
+      <li><strong>Lektion 6:</strong> RAG Grundlagen — Embeddings, Vektorstores und semantische Suche verstehen</li>
+      <li><strong>Lektion 7:</strong> RAG Praxis — Unity/s&amp;box Docs lokal durchsuchbar machen</li>
+    </ul>
+    <p style="margin-top:1rem;color:var(--muted)">Welche Fragen hast du? Was soll als nächstes dran kommen?</p>
+  </div>
+
+  <footer>
+    <p>Lokale KI Setup · Lektion 5 · <a href="https://djtj9.github.io/teach-lessons/" target="_blank">Alle Lektionen online ansehen</a></p>
+  </footer>
+</div>
+<script>
+function answer(el,result){
+  const c=el.closest('.quiz-q');
+  c.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  el.classList.add(result);
+  const e=c.querySelector('.explanation');
+  if(e)e.classList.add('show');
+}
+</script>
+</body>
+</html>

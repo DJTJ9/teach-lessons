@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 1 – Hardware & Modell-Auswahl | Lokale KI</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --border: #2d3155;
+      --accent: #7c6af7;
+      --accent2: #4ade80;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.7; }
+    .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    header { border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .lesson-tag { display: inline-block; background: var(--accent); color: white; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    h1 { font-size: 1.875rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; }
+
+    h2 { font-size: 1.375rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text); border-left: 3px solid var(--accent); padding-left: 0.75rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: var(--accent); }
+    p { margin-bottom: 1rem; }
+
+    .callout { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0.5rem; padding: 1rem 1.25rem; margin: 1.5rem 0; }
+    .callout.warn { border-left-color: var(--warn); }
+    .callout.success { border-left-color: var(--accent2); }
+    .callout strong { color: var(--accent); }
+    .callout.warn strong { color: var(--warn); }
+    .callout.success strong { color: var(--accent2); }
+
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; }
+    th { background: var(--surface); border: 1px solid var(--border); padding: 0.6rem 0.9rem; text-align: left; color: var(--accent); font-weight: 700; }
+    td { border: 1px solid var(--border); padding: 0.6rem 0.9rem; }
+    tr:nth-child(even) { background: var(--surface); }
+    .good { color: var(--accent2); font-weight: 700; }
+    .bad { color: var(--danger); }
+    .warn-color { color: var(--warn); }
+
+    .model-card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; margin: 1rem 0; }
+    .model-card.recommended { border-color: var(--accent); }
+    .model-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .badge { font-size: 0.7rem; background: var(--accent); color: white; padding: 0.15rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; vertical-align: middle; }
+    .badge.orange { background: var(--warn); }
+    .model-meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.75rem; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+    @media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+    .pros, .cons { background: var(--bg); border-radius: 0.5rem; padding: 0.75rem; }
+    .pros { border-left: 3px solid var(--accent2); }
+    .cons { border-left: 3px solid var(--danger); }
+    .pros h4 { color: var(--accent2); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .cons h4 { color: var(--danger); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    ul.compact { list-style: none; font-size: 0.875rem; }
+    ul.compact li { padding: 0.15rem 0; }
+    ul.compact li::before { content: "• "; color: var(--muted); }
+
+    .upgrade-path { background: var(--surface); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem 1.25rem; margin: 0.75rem 0; }
+    .upgrade-path h4 { color: var(--accent); margin-bottom: 0.5rem; font-size: 1rem; }
+
+    code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 0.3rem; padding: 0.1rem 0.4rem; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.875rem; color: #a5d6ff; }
+
+    .quiz-section { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-top: 2.5rem; }
+    .quiz-section h2 { border: none; padding: 0; margin-top: 0; }
+    .quiz-q { margin: 1.5rem 0; }
+    .quiz-q p { font-weight: 600; margin-bottom: 0.6rem; }
+    .options { display: flex; flex-direction: column; gap: 0.4rem; }
+    .option { background: var(--bg); border: 1px solid var(--border); border-radius: 0.4rem; padding: 0.6rem 1rem; cursor: pointer; transition: border-color 0.15s; font-size: 0.9rem; }
+    .option:hover { border-color: var(--accent); }
+    .option.correct { border-color: var(--accent2); background: rgba(74,222,128,0.08); }
+    .option.wrong { border-color: var(--danger); background: rgba(239,68,68,0.08); }
+    .option.disabled { pointer-events: none; }
+    .explanation { display: none; font-size: 0.875rem; color: var(--muted); padding: 0.6rem 0.75rem; border-left: 2px solid var(--muted); margin-top: 0.6rem; line-height: 1.6; }
+    .explanation.show { display: block; }
+
+    .next-steps { background: linear-gradient(135deg, #1a1d2e, #1a2040); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-top: 2rem; }
+    .next-steps h2 { border: none; padding: 0; margin-top: 0; }
+    .next-steps ul { padding-left: 1.25rem; margin-top: 0.75rem; }
+    .next-steps li { margin: 0.4rem 0; }
+
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="lesson-tag">Lektion 1 · Lokale KI Setup</div>
+    <h1>Hardware &amp; Modell-Auswahl</h1>
+    <p class="subtitle">Warum VRAM alles entscheidet — und welche Modelle für C#, Unity &amp; s&amp;box am besten taugen</p>
+  </header>
+
+  <h2>1. Warum GPU statt CPU?</h2>
+  <p>Große Sprachmodelle (LLMs) bestehen aus <strong>Gewichten</strong> — Milliarden von Dezimalzahlen. Bei jeder Anfrage werden diese Zahlen millionenfach miteinander multipliziert. Das ist Mathe in industriellem Maßstab.</p>
+  <table>
+    <thead><tr><th>Prozessor</th><th>Stärke</th><th>LLM-Geschwindigkeit</th></tr></thead>
+    <tbody>
+      <tr><td><strong>GPU</strong></td><td>Tausende parallele Berechnungen gleichzeitig</td><td class="good">25–80 Token/s</td></tr>
+      <tr><td><strong>CPU</strong></td><td>Wenige Kerne, nacheinander</td><td class="warn-color">2–8 Token/s</td></tr>
+    </tbody>
+  </table>
+  <p>Ein Token entspricht ungefähr einem Wort. Bei 5 Token/s wartet man 10 Sekunden bis ein Satz fertig ist. Bei 40 Token/s tippt das Modell schneller als man lesen kann.</p>
+  <div class="callout">
+    <strong>Kernregel:</strong> Damit ein Modell auf der GPU läuft, müssen alle Gewichte in den GPU-Speicher (VRAM) passen. Was nicht passt, wird in den Haupt-RAM ausgelagert — und wird dann so langsam wie CPU-Inferenz.
+  </div>
+
+  <h2>2. Quantisierung: Wie man Modelle verkleinert</h2>
+  <p>Ein 7-Milliarden-Parameter-Modell hat 7.000.000.000 Zahlen. Im vollen Format (<code>float16</code> = 2 Bytes pro Zahl) wären das 14 GB — passt nicht in 8 GB VRAM.</p>
+  <p><strong>Quantisierung</strong> komprimiert diese Zahlen auf weniger Bits:</p>
+  <table>
+    <thead>
+      <tr><th>Format</th><th>Bits/Zahl</th><th>7B benötigt</th><th>13B benötigt</th><th>Qualität</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>F16 (Original)</td><td>16 Bit</td><td>14 GB</td><td>26 GB</td><td>100%</td></tr>
+      <tr><td>Q8_0</td><td>8 Bit</td><td>7 GB</td><td>13 GB</td><td>~99%</td></tr>
+      <tr><td><strong>Q5_K_M</strong></td><td>5 Bit</td><td class="good">4,8 GB</td><td class="warn-color">8,5 GB</td><td>~97%</td></tr>
+      <tr><td><strong>Q4_K_M</strong></td><td>4 Bit</td><td class="good"><strong>4,0 GB ✓</strong></td><td class="good"><strong>7,0 GB ✓</strong></td><td>~95%</td></tr>
+      <tr><td>Q3_K_M</td><td>3 Bit</td><td>3,3 GB</td><td>5,5 GB</td><td>~88%</td></tr>
+      <tr><td>Q2_K</td><td>2 Bit</td><td>2,5 GB</td><td>4,5 GB</td><td class="bad">~75% — spürbar schlechter</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <strong>Sweet Spot:</strong> Q4_K_M ist der Standard für lokale Modelle. ~95% der Originalqualität bei einem Viertel des Speicherbedarfs. Das "K_M" bedeutet: wichtige Modell-Schichten werden weniger stark komprimiert als andere — intelligente Komprimierung statt pauschaler Reduktion.
+  </div>
+
+  <h2>3. Deine Hardware analysiert</h2>
+  <div class="callout success">
+    <strong>Dein Setup:</strong> RTX 3070 Ti Laptop · 8 GB VRAM · Ryzen 7 6800H · 16 GB RAM<br><br>
+    <strong>Was problemlos läuft:</strong><br>
+    ✓ 7B Modelle (Q4–Q8) vollständig auf GPU — flüssig (~25–50 Token/s)<br>
+    ✓ 13B Modelle in Q4 — passt knapp (7 GB) mit wenig Puffer<br><br>
+    <strong>Was schwierig wird:</strong><br>
+    ⚠ 13B in Q5/Q8 — zu groß, CPU-Offload nötig (~5–10 Token/s)<br>
+    ✗ 34B+ — nicht sinnvoll auf 8 GB VRAM<br>
+    ⚠ Fine-Tuning 7B (QLoRA) — technisch möglich, aber sehr langsam auf 8 GB
+  </div>
+
+  <h2>4. Die besten Modelle für C#, Unity &amp; s&amp;box</h2>
+  <p>Stand: Mitte 2025. Alle VRAM-Angaben für Q4_K_M. Fokus: Code-Assistent für lokale Entwicklung.</p>
+
+  <div class="model-card recommended">
+    <div class="model-name">Qwen2.5-Coder-7B-Instruct <span class="badge">Empfehlung #1</span></div>
+    <div class="model-meta">Alibaba Cloud · 7,7 Mrd. Parameter · VRAM (Q4): ~4,5 GB · Kontext: 128.000 Token</div>
+    <p>Stärkste reine Coding-Performance bei 7B-Modellen. Trainiert auf Milliarden Zeilen Code — C# und Unity-APIs gut abgedeckt. Das 128K-Token-Kontextfenster erlaubt es, ganze Klassen oder mehrere Dateien gleichzeitig zu übergeben.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Vorteile</h4>
+        <ul class="compact">
+          <li>Bester Coding-Score bei 7B</li>
+          <li>128K Token Kontext</li>
+          <li>Schnell — passt gut in 8 GB</li>
+          <li>Stark bei Code-Completion &amp; Debugging</li>
+          <li>Solides C# / Unity-Verständnis</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Nachteile</h4>
+        <ul class="compact">
+          <li>Chinesischer Anbieter (Privacy-Aspekt)</li>
+          <li>Schwächer bei komplexem Reasoning außerhalb Code</li>
+          <li>7B hat Grenzen bei sehr komplexen Architekturen</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card">
+    <div class="model-name">DeepSeek-Coder-V2-Lite-Instruct <span class="badge orange">Grenzfall</span></div>
+    <div class="model-meta">DeepSeek AI · 16B aktive Parameter (MoE) · VRAM (Q4): ~9–10 GB · Kontext: 128K Token</div>
+    <p><strong>MoE (Mixture of Experts):</strong> Das Modell hat 236B Parameter total, aktiviert aber pro Anfrage nur 16B. Dadurch ist die Qualität weit höher als ein normales 16B-Modell. Problem: ~9–10 GB VRAM — 1–2 GB zu viel für deine GPU ohne CPU-Offload.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Vorteile</h4>
+        <ul class="compact">
+          <li>Beste Coding-Qualität in dieser Kategorie</li>
+          <li>MoE = effizientes Qualität/VRAM-Verhältnis</li>
+          <li>Stark bei Multi-Datei-Reasoning</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Nachteile</h4>
+        <ul class="compact">
+          <li>Passt nicht vollständig in 8 GB VRAM</li>
+          <li>CPU-Offload = deutlich langsamer</li>
+          <li>Chinesischer Anbieter</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card">
+    <div class="model-name">Meta Llama 3.1 8B Instruct</div>
+    <div class="model-meta">Meta · 8,0 Mrd. Parameter · VRAM (Q4): ~5 GB · Kontext: 128K Token</div>
+    <p>Starkes Allround-Modell, vollständig Open Source. Nicht Code-spezialisiert, aber für Game-Design-Diskussionen, Architektur-Fragen und Erklärungen gut geeignet. Sinnvolle Ergänzung zu Qwen.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Vorteile</h4>
+        <ul class="compact">
+          <li>Vollständig Open Source (Meta)</li>
+          <li>Sehr große Community &amp; Tool-Unterstützung</li>
+          <li>Gut für Reasoning &amp; Design-Fragen</li>
+          <li>128K Token Kontext</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Nachteile</h4>
+        <ul class="compact">
+          <li>Schwächer als Qwen bei reinem Code</li>
+          <li>Generalist, kein Spezialist</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card">
+    <div class="model-name">Microsoft Phi-3.5-mini-Instruct</div>
+    <div class="model-meta">Microsoft · 3,8 Mrd. Parameter · VRAM (Q4): ~2,5 GB · Kontext: 128K Token</div>
+    <p>Klein, aber überraschend stark. Microsofts Ansatz: dicht und gezielt trainieren statt mehr Parameter. Ideal für schnelle Fragen und kurze Code-Snippets. Zu schwach für komplexe Multi-Datei-Architekturen.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Vorteile</h4>
+        <ul class="compact">
+          <li>Extrem schnell (~80–100 Token/s)</li>
+          <li>Nur 2,5 GB — viel freier VRAM</li>
+          <li>Westlicher Anbieter (Microsoft)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Nachteile</h4>
+        <ul class="compact">
+          <li>Schwächer bei komplexen Aufgaben</li>
+          <li>Kein Ersatz für 7B bei schwierigen Problemen</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="model-card">
+    <div class="model-name">Mistral Nemo 12B</div>
+    <div class="model-meta">Mistral AI (Frankreich) · 12,2 Mrd. Parameter · VRAM (Q4): ~7,5 GB · Kontext: 128K Token</div>
+    <p>Europäisches Modell mit gutem Reasoning. Passt knapp in 8 GB bei Q4. Option wenn Datenschutz (EU-Anbieter) wichtig ist und man etwas mehr Reasoning als bei Llama 3.1 8B braucht.</p>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Vorteile</h4>
+        <ul class="compact">
+          <li>EU-Anbieter (DSGVO-nah)</li>
+          <li>Gutes Reasoning</li>
+          <li>Passt knapp in 8 GB</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Nachteile</h4>
+        <ul class="compact">
+          <li>7,5 GB — sehr wenig Puffer für KV-Cache</li>
+          <li>Kein Coding-Spezialist</li>
+          <li>Langsamer als 7B Modelle</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <strong>Empfehlung für 8 GB VRAM:</strong><br>
+    <strong>Primär:</strong> Qwen2.5-Coder-7B-Instruct — tägliche Coding-Arbeit (C#, Unity, s&amp;box)<br>
+    <strong>Sekundär:</strong> Llama 3.1 8B — Reasoning, Game-Design-Diskussionen<br>
+    <strong>Optional:</strong> Phi-3.5-mini — wenn Speed wichtiger als Tiefe
+  </div>
+
+  <h2>5. Hardware-Upgrade: Wann &amp; Was?</h2>
+  <p>Laptop-GPU ist verlötet — kein In-Place-Upgrade. Optionen:</p>
+
+  <div class="upgrade-path">
+    <h4>Option A: Desktop + gebrauchte RTX 3090 (~500–700€ gesamt) ⭐</h4>
+    <p>24 GB VRAM. 34B-Modelle in Q4, 13B in voller Qualität (Q8), Fine-Tuning 7B mit QLoRA praktikabel. RTX 3090 gebraucht ~350€, einfacher Desktop ~300€. Laptop bleibt für unterwegs.</p>
+    <p><span class="good">Bestes Preis-Leistungs-Verhältnis für lokale KI.</span> Sehr beliebt in der Community, stabil mit CUDA.</p>
+  </div>
+
+  <div class="upgrade-path">
+    <h4>Option B: Neue RTX 4070 Super (~500€) für Desktop</h4>
+    <p>12 GB VRAM. 13B-Modelle komfortabel, Fine-Tuning möglich. Keine 34B. Energieeffizienter als 3090.</p>
+  </div>
+
+  <div class="upgrade-path">
+    <h4>Option C: RTX 4090 (~1100–1500€ gebraucht/neu)</h4>
+    <p>24 GB VRAM + deutlich schneller als 3090 (wichtig für intensives Fine-Tuning). Für die nächsten 3–5 Jahre beste Consumer-Karte für lokale KI.</p>
+  </div>
+
+  <div class="upgrade-path">
+    <h4>Option D: Apple Silicon Mac M3/M4 Max (2000€+)</h4>
+    <p>Unified Memory: 64 GB RAM = VRAM. Läuft 70B-Modelle flüssig. Aber: teurer, kein CUDA, weniger Fine-Tuning-Tools.</p>
+  </div>
+
+  <div class="callout">
+    <strong>Bei 700–2000€ Budget:</strong> Desktop + RTX 3090 (gebraucht) ist klare Empfehlung. Bei Fokus auf intensives Fine-Tuning: RTX 4090.
+  </div>
+
+  <h2>6. Tools (Vorschau für Lektion 2)</h2>
+  <table>
+    <thead>
+      <tr><th>Tool</th><th>Was es ist</th><th>Für wen</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Ollama</strong></td><td>CLI: ein Befehl, Modell läuft. REST-API inklusive.</td><td>Einstieg, tägliche Nutzung, IDE-Integration</td></tr>
+      <tr><td><strong>LM Studio</strong></td><td>GUI für Windows, kein Terminal nötig</td><td>Visuelle Auswahl, Ausprobieren ohne Setup</td></tr>
+      <tr><td><strong>llama.cpp</strong></td><td>Basis-Engine, maximale Kontrolle, CPU+GPU</td><td>Fortgeschrittene, eigene Skripte</td></tr>
+    </tbody>
+  </table>
+
+  <div class="quiz-section">
+    <h2>Quiz: Verständnis prüfen</h2>
+
+    <div class="quiz-q">
+      <p>1. Du willst ein 13B-Modell in Q4_K_M auf der RTX 3070 Ti (8 GB VRAM) laden. Was ist realistisch?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Läuft problemlos — 13B ist klein genug</div>
+        <div class="option" onclick="answer(this,'correct')">B) Passt knapp (~7 GB), aber kaum Puffer für KV-Cache — bei langen Gesprächen riskant</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Geht gar nicht — 13B erfordert mindestens 16 GB VRAM</div>
+      </div>
+      <div class="explanation">Richtig. 13B × 0,5 Byte (Q4) ≈ 6,5–7 GB. Technisch möglich, aber der KV-Cache (Speicher für das laufende Gespräch) braucht ebenfalls VRAM. Bei langen Gesprächen droht Out-of-Memory. Für 8 GB sind 7B-Modelle die stabilere Wahl.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. Was ist der Unterschied zwischen Q4_K_M und Q8_0?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Q8 hat doppelt so viele Parameter wie Q4</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Q4 ist nur für Gaming-GPUs, Q8 für Workstations</div>
+        <div class="option" onclick="answer(this,'correct')">C) Q4 speichert Gewichte in 4 Bit (halber Speicher), Q8 in 8 Bit — Q8 ist qualitativ besser, aber doppelt so groß</div>
+      </div>
+      <div class="explanation">Genau. Q4_K_M ≈ 0,5 Bytes/Parameter. Q8_0 ≈ 1 Byte/Parameter. Mehr Bits = weniger Informationsverlust = bessere Qualität = mehr VRAM. Das "K_M" bedeutet: wichtige Modell-Schichten werden weniger stark komprimiert als nebensächliche.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>3. Warum ist Qwen2.5-Coder-7B für C#/Unity besser als Llama 3.1 8B?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Es hat mehr Parameter</div>
+        <div class="option" onclick="answer(this,'correct')">B) Es wurde explizit auf Code spezialisiert trainiert — weit mehr Code-Trainingsdaten, besser auf Coding-Benchmarks</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Es läuft schneller auf AMD-CPUs</div>
+      </div>
+      <div class="explanation">Richtig. Llama 3.1 8B ist ein Allround-Modell. Qwen2.5-Coder wurde mit einem massiv höheren Anteil an Quellcode trainiert und anschließend auf Coding-Aufgaben feinabgestimmt. Das ergibt bei C#, Unity-API-Calls und s&amp;box-spezifischem Code deutlich präzisere Ausgaben.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>4. Du hast 700€ Budget für ein Upgrade. Was empfiehlt diese Lektion?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'correct')">A) Desktop + gebrauchte RTX 3090 — 24 GB VRAM für maximale Flexibilität</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Neues Gaming-Laptop mit RTX 4060</div>
+        <div class="option" onclick="answer(this,'wrong')">C) MacBook Air M3</div>
+      </div>
+      <div class="explanation">Korrekt. RTX 3090 gebraucht (~350€) + einfacher Desktop (~300€) = 24 GB VRAM. Das schaltet 34B-Modelle, echtes Fine-Tuning und komfortables 13B-Arbeiten frei — und dein Laptop bleibt für unterwegs erhalten.</div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>Nächste Schritte</h2>
+    <ul>
+      <li><strong>Lektion 2:</strong> Ollama installieren &amp; erstes Modell starten — in 15 Minuten läuft Qwen2.5-Coder lokal auf Windows</li>
+      <li><strong>Lektion 3:</strong> IDE-Integration — Continue.dev in VS Code/Rider als lokalen Copilot-Ersatz einrichten</li>
+      <li><strong>Lektion 4:</strong> RAG — eigene Codebase &amp; Docs in lokalen Vektorstore laden</li>
+      <li><strong>Lektion 5:</strong> Fine-Tuning mit QLoRA — Modell auf eigene C#-Projekte anpassen</li>
+    </ul>
+    <p style="margin-top:1rem;color:var(--muted)">Welche Fragen hast du? Was soll als nächstes dran kommen?</p>
+  </div>
+
+  <footer>
+    <p>Lokale KI Setup · Lektion 1 · <a href="https://djtj9.github.io/teach-lessons/" target="_blank">Alle Lektionen online ansehen</a></p>
+  </footer>
+
+</div>
+<script>
+function answer(el, result) {
+  const container = el.closest('.quiz-q');
+  container.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+  el.classList.add(result);
+  const exp = container.querySelector('.explanation');
+  if (exp) exp.classList.add('show');
+}
+</script>
+</body>
+</html>

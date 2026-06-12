@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 4 – Continue.dev IDE Integration | Lokale KI</title>
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d2e;--border:#2d3155;--accent:#7c6af7;--accent2:#4ade80;--text:#e2e8f0;--muted:#94a3b8;--warn:#f59e0b;--danger:#ef4444;--code-bg:#0d1117}
+    *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+    .container{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+    header{border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:2rem}
+    .lesson-tag{display:inline-block;background:var(--accent);color:white;font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem}
+    h1{font-size:1.875rem;font-weight:800;line-height:1.2;margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:1rem}
+    h2{font-size:1.375rem;font-weight:700;margin:2rem 0 1rem;border-left:3px solid var(--accent);padding-left:.75rem}
+    h3{font-size:1.05rem;font-weight:600;margin:1.25rem 0 .5rem;color:var(--accent)}p{margin-bottom:1rem}
+    .callout{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:.5rem;padding:1rem 1.25rem;margin:1.5rem 0}
+    .callout.warn{border-left-color:var(--warn)}.callout.success{border-left-color:var(--accent2)}
+    .callout strong{color:var(--accent)}.callout.warn strong{color:var(--warn)}.callout.success strong{color:var(--accent2)}
+    table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+    th{background:var(--surface);border:1px solid var(--border);padding:.6rem .9rem;text-align:left;color:var(--accent);font-weight:700}
+    td{border:1px solid var(--border);padding:.6rem .9rem}tr:nth-child(even){background:var(--surface)}
+    pre{background:var(--code-bg);border:1px solid var(--border);border-radius:.5rem;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-size:.875rem;line-height:1.6}
+    code{font-family:'Cascadia Code','Fira Code',monospace;color:#a5d6ff}pre code{color:#e2e8f0}
+    .cmd{color:#4ade80}.comment{color:#64748b;font-style:italic}.key{color:#fbbf24}
+    .step{display:flex;gap:.75rem;margin:.75rem 0;align-items:flex-start}
+    .step-num{background:var(--accent);color:white;font-weight:700;font-size:.8rem;min-width:1.75rem;height:1.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.15rem}
+    .step-body{flex:1}
+    .kbd{background:var(--surface);border:1px solid var(--border);border-radius:.25rem;padding:.1rem .4rem;font-family:monospace;font-size:.85rem}
+    .quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2.5rem}
+    .quiz-section h2{border:none;padding:0;margin-top:0}.quiz-q{margin:1.5rem 0}.quiz-q p{font-weight:600;margin-bottom:.6rem}
+    .options{display:flex;flex-direction:column;gap:.4rem}
+    .option{background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.6rem 1rem;cursor:pointer;transition:border-color .15s;font-size:.9rem}
+    .option:hover{border-color:var(--accent)}.option.correct{border-color:var(--accent2);background:rgba(74,222,128,.08)}.option.wrong{border-color:var(--danger);background:rgba(239,68,68,.08)}.option.disabled{pointer-events:none}
+    .explanation{display:none;font-size:.875rem;color:var(--muted);padding:.6rem .75rem;border-left:2px solid var(--muted);margin-top:.6rem;line-height:1.6}.explanation.show{display:block}
+    .next-steps{background:linear-gradient(135deg,#1a1d2e,#1a2040);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2rem}
+    .next-steps h2{border:none;padding:0;margin-top:0}.next-steps ul{padding-left:1.25rem;margin-top:.75rem}.next-steps li{margin:.4rem 0}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;text-align:center}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="lesson-tag">Lektion 4 · Lokale KI Setup</div>
+    <h1>Continue.dev — Lokaler Copilot in der IDE</h1>
+    <p class="subtitle">Qwen2.5-Coder direkt in VS Code oder Rider — Tab-Completion, Chat, Code-Auswahl ohne Cloud</p>
+  </header>
+
+  <h2>1. Was ist Continue.dev?</h2>
+  <p>Continue.dev ist ein Open-Source IDE-Plugin, das GitHub Copilot ersetzt — aber mit lokalen Modellen via Ollama. Es läuft in VS Code und JetBrains-IDEs (Rider, IntelliJ) und bietet dieselben Kern-Features wie Copilot, ohne Cloud-Abo.</p>
+  <table>
+    <thead><tr><th>Feature</th><th>GitHub Copilot</th><th>Continue.dev + Ollama</th></tr></thead>
+    <tbody>
+      <tr><td>Tab-Completion</td><td>✓ (Cloud)</td><td>✓ (lokal)</td></tr>
+      <tr><td>Chat in IDE</td><td>✓ (Cloud)</td><td>✓ (lokal)</td></tr>
+      <tr><td>Code auswählen + erklären</td><td>✓ (Cloud)</td><td>✓ (lokal)</td></tr>
+      <tr><td>Datenschutz</td><td>Code geht an Microsoft/OpenAI</td><td>Alles bleibt lokal</td></tr>
+      <tr><td>Kosten</td><td>10–19€/Monat</td><td>0€ laufend</td></tr>
+      <tr><td>Offline-Nutzung</td><td>Nein</td><td>Ja</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. Installation in VS Code</h2>
+  <div class="step"><div class="step-num">1</div><div class="step-body">Extensions öffnen (<span class="kbd">Ctrl+Shift+X</span>) → "Continue" suchen → <strong>Continue - Codestral, Claude, and more</strong> installieren</div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body">Continue-Panel erscheint rechts → <strong>⚙ Configure Continue</strong> klicken → öffnet <code>~/.continue/config.json</code></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body">config.json anpassen (siehe nächster Abschnitt)</div></div>
+
+  <h2>3. config.json — Empfohlene Konfiguration</h2>
+  <pre><code>{
+  <span class="key">"models"</span>: [
+    {
+      <span class="key">"title"</span>: <span class="comment">"Qwen2.5 Coder (Unity/C#)"</span>,
+      <span class="key">"provider"</span>: <span class="comment">"ollama"</span>,
+      <span class="key">"model"</span>: <span class="comment">"qwen2.5-coder:7b-instruct-q4_K_M"</span>,
+      <span class="key">"apiBase"</span>: <span class="comment">"http://localhost:11434"</span>,
+      <span class="key">"systemMessage"</span>: <span class="comment">"Du bist ein erfahrener C#-Entwickler spezialisiert auf Unity und s&box. Antworte auf Deutsch. Nutze modernes C# (C# 9+)."</span>
+    },
+    {
+      <span class="key">"title"</span>: <span class="comment">"Llama 3.1 (Reasoning)"</span>,
+      <span class="key">"provider"</span>: <span class="comment">"ollama"</span>,
+      <span class="key">"model"</span>: <span class="comment">"llama3.1:8b-instruct-q4_K_M"</span>,
+      <span class="key">"apiBase"</span>: <span class="comment">"http://localhost:11434"</span>
+    }
+  ],
+  <span class="key">"tabAutocompleteModel"</span>: {
+    <span class="key">"title"</span>: <span class="comment">"Qwen2.5 Autocomplete"</span>,
+    <span class="key">"provider"</span>: <span class="comment">"ollama"</span>,
+    <span class="key">"model"</span>: <span class="comment">"qwen2.5-coder:7b-instruct-q4_K_M"</span>,
+    <span class="key">"apiBase"</span>: <span class="comment">"http://localhost:11434"</span>
+  },
+  <span class="key">"tabAutocompleteOptions"</span>: {
+    <span class="key">"debounceDelay"</span>: 500,
+    <span class="key">"maxPromptTokens"</span>: 1024,
+    <span class="key">"multilineCompletions"</span>: <span class="comment">"auto"</span>
+  },
+  <span class="key">"contextProviders"</span>: [
+    { <span class="key">"name"</span>: <span class="comment">"code"</span> },
+    { <span class="key">"name"</span>: <span class="comment">"file"</span> },
+    { <span class="key">"name"</span>: <span class="comment">"currentFile"</span> },
+    { <span class="key">"name"</span>: <span class="comment">"terminal"</span> }
+  ]
+}</code></pre>
+
+  <div class="callout warn">
+    <strong>Performance-Erwartung:</strong> Tab-Completion auf einem lokalen 7B-Modell dauert ~0,5–2 Sekunden pro Vorschlag — langsamer als GitHub Copilot (Cloud). Der <code>debounceDelay: 500</code> verhindert, dass jeder Tastendruck sofort eine GPU-Anfrage auslöst.
+  </div>
+
+  <h2>4. Installation in JetBrains Rider</h2>
+  <div class="step"><div class="step-num">1</div><div class="step-body">Rider → <strong>File → Settings → Plugins → Marketplace</strong> → "Continue" suchen → Installieren</div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body">Neustart → Continue-Panel erscheint rechts in der IDE</div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body">Dieselbe <code>~/.continue/config.json</code> wie bei VS Code — beide IDEs teilen die Konfiguration automatisch</div></div>
+
+  <h2>5. Wichtige Tastenkürzel &amp; Workflows</h2>
+  <table>
+    <thead><tr><th>Aktion</th><th>Kürzel</th></tr></thead>
+    <tbody>
+      <tr><td>Chat öffnen</td><td><span class="kbd">Ctrl+L</span></td></tr>
+      <tr><td>Code auswählen + in Chat laden</td><td><span class="kbd">Ctrl+Shift+L</span></td></tr>
+      <tr><td>Autocomplete akzeptieren</td><td><span class="kbd">Tab</span></td></tr>
+      <tr><td>Autocomplete ablehnen</td><td><span class="kbd">Esc</span></td></tr>
+      <tr><td>Inline-Edit (Code umschreiben)</td><td><span class="kbd">Ctrl+I</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Typische Entwicklungs-Workflows</h3>
+  <table>
+    <thead><tr><th>Use Case</th><th>Vorgehen</th></tr></thead>
+    <tbody>
+      <tr><td>Funktion erklären</td><td>Auswählen → <span class="kbd">Ctrl+Shift+L</span> → "Erkläre diese Funktion"</td></tr>
+      <tr><td>Bug finden</td><td>Fehlerhafte Methode auswählen → Chat → "Wo ist der Bug?"</td></tr>
+      <tr><td>Code umschreiben</td><td>Auswählen → <span class="kbd">Ctrl+I</span> → "Refactore zu async/await"</td></tr>
+      <tr><td>Tests schreiben</td><td>Klasse auswählen → Chat → "Schreibe NUnit-Tests für diese Klasse"</td></tr>
+      <tr><td>Unity Component</td><td>Chat → "Erstelle ein PlayerController MonoBehaviour mit WASD-Bewegung"</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. @-Kontext-Provider: Eigene Dateien laden</h2>
+  <p>Im Chat mit <code>@</code> verschiedene Kontext-Quellen referenzieren:</p>
+  <table>
+    <thead><tr><th>@-Befehl</th><th>Was geladen wird</th></tr></thead>
+    <tbody>
+      <tr><td><code>@currentFile</code></td><td>Gesamte aktuelle Datei</td></tr>
+      <tr><td><code>@file PlayerController.cs</code></td><td>Spezifische Projektdatei</td></tr>
+      <tr><td><code>@terminal</code></td><td>Letzter Terminal-Output (z.B. Compiler-Fehler)</td></tr>
+      <tr><td><code>@code MyClass.MyMethod</code></td><td>Spezifische Methode oder Klasse</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success">
+    <strong>Praxis-Tipp:</strong> Unity-Build-Fehler aufgetreten? Im Continue-Chat <code>@terminal</code> + "Was bedeutet dieser Fehler und wie behebe ich ihn?" — das Modell liest die Fehlermeldung direkt. Kein manuelles Copy-Paste.
+  </div>
+
+  <div class="quiz-section">
+    <h2>Quiz</h2>
+
+    <div class="quiz-q">
+      <p>1. Warum ist <code>debounceDelay: 500</code> in der Autocomplete-Konfiguration sinnvoll?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Erhöht Qualität durch 500ms extra Denkzeit</div>
+        <div class="option" onclick="answer(this,'correct')">B) Wartet 500ms nach dem letzten Tastendruck bevor eine GPU-Anfrage startet — verhindert Anfrage bei jedem getippten Zeichen</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Gibt dem Modell 500ms mehr VRAM-Zeit</div>
+      </div>
+      <div class="explanation">Debounce: Warte N ms nach dem letzten Ereignis. Bei 500ms: Erst wenn 0,5 Sekunden nach dem letzten Tastendruck vergangen sind, wird eine Completion-Anfrage gestartet. Wichtig für flüssiges Tippen — ohne Debounce würde jedes Zeichen eine GPU-Anfrage auslösen.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. Du nutzt VS Code und Rider gleichzeitig. Musst du Continue.dev in beiden separat konfigurieren?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'correct')">A) Nein — beide lesen dieselbe <code>~/.continue/config.json</code>, Konfiguration wird geteilt</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Ja — jede IDE hat eine eigene Konfigurationsdatei</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Nur VS Code nutzt config.json, Rider nutzt XML</div>
+      </div>
+      <div class="explanation">Continue.dev speichert die Konfiguration im Benutzerverzeichnis (<code>~/.continue/config.json</code>). Sowohl VS Code als auch JetBrains-Plugins lesen diese Datei — einmal konfigurieren, überall verfügbar.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>3. Unity-Compilerfehler in der Konsole. Schnellster Weg, das Modell um Hilfe zu bitten?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Fehlertext manuell in den Chat copy-pasten</div>
+        <div class="option" onclick="answer(this,'correct')">B) Im Continue-Chat <code>@terminal</code> eingeben — fügt automatisch den letzten Terminal-Output als Kontext ein</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Fehlerdatei als .txt speichern und hochladen</div>
+      </div>
+      <div class="explanation">Der <code>@terminal</code> Kontext-Provider fügt den letzten Output des integrierten Terminals automatisch in den Chat-Kontext ein. Dann einfach "Erkläre diesen Fehler" schreiben — kein Copy-Paste.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>4. Was ist der größte Vorteil gegenüber GitHub Copilot für dieses Setup?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Schneller als Copilot</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Kennt Unity-APIs besser</div>
+        <div class="option" onclick="answer(this,'correct')">C) Code verlässt nie den eigenen Rechner — kein Cloud-Zugriff auf Quellcode, offline-fähig, keine laufenden Kosten</div>
+      </div>
+      <div class="explanation">Hauptvorteil: Privatsphäre + Offline-Fähigkeit + Kostenkontrolle. Copilot ist oft schneller und besser bei allgemeinen Coding-Tasks. Aber für ein unabhängiges, offline-fähiges, dauerhaft kostenloses Setup ist Continue.dev + lokales Modell die richtige Wahl.</div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>Nächste Schritte</h2>
+    <ul>
+      <li><strong>Lektion 5:</strong> Hugging Face — weitere GGUF-Modelle finden und direkt in Ollama laden</li>
+      <li><strong>Lektion 6:</strong> RAG Grundlagen — eigene Codebase semantisch durchsuchbar machen</li>
+    </ul>
+    <p style="margin-top:1rem;color:var(--muted)">Welche Fragen hast du? Was soll als nächstes dran kommen?</p>
+  </div>
+
+  <footer>
+    <p>Lokale KI Setup · Lektion 4 · <a href="https://djtj9.github.io/teach-lessons/" target="_blank">Alle Lektionen online ansehen</a></p>
+  </footer>
+</div>
+<script>
+function answer(el,result){
+  const c=el.closest('.quiz-q');
+  c.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  el.classList.add(result);
+  const e=c.querySelector('.explanation');
+  if(e)e.classList.add('show');
+}
+</script>
+</body>
+</html>

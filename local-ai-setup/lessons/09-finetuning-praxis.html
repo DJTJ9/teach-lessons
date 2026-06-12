@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 9 – Fine-Tuning Praxis | Lokale KI</title>
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d2e;--border:#2d3155;--accent:#7c6af7;--accent2:#4ade80;--text:#e2e8f0;--muted:#94a3b8;--warn:#f59e0b;--danger:#ef4444;--code-bg:#0d1117}
+    *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+    .container{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+    header{border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:2rem}
+    .lesson-tag{display:inline-block;background:var(--accent);color:white;font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem}
+    h1{font-size:1.875rem;font-weight:800;line-height:1.2;margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:1rem}
+    h2{font-size:1.375rem;font-weight:700;margin:2rem 0 1rem;border-left:3px solid var(--accent);padding-left:.75rem}
+    h3{font-size:1.05rem;font-weight:600;margin:1.25rem 0 .5rem;color:var(--accent)}p{margin-bottom:1rem}
+    .callout{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:.5rem;padding:1rem 1.25rem;margin:1.5rem 0}
+    .callout.warn{border-left-color:var(--warn)}.callout.success{border-left-color:var(--accent2)}
+    .callout strong{color:var(--accent)}.callout.warn strong{color:var(--warn)}.callout.success strong{color:var(--accent2)}
+    table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+    th{background:var(--surface);border:1px solid var(--border);padding:.6rem .9rem;text-align:left;color:var(--accent);font-weight:700}
+    td{border:1px solid var(--border);padding:.6rem .9rem}tr:nth-child(even){background:var(--surface)}
+    pre{background:var(--code-bg);border:1px solid var(--border);border-radius:.5rem;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-size:.875rem;line-height:1.6}
+    code{font-family:'Cascadia Code','Fira Code',monospace;color:#a5d6ff}pre code{color:#e2e8f0}
+    .cmd{color:#4ade80}.comment{color:#64748b;font-style:italic}.str{color:#fbbf24}.kw{color:#c084fc}.fn{color:#7dd3fc}
+    .step{display:flex;gap:.75rem;margin:.75rem 0;align-items:flex-start}
+    .step-num{background:var(--accent);color:white;font-weight:700;font-size:.8rem;min-width:1.75rem;height:1.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.15rem}
+    .step-body{flex:1}
+    .quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2.5rem}
+    .quiz-section h2{border:none;padding:0;margin-top:0}.quiz-q{margin:1.5rem 0}.quiz-q p{font-weight:600;margin-bottom:.6rem}
+    .options{display:flex;flex-direction:column;gap:.4rem}
+    .option{background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.6rem 1rem;cursor:pointer;transition:border-color .15s;font-size:.9rem}
+    .option:hover{border-color:var(--accent)}.option.correct{border-color:var(--accent2);background:rgba(74,222,128,.08)}.option.wrong{border-color:var(--danger);background:rgba(239,68,68,.08)}.option.disabled{pointer-events:none}
+    .explanation{display:none;font-size:.875rem;color:var(--muted);padding:.6rem .75rem;border-left:2px solid var(--muted);margin-top:.6rem;line-height:1.6}.explanation.show{display:block}
+    .next-steps{background:linear-gradient(135deg,#1a1d2e,#1a2040);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2rem}
+    .next-steps h2{border:none;padding:0;margin-top:0}.next-steps ul{padding-left:1.25rem;margin-top:.75rem}.next-steps li{margin:.4rem 0}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;text-align:center}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    .url-list{background:var(--surface);border:1px solid var(--accent);border-radius:.5rem;padding:1.25rem;margin:1.5rem 0}
+    .url-list li{margin:.4rem 0;list-style:none}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="lesson-tag">Lektion 9 · Lokale KI Setup</div>
+    <h1>Fine-Tuning Praxis — Training mit Unsloth und Export nach Ollama</h1>
+    <p class="subtitle">Vollständiger Workflow: Datensatz bauen → Training → GGUF → Ollama</p>
+  </header>
+
+  <h2>1. Voraussetzungen</h2>
+  <div class="callout warn">
+    <strong>WSL2 erforderlich:</strong> Unsloth läuft auf Windows nur unter WSL2. Einrichten: <code>wsl --install -d Ubuntu-22.04</code> in einer Admin-PowerShell. CUDA auf der RTX 3070 Ti ist in WSL2 direkt verfügbar.
+  </div>
+
+  <pre><code><span class="comment"># In WSL2 Ubuntu — einmalige Einrichtung</span>
+<span class="cmd">pip install unsloth</span>
+<span class="cmd">pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121</span>
+<span class="cmd">pip install datasets transformers accelerate bitsandbytes</span>
+
+<span class="comment"># CUDA-Verfügbarkeit prüfen</span>
+<span class="cmd">python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"</span>
+<span class="comment"># Erwartete Ausgabe: True  NVIDIA GeForce RTX 3070 Ti Laptop GPU</span></code></pre>
+
+  <h2>2. Datensatz erstellen — s&amp;box Beispiele</h2>
+  <p>Der Datensatz ist das Herzstück des Fine-Tunings. Hier: Beispiele für s&amp;box-spezifische C#-Components.</p>
+
+  <pre><code><span class="comment"># Datensatz als dataset.jsonl anlegen (Chat-Format)</span>
+<span class="comment"># Jede Zeile = ein Trainingsbeispiel</span>
+
+<span class="comment">// Beispiel 1</span>
+{<span class="str">"messages"</span>: [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Schreibe eine s&box Component die einen Timer implementiert"</span>}, {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"public sealed class TimerComponent : Component\n{\n\t[Property] public float Duration { get; set; } = 5f;\n\t[Property] public Action OnTimerEnd { get; set; }\n\n\tprivate TimeUntil _timeUntil;\n\n\tprotected override void OnStart()\n\t{\n\t\t_timeUntil = Duration;\n\t}\n\n\tprotected override void OnUpdate()\n\t{\n\t\tif ( _timeUntil <= 0 )\n\t\t{\n\t\t\tOnTimerEnd?.Invoke();\n\t\t\tEnabled = false;\n\t\t}\n\t}\n}"</span>}]}
+
+<span class="comment">// Beispiel 2</span>
+{<span class="str">"messages"</span>: [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"s&box: Health-System mit Damage-Events"</span>}, {<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"public sealed class HealthComponent : Component\n{\n\t[Property, Sync] public float Health { get; private set; } = 100f;\n\t[Property] public float MaxHealth { get; set; } = 100f;\n\n\t[Property] public Action&lt;float&gt; OnDamaged { get; set; }\n\t[Property] public Action OnDeath { get; set; }\n\n\tpublic void TakeDamage( float amount )\n\t{\n\t\tHealth = Math.Max( 0, Health - amount );\n\t\tOnDamaged?.Invoke( amount );\n\t\tif ( Health &lt;= 0 ) OnDeath?.Invoke();\n\t}\n}"</span>}]}</code></pre>
+
+  <div class="callout">
+    <strong>Tipp:</strong> Minimum 100-200 solcher Beispiele für sinnvolle Spezialisierung. Schreibe sie aus deinem echten Projekt-Code — das gibt dem Modell deinen spezifischen Stil.
+  </div>
+
+  <h2>3. Training-Script (Unsloth + QLoRA)</h2>
+
+  <pre><code><span class="comment"># train.py — in WSL2 ausführen</span>
+<span class="kw">from</span> unsloth <span class="kw">import</span> FastLanguageModel
+<span class="kw">from</span> datasets <span class="kw">import</span> load_dataset
+<span class="kw">from</span> trl <span class="kw">import</span> SFTTrainer
+<span class="kw">from</span> transformers <span class="kw">import</span> TrainingArguments
+
+<span class="comment"># --- Modell laden (4-Bit QLoRA) ---</span>
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name = <span class="str">"unsloth/Qwen2.5-Coder-7B-Instruct-bnb-4bit"</span>,
+    max_seq_length = <span class="str">2048</span>,
+    load_in_4bit = <span class="kw">True</span>,
+)
+
+<span class="comment"># --- LoRA-Adapter konfigurieren ---</span>
+model = FastLanguageModel.get_peft_model(
+    model,
+    r = <span class="str">16</span>,
+    lora_alpha = <span class="str">32</span>,
+    lora_dropout = <span class="str">0.05</span>,
+    target_modules = [<span class="str">"q_proj"</span>, <span class="str">"k_proj"</span>, <span class="str">"v_proj"</span>, <span class="str">"o_proj"</span>,
+                      <span class="str">"gate_proj"</span>, <span class="str">"up_proj"</span>, <span class="str">"down_proj"</span>],
+    use_gradient_checkpointing = <span class="str">"unsloth"</span>,
+)
+
+<span class="comment"># --- Datensatz laden und formatieren ---</span>
+dataset = load_dataset(<span class="str">"json"</span>, data_files=<span class="str">"dataset.jsonl"</span>, split=<span class="str">"train"</span>)
+
+<span class="fn">def</span> <span class="fn">format_chat</span>(sample):
+    messages = sample[<span class="str">"messages"</span>]
+    <span class="kw">return</span> {<span class="str">"text"</span>: tokenizer.apply_chat_template(messages, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">False</span>)}
+
+dataset = dataset.map(format_chat)
+
+<span class="comment"># --- Training starten ---</span>
+trainer = SFTTrainer(
+    model = model,
+    tokenizer = tokenizer,
+    train_dataset = dataset,
+    dataset_text_field = <span class="str">"text"</span>,
+    max_seq_length = <span class="str">2048</span>,
+    args = TrainingArguments(
+        per_device_train_batch_size = <span class="str">1</span>,
+        gradient_accumulation_steps = <span class="str">4</span>,
+        num_train_epochs = <span class="str">3</span>,
+        learning_rate = <span class="str">2e-4</span>,
+        fp16 = <span class="kw">True</span>,
+        logging_steps = <span class="str">10</span>,
+        output_dir = <span class="str">"./output"</span>,
+        save_strategy = <span class="str">"epoch"</span>,
+    ),
+)
+trainer.train()
+
+<span class="comment"># --- Adapter speichern ---</span>
+model.save_pretrained(<span class="str">"./sbox-adapter"</span>)
+tokenizer.save_pretrained(<span class="str">"./sbox-adapter"</span>)
+print(<span class="str">"Training abgeschlossen! Adapter unter ./sbox-adapter"</span>)
+</code></pre>
+
+  <div class="callout">
+    <strong>VRAM-Monitoring:</strong> Führe <code>nvidia-smi -l 1</code> in einem zweiten Terminal aus, um VRAM-Auslastung live zu sehen. Typisch: 6-7.5 GB beim Training mit diesen Einstellungen.
+  </div>
+
+  <h2>4. Export nach GGUF und Ollama</h2>
+
+  <h3>Schritt 1: Adapter mergen und zu GGUF exportieren</h3>
+  <pre><code><span class="comment"># export.py — nach dem Training</span>
+<span class="kw">from</span> unsloth <span class="kw">import</span> FastLanguageModel
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name = <span class="str">"./sbox-adapter"</span>,
+    load_in_4bit = <span class="kw">True</span>,
+)
+
+<span class="comment"># Direkt als GGUF exportieren (Unsloth macht Merge + Konvertierung intern)</span>
+model.save_pretrained_gguf(
+    <span class="str">"sbox-qwen-7b"</span>,
+    tokenizer,
+    quantization_method = <span class="str">"q4_k_m"</span>  <span class="comment"># oder "q5_k_m" für bessere Qualität</span>
+)
+<span class="comment"># Erzeugt: sbox-qwen-7b-Q4_K_M.gguf</span></code></pre>
+
+  <h3>Schritt 2: Modell in Ollama registrieren</h3>
+  <pre><code><span class="comment"># Modelfile erstellen</span>
+<span class="cmd">cat &gt; Modelfile &lt;&lt; 'EOF'
+FROM ./sbox-qwen-7b-Q4_K_M.gguf
+
+SYSTEM """
+Du bist ein erfahrener C#-Entwickler spezialisiert auf s&box (Facepunch).
+Nutze immer s&box-spezifische APIs: Component-System, GameResource, [Property]-Attribute, Sync-Attribute.
+Antworte auf Deutsch mit sauberem, idomatischem s&box-C#.
+"""
+
+PARAMETER temperature 0.3
+PARAMETER num_ctx 4096
+EOF</span>
+
+<span class="comment"># In Ollama laden</span>
+<span class="cmd">ollama create sbox-assistant -f Modelfile</span>
+
+<span class="comment"># Testen</span>
+<span class="cmd">ollama run sbox-assistant "Schreibe eine Component für Inventar-Verwaltung"</span></code></pre>
+
+  <h2>5. Overfitting erkennen und verhindern</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Ursache</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Modell wiederholt Training-Sätze wortwörtlich</td><td>Overfitting — zu viele Epochs</td><td>num_train_epochs auf 1-2 reduzieren</td></tr>
+      <tr><td>Antworten auf neue Fragen sehr seltsam</td><td>Catastrophic Forgetting</td><td>Learning Rate senken (1e-4), mehr Datensatz-Vielfalt</td></tr>
+      <tr><td>Loss sinkt nicht mehr nach Epoch 1</td><td>Datensatz zu klein oder zu wenig Vielfalt</td><td>Mehr und vielfältigere Beispiele hinzufügen</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. Kombination: Fine-Tuning + RAG</h2>
+  <p>Die stärkste Konfiguration kombiniert beide Ansätze: ein fine-getuntes Modell (das deinen Coding-Stil kennt) plus RAG (das aktuellen Projekt-Code nachschlägt).</p>
+
+  <div class="callout success">
+    <strong>Empfohlener Stack:</strong>
+    <ol style="padding-left:1.25rem;margin-top:.5rem">
+      <li style="margin:.3rem 0">Qwen2.5-Coder auf s&amp;box-Beispielen fine-getuned → versteht dein Framework</li>
+      <li style="margin:.3rem 0">ChromaDB-Index deines aktuellen Projekts → kennt deinen spezifischen Code</li>
+      <li style="margin:.3rem 0">query.py schickt relevante Code-Chunks als Kontext → präzise, projektspezifische Antworten</li>
+    </ol>
+  </div>
+
+  <h2>7. Alle Lektionen im Überblick</h2>
+  <ul class="url-list">
+    <li>01 · Hardware &amp; Modell-Auswahl — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/01-hardware-modell-auswahl.html" target="_blank">Link</a></li>
+    <li>02 · Ollama — Erstes Modell — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/02-ollama-erstes-modell.html" target="_blank">Link</a></li>
+    <li>03 · Open-WebUI — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/03-open-webui.html" target="_blank">Link</a></li>
+    <li>04 · Continue.dev IDE-Integration — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/04-continue-dev-ide.html" target="_blank">Link</a></li>
+    <li>05 · Hugging Face Modelle — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/05-hugging-face-modelle.html" target="_blank">Link</a></li>
+    <li>06 · RAG Grundlagen — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/06-rag-grundlagen.html" target="_blank">Link</a></li>
+    <li>07 · RAG Praxis — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/07-rag-praxis.html" target="_blank">Link</a></li>
+    <li>08 · Fine-Tuning Grundlagen — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/08-finetuning-grundlagen.html" target="_blank">Link</a></li>
+    <li>09 · Fine-Tuning Praxis — <a href="https://djtj9.github.io/teach-lessons/local-ai-setup/lessons/09-finetuning-praxis.html" target="_blank">Link</a></li>
+  </ul>
+
+  <div class="quiz-section">
+    <h2>Quiz</h2>
+
+    <div class="quiz-q">
+      <p>1. Du trainierst 3 Epochs und siehst, dass das Modell auf neue Fragen wortwörtlich Trainings-Beispiele antwortet. Was ist die wahrscheinlichste Ursache?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Learning Rate zu niedrig — das Modell hat nichts gelernt</div>
+        <div class="option" onclick="answer(this,'correct')">B) Overfitting — das Modell hat die Trainingsbeispiele auswendig gelernt statt zu generalisieren, wahrscheinlich zu wenig Datensatz-Vielfalt</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Das ist normales Verhalten — Fine-Tuning soll Beispiele memorieren</div>
+      </div>
+      <div class="explanation">Wenn ein Modell Trainingsbeispiele wortwörtlich reproduziert, ist es overfittet. Ursachen: zu wenige Beispiele (Modell sieht dieselben zu oft), zu viele Epochs, zu hohe Learning Rate. Fixes: mehr Daten, num_train_epochs auf 1-2 senken, lora_dropout erhöhen, learning_rate auf 1e-4 reduzieren.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. Warum nutzt das Training-Script <code>gradient_accumulation_steps=4</code> bei <code>per_device_train_batch_size=1</code>?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'correct')">B) Simuliert eine effektive Batch-Size von 4 ohne 4x VRAM zu brauchen — Gradienten werden über 4 Schritte akkumuliert bevor ein Optimizer-Schritt gemacht wird</div>
+        <div class="option" onclick="answer(this,'wrong')">A) Macht das Training 4x schneller durch Parallelisierung</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Ist eine Sicherheitseinstellung gegen Speicherüberläufe, hat keine Auswirkung auf Qualität</div>
+      </div>
+      <div class="explanation">Mit Batch-Size 1 und 8GB VRAM wäre die effektive Batch-Size zu klein — Training wird instabil. Gradient Accumulation löst das: 4 Forward Passes mit je 1 Sample, Gradienten addieren, dann ein einziger Optimizer-Schritt mit akkumulierten Gradienten. Effekt identisch zu Batch-Size 4, aber nur VRAM für 1 Sample gleichzeitig.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>3. Dein fine-getuntes Modell ist in Ollama geladen. Wie integrierst du es am besten mit dem RAG-System aus Lektion 7?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) RAG und Fine-Tuning schließen sich aus — du musst dich für eines entscheiden</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Das fine-getunte Modell braucht kein RAG mehr, es kennt deinen Code bereits</div>
+        <div class="option" onclick="answer(this,'correct')">C) Im query.py einfach LLM_MODEL auf das neue Modell setzen — das fine-getunte Modell versteht s&box-Patterns besser, RAG liefert weiterhin aktuellen Projekt-Code als Kontext</div>
+      </div>
+      <div class="explanation">Fine-Tuning und RAG ergänzen sich: Das fine-getunte Modell "denkt" besser in s&box-Patterns (durch Training gelernt). RAG liefert den aktuellen Projektstand (durch Indexierung). Im query.py nur LLM_MODEL = "sbox-assistant" setzen — alles andere bleibt. Das ist der beste Stack: Stil durch Fine-Tuning, Fakten durch RAG.</div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>Kurs abgeschlossen!</h2>
+    <p>Du kennst jetzt alle Bausteine für dein privates lokales KI-Setup:</p>
+    <ul>
+      <li>Hardware-Grenzen kennen und richtig quantisieren</li>
+      <li>Ollama + Open-WebUI als Infrastruktur betreiben</li>
+      <li>Continue.dev als lokalen Copilot in der IDE nutzen</li>
+      <li>Modelle von Hugging Face laden und anpassen</li>
+      <li>RAG für eigene Codebasen aufbauen</li>
+      <li>Modelle mit QLoRA fine-tunen und nach Ollama exportieren</li>
+    </ul>
+    <p style="margin-top:1rem"><strong>Nächste Praxis-Schritte:</strong></p>
+    <ul>
+      <li>Dein Unity-/s&box-Projekt indexieren (Lektion 7)</li>
+      <li>50 eigene Trainingsbeispiele schreiben und ersten Fine-Tuning-Lauf starten</li>
+      <li>RTX 3090 anschaffen wenn 13B+ Modelle gewünscht werden (Budget 600-900€ gebraucht)</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>Lokale KI Setup · Lektion 9 · <a href="https://djtj9.github.io/teach-lessons/" target="_blank">Alle Lektionen online ansehen</a></p>
+  </footer>
+</div>
+<script>
+function answer(el,result){
+  const c=el.closest('.quiz-q');
+  c.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  el.classList.add(result);
+  const e=c.querySelector('.explanation');
+  if(e)e.classList.add('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 7 – RAG Praxis | Lokale KI</title>
+  <style>
+    :root{--bg:#0f1117;--surface:#1a1d2e;--border:#2d3155;--accent:#7c6af7;--accent2:#4ade80;--text:#e2e8f0;--muted:#94a3b8;--warn:#f59e0b;--danger:#ef4444;--code-bg:#0d1117}
+    *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+    .container{max-width:860px;margin:0 auto;padding:2rem 1.5rem}
+    header{border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:2rem}
+    .lesson-tag{display:inline-block;background:var(--accent);color:white;font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.75rem}
+    h1{font-size:1.875rem;font-weight:800;line-height:1.2;margin-bottom:.5rem}.subtitle{color:var(--muted);font-size:1rem}
+    h2{font-size:1.375rem;font-weight:700;margin:2rem 0 1rem;border-left:3px solid var(--accent);padding-left:.75rem}
+    h3{font-size:1.05rem;font-weight:600;margin:1.25rem 0 .5rem;color:var(--accent)}p{margin-bottom:1rem}
+    .callout{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:.5rem;padding:1rem 1.25rem;margin:1.5rem 0}
+    .callout.warn{border-left-color:var(--warn)}.callout.success{border-left-color:var(--accent2)}
+    .callout strong{color:var(--accent)}.callout.warn strong{color:var(--warn)}.callout.success strong{color:var(--accent2)}
+    table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.9rem}
+    th{background:var(--surface);border:1px solid var(--border);padding:.6rem .9rem;text-align:left;color:var(--accent);font-weight:700}
+    td{border:1px solid var(--border);padding:.6rem .9rem}tr:nth-child(even){background:var(--surface)}
+    pre{background:var(--code-bg);border:1px solid var(--border);border-radius:.5rem;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-size:.875rem;line-height:1.6}
+    code{font-family:'Cascadia Code','Fira Code',monospace;color:#a5d6ff}pre code{color:#e2e8f0}
+    .cmd{color:#4ade80}.comment{color:#64748b;font-style:italic}.str{color:#fbbf24}.kw{color:#c084fc}.fn{color:#7dd3fc}
+    .step{display:flex;gap:.75rem;margin:.75rem 0;align-items:flex-start}
+    .step-num{background:var(--accent);color:white;font-weight:700;font-size:.8rem;min-width:1.75rem;height:1.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.15rem}
+    .step-body{flex:1}
+    .quiz-section{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2.5rem}
+    .quiz-section h2{border:none;padding:0;margin-top:0}.quiz-q{margin:1.5rem 0}.quiz-q p{font-weight:600;margin-bottom:.6rem}
+    .options{display:flex;flex-direction:column;gap:.4rem}
+    .option{background:var(--bg);border:1px solid var(--border);border-radius:.4rem;padding:.6rem 1rem;cursor:pointer;transition:border-color .15s;font-size:.9rem}
+    .option:hover{border-color:var(--accent)}.option.correct{border-color:var(--accent2);background:rgba(74,222,128,.08)}.option.wrong{border-color:var(--danger);background:rgba(239,68,68,.08)}.option.disabled{pointer-events:none}
+    .explanation{display:none;font-size:.875rem;color:var(--muted);padding:.6rem .75rem;border-left:2px solid var(--muted);margin-top:.6rem;line-height:1.6}.explanation.show{display:block}
+    .next-steps{background:linear-gradient(135deg,#1a1d2e,#1a2040);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;margin-top:2rem}
+    .next-steps h2{border:none;padding:0;margin-top:0}.next-steps ul{padding-left:1.25rem;margin-top:.75rem}.next-steps li{margin:.4rem 0}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;text-align:center}
+    a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="lesson-tag">Lektion 7 · Lokale KI Setup</div>
+    <h1>RAG Praxis — Unity-Projekt indexieren und abfragen</h1>
+    <p class="subtitle">Vollständiger Code: eigene .cs-Dateien in ChromaDB laden, mit Qwen abfragen</p>
+  </header>
+
+  <h2>1. Setup: Abhängigkeiten und Modell</h2>
+
+  <div class="step"><div class="step-num">1</div><div class="step-body">
+    Python-Pakete installieren:
+    <pre><code><span class="cmd">pip install chromadb langchain-community langchain-text-splitters</span></code></pre>
+  </div></div>
+
+  <div class="step"><div class="step-num">2</div><div class="step-body">
+    Embedding-Modell via Ollama holen:
+    <pre><code><span class="cmd">ollama pull nomic-embed-text</span>
+<span class="comment"># 274 MB, CPU-fähig — kein VRAM nötig</span></code></pre>
+  </div></div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-body">
+    LLM für Antworten (falls noch nicht vorhanden):
+    <pre><code><span class="cmd">ollama pull qwen2.5-coder:7b-instruct-q4_K_M</span></code></pre>
+  </div></div>
+
+  <h2>2. Indexierungs-Script: Projekt einlesen</h2>
+  <p>Dieses Script liest alle .cs-Dateien aus deinem Unity-Projekt, teilt sie in Chunks auf und speichert sie in ChromaDB.</p>
+
+  <pre><code><span class="comment"># indexer.py — einmalig ausführen wenn sich Dateien ändern</span>
+<span class="kw">import</span> os
+<span class="kw">import</span> chromadb
+<span class="kw">from</span> langchain_text_splitters <span class="kw">import</span> RecursiveCharacterTextSplitter
+<span class="kw">import</span> ollama
+
+<span class="comment"># --- Konfiguration ---</span>
+PROJECT_DIR = <span class="str">r"C:\Projekte\MeinUnityProjekt\Assets\Scripts"</span>
+DB_DIR      = <span class="str">r"C:\Projekte\MeinUnityProjekt\.rag_db"</span>
+COLLECTION  = <span class="str">"unity_codebase"</span>
+
+<span class="comment"># --- Alle .cs-Dateien finden ---</span>
+all_files = []
+<span class="kw">for</span> root, _, files <span class="kw">in</span> os.walk(PROJECT_DIR):
+    <span class="kw">for</span> f <span class="kw">in</span> files:
+        <span class="kw">if</span> f.endswith(<span class="str">".cs"</span>):
+            all_files.append(os.path.join(root, f))
+
+print(f<span class="str">"Gefunden: {len(all_files)} .cs-Dateien"</span>)
+
+<span class="comment"># --- Text laden ---</span>
+texts, metas = [], []
+<span class="kw">for</span> path <span class="kw">in</span> all_files:
+    <span class="kw">try</span>:
+        content = open(path, encoding=<span class="str">"utf-8"</span>).read()
+        texts.append(content)
+        metas.append({<span class="str">"source"</span>: os.path.relpath(path, PROJECT_DIR)})
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        print(f<span class="str">"Fehler bei {path}: {e}"</span>)
+
+<span class="comment"># --- Chunking ---</span>
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=<span class="str">800</span>,
+    chunk_overlap=<span class="str">80</span>,
+    separators=[<span class="str">"\n\n"</span>, <span class="str">"\n"</span>, <span class="str">"{"</span>, <span class="str">"}"</span>, <span class="str">" "</span>],
+)
+chunks, chunk_metas = [], []
+<span class="kw">for</span> text, meta <span class="kw">in</span> zip(texts, metas):
+    splits = splitter.split_text(text)
+    chunks.extend(splits)
+    chunk_metas.extend([meta] * len(splits))
+
+print(f<span class="str">"Chunks erstellt: {len(chunks)}"</span>)
+
+<span class="comment"># --- Embeddings via Ollama ---</span>
+<span class="fn">def</span> <span class="fn">embed_batch</span>(texts_batch):
+    resp = ollama.embed(model=<span class="str">"nomic-embed-text"</span>, input=texts_batch)
+    <span class="kw">return</span> resp.embeddings
+
+<span class="comment"># --- ChromaDB speichern ---</span>
+client = chromadb.PersistentClient(path=DB_DIR)
+<span class="comment"># Alte Collection löschen falls vorhanden (Re-Indexierung)</span>
+<span class="kw">try</span>: client.delete_collection(COLLECTION)
+<span class="kw">except</span>: <span class="kw">pass</span>
+collection = client.create_collection(COLLECTION)
+
+BATCH = <span class="str">50</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="str">0</span>, len(chunks), BATCH):
+    batch_texts = chunks[i:i+BATCH]
+    batch_metas = chunk_metas[i:i+BATCH]
+    batch_embeds = embed_batch(batch_texts)
+    batch_ids = [f<span class="str">"chunk_{i+j}"</span> <span class="kw">for</span> j <span class="kw">in</span> range(len(batch_texts))]
+    collection.add(
+        documents=batch_texts,
+        embeddings=batch_embeds,
+        metadatas=batch_metas,
+        ids=batch_ids,
+    )
+    print(f<span class="str">"Indexiert: {i+len(batch_texts)}/{len(chunks)}"</span>)
+
+print(<span class="str">"Indexierung abgeschlossen!"</span>)
+</code></pre>
+
+  <div class="callout warn">
+    <strong>Separators für C#:</strong> <code>{</code> und <code>}</code> als Trenner hinzugefügt — so versucht der Splitter, an Methoden/Klassen-Grenzen zu trennen statt mitten in Code. Ergibt semantisch kohärentere Chunks.
+  </div>
+
+  <h2>3. Query-Script: Fragen stellen</h2>
+  <p>Dieses Script nimmt deine Frage, findet die relevantesten Code-Abschnitte und gibt sie zusammen mit dem LLM-Output aus.</p>
+
+  <pre><code><span class="comment"># query.py — bei jeder Frage ausführen</span>
+<span class="kw">import</span> chromadb
+<span class="kw">import</span> ollama
+
+DB_DIR     = <span class="str">r"C:\Projekte\MeinUnityProjekt\.rag_db"</span>
+COLLECTION = <span class="str">"unity_codebase"</span>
+LLM_MODEL  = <span class="str">"qwen2.5-coder:7b-instruct-q4_K_M"</span>
+TOP_K      = <span class="str">3</span>  <span class="comment"># Wie viele Chunks als Kontext</span>
+
+<span class="fn">def</span> <span class="fn">query_rag</span>(question: str):
+    <span class="comment"># 1. Frage embedden</span>
+    q_embed = ollama.embed(model=<span class="str">"nomic-embed-text"</span>, input=[question]).embeddings[<span class="str">0</span>]
+
+    <span class="comment"># 2. Ähnlichste Chunks finden</span>
+    client = chromadb.PersistentClient(path=DB_DIR)
+    coll = client.get_collection(COLLECTION)
+    results = coll.query(query_embeddings=[q_embed], n_results=TOP_K, include=[<span class="str">"documents"</span>, <span class="str">"metadatas"</span>])
+
+    <span class="comment"># 3. Kontext zusammenbauen</span>
+    context_parts = []
+    <span class="kw">for</span> doc, meta <span class="kw">in</span> zip(results[<span class="str">"documents"</span>][<span class="str">0</span>], results[<span class="str">"metadatas"</span>][<span class="str">0</span>]):
+        context_parts.append(f<span class="str">"--- {meta['source']} ---\n{doc}"</span>)
+    context = <span class="str">"\n\n"</span>.join(context_parts)
+
+    <span class="comment"># 4. LLM-Prompt mit Kontext</span>
+    prompt = f<span class="str">"""Du bist ein C#/Unity-Experte. Beantworte die Frage basierend auf dem folgenden Code:
+
+{context}
+
+Frage: {question}
+
+Antworte auf Deutsch. Beziehe dich konkret auf den gezeigten Code."""</span>
+
+    <span class="comment"># 5. LLM antworten lassen</span>
+    print(<span class="str">"\n=== Kontext gefunden ==="</span>)
+    <span class="kw">for</span> meta <span class="kw">in</span> results[<span class="str">"metadatas"</span>][<span class="str">0</span>]:
+        print(f<span class="str">"  · {meta['source']}"</span>)
+
+    print(<span class="str">"\n=== Antwort ==="</span>)
+    <span class="kw">for</span> chunk <span class="kw">in</span> ollama.chat(model=LLM_MODEL, messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}], stream=<span class="kw">True</span>):
+        print(chunk.message.content, end=<span class="str">""</span>, flush=<span class="kw">True</span>)
+    print()
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="kw">import</span> sys
+    q = <span class="str">" "</span>.join(sys.argv[<span class="str">1</span>:]) <span class="kw">if</span> len(sys.argv) > <span class="str">1</span> <span class="kw">else</span> input(<span class="str">"Frage: "</span>)
+    query_rag(q)
+</code></pre>
+
+  <h3>Nutzung:</h3>
+  <pre><code><span class="comment"># Einmalig indexieren:</span>
+<span class="cmd">python indexer.py</span>
+
+<span class="comment"># Dann fragen:</span>
+<span class="cmd">python query.py "Wie funktioniert der PlayerController?"</span>
+<span class="cmd">python query.py "Welche Klassen erben von MonoBehaviour?"</span>
+<span class="cmd">python query.py "Wo wird OnCollisionEnter verwendet?"</span></code></pre>
+
+  <h2>4. Re-Indexierung bei Codeänderungen</h2>
+  <p>Wann immer du deinen Code signifikant änderst, führe <code>indexer.py</code> erneut aus. Die alte Collection wird automatisch gelöscht und neu aufgebaut.</p>
+
+  <div class="callout">
+    <strong>Performance:</strong> Ein Unity-Projekt mit 100 .cs-Dateien indexiert in 1–3 Minuten (CPU-Embeddings). ChromaDB legt den Index unter <code>.rag_db/</code> ab — diese ~50-200 MB bleiben dauerhaft. Re-Queries dauern &lt;1 Sekunde.
+  </div>
+
+  <h2>5. Integration in Open-WebUI</h2>
+  <p>Open-WebUI hat eine eigene RAG-Funktion (Workspace → Knowledge). Du kannst Dateien hochladen und als Wissensbasis für Chats nutzen — ohne eigenes Python-Script. Der Nachteil: weniger Kontrolle über Chunking und Embedding-Modell.</p>
+
+  <table>
+    <thead><tr><th></th><th>Eigenes Script</th><th>Open-WebUI Knowledge</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Kontrolle</strong></td><td>Vollständig — eigene Parameter</td><td>Begrenzt — GUI-Einstellungen</td></tr>
+      <tr><td><strong>Integration</strong></td><td>Terminal / eigene App</td><td>Direkt im Chat</td></tr>
+      <tr><td><strong>Automatisierung</strong></td><td>Script in CI/CD einbaubar</td><td>Manueller Upload</td></tr>
+      <tr><td><strong>Einstieg</strong></td><td>Mehr Setup</td><td>Sofort nutzbar</td></tr>
+    </tbody>
+  </table>
+
+  <div class="quiz-section">
+    <h2>Quiz</h2>
+
+    <div class="quiz-q">
+      <p>1. Warum wird die ChromaDB-Collection im indexer.py vor dem Neu-Indexieren gelöscht?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) ChromaDB unterstützt keine Updates — alles muss immer neu angelegt werden</div>
+        <div class="option" onclick="answer(this,'correct')">B) Beim Re-Indexieren sollen alte Chunks (von gelöschten/umbenannten Dateien) nicht als Zombies in der DB bleiben</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Es spart VRAM, da alte Vektoren aus dem Speicher entfernt werden</div>
+      </div>
+      <div class="explanation">Wenn du eine Datei umbenennst oder löschst, ist ihr alter Chunk noch in der DB. Bei einer Suche würde er trotzdem auftauchen und auf eine nicht mehr existierende Datei zeigen. Einfachste Lösung: Collection löschen und komplett neu aufbauen. Für große Projekte gibt es effizientere Strategien (Timestamps, Hashes), aber für den Start ist Delete+Rebuild am robustesten.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>2. Du erhöhst TOP_K von 3 auf 10. Was ist der Tradeoff?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'wrong')">A) Schnellere Antworten, weil mehr Kontext = weniger Nachdenken für das LLM</div>
+        <div class="option" onclick="answer(this,'correct')">B) Mehr relevante Chunks im Kontext, aber auch mehr Rauschen — und längerer Prompt braucht mehr Kontext-Fenster und erzeugt langsamere Antworten</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Kein Unterschied — LLMs ignorieren irrelevante Teile des Kontexts automatisch</div>
+      </div>
+      <div class="explanation">Mehr Chunks bedeuten: bessere Chance, relevante Info zu finden (gut), aber auch mehr irrelevanter Text im Prompt (schlecht). LLMs haben begrenzte Kontextfenster (z.B. 8192 Tokens) und werden langsamer mit mehr Kontext. TOP_K=3-5 ist ein guter Startpunkt; erhöhe auf 5-8 wenn Antworten zu wenig Kontext haben.</div>
+    </div>
+
+    <div class="quiz-q">
+      <p>3. Du willst auch Markdown-Dokumentation (.md) und Unity-Asset-Beschreibungen indexieren. Was musst du ändern?</p>
+      <div class="options">
+        <div class="option" onclick="answer(this,'correct')">A) Im Datei-Scan <code>f.endswith(".cs")</code> zu <code>f.endswith((".cs", ".md", ".txt"))</code> erweitern — alles andere bleibt gleich</div>
+        <div class="option" onclick="answer(this,'wrong')">B) Ein separates Embedding-Modell für Markdown-Dateien verwenden</div>
+        <div class="option" onclick="answer(this,'wrong')">C) Separate ChromaDB-Collections für jeden Dateityp anlegen</div>
+      </div>
+      <div class="explanation">Das Embedding-Modell und die Vector-Suche funktionieren für beliebigen Text — egal ob C#, Markdown oder JSON. Du musst nur die Dateierweiterungen im Scan-Teil erweitern. Alle Chunks landen in derselben Collection und werden gemeinsam durchsucht. Das Modell versteht sowohl Code als auch natürlichsprachliche Doku.</div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <h2>Nächste Schritte</h2>
+    <ul>
+      <li><strong>Lektion 8:</strong> Fine-Tuning Grundlagen — wann RAG nicht reicht und QLoRA mit Unsloth erklärt</li>
+      <li><strong>Lektion 9:</strong> Fine-Tuning Praxis — Datensatz bauen, Training starten, Modell nach Ollama exportieren</li>
+    </ul>
+    <p style="margin-top:1rem;color:var(--muted)">Welche Fragen hast du? Was soll als nächstes dran kommen?</p>
+  </div>
+
+  <footer>
+    <p>Lokale KI Setup · Lektion 7 · <a href="https://djtj9.github.io/teach-lessons/" target="_blank">Alle Lektionen online ansehen</a></p>
+  </footer>
+</div>
+<script>
+function answer(el,result){
+  const c=el.closest('.quiz-q');
+  c.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  el.classList.add(result);
+  const e=c.querySelector('.explanation');
+  if(e)e.classList.add('show');
+}
+</script>
+</body>
+</html>
