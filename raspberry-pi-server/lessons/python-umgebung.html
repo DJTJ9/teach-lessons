@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 5: Python-Umgebung einrichten</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); padding: 3rem 2rem; text-align: center; border-bottom: 1px solid #1e293b; }
+  .hero .tag { display: inline-block; background: #3b82f6; color: white; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 9999px; margin-bottom: 1rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.5rem; }
+  .hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .mission-box { background: #1e293b; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+  .mission-box h3 { color: #3b82f6; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .mission-box p { color: #cbd5e1; }
+  h2 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1e293b; }
+  p { color: #cbd5e1; margin-bottom: 1rem; }
+  .step { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: #3b82f6; color: white; border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .step h4 { color: #f1f5f9; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .step p { margin-bottom: 0.5rem; }
+  code { background: #0f172a; color: #86efac; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.875rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid #1e293b; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; border: none; padding: 0; color: #86efac; font-size: 0.875rem; }
+  .tip { background: #0c2a1a; border: 1px solid #166534; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .tip .label { color: #4ade80; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .tip p { color: #bbf7d0; margin: 0; }
+  .warning { background: #2d1b00; border: 1px solid #92400e; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .warning .label { color: #fbbf24; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .warning p { color: #fde68a; margin: 0; }
+  .concept-box { background: #0f2a3a; border: 1px solid #0e4f6e; border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+  .concept-box h4 { color: #38bdf8; margin-bottom: 0.5rem; }
+  .concept-box p { color: #bae6fd; margin: 0; }
+  .success-box { background: #0c2a1a; border: 1px solid #166534; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .success-box .label { color: #4ade80; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .success-box p { color: #bbf7d0; margin: 0; }
+  .quiz { background: #1a1040; border: 1px solid #4c1d95; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .quiz h3 { color: #a78bfa; margin-top: 0; }
+  .quiz-q { color: #e2e8f0; font-weight: 600; margin: 1rem 0 0.5rem; }
+  .quiz-a { color: #c4b5fd; padding-left: 1rem; border-left: 2px solid #4c1d95; margin-bottom: 1rem; }
+  .summary { background: #0c1f3a; border: 1px solid #1e40af; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .summary h3 { color: #60a5fa; margin-top: 0; }
+  .summary ul { padding-left: 1.5rem; color: #bfdbfe; }
+  .summary li { margin-bottom: 0.5rem; }
+  .citation { font-size: 0.8rem; color: #475569; margin-top: 1rem; }
+  .citation a { color: #3b82f6; }
+  .nav { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+  .nav a { background: #1e293b; color: #94a3b8; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; }
+  .nav a.next { background: #3b82f6; color: white; }
+  .progress { display: flex; gap: 0.4rem; justify-content: center; margin: 1rem 0 0; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; }
+  .progress-dot.inactive { background: #334155; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="tag">Lektion 5 von 8 · Raspberry Pi als Home-Server</div>
+  <h1>Python-Umgebung einrichten</h1>
+  <p>venv erstellen, Dependencies installieren, .env-Datei für Secrets — dann den Bot testweise starten.</p>
+  <div class="progress">
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="mission-box">
+    <h3>Warum diese Lektion?</h3>
+    <p>Python-Projekte brauchen isolierte Umgebungen (venv), damit Pakete nicht mit anderen Projekten kollidieren. API-Keys müssen sicher konfiguriert werden — nie im Code, immer in einer .env-Datei.</p>
+  </div>
+
+  <h2>Was ist ein venv?</h2>
+
+  <div class="concept-box">
+    <h4>Virtual Environment (venv)</h4>
+    <p>Ein venv ist ein isolierter Python-Ordner mit eigenen installierten Paketen. Pakete im venv beeinflussen nicht das System-Python und andere Projekte. Standard-Praxis für alle Python-Projekte.</p>
+  </div>
+
+  <h2>Schritt 1: Python prüfen und venv erstellen</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <h4>Python-Version prüfen</h4>
+    <p>Auf dem Pi (via SSH):</p>
+    <pre><code>python3 --version</code></pre>
+    <p>Raspberry Pi OS Lite (64-bit) kommt mit Python 3.11+. Falls venv fehlt:</p>
+    <pre><code>sudo apt update && sudo apt install python3 python3-venv python3-pip -y</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <h4>In den Bot-Ordner wechseln</h4>
+    <pre><code>cd ~/projekte/telegram-notion-bot</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <h4>Virtuelles Environment erstellen</h4>
+    <pre><code>python3 -m venv venv</code></pre>
+    <p>Das erstellt einen Ordner <code>venv/</code> mit einer isolierten Python-Installation.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <h4>venv aktivieren</h4>
+    <pre><code>source venv/bin/activate</code></pre>
+    <p>Die Eingabeaufforderung ändert sich zu <code>(venv) pi@raspberry-pi:...</code> — das zeigt, dass das venv aktiv ist.</p>
+    <div class="tip">
+      <div class="label">💡 venv immer aktivieren</div>
+      <p>Vor jedem manuellen Start muss <code>source venv/bin/activate</code> ausgeführt werden. Der systemd-Service (Lektion 6) macht das automatisch im Service-Setup.</p>
+    </div>
+  </div>
+
+  <h2>Schritt 2: Abhängigkeiten installieren</h2>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <h4>Requirements installieren</h4>
+    <p>Im aktiven venv:</p>
+    <pre><code>pip install -r requirements.txt</code></pre>
+    <p>pip installiert alle in <code>requirements.txt</code> gelisteten Pakete. Das dauert einige Minuten — der Pi kompiliert manche Pakete.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <h4>Installation prüfen</h4>
+    <pre><code>pip list</code></pre>
+    <p>Du solltest <code>python-telegram-bot</code>, <code>notion-client</code> und andere Bot-Abhängigkeiten sehen.</p>
+  </div>
+
+  <h2>Schritt 3: .env-Datei mit Secrets anlegen</h2>
+
+  <div class="warning">
+    <div class="label">⚠️ Secrets sicher konfigurieren</div>
+    <p>Die .env-Datei enthält API-Keys — niemals per git commiten. Sie muss manuell auf dem Pi erstellt werden.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <h4>.env-Datei erstellen</h4>
+    <pre><code>nano ~/projekte/telegram-notion-bot/.env</code></pre>
+    <p>Inhalt (ersetze die Platzhalter mit deinen echten Werten):</p>
+    <pre><code>TELEGRAM_TOKEN=123456789:ABCdef...
+NOTION_TOKEN=secret_abc123...
+TELEGRAM_CHAT_ID=8896609541</code></pre>
+    <p>Speichern: <strong>Strg+X</strong> → <strong>Y</strong> → <strong>Enter</strong></p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">8</div>
+    <h4>Dateiberechtigungen sichern</h4>
+    <pre><code>chmod 600 ~/projekte/telegram-notion-bot/.env</code></pre>
+    <p><code>chmod 600</code> = nur du (pi) kannst lesen und schreiben — kein anderer Nutzer auf dem System.</p>
+  </div>
+
+  <h2>Schritt 4: Bot testweise starten</h2>
+
+  <div class="step">
+    <div class="step-num">9</div>
+    <h4>Bot manuell starten</h4>
+    <pre><code>cd ~/projekte/telegram-notion-bot
+source venv/bin/activate
+python3 bot.py</code></pre>
+    <p>Der Bot startet und gibt Logs aus. Schicke eine Nachricht auf Telegram — der Bot sollte antworten.</p>
+    <p>Stoppen mit <strong>Strg+C</strong></p>
+  </div>
+
+  <div class="success-box">
+    <div class="label">✅ Bot läuft!</div>
+    <p>Wenn der Bot auf Telegram-Nachrichten antwortet — alles korrekt konfiguriert. Jetzt kommt Lektion 6: den Bot als systemd-Service einrichten, damit er permanent läuft.</p>
+  </div>
+
+  <div class="concept-box">
+    <h4>Warum nicht einfach python3 bot.py dauerhaft laufen lassen?</h4>
+    <p>Ein manuell gestarteter Prozess stoppt, wenn du die SSH-Verbindung trennst. systemd (Lektion 6) startet den Bot automatisch beim Booten und beim Absturz — das ist echtes 24/7-Hosting.</p>
+  </div>
+
+  <div class="quiz">
+    <h3>🧠 Wissenscheck</h3>
+    <div class="quiz-q">1. Warum braucht man ein venv statt das System-Python zu nutzen?</div>
+    <div class="quiz-a">Isolation: Pakete im venv beeinflussen nicht das System-Python und andere Projekte. Verschiedene Versionen desselben Pakets für verschiedene Projekte sind so kein Problem.</div>
+    <div class="quiz-q">2. Was bedeutet <code>chmod 600 .env</code>?</div>
+    <div class="quiz-a"><code>600</code> = Lesen + Schreiben nur für den Eigentümer, kein Zugriff für andere Nutzer. Wichtig für Secrets — kein anderer Systemnutzer soll die API-Keys lesen können.</div>
+    <div class="quiz-q">3. Warum stoppt der Bot wenn man die SSH-Verbindung schließt?</div>
+    <div class="quiz-a">Ein im Terminal gestarteter Prozess ist an die Terminal-Session gebunden. Endet die Session, wird der Prozess beendet. systemd (nächste Lektion) löst das dauerhaft.</div>
+  </div>
+
+  <div class="summary">
+    <h3>✅ Das hast du in dieser Lektion gelernt</h3>
+    <ul>
+      <li>venv isoliert Python-Pakete vom System — Standard-Praxis für Python-Projekte</li>
+      <li><code>python3 -m venv venv</code> erstellt, <code>source venv/bin/activate</code> aktiviert</li>
+      <li><code>pip install -r requirements.txt</code> installiert alle Bot-Abhängigkeiten</li>
+      <li><code>.env</code>-Datei speichert Secrets, <code>chmod 600</code> schützt sie</li>
+      <li>Bot läuft — aber nur wenn Terminal offen ist. Nächster Schritt: systemd-Service</li>
+    </ul>
+  </div>
+
+  <p class="citation">Quellen: <a href="https://docs.python.org/3/library/venv.html">Python venv Dokumentation</a> · <a href="https://12factor.net/config">12factor.net: Config</a></p>
+
+  <div class="nav">
+    <a href="bot-code-transfer.html">← Lektion 4</a>
+    <a href="systemd-service.html" class="next">Lektion 6: systemd-Service →</a>
+  </div>
+</div>
+</body>
+</html>

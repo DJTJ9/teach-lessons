@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 7: Firewall und Sicherheit</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); padding: 3rem 2rem; text-align: center; border-bottom: 1px solid #1e293b; }
+  .hero .tag { display: inline-block; background: #3b82f6; color: white; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 9999px; margin-bottom: 1rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.5rem; }
+  .hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .mission-box { background: #1e293b; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+  .mission-box h3 { color: #3b82f6; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .mission-box p { color: #cbd5e1; }
+  h2 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #93c5fd; margin: 1.5rem 0 0.75rem; }
+  p { color: #cbd5e1; margin-bottom: 1rem; }
+  .step { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: #3b82f6; color: white; border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .step h4 { color: #f1f5f9; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .step p { margin-bottom: 0.5rem; }
+  code { background: #0f172a; color: #86efac; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.875rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid #1e293b; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; border: none; padding: 0; color: #86efac; font-size: 0.875rem; }
+  .tip { background: #0c2a1a; border: 1px solid #166534; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .tip .label { color: #4ade80; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .tip p { color: #bbf7d0; margin: 0; }
+  .warning { background: #2d1b00; border: 1px solid #92400e; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .warning .label { color: #fbbf24; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .warning p { color: #fde68a; margin: 0; }
+  .concept-box { background: #0f2a3a; border: 1px solid #0e4f6e; border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+  .concept-box h4 { color: #38bdf8; margin-bottom: 0.5rem; }
+  .concept-box p { color: #bae6fd; margin: 0; }
+  .cmd-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+  .cmd-table th { background: #1e293b; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1rem; text-align: left; }
+  .cmd-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+  .cmd-table td:first-child { font-family: 'Cascadia Code', monospace; color: #86efac; font-size: 0.875rem; }
+  .quiz { background: #1a1040; border: 1px solid #4c1d95; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .quiz h3 { color: #a78bfa; margin-top: 0; }
+  .quiz-q { color: #e2e8f0; font-weight: 600; margin: 1rem 0 0.5rem; }
+  .quiz-a { color: #c4b5fd; padding-left: 1rem; border-left: 2px solid #4c1d95; margin-bottom: 1rem; }
+  .summary { background: #0c1f3a; border: 1px solid #1e40af; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .summary h3 { color: #60a5fa; margin-top: 0; }
+  .summary ul { padding-left: 1.5rem; color: #bfdbfe; }
+  .summary li { margin-bottom: 0.5rem; }
+  .citation { font-size: 0.8rem; color: #475569; margin-top: 1rem; }
+  .citation a { color: #3b82f6; }
+  .nav { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+  .nav a { background: #1e293b; color: #94a3b8; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; }
+  .nav a.next { background: #3b82f6; color: white; }
+  .progress { display: flex; gap: 0.4rem; justify-content: center; margin: 1rem 0 0; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; }
+  .progress-dot.inactive { background: #334155; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="tag">Lektion 7 von 8 · Raspberry Pi als Home-Server</div>
+  <h1>Firewall und Sicherheit</h1>
+  <p>ufw einrichten, SSH absichern, fail2ban als Bonus — Grundschutz für den Home-Server.</p>
+  <div class="progress">
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot inactive"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="mission-box">
+    <h3>Warum diese Lektion?</h3>
+    <p>Dein Pi kommuniziert nur ausgehend mit Telegram/Notion — er braucht keinen eingehenden Traffic außer SSH. Eine Firewall stellt sicher, dass nur dieser eine Port offen ist.</p>
+  </div>
+
+  <h2>Was ist ufw?</h2>
+
+  <div class="concept-box">
+    <h4>ufw — Uncomplicated Firewall</h4>
+    <p>ufw ist ein benutzerfreundliches Frontend für iptables (die eigentliche Linux-Firewall). Es macht Firewall-Regeln lesbar und einfach zu verwalten — ohne komplizierte Syntax.</p>
+  </div>
+
+  <h2>Schritt 1: ufw konfigurieren</h2>
+
+  <div class="warning">
+    <div class="label">⚠️ SSH zuerst erlauben!</div>
+    <p>Erlaube SSH BEVOR du die Firewall aktivierst. Sonst sperrst du dich selbst aus.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <h4>ufw installieren</h4>
+    <pre><code>sudo apt update && sudo apt install ufw -y</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <h4>SSH-Port erlauben (ZUERST!)</h4>
+    <pre><code>sudo ufw allow ssh</code></pre>
+    <p>Das erlaubt Port 22. Ohne diese Regel: nach dem Aktivieren ausgesperrt.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <h4>Standard-Policy setzen</h4>
+    <pre><code>sudo ufw default deny incoming
+sudo ufw default allow outgoing</code></pre>
+    <p>Alles eingehend blockieren außer explizit erlaubten Ports. Ausgehend alles erlauben (Bot braucht das für Telegram/Notion).</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <h4>Firewall aktivieren</h4>
+    <pre><code>sudo ufw enable</code></pre>
+    <p>Bestätigung mit <code>y</code>. Firewall ist jetzt aktiv und startet beim Boot automatisch.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <h4>Status prüfen</h4>
+    <pre><code>sudo ufw status verbose</code></pre>
+    <p>Du solltest sehen: <code>Status: active</code> und Port 22 als erlaubt.</p>
+  </div>
+
+  <h2>Bonus: fail2ban</h2>
+
+  <div class="concept-box">
+    <h4>fail2ban</h4>
+    <p>fail2ban überwacht Log-Dateien und blockiert IPs automatisch nach zu vielen fehlgeschlagenen Login-Versuchen. Schützt vor Brute-Force-Angriffen auf SSH.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <h4>fail2ban installieren</h4>
+    <pre><code>sudo apt install fail2ban -y
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban</code></pre>
+    <p>Standard-Konfiguration schützt SSH bereits: 5 fehlgeschlagene Versuche → IP für 10 Minuten blockiert.</p>
+    <pre><code>sudo fail2ban-client status sshd</code></pre>
+  </div>
+
+  <h2>Firewall-Regeln verwalten</h2>
+
+  <table class="cmd-table">
+    <tr><th>Befehl</th><th>Bedeutung</th></tr>
+    <tr><td>sudo ufw status</td><td>Aktive Regeln anzeigen</td></tr>
+    <tr><td>sudo ufw allow 8080</td><td>Port 8080 erlauben</td></tr>
+    <tr><td>sudo ufw delete allow 8080</td><td>Regel löschen</td></tr>
+    <tr><td>sudo ufw disable</td><td>Firewall deaktivieren</td></tr>
+  </table>
+
+  <div class="tip">
+    <div class="label">💡 Bot braucht keinen eingehenden Port</div>
+    <p>Der Telegram-Notion-Bot nutzt Polling (ausgehend). Kein eingehender Port nötig — nur SSH bleibt offen. Das ist die sicherste Konfiguration.</p>
+  </div>
+
+  <div class="quiz">
+    <h3>🧠 Wissenscheck</h3>
+    <div class="quiz-q">1. Warum muss man SSH erlauben BEVOR man ufw aktiviert?</div>
+    <div class="quiz-a">Sobald ufw aktiv ist mit <code>deny incoming</code>, wird jede eingehende Verbindung blockiert — auch SSH. Ohne vorherige Erlaubnis von Port 22 sperrt man sich selbst aus.</div>
+    <div class="quiz-q">2. Warum braucht der Bot keinen eingehenden Port?</div>
+    <div class="quiz-a">Der Bot nutzt Telegram-Polling: Er fragt selbst bei Telegram ab ob neue Nachrichten da sind (ausgehende Verbindung). Telegram "pusht" nichts an den Bot — keine eingehenden Ports nötig.</div>
+    <div class="quiz-q">3. Was macht fail2ban bei 5 fehlgeschlagenen SSH-Logins?</div>
+    <div class="quiz-a">Es blockiert die angreifende IP-Adresse automatisch für 10 Minuten. Brute-Force-Angriffe werden so wirkungslos — zu viele gesperrte IPs, zu wenig Zeit.</div>
+  </div>
+
+  <div class="summary">
+    <h3>✅ Das hast du in dieser Lektion gelernt</h3>
+    <ul>
+      <li>ufw macht Linux-Firewall einfach verwaltbar</li>
+      <li>Reihenfolge: SSH erlauben → Defaults setzen → Firewall aktivieren</li>
+      <li><code>deny incoming</code> + <code>allow outgoing</code>: Bot funktioniert, niemand kommt rein außer SSH</li>
+      <li>fail2ban schützt automatisch vor Brute-Force-Angriffen</li>
+      <li>Letzte Lektion: Logs lesen und Bot warten</li>
+    </ul>
+  </div>
+
+  <p class="citation">Quellen: <a href="https://help.ubuntu.com/community/UFW">Ubuntu UFW Guide</a> · <a href="https://www.fail2ban.org/wiki/index.php/Main_Page">fail2ban Wiki</a></p>
+
+  <div class="nav">
+    <a href="systemd-service.html">← Lektion 6</a>
+    <a href="logs-und-wartung.html" class="next">Lektion 8: Logs und Wartung →</a>
+  </div>
+</div>
+</body>
+</html>

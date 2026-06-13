@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 4: Bot-Code auf den Pi übertragen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); padding: 3rem 2rem; text-align: center; border-bottom: 1px solid #1e293b; }
+  .hero .tag { display: inline-block; background: #3b82f6; color: white; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 9999px; margin-bottom: 1rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.5rem; }
+  .hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .mission-box { background: #1e293b; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+  .mission-box h3 { color: #3b82f6; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .mission-box p { color: #cbd5e1; }
+  h2 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1e293b; }
+  p { color: #cbd5e1; margin-bottom: 1rem; }
+  .step { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: #3b82f6; color: white; border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .step h4 { color: #f1f5f9; font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .step p { margin-bottom: 0.5rem; }
+  code { background: #0f172a; color: #86efac; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.875rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid #1e293b; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; border: none; padding: 0; color: #86efac; font-size: 0.875rem; }
+  .tip { background: #0c2a1a; border: 1px solid #166534; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .tip .label { color: #4ade80; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .tip p { color: #bbf7d0; margin: 0; }
+  .warning { background: #2d1b00; border: 1px solid #92400e; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .warning .label { color: #fbbf24; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .warning p { color: #fde68a; margin: 0; }
+  .concept-box { background: #0f2a3a; border: 1px solid #0e4f6e; border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+  .concept-box h4 { color: #38bdf8; margin-bottom: 0.5rem; }
+  .concept-box p { color: #bae6fd; margin: 0; }
+  .quiz { background: #1a1040; border: 1px solid #4c1d95; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .quiz h3 { color: #a78bfa; margin-top: 0; }
+  .quiz-q { color: #e2e8f0; font-weight: 600; margin: 1rem 0 0.5rem; }
+  .quiz-a { color: #c4b5fd; padding-left: 1rem; border-left: 2px solid #4c1d95; margin-bottom: 1rem; }
+  .summary { background: #0c1f3a; border: 1px solid #1e40af; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .summary h3 { color: #60a5fa; margin-top: 0; }
+  .summary ul { padding-left: 1.5rem; color: #bfdbfe; }
+  .summary li { margin-bottom: 0.5rem; }
+  .citation { font-size: 0.8rem; color: #475569; margin-top: 1rem; }
+  .citation a { color: #3b82f6; }
+  .nav { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+  .nav a { background: #1e293b; color: #94a3b8; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; }
+  .nav a.next { background: #3b82f6; color: white; }
+  .progress { display: flex; gap: 0.4rem; justify-content: center; margin: 1rem 0 0; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; }
+  .progress-dot.inactive { background: #334155; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="tag">Lektion 4 von 8 · Raspberry Pi als Home-Server</div>
+  <h1>Bot-Code auf den Pi übertragen</h1>
+  <p>Git installieren, das Repository klonen — der Bot-Code landet auf dem Pi.</p>
+  <div class="progress">
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="mission-box">
+    <h3>Warum diese Lektion?</h3>
+    <p>Der Bot-Code liegt auf GitHub. Git ist der sauberste Weg, ihn auf den Pi zu bringen — und ermöglicht spätere Updates mit einem einzigen Befehl statt Dateien manuell zu kopieren.</p>
+  </div>
+
+  <h2>Was ist Git?</h2>
+  <p><strong>Git</strong> ist ein Versionskontrollsystem. Es verfolgt Änderungen an Code und erlaubt die Synchronisierung zwischen Computern. Für uns: Bot-Code von GitHub auf den Pi holen.</p>
+
+  <div class="concept-box">
+    <h4>Repository (Repo)</h4>
+    <p>Ein Repository ist ein Ordner, dessen Änderungsgeschichte von Git verwaltet wird. Das Bot-Repo liegt auf GitHub — <code>git clone</code> kopiert es einmalig auf den Pi.</p>
+  </div>
+
+  <h2>Schritt 1: Git installieren</h2>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <h4>Prüfen ob Git vorhanden ist</h4>
+    <p>Auf dem Pi (via SSH):</p>
+    <pre><code>git --version</code></pre>
+    <p>Wenn eine Version erscheint: fertig. Sonst installieren:</p>
+    <pre><code>sudo apt update && sudo apt install git -y</code></pre>
+  </div>
+
+  <h2>Schritt 2: Repository klonen</h2>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <h4>Arbeitsverzeichnis anlegen</h4>
+    <pre><code>mkdir -p ~/projekte
+cd ~/projekte</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <h4>Repo von GitHub klonen</h4>
+    <pre><code>git clone https://github.com/DJTJ9/telegram-notion-bot.git</code></pre>
+    <p>Ergebnis: neuer Ordner <code>~/projekte/telegram-notion-bot/</code> mit dem kompletten Bot-Code.</p>
+    <pre><code>ls telegram-notion-bot/     # Prüfen ob Dateien da sind</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <h4>In den Bot-Ordner wechseln</h4>
+    <pre><code>cd ~/projekte/telegram-notion-bot
+ls -la</code></pre>
+    <p>Du solltest Dateien wie <code>bot.py</code>, <code>requirements.txt</code>, <code>.gitignore</code> sehen.</p>
+  </div>
+
+  <h2>Schritt 3: Updates einspielen</h2>
+  <p>Wenn du auf dem Windows-PC Code änderst und auf GitHub pushst, reicht auf dem Pi:</p>
+  <pre><code>cd ~/projekte/telegram-notion-bot
+git pull</code></pre>
+  <p>Git lädt nur die Änderungen herunter — kein erneutes Klonen nötig.</p>
+
+  <div class="tip">
+    <div class="label">💡 Alias für schnelle Updates</div>
+    <p>Füge in <code>~/.bashrc</code> einen Alias hinzu:</p>
+    <pre><code>echo 'alias bot-update="cd ~/projekte/telegram-notion-bot && git pull"' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+    <p>Danach reicht: <code>bot-update</code></p>
+  </div>
+
+  <h2>Wichtig: .env-Datei gehört nicht ins Repo</h2>
+
+  <div class="warning">
+    <div class="label">⚠️ Secrets bleiben lokal</div>
+    <p>Die <code>.env</code>-Datei mit Telegram-Token und Notion-API-Key ist in <code>.gitignore</code> eingetragen und landet nie auf GitHub. Du erstellst sie manuell auf dem Pi — das kommt in der nächsten Lektion.</p>
+  </div>
+
+  <div class="concept-box">
+    <h4>Warum .gitignore?</h4>
+    <p>Die Datei <code>.gitignore</code> listet Dateien auf, die Git bewusst ignoriert. Secrets (API-Keys, Passwörter) dürfen nie in Git — sonst sind sie öffentlich auf GitHub sichtbar.</p>
+  </div>
+
+  <h2>Verifikation</h2>
+  <div class="step">
+    <h4>Prüfen ob alles da ist</h4>
+    <pre><code>ls -la ~/projekte/telegram-notion-bot/
+cat ~/projekte/telegram-notion-bot/requirements.txt</code></pre>
+    <p>Wenn du die Python-Dependencies siehst — Code ist erfolgreich übertragen.</p>
+  </div>
+
+  <div class="quiz">
+    <h3>🧠 Wissenscheck</h3>
+    <div class="quiz-q">1. Was ist der Unterschied zwischen <code>git clone</code> und <code>git pull</code>?</div>
+    <div class="quiz-a"><code>clone</code> = erstes Herunterladen eines Repos (einmalig). <code>pull</code> = Änderungen vom Server holen, wenn das Repo schon lokal existiert.</div>
+    <div class="quiz-q">2. Warum ist die .env-Datei nicht im GitHub-Repo?</div>
+    <div class="quiz-a">Sie enthält API-Keys und Tokens. Diese Secrets auf GitHub würden jeden erlauben, deinen Bot zu übernehmen. <code>.gitignore</code> stellt sicher, dass sie nie committed werden.</div>
+    <div class="quiz-q">3. Wie bekommst du später Code-Updates auf den Pi?</div>
+    <div class="quiz-a"><code>cd ~/projekte/telegram-notion-bot &amp;&amp; git pull</code> — Git holt nur die Änderungen herunter.</div>
+  </div>
+
+  <div class="summary">
+    <h3>✅ Das hast du in dieser Lektion gelernt</h3>
+    <ul>
+      <li>Git ist ein Versionskontrollsystem für Code-Synchronisierung</li>
+      <li><code>git clone URL</code> kopiert ein Repository einmalig auf den Pi</li>
+      <li><code>git pull</code> holt spätere Updates — kein erneutes Klonen nötig</li>
+      <li>Die <code>.env</code>-Datei mit Secrets gehört nie ins Repo — muss manuell erstellt werden</li>
+      <li>Nächster Schritt: Python-Umgebung einrichten und Bot testweise starten</li>
+    </ul>
+  </div>
+
+  <p class="citation">Quellen: <a href="https://git-scm.com/doc">Git Dokumentation (git-scm.com)</a> · <a href="https://docs.github.com/en/get-started/quickstart/set-up-git">GitHub: Set Up Git</a></p>
+
+  <div class="nav">
+    <a href="linux-grundlagen.html">← Lektion 3</a>
+    <a href="python-umgebung.html" class="next">Lektion 5: Python-Umgebung →</a>
+  </div>
+</div>
+</body>
+</html>

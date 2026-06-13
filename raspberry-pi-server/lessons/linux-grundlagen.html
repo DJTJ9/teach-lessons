@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 3: Linux-Grundlagen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); padding: 3rem 2rem; text-align: center; border-bottom: 1px solid #1e293b; }
+  .hero .tag { display: inline-block; background: #3b82f6; color: white; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 9999px; margin-bottom: 1rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; color: #f1f5f9; margin-bottom: 0.5rem; }
+  .hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+  .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+  .mission-box { background: #1e293b; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem; margin: 2rem 0; }
+  .mission-box h3 { color: #3b82f6; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .mission-box p { color: #cbd5e1; }
+  h2 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1e293b; }
+  p { color: #cbd5e1; margin-bottom: 1rem; }
+  .cmd-table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+  .cmd-table th { background: #1e293b; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1rem; text-align: left; }
+  .cmd-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+  .cmd-table td:first-child { font-family: 'Cascadia Code', monospace; color: #86efac; font-size: 0.875rem; white-space: nowrap; }
+  .cmd-table tr:hover td { background: #1e293b; }
+  code { background: #0f172a; color: #86efac; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.875rem; padding: 0.15rem 0.4rem; border-radius: 4px; border: 1px solid #1e293b; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; border: none; padding: 0; color: #86efac; font-size: 0.875rem; }
+  .tip { background: #0c2a1a; border: 1px solid #166534; border-radius: 8px; padding: 1.25rem; margin: 1.25rem 0; }
+  .tip .label { color: #4ade80; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .tip p { color: #bbf7d0; margin: 0; }
+  .practice { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; border-left: 4px solid #f59e0b; }
+  .practice .label { color: #f59e0b; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.75rem; }
+  .practice p { margin-bottom: 0.5rem; }
+  .quiz { background: #1a1040; border: 1px solid #4c1d95; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .quiz h3 { color: #a78bfa; margin-top: 0; }
+  .quiz-q { color: #e2e8f0; font-weight: 600; margin: 1rem 0 0.5rem; }
+  .quiz-a { color: #c4b5fd; padding-left: 1rem; border-left: 2px solid #4c1d95; margin-bottom: 1rem; }
+  .summary { background: #0c1f3a; border: 1px solid #1e40af; border-radius: 12px; padding: 1.75rem; margin: 2.5rem 0; }
+  .summary h3 { color: #60a5fa; margin-top: 0; }
+  .summary ul { padding-left: 1.5rem; color: #bfdbfe; }
+  .summary li { margin-bottom: 0.5rem; }
+  .citation { font-size: 0.8rem; color: #475569; margin-top: 1rem; }
+  .citation a { color: #3b82f6; }
+  .nav { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+  .nav a { background: #1e293b; color: #94a3b8; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; }
+  .nav a.next { background: #3b82f6; color: white; }
+  .progress { display: flex; gap: 0.4rem; justify-content: center; margin: 1rem 0 0; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; }
+  .progress-dot.inactive { background: #334155; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="tag">Lektion 3 von 8 · Raspberry Pi als Home-Server</div>
+  <h1>Linux-Grundlagen</h1>
+  <p>Dateisystem navigieren, Pakete installieren, Dateien bearbeiten — das Handwerkszeug für den Alltag auf dem Pi.</p>
+  <div class="progress">
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+    <div class="progress-dot inactive"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="mission-box">
+    <h3>Warum diese Lektion?</h3>
+    <p>Alles auf dem Pi passiert über das Terminal. Wer Befehle kennt, kann den Bot installieren, starten, debuggen und warten. Diese Lektion gibt dir die 20% der Befehle, die du 80% der Zeit brauchst.</p>
+  </div>
+
+  <h2>Das Dateisystem verstehen</h2>
+  <p>Linux hat eine andere Struktur als Windows. Statt <code>C:\Users\...</code> gibt es <code>/home/pi/...</code>. Alles startet von <code>/</code> (Root-Verzeichnis).</p>
+
+  <table class="cmd-table">
+    <tr><th>Pfad</th><th>Was ist das?</th></tr>
+    <tr><td>/</td><td>Root — Wurzel des ganzen Systems</td></tr>
+    <tr><td>/home/pi/</td><td>Dein Heimverzeichnis (wie C:\Users\pi)</td></tr>
+    <tr><td>/etc/</td><td>Konfigurationsdateien</td></tr>
+    <tr><td>/var/log/</td><td>Log-Dateien</td></tr>
+    <tr><td>/usr/bin/</td><td>Installierte Programme</td></tr>
+    <tr><td>~</td><td>Abkürzung für /home/pi (dein Heimverzeichnis)</td></tr>
+  </table>
+
+  <h2>Navigation</h2>
+
+  <table class="cmd-table">
+    <tr><th>Befehl</th><th>Bedeutung</th><th>Beispiel</th></tr>
+    <tr><td>pwd</td><td>Aktuelles Verzeichnis anzeigen</td><td><code>pwd</code> → <code>/home/pi</code></td></tr>
+    <tr><td>ls -la</td><td>Verzeichnisinhalt mit Details</td><td><code>ls -la</code></td></tr>
+    <tr><td>cd pfad</td><td>Verzeichnis wechseln</td><td><code>cd ~/projekte</code></td></tr>
+    <tr><td>cd ..</td><td>Eine Ebene hoch</td><td><code>cd ..</code></td></tr>
+    <tr><td>mkdir name</td><td>Verzeichnis erstellen</td><td><code>mkdir projekte</code></td></tr>
+    <tr><td>rm -rf name</td><td>Verzeichnis/Datei löschen</td><td><code>rm -rf temp/</code></td></tr>
+  </table>
+
+  <div class="practice">
+    <div class="label">🖥️ Übung 1: Navigieren</div>
+    <pre><code>pwd                    # Wo bin ich? → /home/pi
+ls -la                 # Was ist hier?
+mkdir projekte         # Ordner erstellen
+cd projekte            # Rein
+pwd                    # Kontrolle: /home/pi/projekte
+cd ..                  # Zurück</code></pre>
+  </div>
+
+  <h2>Dateien lesen und bearbeiten</h2>
+
+  <table class="cmd-table">
+    <tr><th>Befehl</th><th>Bedeutung</th></tr>
+    <tr><td>cat datei.txt</td><td>Datei komplett ausgeben</td></tr>
+    <tr><td>less datei.txt</td><td>Seitenweise lesen (q zum Beenden)</td></tr>
+    <tr><td>nano datei.txt</td><td>Datei bearbeiten (Strg+X zum Beenden)</td></tr>
+    <tr><td>cp quelle ziel</td><td>Datei kopieren</td></tr>
+    <tr><td>mv quelle ziel</td><td>Datei verschieben / umbenennen</td></tr>
+  </table>
+
+  <div class="practice">
+    <div class="label">🖥️ Übung 2: nano-Editor</div>
+    <pre><code>nano ~/test.txt</code></pre>
+    <p>Schreibe etwas, dann speichern: <strong>Strg+X</strong> → <strong>Y</strong> → <strong>Enter</strong></p>
+    <pre><code>cat ~/test.txt         # Inhalt prüfen</code></pre>
+  </div>
+
+  <h2>Pakete installieren mit apt</h2>
+  <p><strong>apt</strong> ist der Paketmanager von Debian. Damit installierst du Software — wie ein App Store in der Kommandozeile.</p>
+
+  <table class="cmd-table">
+    <tr><th>Befehl</th><th>Bedeutung</th></tr>
+    <tr><td>sudo apt update</td><td>Paketliste aktualisieren (immer zuerst)</td></tr>
+    <tr><td>sudo apt upgrade</td><td>Installierte Pakete aktualisieren</td></tr>
+    <tr><td>sudo apt install paket</td><td>Paket installieren</td></tr>
+    <tr><td>sudo apt remove paket</td><td>Paket entfernen</td></tr>
+  </table>
+
+  <div class="tip">
+    <div class="label">💡 Was ist sudo?</div>
+    <p><code>sudo</code> = "super user do" — Admin-Rechte für einen Befehl. Systemänderungen (Pakete, Dienste) brauchen sudo. Eigene Dateien bearbeiten nicht.</p>
+  </div>
+
+  <div class="practice">
+    <div class="label">🖥️ Übung 3: System aktualisieren</div>
+    <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+    <p><code>&&</code> = "nur ausführen wenn der erste Befehl erfolgreich war". <code>-y</code> = alle Fragen automatisch bestätigen.</p>
+  </div>
+
+  <h2>Nützliche Alltagsbefehle</h2>
+
+  <table class="cmd-table">
+    <tr><th>Befehl</th><th>Bedeutung</th></tr>
+    <tr><td>df -h</td><td>Festplattenbelegung anzeigen</td></tr>
+    <tr><td>free -h</td><td>RAM-Nutzung anzeigen</td></tr>
+    <tr><td>top</td><td>Laufende Prozesse (q zum Beenden)</td></tr>
+    <tr><td>history</td><td>Zuletzt eingegebene Befehle</td></tr>
+    <tr><td>sudo reboot</td><td>Pi neu starten</td></tr>
+    <tr><td>sudo shutdown now</td><td>Pi sauber herunterfahren</td></tr>
+    <tr><td>Tab-Taste</td><td>Befehle / Pfade automatisch vervollständigen</td></tr>
+    <tr><td>Pfeil ↑/↓</td><td>Letzte Befehle durchblättern</td></tr>
+  </table>
+
+  <div class="quiz">
+    <h3>🧠 Wissenscheck</h3>
+    <div class="quiz-q">1. Was macht <code>sudo apt update</code> und warum ist es wichtig?</div>
+    <div class="quiz-a">Es aktualisiert die Paketliste — lädt aber noch nichts herunter. Wichtig, weil apt sonst veraltete Versionen findet. Immer vor <code>apt install</code> ausführen.</div>
+    <div class="quiz-q">2. Was ist der Unterschied zwischen <code>~</code> und <code>/</code>?</div>
+    <div class="quiz-a"><code>~</code> = dein Heimverzeichnis (<code>/home/pi</code>). <code>/</code> = Root des gesamten Systems. Als normaler Nutzer arbeitest du immer in <code>~</code>.</div>
+    <div class="quiz-q">3. Wie speichert man in nano und verlässt den Editor?</div>
+    <div class="quiz-a"><strong>Strg+X</strong> → <strong>Y</strong> (Ja, speichern) → <strong>Enter</strong> (Dateiname bestätigen).</div>
+  </div>
+
+  <div class="summary">
+    <h3>✅ Das hast du in dieser Lektion gelernt</h3>
+    <ul>
+      <li>Linux-Dateisystem: alles startet bei <code>/</code>, Heimverzeichnis ist <code>~</code></li>
+      <li>Navigation: <code>pwd</code>, <code>ls -la</code>, <code>cd</code>, <code>mkdir</code></li>
+      <li>Dateien lesen: <code>cat</code>, <code>less</code> — bearbeiten: <code>nano</code></li>
+      <li><code>sudo apt update &amp;&amp; sudo apt install</code> für Softwareinstallation</li>
+      <li>Nächster Schritt: Bot-Code per Git auf den Pi holen</li>
+    </ul>
+  </div>
+
+  <p class="citation">Quellen: <a href="https://www.debian.org/doc/manuals/debian-reference/">Debian Reference Manual</a> · <a href="https://linuxcommand.org/">linuxcommand.org</a></p>
+
+  <div class="nav">
+    <a href="ssh-zugang.html">← Lektion 2</a>
+    <a href="bot-code-transfer.html" class="next">Lektion 4: Bot-Code übertragen →</a>
+  </div>
+</div>
+</body>
+</html>
