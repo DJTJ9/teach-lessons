@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 05 — Mocking mit pytest</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #2980b9; border-bottom: 3px solid #2980b9; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #2980b9; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>🎭 Lektion 05 — Mocking mit pytest</h1>
+<p class="mission">Ziel: Externe Abhängigkeiten (Telegram API, Dateisystem, subprocess) in Tests durch Fakes ersetzen — damit Unit Tests ohne Netzwerk laufen.</p>
+
+<h2>Das Problem: externe Abhängigkeiten</h2>
+<p>Dein Chatbot ruft echte externe Dienste auf: Telegram API, Notion, Claude CLI (subprocess). Du kannst in Tests nicht:</p>
+<ul>
+  <li>Echte Telegram-Nachrichten senden</li>
+  <li>Echte Notion-Datenbanken schreiben</li>
+  <li>Echte Claude CLI-Prozesse starten</li>
+</ul>
+<p><strong>Lösung:</strong> Diese Abhängigkeiten durch kontrollierte Fakes (Mocks) ersetzen.</p>
+
+<h2>Zwei Werkzeuge in pytest</h2>
+<table>
+  <tr><th>Werkzeug</th><th>Wann nutzen</th></tr>
+  <tr><td><code>monkeypatch</code></td><td>Funktionen/Attribute/Pfade temporär überschreiben (pytest built-in)</td></tr>
+  <tr><td><code>unittest.mock.patch</code></td><td>Komplexere Mocks, Aufruf-Zähler, Return-Values</td></tr>
+</table>
+
+<h2>monkeypatch — einfache Substitution</h2>
+<p>Du hast das bereits in deinen Tests gesehen:</p>
+
+<pre># aus test_bot.py:
+def test_load_reminders_empty(tmp_path, monkeypatch):
+    import bot
+    monkeypatch.setattr(bot, "REMINDERS_PATH", tmp_path / "reminders.json")
+    assert bot.load_reminders() == []</pre>
+
+<p><strong>Was passiert:</strong></p>
+<ul>
+  <li><code>monkeypatch.setattr</code> ersetzt <code>bot.REMINDERS_PATH</code> für die Dauer dieses Tests</li>
+  <li>Danach wird es automatisch zurückgesetzt</li>
+  <li>Der Test berührt keine echten Produktionsdaten</li>
+</ul>
+
+<pre># Weiteres Beispiel — Umgebungsvariable überschreiben:
+def test_telegram_token_fehlt(monkeypatch):
+    monkeypatch.delenv("TELEGRAM_TOKEN", raising=False)
+    # jetzt kann ich testen wie der Code ohne Token reagiert</pre>
+
+<h2>unittest.mock — mächtigere Mocks</h2>
+<p>Wenn du prüfen willst <em>ob</em> etwas aufgerufen wurde und <em>mit welchen Argumenten</em>:</p>
+
+<pre>from unittest.mock import patch, MagicMock
+
+def test_send_message_called():
+    with patch("bot.requests.post") as mock_post:
+        mock_post.return_value.status_code = 200
+        
+        # Rufe Funktion auf die intern requests.post benutzt
+        send_telegram_message("Hallo!")
+        
+        # Prüfe dass requests.post aufgerufen wurde
+        mock_post.assert_called_once()
+        
+        # Prüfe mit welchen Argumenten:
+        args, kwargs = mock_post.call_args
+        assert "Hallo!" in str(kwargs)</pre>
+
+<h2>subprocess mocken — Claude CLI</h2>
+<p>Dein Bot startet Claude als subprocess. Das kannst du so mocken:</p>
+
+<pre>from unittest.mock import patch, MagicMock
+
+def test_run_teach_startet_subprocess():
+    with patch("bot.subprocess.Popen") as mock_popen:
+        # Simuliere dass subprocess Erfolg zurückgibt
+        mock_process = MagicMock()
+        mock_process.stdout.readline.return_value = b""
+        mock_process.poll.return_value = 0
+        mock_popen.return_value = mock_process
+        
+        # Jetzt kannst du testen ohne echte CLI
+        from bot import _run_teach
+        _run_teach(12345, "Python Grundlagen")</pre>
+
+<div class="tip">
+  <strong>Wann mocken?</strong> Wenn das echte System: langsam ist, externe Abhängigkeiten hat, schwer kontrollierbar ist, oder Seiteneffekte hat (Dateien schreiben, Nachrichten senden).
+</div>
+
+<div class="warning">
+  <strong>Vorsicht beim Mocken:</strong> Zu viel Mocking testet nur noch den Mock selbst, nicht den echten Code. Mock externe Grenzen (API, Filesystem), nicht interne Logik.
+</div>
+
+<h2>tmp_path — sicherer Filesystem-Zugriff</h2>
+<p>pytest stellt <code>tmp_path</code> als Fixture bereit — ein temporäres Verzeichnis das nach dem Test automatisch gelöscht wird:</p>
+
+<pre>def test_settings_gespeichert(tmp_path):
+    settings_file = tmp_path / "settings.json"
+    
+    save_settings({"notifications_enabled": True}, tmp_path)
+    
+    # Echte Datei lesen — aber im tmp-Verzeichnis, nicht in Production
+    import json
+    data = json.loads(settings_file.read_text())
+    assert data["notifications_enabled"] is True</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was passiert mit <code>monkeypatch</code>-Änderungen nach dem Test?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Sie bleiben dauerhaft</div>
+  <div class="reveal wrong">❌ Falsch. monkeypatch macht alle Änderungen automatisch rückgängig nach jedem Test.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Sie werden automatisch zurückgesetzt</div>
+  <div class="reveal">✅ Richtig! Das macht monkeypatch zu einem sicheren Werkzeug — kein State leakt zwischen Tests.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Du willst prüfen ob eine Funktion genau einmal aufgerufen wurde. Welches Werkzeug?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) monkeypatch</div>
+  <div class="reveal wrong">❌ monkeypatch kann Funktionen ersetzen, aber nicht Aufruf-Zähler verfolgen.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) unittest.mock mit assert_called_once()</div>
+  <div class="reveal">✅ Richtig! MagicMock verfolgt alle Aufrufe automatisch.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Was würdest du mocken wenn du <code>load_settings()</code> testen willst ohne echte Dateien zu berühren?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+    <code>tmp_path</code> nutzen — pytest gibt dir ein temporäres Verzeichnis und load_settings() schreibt/liest dort statt in Production:<br><br>
+    <code>def test_load_settings(tmp_path):<br>&nbsp;&nbsp;result = load_settings(tmp_path)<br>&nbsp;&nbsp;assert result == {"notifications_enabled": True}</code>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><strong>Mock</strong>: Ersatz für externe Abhängigkeiten in Tests</li>
+    <li><strong>monkeypatch</strong>: einfach, pytest built-in, automatisch rückgesetzt</li>
+    <li><strong>unittest.mock</strong>: Aufrufzähler, Return-Values, Argument-Prüfung</li>
+    <li><strong>tmp_path</strong>: sicherer Filesystem-Zugriff in Tests</li>
+    <li>Mock externe Grenzen (APIs, Files), nicht interne Logik</li>
+    <li>Zu viel Mocking = Test testet nur den Mock, nicht den Code</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> TDD für ein neues Feature — wir entwickeln einen neuen Command test-first.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.pytest.org/en/stable/reference/fixtures.html">pytest Fixtures Dokumentation</a>. Python <a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock</a>.</cite></p>
+</body>
+</html>

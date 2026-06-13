@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 07 — I/O &amp; Dateizugriff</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 07 — I/O &amp; Dateizugriff</h1>
+<p class="mission">Ziel: Konsoleneingabe mit Scanner lesen, Dateien schreiben und lesen — die Grundlagen für das Praxisprojekt.</p>
+
+<h2>Konsoleneingabe — Scanner</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — Scanner</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import java.util.Scanner;
+
+Scanner scanner = new Scanner(System.in);
+
+System.out.print("Dein Name: ");
+String name = scanner.nextLine();
+
+System.out.print("Dein Alter: ");
+int alter = scanner.nextInt();
+
+System.out.println("Hallo " + name + "!");
+scanner.close();</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">Console.Write("Dein Name: ");
+string name = Console.ReadLine();
+
+Console.Write("Dein Alter: ");
+int alter = int.Parse(Console.ReadLine());
+
+Console.WriteLine($"Hallo {name}!");</pre>
+  </div>
+</div>
+
+<h2>Datei schreiben</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — Files API (modern)</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
+
+// Ganzen String in Datei schreiben:
+try {
+    Files.writeString(Path.of("aufgaben.txt"), 
+        "Task 1: Einkaufen\nTask 2: Sport");
+} catch (IOException e) {
+    System.out.println("Fehler: " + e.getMessage());
+}
+
+// Mehrere Zeilen:
+List&lt;String&gt; zeilen = List.of("Zeile 1", "Zeile 2");
+Files.write(Path.of("liste.txt"), zeilen);</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">using System.IO;
+
+// Ganzen String schreiben:
+File.WriteAllText("aufgaben.txt", 
+    "Task 1: Einkaufen\nTask 2: Sport");
+
+// Mehrere Zeilen:
+string[] zeilen = {"Zeile 1", "Zeile 2"};
+File.WriteAllLines("liste.txt", zeilen);</pre>
+  </div>
+</div>
+
+<h2>Datei lesen</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// Ganzen Inhalt als String:
+String inhalt = Files.readString(Path.of("aufgaben.txt"));
+System.out.println(inhalt);
+
+// Alle Zeilen als Liste:
+List&lt;String&gt; zeilen = Files.readAllLines(Path.of("liste.txt"));
+for (String zeile : zeilen) {
+    System.out.println(zeile);
+}
+
+// Datei existiert?
+boolean existiert = Files.exists(Path.of("aufgaben.txt"));</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// Ganzen Inhalt:
+string inhalt = File.ReadAllText("aufgaben.txt");
+Console.WriteLine(inhalt);
+
+// Alle Zeilen:
+string[] zeilen = File.ReadAllLines("liste.txt");
+foreach (string zeile in zeilen) {
+    Console.WriteLine(zeile);
+}
+
+// Datei existiert?
+bool existiert = File.Exists("aufgaben.txt");</pre>
+  </div>
+</div>
+
+<h2>Methodenvergleich</h2>
+<table>
+  <tr><th>Java (Files API)</th><th>C# (File API)</th></tr>
+  <tr><td><code>Files.readString(path)</code></td><td><code>File.ReadAllText(path)</code></td></tr>
+  <tr><td><code>Files.writeString(path, text)</code></td><td><code>File.WriteAllText(path, text)</code></td></tr>
+  <tr><td><code>Files.readAllLines(path)</code></td><td><code>File.ReadAllLines(path)</code></td></tr>
+  <tr><td><code>Files.write(path, lines)</code></td><td><code>File.WriteAllLines(path, lines)</code></td></tr>
+  <tr><td><code>Files.exists(path)</code></td><td><code>File.Exists(path)</code></td></tr>
+  <tr><td><code>Path.of("pfad")</code></td><td><code>"pfad"</code> (direkt als String)</td></tr>
+</table>
+
+<h2>JSON lesen/schreiben (mit Gson)</h2>
+<pre>// pom.xml Abhängigkeit hinzufügen:
+// &lt;dependency&gt;
+//   &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+//   &lt;artifactId&gt;gson&lt;/artifactId&gt;
+//   &lt;version&gt;2.10.1&lt;/version&gt;
+// &lt;/dependency&gt;
+
+import com.google.gson.Gson;
+import java.util.HashMap;
+
+Gson gson = new Gson();
+
+// Objekt → JSON-String:
+HashMap&lt;String, Object&gt; daten = new HashMap&lt;&gt;();
+daten.put("name", "Tjark");
+daten.put("punkte", 95);
+String json = gson.toJson(daten);  // {"name":"Tjark","punkte":95}
+Files.writeString(Path.of("daten.json"), json);
+
+// JSON-String → Objekt:
+String gelesenerJson = Files.readString(Path.of("daten.json"));
+HashMap datenZurueck = gson.fromJson(gelesenerJson, HashMap.class);</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Wie liest man Konsoleneingabe in Java?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Console.ReadLine()</div>
+  <div class="reveal wrong">❌ Das ist C#. Java nutzt <code>new Scanner(System.in)</code> und dann <code>scanner.nextLine()</code>.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) new Scanner(System.in).nextLine()</div>
+  <div class="reveal">✅ Richtig! Scanner ist das Standard-Werkzeug für Konsoleneingabe.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Welche IOException-Behandlung ist für <code>Files.readString()</code> nötig?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Keine — IOException ist unchecked</div>
+  <div class="reveal wrong">❌ Falsch. IOException ist eine Checked Exception — try/catch oder throws nötig.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) try/catch IOException oder throws IOException im Methodenkopf</div>
+  <div class="reveal">✅ Richtig! Checked Exception — Compiler erzwingt die Behandlung.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><code>Scanner(System.in)</code> für Konsoleneingabe (statt <code>Console.ReadLine()</code>)</li>
+    <li><code>Files.readString(Path.of(...))</code> für Dateizugriff (modernes API)</li>
+    <li>IOException ist Checked — immer try/catch oder throws nötig</li>
+    <li>Methodennamen ähnlich zu C# File-API, aber lowercase</li>
+    <li>Gson-Bibliothek für JSON (wie Newtonsoft.Json in C#)</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Praxisprojekt — Todo-Konsolen-App in Java.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Files.html">Java 21 Files API</a>.</cite></p>
+</body>
+</html>

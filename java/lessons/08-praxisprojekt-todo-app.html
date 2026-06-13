@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 08 — Praxisprojekt: Todo-Konsolen-App</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .step { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1rem; margin: .8rem 0; }
+    .step h4 { margin-top: 0; color: #e76f00; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 08 — Praxisprojekt: Todo-Konsolen-App</h1>
+<p class="mission">Ziel: Alle gelernten Java-Konzepte in einer vollständigen, funktionsfähigen Anwendung zusammenführen.</p>
+
+<h2>Was bauen wir?</h2>
+<p>Eine Konsolen-App die Todos verwaltet:</p>
+<ul>
+  <li>Todo hinzufügen</li>
+  <li>Alle Todos anzeigen</li>
+  <li>Todo als erledigt markieren</li>
+  <li>Todos in Datei speichern und laden</li>
+</ul>
+
+<h2>Projektstruktur</h2>
+<pre>todo-app/
+  src/main/java/com/todo/
+    Todo.java          ← Datenklasse
+    TodoManager.java   ← Logik
+    App.java           ← Einstiegspunkt + UI</pre>
+
+<h2>Schritt 1 — Todo-Klasse</h2>
+<div class="step">
+  <h4>Todo.java</h4>
+<pre>package com.todo;
+
+public class Todo {
+    private String text;
+    private boolean erledigt;
+
+    public Todo(String text) {
+        this.text = text;
+        this.erledigt = false;
+    }
+
+    public String getText() { return text; }
+    public boolean isErledigt() { return erledigt; }
+    public void setErledigt(boolean erledigt) { this.erledigt = erledigt; }
+
+    @Override
+    public String toString() {
+        String status = erledigt ? "[x]" : "[ ]";
+        return status + " " + text;
+    }
+}</pre>
+</div>
+
+<h2>Schritt 2 — TodoManager</h2>
+<div class="step">
+  <h4>TodoManager.java</h4>
+<pre>package com.todo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
+
+public class TodoManager {
+    private ArrayList&lt;Todo&gt; todos = new ArrayList&lt;&gt;();
+    private static final Path DATEI = Path.of("todos.txt");
+
+    public void hinzufuegen(String text) {
+        todos.add(new Todo(text));
+    }
+
+    public List&lt;Todo&gt; alleTodos() {
+        return todos;
+    }
+
+    public void alsErledigt(int index) {
+        if (index >= 0 && index < todos.size()) {
+            todos.get(index).setErledigt(true);
+        } else {
+            throw new IllegalArgumentException("Ungültiger Index: " + index);
+        }
+    }
+
+    public void speichern() throws IOException {
+        ArrayList&lt;String&gt; zeilen = new ArrayList&lt;&gt;();
+        for (Todo todo : todos) {
+            zeilen.add((todo.isErledigt() ? "1" : "0") + ":" + todo.getText());
+        }
+        Files.write(DATEI, zeilen);
+    }
+
+    public void laden() throws IOException {
+        if (!Files.exists(DATEI)) return;
+        List&lt;String&gt; zeilen = Files.readAllLines(DATEI);
+        for (String zeile : zeilen) {
+            String[] teile = zeile.split(":", 2);
+            Todo todo = new Todo(teile[1]);
+            if (teile[0].equals("1")) todo.setErledigt(true);
+            todos.add(todo);
+        }
+    }
+}</pre>
+</div>
+
+<h2>Schritt 3 — App (Einstiegspunkt)</h2>
+<div class="step">
+  <h4>App.java</h4>
+<pre>package com.todo;
+
+import java.util.Scanner;
+import java.io.IOException;
+
+public class App {
+    public static void main(String[] args) {
+        TodoManager manager = new TodoManager();
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            manager.laden();
+            System.out.println("Todos geladen.");
+        } catch (IOException e) {
+            System.out.println("Keine gespeicherten Todos gefunden.");
+        }
+
+        while (true) {
+            System.out.println("\n--- TODO APP ---");
+            System.out.println("1) Alle Todos anzeigen");
+            System.out.println("2) Todo hinzufügen");
+            System.out.println("3) Todo erledigen");
+            System.out.println("4) Speichern und beenden");
+            System.out.print("Auswahl: ");
+
+            String eingabe = scanner.nextLine().trim();
+
+            switch (eingabe) {
+                case "1":
+                    var todos = manager.alleTodos();
+                    if (todos.isEmpty()) {
+                        System.out.println("Keine Todos vorhanden.");
+                    } else {
+                        for (int i = 0; i < todos.size(); i++) {
+                            System.out.println((i + 1) + ". " + todos.get(i));
+                        }
+                    }
+                    break;
+
+                case "2":
+                    System.out.print("Neues Todo: ");
+                    String text = scanner.nextLine().trim();
+                    if (!text.isEmpty()) {
+                        manager.hinzufuegen(text);
+                        System.out.println("Todo hinzugefügt!");
+                    }
+                    break;
+
+                case "3":
+                    System.out.print("Welche Nummer erledigen? ");
+                    try {
+                        int num = Integer.parseInt(scanner.nextLine().trim()) - 1;
+                        manager.alsErledigt(num);
+                        System.out.println("Erledigt!");
+                    } catch (NumberFormatException e) {
+                        System.out.println("Keine gültige Nummer.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                case "4":
+                    try {
+                        manager.speichern();
+                        System.out.println("Gespeichert. Tschüss!");
+                    } catch (IOException e) {
+                        System.out.println("Fehler beim Speichern: " + e.getMessage());
+                    }
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Ungültige Eingabe.");
+            }
+        }
+    }
+}</pre>
+</div>
+
+<h2>Kompilieren und Ausführen</h2>
+<pre>mvn compile
+mvn exec:java -Dexec.mainClass="com.todo.App"</pre>
+
+<h2>Was du hier genutzt hast</h2>
+<ul>
+  <li>✅ <strong>Klassen</strong> (Todo, TodoManager, App)</li>
+  <li>✅ <strong>ArrayList</strong> für dynamische Liste</li>
+  <li>✅ <strong>Getter/Setter</strong> statt Properties</li>
+  <li>✅ <strong>toString()</strong> Override</li>
+  <li>✅ <strong>Exception Handling</strong> (IOException, NumberFormatException)</li>
+  <li>✅ <strong>Files API</strong> für Dateizugriff</li>
+  <li>✅ <strong>Scanner</strong> für Konsoleneingabe</li>
+  <li>✅ <strong>switch/case</strong> für Menüsteuerung</li>
+</ul>
+
+<div class="quiz">
+  <h3>🧠 Erweiterungsaufgaben</h3>
+  <p>Versuche diese Erweiterungen selbst umzusetzen:</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">1. Todo löschen hinzufügen</div>
+  <div class="reveal">Methode <code>loeschen(int index)</code> in TodoManager: <code>todos.remove(index)</code>. Dann case "5" in App.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">2. Nur offene Todos anzeigen</div>
+  <div class="reveal">In alleTodos() filtern: <code>if (!todo.isErledigt())</code> in einer neuen Methode <code>offeneTodos()</code>.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">3. Priorität zu Todo hinzufügen (Hoch/Mittel/Niedrig)</div>
+  <div class="reveal">Neues Enum <code>Prioritaet { HOCH, MITTEL, NIEDRIG }</code>, Feld in Todo, Konstruktor anpassen, Speicher/Laden aktualisieren.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Java-Kurs abgeschlossen!</h2>
+  <p>Du hast alle Grundlagen gelernt:</p>
+  <ul>
+    <li>✅ Setup, Maven, Hello World</li>
+    <li>✅ Syntax: Typen, Variablen, Kontrollfluss</li>
+    <li>✅ OOP: Klassen, Konstruktoren, Getter/Setter</li>
+    <li>✅ Vererbung (extends), Interfaces (implements)</li>
+    <li>✅ Collections: ArrayList, HashMap</li>
+    <li>✅ Exception Handling mit Checked Exceptions</li>
+    <li>✅ I/O: Scanner, Files API</li>
+    <li>✅ Vollständige App gebaut</li>
+  </ul>
+  <p>Du kannst jetzt Java-Code auf Junior-Niveau lesen, verstehen und selbst schreiben.</p>
+</div>
+
+<p><cite>Baeldung Java Tutorials: <a href="https://www.baeldung.com/">baeldung.com</a> — empfohlen für Vertiefung.</cite></p>
+</body>
+</html>

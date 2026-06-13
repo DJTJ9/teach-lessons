@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 01 — Java vs. C# Überblick &amp; Setup</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    .tip { background: #fff5eb; border-left: 4px solid #e76f00; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 01 — Java vs. C#: Überblick &amp; Setup</h1>
+<p class="mission">Ziel: Die Gemeinsamkeiten und Unterschiede von Java und C# verstehen, JDK + Maven installieren, und Hello World kompilieren.</p>
+
+<h2>Java und C# — mehr Geschwister als Fremde</h2>
+<p>Java kam 1995 (Sun Microsystems). C# kam 2002 (Microsoft) — und war stark von Java inspiriert. Beide sind:</p>
+<ul>
+  <li>Objektorientiert, statisch typisiert</li>
+  <li>Kompiliert zu Bytecode (Java → JVM, C# → .NET CLR)</li>
+  <li>Garbage Collected — kein manuelles Speichermanagement</li>
+  <li>Mit ähnlicher Syntax: Klassen, Interfaces, Vererbung, Generics</li>
+</ul>
+
+<h2>Die wichtigsten Unterschiede im Überblick</h2>
+<table>
+  <tr><th>Feature</th><th>Java</th><th>C#</th></tr>
+  <tr><td>Hersteller</td><td>Oracle (ehem. Sun)</td><td>Microsoft</td></tr>
+  <tr><td>Platform</td><td>JVM (überall)</td><td>.NET (Windows, Linux, Mac)</td></tr>
+  <tr><td>Properties</td><td>Getter/Setter Methoden</td><td>Properties mit get/set</td></tr>
+  <tr><td>Checked Exceptions</td><td>Ja (müssen behandelt werden)</td><td>Nein (alle unchecked)</td></tr>
+  <tr><td>Delegates/Events</td><td>Interfaces oder Lambdas</td><td>delegate, event</td></tr>
+  <tr><td>Primärnutzung</td><td>Backend, Android, Enterprise</td><td>Unity, .NET Backend, Windows</td></tr>
+  <tr><td>Build Tool</td><td>Maven / Gradle</td><td>MSBuild / dotnet CLI</td></tr>
+</table>
+
+<h2>Setup — JDK und Maven installieren</h2>
+<pre># JDK 21 (LTS) installieren:
+# Windows: https://adoptium.net/ → JDK 21 → .msi herunterladen
+
+# Prüfen:
+java -version
+javac -version
+
+# Maven installieren:
+# https://maven.apache.org/download.cgi → Binary zip → entpacken → PATH setzen
+
+# Prüfen:
+mvn -version</pre>
+
+<h2>Erstes Maven-Projekt</h2>
+<pre># Projekt erstellen:
+mvn archetype:generate -DgroupId=com.beispiel -DartifactId=hallo-java \
+  -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+cd hallo-java</pre>
+
+<h2>Hello World — Java vs. C#</h2>
+
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// src/main/java/com/beispiel/App.java
+package com.beispiel;
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hallo, Java!");
+    }
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// Program.cs
+using System;
+
+class Program {
+    static void Main(string[] args) {
+        Console.WriteLine("Hallo, C#!");
+    }
+}</pre>
+  </div>
+</div>
+
+<h2>Was du sofort erkennst</h2>
+<table>
+  <tr><th>Java</th><th>C# Äquivalent</th></tr>
+  <tr><td><code>System.out.println()</code></td><td><code>Console.WriteLine()</code></td></tr>
+  <tr><td><code>public static void main(String[] args)</code></td><td><code>static void Main(string[] args)</code></td></tr>
+  <tr><td><code>package com.beispiel;</code></td><td><code>namespace MeinProjekt;</code></td></tr>
+  <tr><td>Dateiname = Klassenname (Pflicht)</td><td>Dateiname beliebig</td></tr>
+  <tr><td><code>String</code> (groß geschrieben)</td><td><code>string</code> (klein)</td></tr>
+</table>
+
+<h2>Kompilieren und Ausführen</h2>
+<pre># Mit Maven:
+mvn compile
+mvn exec:java -Dexec.mainClass="com.beispiel.App"
+
+# Ausgabe:
+# Hallo, Java!</pre>
+
+<div class="tip">
+  <strong>Dateiname = Klassenname:</strong> In Java muss die Klasse <code>App</code> in der Datei <code>App.java</code> liegen. Das ist eine strikte Regel, nicht nur Konvention.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Wie gibt man in Java Text auf der Konsole aus?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Console.WriteLine("Text")</div>
+  <div class="reveal wrong">❌ Das ist C#. In Java: <code>System.out.println("Text")</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) System.out.println("Text")</div>
+  <div class="reveal">✅ Richtig! <code>System.out</code> ist der Standard-Ausgabestream in Java.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was ist in Java anders als in C# bezüglich Dateinamen?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) In Java muss der Dateiname dem public class Namen entsprechen</div>
+  <div class="reveal">✅ Richtig! <code>public class PlayerHealth</code> muss in <code>PlayerHealth.java</code> sein.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) In Java ist der Dateiname beliebig</div>
+  <div class="reveal wrong">❌ Falsch. Java erzwingt dass der Dateiname = public class Name.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Erstelle ein Maven-Projekt und schreibe ein Hello-World das deinen Namen ausgibt. Kompiliere und führe es aus.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir den Code</div>
+  <div class="reveal">
+<pre>System.out.println("Hallo, Tjark!");</pre>
+Kompilieren: <code>mvn compile</code>, Ausführen: <code>mvn exec:java -Dexec.mainClass="com.beispiel.App"</code>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>Java und C# sind Geschwister — ähnliche Syntax, ähnliche Konzepte</li>
+    <li>Hauptunterschiede: Properties-Syntax, Checked Exceptions, Primärplattform</li>
+    <li><code>System.out.println()</code> = <code>Console.WriteLine()</code></li>
+    <li>Dateiname muss Klassenname entsprechen (Java-Regel)</li>
+    <li>Maven: Build-Tool für Java (<code>mvn compile</code>, <code>mvn exec:java</code>)</li>
+    <li><code>package</code> in Java entspricht <code>namespace</code> in C#</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Java-Syntax im Detail — Typen, Variablen, Kontrollfluss verglichen mit C#.</p>
+</div>
+
+<p><cite>Quellen: <a href="https://docs.oracle.com/en/java/javase/21/">Oracle Java 21 Dokumentation</a>. <a href="https://www.baeldung.com/">Baeldung Java Tutorials</a>.</cite></p>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 06 — TDD neues Feature: Command test-first</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #27ae60; border-bottom: 3px solid #27ae60; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .step-label { display: inline-block; padding: .3rem .8rem; border-radius: 4px; font-weight: bold; margin-bottom: .5rem; }
+    .red-label { background: #fdecea; color: #e74c3c; border: 1px solid #e74c3c; }
+    .green-label { background: #eafaf1; color: #27ae60; border: 1px solid #27ae60; }
+    .blue-label { background: #eaf0fb; color: #2980b9; border: 1px solid #2980b9; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .insight { background: #fff0f6; border-left: 4px solid #8e44ad; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    ol.tdd { counter-reset: tdd; list-style: none; padding: 0; }
+    ol.tdd li { counter-increment: tdd; padding: .5rem 0 .5rem 2.5rem; border-bottom: 1px solid #eee; position: relative; }
+    ol.tdd li::before { content: counter(tdd); position: absolute; left: 0; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: #2980b9; color: #fff; text-align: center; line-height: 1.8rem; font-weight: bold; font-size: .9em; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>🛠️ Lektion 06 — TDD: Neues Feature test-first</h1>
+<p class="mission">Ziel: Ein komplettes neues Chatbot-Feature von Anfang bis Ende mit TDD entwickeln — ohne eine Zeile Produktionscode vorab zu schreiben.</p>
+
+<h2>Das Feature: "hilfe: &lt;befehl&gt;"</h2>
+<p>Neue Anforderung: Der Bot soll spezifische Hilfe zu einem Command geben können. <code>"hilfe: moin"</code> soll eine Erklärung nur zum <code>moin</code>-Command zurückgeben.</p>
+
+<p>Wir entwickeln <strong>nur die Parse-Logik</strong> — kein echtes Claude-Aufruf, nur Prefix-Erkennung und Extraktion.</p>
+
+<h2>TDD-Ablauf: Schritt für Schritt</h2>
+
+<ol class="tdd">
+  <li>Anforderung klären: Was soll die Funktion tun?</li>
+  <li>Ersten (einfachsten) Test schreiben</li>
+  <li>Fehlschlag bestätigen (Red)</li>
+  <li>Minimaler Code (Green)</li>
+  <li>Nächsten Test schreiben (Grenzfall)</li>
+  <li>Erneut Red → Green</li>
+  <li>Refactoren wenn Duplikate entstehen</li>
+</ol>
+
+<h2>Zyklus 1 — Prefix-Erkennung</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre># tests/test_bot.py — am Ende anhängen:
+
+def test_hilfe_befehl_prefix():
+    text = "hilfe: moin"
+    assert text.lower().startswith("hilfe:")
+    assert text[6:].strip() == "moin"</pre>
+
+<pre># Ausführen:
+pytest tests/test_bot.py::test_hilfe_befehl_prefix -v
+# PASSED (sofort!) — warum?</pre>
+
+<div class="insight">
+  <strong>Achtung:</strong> Dieser Test testet nur Python-String-Operationen, nicht unseren Code. Er ist sofort grün, weil <code>startswith</code> und String-Slicing immer funktionieren. Das ist ein Design-Hinweis: Prefix-Erkennung braucht keine eigene Funktion — sie passiert direkt im Handler.
+</div>
+
+<h2>Zyklus 2 — Leeren Befehl behandeln</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>def test_hilfe_ohne_befehl():
+    text = "hilfe:"
+    assert text[6:].strip() == ""</pre>
+
+<pre># PASSED sofort — wieder kein Code nötig</pre>
+
+<h2>Zyklus 3 — hilfe: in known_prefixes</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>def test_hilfe_ist_bekannter_befehl():
+    known_prefixes = (
+        "task:", "status:", "fokus:", "verschieben:", "lern:",
+        "idee:", "habit:", "termin:", "projekt:", "teach:", "erinnere",
+        "implement-plan:", "abort-plan:", "backlog:", "suche:", "hilfe:",
+    )
+    assert "hilfe: moin".lower().startswith(known_prefixes)
+
+# FAILS — "hilfe:" fehlt noch in bot.py!</pre>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<p>In <code>bot.py</code> die <code>KNOWN_PREFIXES</code> Konstante um <code>"hilfe:"</code> erweitern (oder wo immer Prefixes definiert sind). Test wird grün.</p>
+
+<h2>Zyklus 4 — Hilfe-Text Struktur</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>def test_hilfe_text_enthaelt_befehl_erklaerungen():
+    from bot import HILFE_TEXT
+    # Hilfe soll alle Commands erklären
+    for cmd in ["moin", "abend", "task:", "status:"]:
+        assert cmd in HILFE_TEXT</pre>
+
+<pre># Ausführen → prüfen ob alle Commands dokumentiert sind</pre>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<p>Falls ein Command fehlt: <code>HILFE_TEXT</code> in <code>bot.py</code> ergänzen. Tests grün machen, einen nach dem anderen.</p>
+
+<div class="step-label blue-label">🔵 REFACTOR</div>
+<p>Gibt es Duplikate in <code>HILFE_TEXT</code>? Ist die Liste der Commands an einer oder mehreren Stellen definiert? Wenn mehreren Stellen: zu einer zentralen Konstante zusammenfassen.</p>
+
+<h2>Was du aus diesem Zyklus lernst</h2>
+<ul>
+  <li><strong>Manchmal braucht Code keinen eigenen Test</strong> — wenn das Verhalten triviale Python-Operationen sind</li>
+  <li><strong>Tests enthüllen Design-Probleme</strong> — "schwer zu testen" bedeutet oft "schlecht designed"</li>
+  <li><strong>Kurze Zyklen</strong> — nicht fünf Features auf einmal, ein Test nach dem anderen</li>
+  <li><strong>Red ist Information</strong> — der Fehler zeigt dir genau was fehlt</li>
+</ul>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Du schreibst einen Test und er ist sofort grün ohne Code zu schreiben. Was bedeutet das?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Der Test ist überflüssig — löschen</div>
+  <div class="reveal wrong">❌ Nicht unbedingt. Manchmal ist das Verhalten bereits korrekt (z.B. wenn du ein Refactoring machst). Aber: untersuche warum es grün ist.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Entweder das Feature ist schon vorhanden, oder der Test testet triviales Verhalten</div>
+  <div class="reveal">✅ Richtig! Beide Fälle sind möglich — beide sind informativ.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Du merkst während TDD dass deine Funktion schwer zu testen ist. Was tust du?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Mocking hinzufügen damit der Test funktioniert</div>
+  <div class="reveal wrong">❌ Vielleicht. Aber zuerst: warum ist es schwer? Oft ist "schwer zu testen" ein Hinweis auf schlechtes Design.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Das Design der Funktion überdenken — zu viele Abhängigkeiten deuten auf schlechtes Design hin</div>
+  <div class="reveal">✅ Richtig! TDD erzwingt testbares Design. Wenn der Test schmerzt, ist das wertvolles Feedback.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe einen TDD-Zyklus für eine neue Funktion <code>extract_command(text)</code> die den Befehlsnamen aus <code>"task: Einkauf"</code> extrahiert → <code>"task"</code>.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre># Red:
+def test_extract_command_task():
+    assert extract_command("task: Einkauf") == "task"
+
+# Green:
+def extract_command(text):
+    return text.split(":")[0].strip().lower()
+
+# Refactor: braucht es lower()? Hängt von Anforderungen ab.</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>TDD für neue Features: kleine Zyklen, ein Test nach dem anderen</li>
+    <li>Sofort grüne Tests → untersuchen warum (triviales Verhalten oder Fehler im Test?)</li>
+    <li>"Schwer zu testen" ist ein Design-Problem, kein Test-Problem</li>
+    <li>Grenzfälle (leere Eingabe, Sonderzeichen) als eigene TDD-Zyklen</li>
+    <li>Refactoring nur wenn alle Tests grün — Schritt für Schritt</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Unity Test Framework — NUnit einführen für C#-Tests in Spielen.</p>
+</div>
+
+<p><cite>Quelle: Kent Beck, "Test Driven Development: By Example" (2002), Part I — Money Example.</cite></p>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 01 — Red-Green-Refactor</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #c0392b; border-bottom: 3px solid #c0392b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    .cycle { display: flex; gap: 1rem; margin: 1.5rem 0; flex-wrap: wrap; }
+    .step { flex: 1; min-width: 160px; padding: 1.2rem; border-radius: 8px; text-align: center; }
+    .step.red { background: #fdecea; border: 2px solid #e74c3c; }
+    .step.green { background: #eafaf1; border: 2px solid #27ae60; }
+    .step.blue { background: #eaf0fb; border: 2px solid #2980b9; }
+    .step h3 { margin: 0 0 .5rem; }
+    .step.red h3 { color: #e74c3c; }
+    .step.green h3 { color: #27ae60; }
+    .step.blue h3 { color: #2980b9; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; transition: background .2s; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .why { background: #fff0f0; border-left: 4px solid #e74c3c; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+    .arrow { font-size: 1.5rem; display: flex; align-items: center; color: #7f8c8d; }
+  </style>
+</head>
+<body>
+
+<h1>🔴🟢🔵 Lektion 01 — Red-Green-Refactor</h1>
+<p class="mission">Ziel: Den TDD-Kernzyklus verstehen und erklären können — bevor du eine Zeile Produktionscode schreibst.</p>
+
+<h2>Was ist TDD?</h2>
+<p><strong>Test-Driven Development</strong> (testgetriebene Entwicklung) ist eine Methode, bei der du <em>erst den Test schreibst</em>, dann den Code der ihn grün macht, und schließlich aufräumst. Immer in diesem Zyklus:</p>
+
+<div class="cycle">
+  <div class="step red">
+    <h3>🔴 Red</h3>
+    <p>Test für Verhalten schreiben das noch nicht existiert. Der Test <strong>muss fehlschlagen</strong>.</p>
+  </div>
+  <div class="arrow">→</div>
+  <div class="step green">
+    <h3>🟢 Green</h3>
+    <p><strong>Minimalen Code</strong> schreiben damit der Test besteht. Noch keine Perfektion.</p>
+  </div>
+  <div class="arrow">→</div>
+  <div class="step blue">
+    <h3>🔵 Refactor</h3>
+    <p>Codestruktur verbessern ohne Verhalten zu ändern. Tests bleiben grün.</p>
+  </div>
+</div>
+
+<div class="why">
+  <strong>Warum fehlschlagen lassen?</strong> Ein Test der nie rot war, beweist nichts. Er könnte immer grün sein — egal was dein Code macht. Ein roter Test beweist, dass er wirklich prüft.
+</div>
+
+<h2>Das Problem ohne TDD</h2>
+<p>Ohne TDD schreibst du Code, bist fertig, und schreibst danach Tests die zum existierenden Code passen. Das nennt man <strong>post-hoc Testing</strong>. Genau das passiert bisher im Chatbot-Projekt — die Tests in <code>tests/</code> wurden nach dem Code geschrieben.</p>
+<p>Das Problem: Du testest was du <em>gebaut hast</em>, nicht was du <em>brauchst</em>. Lücken in den Anforderungen bleiben unbemerkt.</p>
+
+<h2>Konkretes Beispiel — Schritt für Schritt</h2>
+<pre># SCHRITT 1 — Red: Test schreiben (add() existiert noch nicht)
+def test_add_zwei_zahlen():
+    assert add(2, 3) == 5
+
+# Ausführen: NameError: name 'add' is not defined  ← GEWOLLT!</pre>
+
+<pre># SCHRITT 2 — Green: minimaler Code
+def add(a, b):
+    return a + b
+
+# Ausführen: PASSED ✓</pre>
+
+<pre># SCHRITT 3 — Refactor: gibt es etwas zu verbessern?
+# Nein — der Code ist bereits minimal und klar.
+# Bei komplexerem Code würden wir hier aufräumen, solange Tests grün bleiben.</pre>
+
+<h2>Regeln des Zyklus</h2>
+<ul>
+  <li><strong>Kein Code ohne roten Test davor</strong> — immer erst der Test</li>
+  <li><strong>Ein Test auf einmal</strong> — nicht fünf auf einmal schreiben</li>
+  <li><strong>Refactor nur wenn grün</strong> — nie mit rotem Test umbauen</li>
+  <li><strong>Tests nie löschen</strong> — sie dokumentieren Verhalten dauerhaft</li>
+</ul>
+
+<h2>Was TDD dir gibt</h2>
+<ul>
+  <li>Du weißt sofort wenn du etwas kaputt machst</li>
+  <li>Code ist von Anfang an testbar (kein Spaghetti-Code)</li>
+  <li>Tests <em>sind</em> die Dokumentation — sie zeigen was der Code tun soll</li>
+  <li>Du kannst selbstbewusst refactoren, weil die Tests aufpassen</li>
+</ul>
+
+<div class="quiz">
+  <h3>🧠 Quiz — klick auf eine Antwort</h3>
+
+  <p><strong>Frage 1:</strong> In welcher Reihenfolge läuft der TDD-Zyklus?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Green → Red → Refactor</div>
+  <div class="reveal wrong">❌ Falsch. Du musst erst wissen was du willst (Test schreiben = Red), dann bauen.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Red → Green → Refactor</div>
+  <div class="reveal">✅ Richtig! Erst scheitern, dann bestehen, dann verbessern.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">C) Code → Test → Refactor</div>
+  <div class="reveal wrong">❌ Das ist post-hoc Testing — genau was TDD verhindert.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was beweist ein Test der noch nie rot war?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Dass der Code korrekt ist</div>
+  <div class="reveal wrong">❌ Falsch. Er beweist gar nichts — er könnte immer grün sein, egal was passiert.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Nichts — er muss erst scheitern um zu beweisen dass er wirklich prüft</div>
+  <div class="reveal">✅ Richtig! Ein Test der nie rot war, ist unbewiesen.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 3:</strong> Wann darf ich refactoren?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Jederzeit, auch wenn Tests rot sind</div>
+  <div class="reveal wrong">❌ Falsch. Refactoring bei rotem Test ändert zwei Dinge gleichzeitig — du weißt nicht was etwas kaputt gemacht hat.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Nur wenn alle Tests grün sind</div>
+  <div class="reveal">✅ Richtig! Grüne Tests = sicheres Netz für Umbau.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><strong>TDD</strong> = Test-first: Red → Green → Refactor</li>
+    <li><strong>Red</strong>: Test für nicht-existierendes Verhalten schreiben — muss scheitern</li>
+    <li><strong>Green</strong>: minimaler Code damit Test besteht</li>
+    <li><strong>Refactor</strong>: Code verbessern, Tests grün halten</li>
+    <li>Ein Test der nie rot war, ist nicht vertrauenswürdig</li>
+    <li>TDD zwingt dich, erst über <em>was</em> nachzudenken, dann über <em>wie</em></li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> pytest einrichten und den Zyklus live im Chatbot erleben.</p>
+</div>
+
+<p><cite>Quelle: Kent Beck, "Test Driven Development: By Example" (2002) — der Begründer von TDD.</cite></p>
+</body>
+</html>

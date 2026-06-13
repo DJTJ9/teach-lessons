@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js 03 — async/await &amp; Promises</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #339933; border-bottom: 3px solid #339933; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.js { border-color: #f7df1e; background: #fefde0; }
+    .compare-box.python { border-color: #3776ab; background: #eaf0fb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .evolution { background: #f8f8f8; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .tip { background: #f0fff0; border-left: 4px solid #339933; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>⏳ Lektion 03 — async/await &amp; Promises</h1>
+<p class="mission">Ziel: Das wichtigste Node.js-Konzept verstehen: asynchrone Operationen mit async/await schreiben — ohne Callback-Hölle.</p>
+
+<h2>Warum Asynchronität?</h2>
+<p>Dein Chatbot macht viel: HTTP-Anfragen an Telegram, Notion, Claude CLI. Diese Operationen dauern Millisekunden bis Sekunden. Node.js wartet dabei nicht — es macht andere Arbeit und kommt zurück wenn die Operation fertig ist.</p>
+
+<div class="evolution">
+  <strong>Evolution der Asynchronität in Node.js:</strong><br>
+  1. <strong>Callbacks</strong> (alt, unleserlich) → 2005-2015<br>
+  2. <strong>Promises</strong> (.then/.catch) → 2015<br>
+  3. <strong>async/await</strong> (modern, lesbar) → 2017+<br>
+  Du lernst direkt async/await — das ist der Standard heute.
+</div>
+
+<h2>async/await — Vergleich mit Python</h2>
+<div class="compare">
+  <div class="compare-box js">
+    <h4>🟡 Node.js async/await</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// async macht eine Funktion asynchron:
+async function dateiLesen() {
+    const fs = require('fs/promises');
+    const inhalt = await fs.readFile('daten.txt', 'utf-8');
+    return inhalt;
+}
+
+// Aufrufen:
+async function main() {
+    const text = await dateiLesen();
+    console.log(text);
+}
+
+main();</pre>
+  </div>
+  <div class="compare-box python">
+    <h4>🐍 Python async/await</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import asyncio
+
+async def datei_lesen():
+    with open('daten.txt', 'r') as f:
+        return f.read()
+
+async def main():
+    text = await datei_lesen()
+    print(text)
+
+asyncio.run(main())</pre>
+  </div>
+</div>
+
+<p>Syntax fast identisch zu Python! Beide nutzen <code>async</code> und <code>await</code>.</p>
+
+<h2>Promises — was async/await darunter tut</h2>
+<p>Jede <code>async</code>-Funktion gibt ein <strong>Promise</strong> zurück. Ein Promise ist wie ein Versprechen: "Ich gebe dir das Ergebnis, wenn ich fertig bin."</p>
+
+<pre>// Promise hat drei Zustände:
+// pending  → läuft noch
+// resolved → erfolgreich, Ergebnis vorhanden
+// rejected → Fehler aufgetreten
+
+// async/await ist "syntactic sugar" über Promises:
+const ergebnis = await machEtwas();
+// ist gleichbedeutend mit:
+machEtwas().then(ergebnis => { ... });</pre>
+
+<h2>HTTP-Anfragen mit fetch (Node.js 18+)</h2>
+<pre>// Telegram API anfragen (wie dein Bot das macht):
+async function sendeTelegramNachricht(token, chatId, text) {
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: text })
+    });
+    
+    const daten = await response.json();
+    return daten;
+}
+
+// Aufrufen:
+await sendeTelegramNachricht(TOKEN, CHAT_ID, "Hallo!");</pre>
+
+<h2>Fehlerbehandlung mit try/catch</h2>
+<pre>async function sicherLaden(pfad) {
+    try {
+        const fs = require('fs/promises');
+        const inhalt = await fs.readFile(pfad, 'utf-8');
+        return inhalt;
+    } catch (fehler) {
+        console.error(`Datei nicht gefunden: ${fehler.message}`);
+        return null;
+    }
+}
+
+// Mehrere async-Operationen parallel:
+const [telegram, notion] = await Promise.all([
+    fetchTelegram(),
+    fetchNotion()
+]);
+// Beide laufen gleichzeitig!</pre>
+
+<div class="tip">
+  <strong>Promise.all()</strong>: Wenn du mehrere unabhängige async-Operationen brauchst, starte sie parallel. Das ist wie Python's <code>asyncio.gather()</code>.
+</div>
+
+<h2>Das Callback-Muster (historisch, manchmal noch zu sehen)</h2>
+<pre>// ALT — Callback-Stil (vor async/await):
+const fs = require('fs');
+fs.readFile('daten.txt', 'utf-8', (fehler, inhalt) => {
+    if (fehler) {
+        console.error(fehler);
+        return;
+    }
+    console.log(inhalt);
+});
+
+// NEU — async/await (bevorzugt):
+const { readFile } = require('fs/promises');
+const inhalt = await readFile('daten.txt', 'utf-8');</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was gibt eine <code>async function</code> immer zurück?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Den direkten Return-Wert</div>
+  <div class="reveal wrong">❌ Falsch. async functions wrappen den Return-Wert immer in ein Promise.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Ein Promise (das den Return-Wert enthält)</div>
+  <div class="reveal">✅ Richtig! <code>async function f() { return 42; }</code> gibt ein Promise zurück das zu 42 resolved.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Du musst zwei unabhängige API-Calls machen. Was ist schneller?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) await call1(); await call2(); (nacheinander)</div>
+  <div class="reveal wrong">❌ Langsamer. Call2 startet erst nach Call1. Gesamtzeit = Zeit1 + Zeit2.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) await Promise.all([call1(), call2()]); (parallel)</div>
+  <div class="reveal">✅ Richtig! Promise.all startet beide gleichzeitig. Gesamtzeit = max(Zeit1, Zeit2).</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe eine async Funktion die eine URL abruft und die Antwort als JSON zurückgibt. Nutze fetch und await.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>async function holeJson(url) {
+    const response = await fetch(url);
+    return await response.json();
+}
+
+// Nutzen:
+const daten = await holeJson('https://api.example.com/data');</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><strong>async/await</strong>: gleiche Syntax wie Python asyncio — macht asynchronen Code lesbar</li>
+    <li>Jede <code>async</code>-Funktion gibt ein <strong>Promise</strong> zurück</li>
+    <li><code>await</code> pausiert die Funktion bis das Promise resolved ist</li>
+    <li>Fehlerbehandlung: <code>try/catch</code> wie synchroner Code</li>
+    <li><code>Promise.all()</code>: mehrere Operationen parallel starten</li>
+    <li><code>fetch()</code>: HTTP-Anfragen in Node.js 18+ eingebaut</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Module und npm — wie Node.js Code organisiert und Pakete installiert.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Promises">MDN: Using Promises</a>.</cite></p>
+</body>
+</html>

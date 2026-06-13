@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 06 — Exception Handling</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .diff { background: #fff3cd; border-left: 4px solid #ffc107; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 06 — Exception Handling</h1>
+<p class="mission">Ziel: try/catch/finally in Java schreiben, und den größten Java-Unterschied zu C# verstehen: Checked Exceptions.</p>
+
+<h2>try/catch/finally — fast identisch zu C#</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">try {
+    int ergebnis = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("Fehler: " + e.getMessage());
+} catch (Exception e) {
+    System.out.println("Unbekannter Fehler");
+} finally {
+    System.out.println("Wird immer ausgeführt");
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">try {
+    int ergebnis = 10 / 0;
+} catch (DivideByZeroException e) {
+    Console.WriteLine("Fehler: " + e.Message);
+} catch (Exception e) {
+    Console.WriteLine("Unbekannter Fehler");
+} finally {
+    Console.WriteLine("Wird immer ausgeführt");
+}</pre>
+  </div>
+</div>
+
+<h2>Eigene Exceptions werfen</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">if (alter < 0) {
+    throw new IllegalArgumentException(
+        "Alter darf nicht negativ sein"
+    );
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">if (alter < 0) {
+    throw new ArgumentException(
+        "Alter darf nicht negativ sein"
+    );
+}</pre>
+  </div>
+</div>
+
+<h2>Der größte Unterschied: Checked Exceptions</h2>
+<p>Das ist eine Java-Eigenheit die C# nicht kennt. In Java gibt es zwei Arten von Exceptions:</p>
+
+<table>
+  <tr><th>Typ</th><th>Was</th><th>Muss behandelt werden?</th></tr>
+  <tr><td><strong>Checked Exception</strong></td><td>Erbt von <code>Exception</code> (nicht RuntimeException)</td><td><strong>Ja</strong> — Compiler erzwingt es</td></tr>
+  <tr><td><strong>Unchecked Exception</strong></td><td>Erbt von <code>RuntimeException</code></td><td>Nein — optional</td></tr>
+</table>
+
+<pre>// Checked Exception — muss behandelt werden:
+try {
+    FileReader file = new FileReader("daten.txt");  // FileNotFoundException = Checked!
+} catch (FileNotFoundException e) {
+    System.out.println("Datei nicht gefunden: " + e.getMessage());
+}
+
+// Erzwungen — ohne try/catch: KOMPILIERUNGSFEHLER!</pre>
+
+<pre>// Unchecked Exception — optional:
+int[] array = {1, 2, 3};
+System.out.println(array[10]);  // ArrayIndexOutOfBoundsException — Runtime-Fehler
+// Kein try/catch nötig (aber empfohlen)</pre>
+
+<h2>throws-Keyword — Exception weitergeben</h2>
+<pre>// Statt selbst zu behandeln, nach oben weitergeben:
+public void dateiLesen(String pfad) throws IOException {
+    FileReader file = new FileReader(pfad);
+    // IOException wird an den Aufrufer weitergegeben
+}
+
+// Aufrufer muss dann behandeln:
+try {
+    dateiLesen("daten.txt");
+} catch (IOException e) {
+    System.out.println("Fehler: " + e.getMessage());
+}</pre>
+
+<div class="diff">
+  <strong>Wichtiger Unterschied zu C#:</strong> In C# gibt es keine Checked Exceptions — alle Exceptions sind optional zu behandeln. Java zwingt dich bei bestimmten Exceptions (IOException, SQLException, etc.) dazu, sie entweder zu behandeln (try/catch) oder weiterzugeben (throws). Das macht Code expliziter aber auch geschwätziger.
+</div>
+
+<h2>Eigene Exception-Klasse erstellen</h2>
+<pre>// Eigene Checked Exception:
+public class SpielFehlerException extends Exception {
+    public SpielFehlerException(String nachricht) {
+        super(nachricht);
+    }
+}
+
+// Eigene Unchecked Exception:
+public class UngueltigerZugException extends RuntimeException {
+    public UngueltigerZugException(String nachricht) {
+        super(nachricht);
+    }
+}
+
+// Nutzen:
+throw new UngueltigerZugException("Zug außerhalb des Spielfelds");</pre>
+
+<h2>try-with-resources (Java 7+)</h2>
+<pre>// Automatisches Schließen von Ressourcen (wie C# using):
+try (FileReader file = new FileReader("daten.txt");
+     BufferedReader reader = new BufferedReader(file)) {
+    String zeile = reader.readLine();
+    System.out.println(zeile);
+}
+// file und reader werden automatisch geschlossen — auch bei Exception</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was ist eine Checked Exception in Java?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Eine Exception die der Compiler zu behandeln zwingt</div>
+  <div class="reveal">✅ Richtig! Entweder try/catch oder throws — der Compiler akzeptiert nichts anderes.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Eine Exception die selten auftritt</div>
+  <div class="reveal wrong">❌ Falsch. Checked/Unchecked beschreibt Compile-Zeit-Zwang, nicht Häufigkeit.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was ist das Java-Äquivalent zu C# <code>using (var f = new File())</code>?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) try-with-resources: try (File f = new File())</div>
+  <div class="reveal">✅ Richtig! Gleiche Semantik — automatisches Schließen nach dem Block.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) finally { f.close(); }</div>
+  <div class="reveal wrong">❌ Geht auch, aber umständlicher. try-with-resources ist der moderne Weg.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe eine Methode <code>dividieren(int a, int b)</code> die eine eigene <code>DivisionDurchNullException</code> (unchecked) wirft wenn b = 0.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>public class DivisionDurchNullException extends RuntimeException {
+    public DivisionDurchNullException() {
+        super("Division durch Null ist nicht erlaubt");
+    }
+}
+
+public int dividieren(int a, int b) {
+    if (b == 0) throw new DivisionDurchNullException();
+    return a / b;
+}</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>try/catch/finally: fast identisch zu C#</li>
+    <li><strong>Checked Exceptions</strong>: Compiler erzwingt Behandlung oder throws — nur in Java!</li>
+    <li><strong>Unchecked Exceptions</strong>: RuntimeException und Unterklassen — optional</li>
+    <li><code>throws</code> im Methodenkopf: Exception nach oben weitergeben</li>
+    <li>try-with-resources: automatisches Schließen (= C# using)</li>
+    <li>Eigene Exceptions: extends Exception (checked) oder RuntimeException (unchecked)</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> I/O und Dateizugriff in Java.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html">Java 21 Exception API</a>.</cite></p>
+</body>
+</html>

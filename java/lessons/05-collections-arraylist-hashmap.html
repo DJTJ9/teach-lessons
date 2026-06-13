@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 05 — Collections: ArrayList &amp; HashMap</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 05 — Collections: ArrayList &amp; HashMap</h1>
+<p class="mission">Ziel: Die wichtigsten Java-Collections verstehen und nutzen — ArrayList (= List&lt;T&gt;) und HashMap (= Dictionary&lt;K,V&gt;).</p>
+
+<h2>ArrayList — Javas List&lt;T&gt;</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — ArrayList</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import java.util.ArrayList;
+
+ArrayList&lt;String&gt; namen = new ArrayList&lt;&gt;();
+namen.add("Anna");
+namen.add("Ben");
+namen.add("Clara");
+
+// Lesen:
+String erster = namen.get(0);   // "Anna"
+int groesse = namen.size();      // 3
+
+// Enthält:
+boolean hat = namen.contains("Ben");   // true
+
+// Entfernen:
+namen.remove("Ben");
+namen.remove(0);  // nach Index
+
+// Iteration:
+for (String name : namen) {
+    System.out.println(name);
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — List&lt;T&gt;</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">using System.Collections.Generic;
+
+List&lt;string&gt; namen = new List&lt;string&gt;();
+namen.Add("Anna");
+namen.Add("Ben");
+namen.Add("Clara");
+
+// Lesen:
+string erster = namen[0];     // "Anna"
+int groesse = namen.Count;    // 3
+
+// Enthält:
+bool hat = namen.Contains("Ben");  // true
+
+// Entfernen:
+namen.Remove("Ben");
+namen.RemoveAt(0);  // nach Index
+
+// Iteration:
+foreach (string name in namen) {
+    Console.WriteLine(name);
+}</pre>
+  </div>
+</div>
+
+<h2>ArrayList Methodenvergleich</h2>
+<table>
+  <tr><th>Java ArrayList</th><th>C# List&lt;T&gt;</th></tr>
+  <tr><td><code>list.add(item)</code></td><td><code>list.Add(item)</code></td></tr>
+  <tr><td><code>list.get(index)</code></td><td><code>list[index]</code></td></tr>
+  <tr><td><code>list.size()</code></td><td><code>list.Count</code></td></tr>
+  <tr><td><code>list.contains(item)</code></td><td><code>list.Contains(item)</code></td></tr>
+  <tr><td><code>list.remove(item)</code></td><td><code>list.Remove(item)</code></td></tr>
+  <tr><td><code>list.remove(index)</code></td><td><code>list.RemoveAt(index)</code></td></tr>
+  <tr><td><code>list.set(index, item)</code></td><td><code>list[index] = item</code></td></tr>
+  <tr><td><code>list.isEmpty()</code></td><td><code>list.Count == 0</code></td></tr>
+</table>
+
+<h2>HashMap — Javas Dictionary&lt;K,V&gt;</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — HashMap</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import java.util.HashMap;
+
+HashMap&lt;String, Integer&gt; punkte = new HashMap&lt;&gt;();
+punkte.put("Anna", 95);
+punkte.put("Ben", 87);
+punkte.put("Clara", 92);
+
+// Lesen:
+int annaPunkte = punkte.get("Anna");   // 95
+
+// Enthält:
+boolean hatKey = punkte.containsKey("Ben");   // true
+boolean hatVal = punkte.containsValue(87);    // true
+
+// Entfernen:
+punkte.remove("Ben");
+
+// Alle Keys/Values:
+for (String key : punkte.keySet()) {
+    System.out.println(key + ": " + punkte.get(key));
+}
+
+// Key nicht vorhanden:
+Integer wert = punkte.get("Unbekannt");  // null!</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — Dictionary</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">var punkte = new Dictionary&lt;string, int&gt;();
+punkte["Anna"] = 95;
+punkte["Ben"] = 87;
+punkte["Clara"] = 92;
+
+// Lesen:
+int annaPunkte = punkte["Anna"];   // 95
+
+// Enthält:
+bool hatKey = punkte.ContainsKey("Ben");
+bool hatVal = punkte.ContainsValue(87);
+
+// Entfernen:
+punkte.Remove("Ben");
+
+// Alle Keys/Values:
+foreach (var kv in punkte) {
+    Console.WriteLine($"{kv.Key}: {kv.Value}");
+}
+
+// Sicheres Lesen:
+if (punkte.TryGetValue("x", out int val)) { }</pre>
+  </div>
+</div>
+
+<h2>Sicheres Lesen aus HashMap</h2>
+<pre>// HashMap.get() gibt null zurück wenn Key nicht existiert!
+// Das kann zu NullPointerException führen:
+int wert = punkte.get("NichtVorhanden");  // NullPointerException!
+
+// Sicherer — getOrDefault():
+int wert = punkte.getOrDefault("NichtVorhanden", 0);  // 0 als Fallback
+
+// Prüfen vor Zugriff:
+if (punkte.containsKey("Anna")) {
+    int p = punkte.get("Anna");
+}</pre>
+
+<h2>Andere wichtige Collection-Typen</h2>
+<table>
+  <tr><th>Java</th><th>C# Äquivalent</th><th>Wofür</th></tr>
+  <tr><td><code>LinkedList&lt;T&gt;</code></td><td><code>LinkedList&lt;T&gt;</code></td><td>Häufige Einfügungen/Löschungen</td></tr>
+  <tr><td><code>HashSet&lt;T&gt;</code></td><td><code>HashSet&lt;T&gt;</code></td><td>Eindeutige Werte, schnelle Contains-Checks</td></tr>
+  <tr><td><code>TreeMap&lt;K,V&gt;</code></td><td><code>SortedDictionary&lt;K,V&gt;</code></td><td>Sortierte Key-Value-Paare</td></tr>
+  <tr><td><code>Stack&lt;T&gt;</code></td><td><code>Stack&lt;T&gt;</code></td><td>LIFO (last in, first out)</td></tr>
+</table>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was gibt <code>hashMap.get("NichtVorhanden")</code> zurück wenn der Key fehlt?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Eine Exception</div>
+  <div class="reveal wrong">❌ Nicht direkt. get() gibt null zurück. Die Exception kommt erst wenn du null auto-unboxst (z.B. in int).</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) null</div>
+  <div class="reveal">✅ Richtig! Nutze <code>getOrDefault(key, fallback)</code> für sicheren Zugriff.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Wie liest man das Element an Index 2 aus einer Java-ArrayList?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) liste[2]</div>
+  <div class="reveal wrong">❌ Das ist C#. In Java: <code>liste.get(2)</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) liste.get(2)</div>
+  <div class="reveal">✅ Richtig! ArrayList hat keine Index-Operator-Syntax wie C#.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Erstelle eine HashMap die Ländernamen (String) auf Einwohnerzahlen (Integer) mappt. Füge 3 Länder ein und gib alle aus.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>HashMap&lt;String, Integer&gt; laender = new HashMap&lt;&gt;();
+laender.put("Deutschland", 84000000);
+laender.put("Österreich", 9000000);
+laender.put("Schweiz", 8700000);
+
+for (String land : laender.keySet()) {
+    System.out.println(land + ": " + laender.get(land));
+}</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><code>ArrayList&lt;T&gt;</code> = C# <code>List&lt;T&gt;</code> — dynamische Liste</li>
+    <li><code>list.get(i)</code> statt <code>list[i]</code>, <code>list.size()</code> statt <code>list.Count</code></li>
+    <li><code>HashMap&lt;K,V&gt;</code> = C# <code>Dictionary&lt;K,V&gt;</code></li>
+    <li><code>map.put(key, value)</code> statt <code>dict[key] = value</code></li>
+    <li><code>map.get(key)</code> gibt <code>null</code> bei fehlendem Key — <code>getOrDefault()</code> für Sicherheit</li>
+    <li>Alle Methoden: lowercase in Java, PascalCase in C#</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Exception Handling — checked vs. unchecked Exceptions, ein wichtiger Java-Unterschied zu C#.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html">Java 21 ArrayList API</a>. <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html">HashMap API</a>.</cite></p>
+</body>
+</html>

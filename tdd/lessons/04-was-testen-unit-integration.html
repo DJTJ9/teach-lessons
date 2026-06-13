@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 04 — Was testen? Unit vs. Integration, FIRST</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #8e44ad; border-bottom: 3px solid #8e44ad; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .pyramid { text-align: center; margin: 1.5rem 0; }
+    .pyramid-layer { margin: 2px auto; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; border-radius: 4px; }
+    .first-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+    .first-item { padding: .8rem; border-radius: 8px; border: 2px solid; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #8e44ad; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>🔬 Lektion 04 — Was testen wir eigentlich?</h1>
+<p class="mission">Ziel: Unit-, Integrations- und E2E-Tests unterscheiden, die FIRST-Prinzipien kennen, und wissen welchen Testtyp man wann schreibt.</p>
+
+<h2>Die Testpyramide</h2>
+<div class="pyramid">
+  <div class="pyramid-layer" style="width:200px;height:50px;background:#e74c3c;">E2E Tests (wenige)</div>
+  <div class="pyramid-layer" style="width:340px;height:50px;background:#f39c12;">Integration Tests (mittel)</div>
+  <div class="pyramid-layer" style="width:480px;height:50px;background:#27ae60;">Unit Tests (viele)</div>
+</div>
+<p style="text-align:center;color:#666;font-size:.9em">Je weiter oben, desto langsamer, teurer, fragiler. Je weiter unten, desto schneller und zuverlässiger.</p>
+
+<h2>Unit Tests</h2>
+<p>Ein Unit Test prüft <strong>eine einzelne Funktion oder Klasse in Isolation</strong>. Keine Datenbank, kein Netzwerk, keine Filesystem-Zugriffe.</p>
+
+<pre># UNIT TEST — Chatbot-Beispiel
+# Testet normalize_voice() ohne externe Abhängigkeiten
+def test_doppelpunkt_lower():
+    assert normalize_voice("task doppelpunkt bug fixen") == "task: bug fixen"
+
+# Läuft in Millisekunden, immer deterministisch</pre>
+
+<p><strong>Im Chatbot:</strong> Die meisten Tests in <code>test_bot.py</code> sind Unit Tests — sie prüfen Funktionen wie <code>normalize_voice</code>, <code>load_settings</code>, <code>save_settings</code> direkt.</p>
+
+<h2>Integration Tests</h2>
+<p>Ein Integration Test prüft wie <strong>mehrere Komponenten zusammenarbeiten</strong>. Oft mit echten Dateisystemen, aber noch ohne echtes Netzwerk.</p>
+
+<pre># INTEGRATION TEST — Chatbot-Beispiel
+def test_save_load_roundtrip(tmp_path):
+    # Prüft: save_settings() UND load_settings() zusammen
+    save_settings({"notifications_enabled": False}, tmp_path)
+    assert load_settings(tmp_path) == {"notifications_enabled": False}
+
+# tmp_path = pytest Fixture für temporäres Verzeichnis</pre>
+
+<p><strong>Im Chatbot:</strong> <code>test_save_load_roundtrip</code> und <code>test_save_load_reminders_roundtrip</code> sind Integration Tests — sie schreiben und lesen echte Dateien.</p>
+
+<h2>E2E Tests (End-to-End)</h2>
+<p>E2E Tests prüfen den <strong>gesamten Ablauf</strong> — Telegram schickt Nachricht, Bot antwortet, Notion wird aktualisiert. Selten, langsam, fragil. Im Chatbot-Projekt haben wir (noch) keine E2E-Tests.</p>
+
+<h2>Welcher Testtyp wann?</h2>
+<table>
+  <tr><th>Frage</th><th>Testtyp</th></tr>
+  <tr><td>Macht diese Funktion das Richtige?</td><td>Unit</td></tr>
+  <tr><td>Spielen diese zwei Komponenten korrekt zusammen?</td><td>Integration</td></tr>
+  <tr><td>Funktioniert der komplette User-Flow?</td><td>E2E</td></tr>
+  <tr><td>Läuft dieser Code schnell und oft?</td><td>Unit</td></tr>
+</table>
+
+<h2>FIRST-Prinzipien — Merksatz für gute Tests</h2>
+<div class="first-grid">
+  <div class="first-item" style="border-color:#27ae60;background:#eafaf1">
+    <strong>F — Fast</strong><br>Tests müssen schnell sein. Langsame Tests werden nicht laufend ausgeführt.
+  </div>
+  <div class="first-item" style="border-color:#2980b9;background:#eaf0fb">
+    <strong>I — Isolated</strong><br>Kein Test hängt von einem anderen ab. Reihenfolge egal.
+  </div>
+  <div class="first-item" style="border-color:#8e44ad;background:#f5eafb">
+    <strong>R — Repeatable</strong><br>Immer gleiches Ergebnis. Kein Datum, kein Zufall, kein externes System.
+  </div>
+  <div class="first-item" style="border-color:#e67e22;background:#fef5ec">
+    <strong>S — Self-validating</strong><br>Test sagt selbst Pass/Fail. Kein manuelles Prüfen der Ausgabe.
+  </div>
+</div>
+<div class="first-item" style="border-color:#e74c3c;background:#fdecea;margin-top:.8rem">
+  <strong>T — Timely</strong><br>Test wird <em>vor</em> dem Produktionscode geschrieben (TDD-Prinzip).
+</div>
+
+<h2>Test-Smells — Warnzeichen für schlechte Tests</h2>
+<ul>
+  <li><strong>Langer Setup-Code</strong> vor dem eigentlichen Test → Funktion hat zu viele Abhängigkeiten</li>
+  <li><strong>Test prüft interne Implementierung</strong> statt Verhalten → zerbricht bei jedem Refactor</li>
+  <li><strong>Test testet mehrere Dinge</strong> → wenn er rot wird, weiß man nicht warum</li>
+  <li><strong>Test hängt von Zeit/Datum ab</strong> → morgen könnte er rot sein</li>
+  <li><strong>Tests stören sich gegenseitig</strong> → Reihenfolge ändert Ergebnis</li>
+</ul>
+
+<div class="warning">
+  <strong>Chatbot-Beispiel für Test-Smell:</strong><br>
+  <code>test_save_load_reminders_roundtrip</code> benutzt <code>monkeypatch</code> um den echten Dateipfad zu überschreiben. Das ist gut — er ist dadurch isolated. Ohne monkeypatch würde er echte Productionsdaten lesen/schreiben und nicht repeatable sein.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Welches FIRST-Prinzip verletzt ein Test der das aktuelle Datum nutzt?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Fast</div>
+  <div class="reveal wrong">❌ Falsch. Das Datum macht ihn nicht langsam.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Repeatable</div>
+  <div class="reveal">✅ Richtig! Heute grün, morgen rot — nicht wiederholbar.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Du hast 100 Tests, 90 davon sind Unit Tests. Ist das gut oder schlecht?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Schlecht — mehr Integration Tests wären besser</div>
+  <div class="reveal wrong">❌ Falsch. Die Testpyramide empfiehlt viele Unit Tests an der Basis.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Gut — das entspricht der Testpyramide</div>
+  <div class="reveal">✅ Richtig! Viele schnelle Unit Tests + wenige langsame Integration Tests.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 3:</strong> Welcher Test-Smell liegt vor wenn Test A fehlschlägt weil Test B vorher gelaufen ist?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Verletzung von Isolated</div>
+  <div class="reveal">✅ Richtig! Tests dürfen sich nicht gegenseitig beeinflussen.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Verletzung von Timely</div>
+  <div class="reveal wrong">❌ Falsch. Timely betrifft wann der Test geschrieben wird, nicht die Ausführungsreihenfolge.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><strong>Unit Test</strong>: eine Funktion in Isolation — schnell, viele davon</li>
+    <li><strong>Integration Test</strong>: mehrere Komponenten zusammen — mittel, wenige</li>
+    <li><strong>E2E Test</strong>: kompletter Flow — langsam, sehr wenige</li>
+    <li><strong>FIRST</strong>: Fast, Isolated, Repeatable, Self-validating, Timely</li>
+    <li>Test-Smells erkennen: langer Setup, externe Abhängigkeiten, mehrere Prüfpunkte pro Test</li>
+    <li>Die meisten TDD-Tests sind Unit Tests — klein und schnell</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Mocking mit pytest — externe Abhängigkeiten (Telegram API, Notion API) isolieren.</p>
+</div>
+
+<p><cite>Quellen: Robert C. Martin, "Clean Code" (2008) — Kapitel 9 "Unit Tests". Tim Ottinger &amp; Jeff Langr, FIRST Principles (Agile in a Flash).</cite></p>
+</body>
+</html>

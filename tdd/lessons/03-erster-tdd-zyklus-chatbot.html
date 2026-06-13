@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 03 — Erster TDD-Zyklus am Chatbot</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e74c3c; border-bottom: 3px solid #e74c3c; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .step-label { display: inline-block; padding: .3rem .8rem; border-radius: 4px; font-weight: bold; margin-bottom: .5rem; }
+    .red-label { background: #fdecea; color: #e74c3c; border: 1px solid #e74c3c; }
+    .green-label { background: #eafaf1; color: #27ae60; border: 1px solid #27ae60; }
+    .blue-label { background: #eaf0fb; color: #2980b9; border: 1px solid #2980b9; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .insight { background: #fff0f6; border-left: 4px solid #8e44ad; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>🔴🟢🔵 Lektion 03 — Erster TDD-Zyklus am Chatbot</h1>
+<p class="mission">Ziel: Ein neues Feature im Chatbot komplett test-first entwickeln — kein Produktionscode ohne roten Test davor.</p>
+
+<h2>Das Szenario</h2>
+<p>Dein Chatbot soll Spracheingaben normalisieren. Die Funktion <code>normalize_voice</code> existiert bereits. Wir bauen eine neue Erweiterung: Zahlen sollen als Sprachersatz erkannt werden.</p>
+
+<p><strong>Anforderung:</strong> <code>"eins komma fünf"</code> → <code>"eins, fünf"</code></p>
+<p>Stell dir vor, diese Anforderung kam gerade rein. Wir fangen sofort mit dem Test an.</p>
+
+<h2>Schritt 1 — Red: Test schreiben</h2>
+<div class="step-label red-label">🔴 RED</div>
+<pre># Öffne: tests/test_bot.py
+# Füge am Ende ein:
+
+def test_komma_ersatz():
+    assert normalize_voice("eins komma fünf") == "eins, fünf"</pre>
+
+<p>Jetzt ausführen:</p>
+<pre>pytest tests/test_bot.py::test_komma_ersatz -v</pre>
+
+<p>Erwartet: <strong>FAILED</strong> — weil <code>normalize_voice</code> "komma" noch nicht kennt. Falls er grün ist, stimmt etwas nicht (die Funktion macht schon zufällig das Richtige, oder der Test ist falsch).</p>
+
+<div class="insight">
+  <strong>Prüfe den Fehler!</strong> pytest zeigt dir: <code>AssertionError: assert 'eins komma fünf' == 'eins, fünf'</code>. Das bedeutet: der Test schlägt fehl weil die Transformation fehlt — genau richtig.
+</div>
+
+<h2>Schritt 2 — Green: minimaler Code</h2>
+<div class="step-label green-label">🟢 GREEN</div>
+<p>Öffne <code>bot.py</code> und such die <code>normalize_voice</code> Funktion. Füge die minimale Erweiterung hinzu:</p>
+
+<pre># In bot.py — nur das Nötigste:
+def normalize_voice(text):
+    replacements = {
+        " doppelpunkt ": ": ",
+        " komma ": ", ",        # ← NEU
+        # ...weitere Ersetzungen
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text</pre>
+
+<p>Ausführen:</p>
+<pre>pytest tests/test_bot.py -v</pre>
+
+<p>Erwartet: <strong>PASSED</strong> — alle Tests, inklusive dem neuen. Und kein alter Test darf jetzt rot sein!</p>
+
+<h2>Schritt 3 — Refactor</h2>
+<div class="step-label blue-label">🔵 REFACTOR</div>
+<p>Ist der Code lesbar? Gibt es Duplikate? In diesem Fall ist das Dict-basierte <code>replacements</code>-System bereits sauber. Refactoring nicht nötig.</p>
+
+<p>Aber was wenn die ursprüngliche Implementierung so aussah?</p>
+<pre># Vor Refactor — unübersichtlich:
+def normalize_voice(text):
+    text = text.replace(" doppelpunkt ", ": ")
+    text = text.replace(" komma ", ", ")
+    text = text.replace(" punkt ", ".")
+    text = text.replace(" ausrufezeichen ", "!")
+    return text</pre>
+
+<pre># Nach Refactor — gleiche Logik, klarer:
+VOICE_REPLACEMENTS = {
+    " doppelpunkt ": ": ",
+    " komma ": ", ",
+    " punkt ": ".",
+    " ausrufezeichen ": "!",
+}
+
+def normalize_voice(text):
+    for old, new in VOICE_REPLACEMENTS.items():
+        text = text.replace(old, new)
+    return text</pre>
+
+<p>Ausführen nach dem Refactor:</p>
+<pre>pytest tests/test_bot.py -v  # Alle müssen noch grün sein!</pre>
+
+<h2>Mehrere Testfälle für eine Funktion</h2>
+<p>Gute Tests decken auch Grenzfälle ab. Was passiert wenn der Text <code>"komma"</code> am Anfang steht? Was wenn kein Ersatz nötig ist?</p>
+
+<pre>def test_normalize_voice_kein_ersatz():
+    assert normalize_voice("moin") == "moin"
+
+def test_normalize_voice_kombiniert():
+    assert normalize_voice("status doppelpunkt sport komma laufen") == "status: sport, laufen"</pre>
+
+<div class="insight">
+  <strong>Reihenfolge beim TDD:</strong> Erst der einfachste Fall, dann Grenzfälle. Nicht alle Fälle auf einmal — einen Test, dann green machen, dann nächster Test.
+</div>
+
+<h2>Was haben wir gerade gemacht?</h2>
+<ol>
+  <li>Anforderung bekommen → sofort Test geschrieben</li>
+  <li>Test gesehen (rot) → bestätigt dass er wirklich prüft</li>
+  <li>Minimaler Code → grün gemacht</li>
+  <li>Refactored → Code verbessert, Tests grün geblieben</li>
+  <li>Grenzfälle → weitere Tests geschrieben (Zyklus wiederholt)</li>
+</ol>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Du schreibst einen Test und er ist sofort grün (ohne dass du Produktionscode geändert hast). Was bedeutet das?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Super — der Code ist schon richtig!</div>
+  <div class="reveal wrong">❌ Falsch. Wenn der Test nie rot war, beweist er nichts. Entweder ist die Anforderung schon erfüllt, oder der Test ist falsch geschrieben.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Entweder ist das Verhalten bereits implementiert, oder der Test testet das Falsche</div>
+  <div class="reveal">✅ Richtig! Untersuche warum er grün ist — beabsichtigt oder Testfehler?</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Du refactorst und ein Test wird rot. Was tust du?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Den Test anpassen damit er wieder grün ist</div>
+  <div class="reveal wrong">❌ Vorsicht! Tests anpassen verschleiert Bugs. Zuerst verstehen warum er rot wurde.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Das Refactoring rückgängig machen und verstehen warum der Test rot wurde</div>
+  <div class="reveal">✅ Richtig! Rot beim Refactor = du hast Verhalten geändert. Das ist ein Bug, kein Testproblem.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe einen Test für <code>normalize_voice("Ende punkt")</code> → <code>"Ende."</code>. Lauf ihn rot, dann mach ihn grün.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>def test_punkt_ersatz():
+    assert normalize_voice("Ende punkt") == "Ende."</pre>
+    Dann in VOICE_REPLACEMENTS: <code>" punkt ": "."</code> hinzufügen. Aber Achtung: "punkt" am Satzende hat kein Leerzeichen danach — edge case!
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>TDD am echten Code: Test → rot sehen → minimal grün machen → refactoren</li>
+    <li>Ein Test der nie rot war, beweist nichts — immer den roten Zustand bestätigen</li>
+    <li>Refactoring ist sicher wenn Tests grün sind — sie passen auf</li>
+    <li>Grenzfälle nach dem Hauptfall testen — auch als eigene TDD-Zyklen</li>
+    <li>Guter TDD-Rhythmus: klein denken, einen Zyklus auf einmal</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Was testen wir eigentlich? Unit vs. Integration, FIRST-Prinzipien.</p>
+</div>
+
+<p><cite>Quelle: Martin Fowler, "Refactoring" (2018) — Kapitel über Test-First als Voraussetzung für sicheres Refactoring.</cite></p>
+</body>
+</html>

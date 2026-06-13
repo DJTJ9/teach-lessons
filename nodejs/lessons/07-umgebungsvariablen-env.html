@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js 07 — Umgebungsvariablen &amp; .env</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #339933; border-bottom: 3px solid #339933; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.js { border-color: #f7df1e; background: #fefde0; }
+    .compare-box.python { border-color: #3776ab; background: #eaf0fb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .security { background: #fdecea; border-left: 4px solid #e74c3c; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+    .connection { background: #f0fff0; border-left: 4px solid #339933; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>🔐 Lektion 07 — Umgebungsvariablen &amp; .env</h1>
+<p class="mission">Ziel: Secrets sicher auslagern, .env-Dateien nutzen, und process.env in Node.js verstehen — genau wie du es schon im Chatbot-Projekt siehst.</p>
+
+<h2>Warum Umgebungsvariablen?</h2>
+<p>Dein Chatbot nutzt bereits Umgebungsvariablen — <code>TELEGRAM_TOKEN</code>, <code>GROQ_API_KEY</code>. Das ist bewährte Praxis:</p>
+<ul>
+  <li>Secrets (API-Keys, Passwörter) gehören <strong>nicht</strong> in den Code</li>
+  <li>Verschiedene Umgebungen (Entwicklung, Produktion) brauchen verschiedene Werte</li>
+  <li>.env-Dateien werden <strong>nie</strong> ins Git committed</li>
+</ul>
+
+<div class="security">
+  <strong>Sicherheitsregel:</strong> Niemals einen API-Key, Passwort, oder Token direkt in eine .js-Datei schreiben. Niemals .env in Git committen. Immer in .gitignore aufnehmen.
+</div>
+
+<h2>Vergleich: Python vs. Node.js</h2>
+<div class="compare">
+  <div class="compare-box python">
+    <h4>🐍 Python (dein Chatbot)</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">import os
+
+TOKEN = os.environ.get("TELEGRAM_TOKEN")
+API_KEY = os.getenv("GROQ_API_KEY")
+
+# .env laden mit python-dotenv:
+from dotenv import load_dotenv
+load_dotenv()
+TOKEN = os.getenv("TELEGRAM_TOKEN")</pre>
+  </div>
+  <div class="compare-box js">
+    <h4>🟡 Node.js</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">// Node.js built-in (process.env):
+const TOKEN = process.env.TELEGRAM_TOKEN;
+const API_KEY = process.env.GROQ_API_KEY;
+
+// .env laden mit dotenv:
+require('dotenv').config();
+const TOKEN = process.env.TELEGRAM_TOKEN;</pre>
+  </div>
+</div>
+
+<h2>.env Datei</h2>
+<pre># .env (NIE in Git!)
+TELEGRAM_TOKEN=1234567890:ABCDEFghijklmno
+PORT=3000
+API_BASE_URL=https://api.example.com
+DEBUG=false</pre>
+
+<pre># .env.example (DARF in Git — ohne echte Werte)
+TELEGRAM_TOKEN=dein_token_hier
+PORT=3000
+API_BASE_URL=https://api.example.com
+DEBUG=false</pre>
+
+<pre># .gitignore
+.env
+node_modules/</pre>
+
+<h2>dotenv installieren und nutzen</h2>
+<pre>npm install dotenv</pre>
+
+<pre>// Am Anfang deiner app.js (vor allem anderen):
+require('dotenv').config();
+
+// Jetzt sind alle .env Variablen in process.env verfügbar:
+const express = require('express');
+const app = express();
+
+const PORT = process.env.PORT || 3000;  // Fallback auf 3000
+const TOKEN = process.env.TELEGRAM_TOKEN;
+
+if (!TOKEN) {
+    console.error('TELEGRAM_TOKEN nicht gesetzt!');
+    process.exit(1);  // Abbrechen wenn kritische Variable fehlt
+}
+
+app.listen(PORT, () => {
+    console.log(`Server läuft auf Port ${PORT}`);
+});</pre>
+
+<h2>Konfiguration als Modul</h2>
+<pre>// config.js — zentrales Konfigurations-Modul
+require('dotenv').config();
+
+const config = {
+    port: Number(process.env.PORT) || 3000,
+    telegramToken: process.env.TELEGRAM_TOKEN,
+    debug: process.env.DEBUG === 'true',
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3001',
+};
+
+// Validierung:
+const erforderlich = ['telegramToken'];
+for (const key of erforderlich) {
+    if (!config[key]) {
+        throw new Error(`Konfiguration fehlt: ${key}`);
+    }
+}
+
+module.exports = config;
+
+// Nutzen in app.js:
+const config = require('./config');
+console.log(`Port: ${config.port}`);</pre>
+
+<div class="connection">
+  <strong>Verbindung zum Chatbot:</strong> Dein Python-Chatbot macht dasselbe — <code>conftest.py</code> setzt TELEGRAM_TOKEN und GROQ_API_KEY für Tests. In Node.js macht dotenv das Gleiche für die Laufzeit, und in Tests würdest du process.env direkt setzen.
+</div>
+
+<h2>Umgebungsvariablen beim Ausführen</h2>
+<pre># In der Kommandozeile setzen (temporär für diesen Prozess):
+TELEGRAM_TOKEN=mytoken node app.js   # Linux/Mac
+$env:TELEGRAM_TOKEN="mytoken"; node app.js  # PowerShell (Windows)
+
+# Oder mit .env automatisch (via dotenv):</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Warum darf .env nicht in Git committed werden?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Weil .env Dateien zu groß sind</div>
+  <div class="reveal wrong">❌ Falsch. .env Dateien sind winzig. Der Grund ist Sicherheit.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Weil sie Secrets enthalten die öffentlich werden würden</div>
+  <div class="reveal">✅ Richtig! Git-History ist dauerhaft. Einmal ein Token committed, ist er kompromittiert.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was gibt <code>process.env.NICHT_GESETZT</code> zurück?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) null</div>
+  <div class="reveal wrong">❌ Falsch. In Node.js gibt process.env für nicht gesetzte Variablen <code>undefined</code> zurück.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) undefined</div>
+  <div class="reveal">✅ Richtig! Deshalb nutzt man <code>process.env.PORT || 3000</code> für Fallbacks.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><code>process.env.VAR</code> = Python <code>os.environ.get("VAR")</code></li>
+    <li><code>dotenv</code>: .env-Datei in process.env laden (= Python python-dotenv)</li>
+    <li>.env: Secrets für lokale Entwicklung — NIE in Git</li>
+    <li>.env.example: Template ohne echte Werte — darf in Git</li>
+    <li>Fallback: <code>process.env.PORT || 3000</code></li>
+    <li>Validation: prüfen ob kritische Variablen gesetzt sind, sonst process.exit(1)</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Praxisprojekt — Mini-Webhook-Server bauen der Telegram-ähnliche Nachrichten empfängt.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://www.npmjs.com/package/dotenv">dotenv npm Paket</a>. <a href="https://nodejs.org/api/process.html#processenv">Node.js process.env API</a>.</cite></p>
+</body>
+</html>

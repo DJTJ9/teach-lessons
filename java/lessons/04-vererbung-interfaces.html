@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 04 — Vererbung &amp; Interfaces</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .diff { background: #fff3cd; border-left: 4px solid #ffc107; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 04 — Vererbung &amp; Interfaces</h1>
+<p class="mission">Ziel: extends und implements in Java verstehen und anwenden — im direkten Vergleich zur C#-Syntax.</p>
+
+<h2>Vererbung — extends vs. :</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — extends</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public class Tier {
+    protected String name;
+    
+    public Tier(String name) {
+        this.name = name;
+    }
+    
+    public void sprechen() {
+        System.out.println("...");
+    }
+}
+
+public class Hund extends Tier {
+    public Hund(String name) {
+        super(name);  // Basisklassen-Konstruktor
+    }
+    
+    @Override
+    public void sprechen() {
+        System.out.println(name + " sagt: Wuff!");
+    }
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — :</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public class Tier {
+    protected string name;
+    
+    public Tier(string name) {
+        this.name = name;
+    }
+    
+    public virtual void Sprechen() {
+        Console.WriteLine("...");
+    }
+}
+
+public class Hund : Tier {
+    public Hund(string name) : base(name) { }
+    
+    public override void Sprechen() {
+        Console.WriteLine($"{name} sagt: Wuff!");
+    }
+}</pre>
+  </div>
+</div>
+
+<h2>Schlüsselwörter im Vergleich</h2>
+<table>
+  <tr><th>Konzept</th><th>Java</th><th>C#</th></tr>
+  <tr><td>Vererbung</td><td><code>extends Basisklasse</code></td><td><code>: Basisklasse</code></td></tr>
+  <tr><td>Basisklasse aufrufen</td><td><code>super(args)</code></td><td><code>base(args)</code> oder <code>base.Methode()</code></td></tr>
+  <tr><td>Methode überschreiben</td><td><code>@Override</code> (Annotation)</td><td><code>override</code> Keyword</td></tr>
+  <tr><td>Überschreibbar machen</td><td>Alle nicht-final Methoden sind überschreibbar</td><td><code>virtual</code> nötig</td></tr>
+  <tr><td>Nicht überschreibbar</td><td><code>final void methode()</code></td><td><code>sealed override</code></td></tr>
+</table>
+
+<div class="diff">
+  <strong>Wichtiger Unterschied:</strong> In Java sind alle Methoden standardmäßig überschreibbar (außer <code>final</code>). In C# muss eine Methode explizit <code>virtual</code> sein damit man sie überschreiben kann.
+</div>
+
+<h2>Interfaces — implements vs. :</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — implements</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public interface Fahrbar {
+    void fahren();
+    int getGeschwindigkeit();
+    
+    // Default-Methoden (seit Java 8):
+    default void hupen() {
+        System.out.println("Beep!");
+    }
+}
+
+public class Auto implements Fahrbar {
+    @Override
+    public void fahren() {
+        System.out.println("Auto fährt");
+    }
+    
+    @Override
+    public int getGeschwindigkeit() {
+        return 120;
+    }
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — :</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public interface IFahrbar {
+    void Fahren();
+    int GetGeschwindigkeit();
+    
+    // Default interface methods (C# 8+):
+    void Hupen() {
+        Console.WriteLine("Beep!");
+    }
+}
+
+public class Auto : IFahrbar {
+    public void Fahren() {
+        Console.WriteLine("Auto fährt");
+    }
+    
+    public int GetGeschwindigkeit() {
+        return 120;
+    }
+}</pre>
+  </div>
+</div>
+
+<h2>Mehrere Interfaces implementieren</h2>
+<pre>// Java — mehrere Interfaces, nur eine Basisklasse:
+public class Amphibienfahrzeug extends Fahrzeug implements Fahrbar, Schwimmbar {
+    // muss alle Methoden beider Interfaces implementieren
+}</pre>
+
+<div class="diff">
+  <strong>Konvention:</strong> C# benennt Interfaces mit "I" Prefix (<code>IFahrbar</code>). Java macht das nicht — Interface heißt einfach <code>Fahrbar</code>. Das ist nur Konvention, kein Zwang.
+</div>
+
+<h2>Abstrakte Klassen</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public abstract class Form {
+    // Abstrakte Methode — MUSS überschrieben werden
+    public abstract double flaeche();
+    
+    // Konkrete Methode — kann benutzt werden
+    public void drucken() {
+        System.out.println("Fläche: " + flaeche());
+    }
+}
+
+public class Kreis extends Form {
+    private double radius;
+    
+    public Kreis(double radius) {
+        this.radius = radius;
+    }
+    
+    @Override
+    public double flaeche() {
+        return Math.PI * radius * radius;
+    }
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public abstract class Form {
+    public abstract double Flaeche();
+    
+    public void Drucken() {
+        Console.WriteLine($"Fläche: {Flaeche()}");
+    }
+}
+
+public class Kreis : Form {
+    private double radius;
+    
+    public Kreis(double radius) {
+        this.radius = radius;
+    }
+    
+    public override double Flaeche() {
+        return Math.PI * radius * radius;
+    }
+}</pre>
+  </div>
+</div>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Wie implementiert man ein Interface in Java?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) class Auto : Fahrbar</div>
+  <div class="reveal wrong">❌ Das ist C#. Java: <code>class Auto implements Fahrbar</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) class Auto implements Fahrbar</div>
+  <div class="reveal">✅ Richtig! <code>implements</code> für Interfaces, <code>extends</code> für Klassen.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Kann man in Java mehrere Klassen erben (multiple inheritance)?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Ja, mit extends Klasse1, Klasse2</div>
+  <div class="reveal wrong">❌ Falsch. Java erlaubt nur Single Inheritance bei Klassen. Mehrere Interfaces sind aber möglich.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Nein — nur eine Basisklasse, aber mehrere Interfaces</div>
+  <div class="reveal">✅ Richtig! Gleich wie C#.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe eine abstrakte Klasse <code>Charakter</code> mit Methode <code>angreifen()</code> und eine Unterklasse <code>Krieger</code> die diese implementiert.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>public abstract class Charakter {
+    public abstract void angreifen();
+}
+
+public class Krieger extends Charakter {
+    @Override
+    public void angreifen() {
+        System.out.println("Krieger schlägt mit Schwert!");
+    }
+}</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>Vererbung: Java <code>extends</code> statt C# <code>:</code></li>
+    <li>Interface: Java <code>implements</code> statt C# <code>:</code></li>
+    <li>Basisklasse aufrufen: Java <code>super()</code> statt C# <code>base()</code></li>
+    <li>Methode überschreiben: Java <code>@Override</code> statt C# <code>override</code></li>
+    <li>In Java: alle Methoden überschreibbar außer <code>final</code>; in C# braucht man <code>virtual</code></li>
+    <li>Java-Interfaces haben kein I-Prefix (C# Konvention)</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Collections — ArrayList und HashMap verglichen mit C# List und Dictionary.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html">Java 21 API</a>. <a href="https://www.baeldung.com/java-inheritance">Baeldung: Java Inheritance</a>.</cite></p>
+</body>
+</html>

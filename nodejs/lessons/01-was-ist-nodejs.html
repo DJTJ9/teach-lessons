@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js 01 — Was ist Node.js?</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #339933; border-bottom: 3px solid #339933; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .analogy { background: #f0fff0; border-left: 4px solid #339933; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #339933; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+    .diagram { background: #f8f8f8; border: 1px solid #ddd; border-radius: 8px; padding: 1.2rem; font-family: monospace; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>🟢 Lektion 01 — Was ist Node.js?</h1>
+<p class="mission">Ziel: Verstehen was Node.js ist, warum es existiert, und was es von anderen Lösungen unterscheidet — bevor du eine Zeile Code schreibst.</p>
+
+<h2>Die kurze Antwort</h2>
+<p><strong>Node.js ist eine Laufzeitumgebung (Runtime) für JavaScript außerhalb des Browsers.</strong></p>
+<p>JavaScript war ursprünglich nur für Browser gedacht. Node.js (2009) hat JavaScript aus dem Browser befreit — jetzt kann JavaScript auch auf Servern, in der Kommandozeile, und überall dort laufen wo früher nur Python, Java, oder C# liefen.</p>
+
+<div class="analogy">
+  <strong>Analogie:</strong> JavaScript ist wie eine Sprache (z.B. Englisch). Ein Browser ist ein Land in dem diese Sprache gesprochen wird. Node.js ist ein weiteres Land — gleiche Sprache, andere Regeln und Umgebung.
+</div>
+
+<h2>Vergleich mit Python (das du kennst)</h2>
+<table>
+  <tr><th>Konzept</th><th>Python</th><th>Node.js</th></tr>
+  <tr><td>Sprache</td><td>Python</td><td>JavaScript</td></tr>
+  <tr><td>Interpreter/Runtime</td><td>CPython</td><td>V8 Engine (Google Chrome)</td></tr>
+  <tr><td>Package Manager</td><td>pip</td><td>npm (Node Package Manager)</td></tr>
+  <tr><td>Abhängigkeiten</td><td>requirements.txt</td><td>package.json</td></tr>
+  <tr><td>Server-Framework</td><td>Flask, FastAPI</td><td>Express.js</td></tr>
+  <tr><td>Ausführen</td><td><code>python script.py</code></td><td><code>node script.js</code></td></tr>
+</table>
+
+<h2>Was ist die V8 Engine?</h2>
+<p>V8 ist Googles JavaScript-Engine — der Teil von Chrome der JavaScript-Code ausführt. Node.js hat diese Engine genommen und sie aus dem Browser befreit. Das bedeutet:</p>
+<ul>
+  <li>JavaScript läuft sehr schnell (V8 kompiliert zu nativem Maschinencode)</li>
+  <li>Gleiche JS-Engine wie im Browser → konsistentes Verhalten</li>
+  <li>Node.js kann auf Windows, Mac, Linux laufen</li>
+</ul>
+
+<h2>Der Event Loop — was Node.js besonders macht</h2>
+<p>Dein Python-Bot macht etwas Interessantes: Er wartet auf Telegram-Nachrichten. Wie wartet ein Server auf Anfragen?</p>
+
+<div class="diagram">
+Traditioneller Server (Threading-Modell):<br>
+Anfrage 1 → Thread 1 → warten... → antworten<br>
+Anfrage 2 → Thread 2 → warten... → antworten<br>
+Anfrage 3 → Thread 3 → warten... → antworten<br>
+(viele Threads = hoher Speicherverbrauch)<br>
+<br>
+Node.js (Event Loop Modell):<br>
+Anfrage 1 → registriere Callback → weiter<br>
+Anfrage 2 → registriere Callback → weiter<br>
+Anfrage 3 → registriere Callback → weiter<br>
+Ergebnis 1 fertig → Callback aufrufen<br>
+(ein Thread, viele gleichzeitige Anfragen)
+</div>
+
+<p>Node.js ist <strong>non-blocking</strong> und <strong>asynchron</strong>. Statt auf eine langsame Operation zu warten (Datenbankabfrage, API-Call), registriert Node.js eine Callback-Funktion und macht andere Arbeit. Wenn die Operation fertig ist, wird der Callback aufgerufen.</p>
+
+<div class="analogy">
+  <strong>Analogie:</strong> Stell dir einen Kellner vor. Blocking (Python-Standard): Der Kellner steht bei Tisch 1 und wartet bis das Essen fertig ist, bevor er zu Tisch 2 geht. Non-blocking (Node.js): Der Kellner nimmt die Bestellung auf, geht zu Tisch 2, Tisch 3 — und bringt das Essen wenn es fertig ist.
+</div>
+
+<h2>Wofür nutzt man Node.js?</h2>
+<ul>
+  <li>REST APIs und Web-Server</li>
+  <li>Echtzeit-Apps (Chat, Notifications — ähnlich deinem Telegram-Bot)</li>
+  <li>CLI-Tools (Command Line Interfaces)</li>
+  <li>Webhook-Server (empfängt HTTP-Anfragen von externen Diensten)</li>
+  <li>Backend für Webanwendungen</li>
+</ul>
+
+<h2>Installation</h2>
+<pre># Von nodejs.org — LTS Version (z.B. 20 LTS) herunterladen
+# Windows: .msi Installer
+
+# Prüfen:
+node --version    # z.B. v20.11.0
+npm --version     # z.B. 10.2.4
+
+# Hello World:
+node -e "console.log('Hallo, Node.js!')"</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was ist Node.js?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Ein JavaScript-Framework für Webseiten</div>
+  <div class="reveal wrong">❌ Falsch. Node.js ist eine Runtime — sie lässt JavaScript außerhalb des Browsers laufen.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Eine Laufzeitumgebung die JavaScript außerhalb des Browsers ausführt</div>
+  <div class="reveal">✅ Richtig! Node.js = V8 Engine + System-APIs (Dateisystem, Netzwerk) außerhalb des Browsers.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was ist der npm-Äquivalent zu Pythons pip?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) yarn</div>
+  <div class="reveal wrong">❌ Yarn ist auch ein Package Manager, aber npm kommt mit Node.js — das ist das Standard.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) npm</div>
+  <div class="reveal">✅ Richtig! npm (Node Package Manager) ist Pythons pip für Node.js.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 3:</strong> Warum ist Node.js gut für Server mit vielen gleichzeitigen Anfragen?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Weil es viele Threads benutzt</div>
+  <div class="reveal wrong">❌ Falsch. Node.js nutzt einen einzigen Thread mit dem Event Loop — nicht viele Threads.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Weil der Event Loop asynchrone Operationen non-blocking verarbeitet</div>
+  <div class="reveal">✅ Richtig! Non-blocking I/O = ein Thread kann tausende Anfragen gleichzeitig handhaben.</div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><strong>Node.js</strong> = JavaScript-Runtime außerhalb des Browsers</li>
+    <li>Powered by <strong>V8</strong> — Googles Chrome JavaScript-Engine</li>
+    <li><strong>npm</strong> = Package Manager (wie pip für Python)</li>
+    <li><strong>Event Loop</strong> = non-blocking, asynchrones I/O-Modell</li>
+    <li>Gut für: APIs, Webhooks, Echtzeit-Apps, CLI-Tools</li>
+    <li><code>node script.js</code> = <code>python script.py</code></li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> JavaScript-Grundlagen — Syntax für Python/C#-Entwickler.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://nodejs.org/en/docs/">Node.js offizielle Dokumentation</a>.</cite></p>
+</body>
+</html>

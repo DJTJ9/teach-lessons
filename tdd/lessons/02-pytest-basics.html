@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 02 — pytest Basics</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #27ae60; border-bottom: 3px solid #27ae60; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .file-tree { background: #f8f8f8; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; font-family: monospace; }
+    cite { font-size: .85em; color: #666; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #2c3e50; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+  </style>
+</head>
+<body>
+
+<h1>🟢 Lektion 02 — pytest Basics</h1>
+<p class="mission">Ziel: pytest aufsetzen, die Dateistruktur verstehen, und erste Tests im Chatbot-Projekt schreiben — im TDD-Stil.</p>
+
+<h2>Was ist pytest?</h2>
+<p><strong>pytest</strong> ist das Standard-Testframework für Python. Es ist einfacher als das eingebaute <code>unittest</code>, erkennt Tests automatisch, und gibt dir lesbare Fehlermeldungen. Dein Chatbot-Projekt nutzt es bereits — schau in <code>tests/</code>.</p>
+
+<h2>Installation</h2>
+<pre># Im Projektordner:
+pip install pytest
+
+# Testen ob es funktioniert:
+pytest --version</pre>
+
+<h2>Wie erkennt pytest Tests?</h2>
+<ul>
+  <li>Dateien die mit <code>test_</code> beginnen oder auf <code>_test.py</code> enden</li>
+  <li>Funktionen die mit <code>test_</code> beginnen</li>
+  <li>Klassen die mit <code>Test</code> beginnen (optional, seltener genutzt)</li>
+</ul>
+
+<div class="file-tree">
+📁 telegram-notion-bot/<br>
+&nbsp;&nbsp;📁 tests/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;📄 conftest.py &nbsp;&nbsp;&nbsp;← gemeinsame Fixtures & Konfiguration<br>
+&nbsp;&nbsp;&nbsp;&nbsp;📄 test_bot.py &nbsp;&nbsp;&nbsp;← deine bestehenden Tests<br>
+&nbsp;&nbsp;&nbsp;&nbsp;📄 test_plans.py<br>
+&nbsp;&nbsp;📄 bot.py<br>
+</div>
+
+<h2>Ein einfacher Test — Anatomie</h2>
+<pre># tests/test_beispiel.py
+
+def test_addition():           # Name fängt mit test_ an
+    ergebnis = 2 + 3           # Arrange + Act
+    assert ergebnis == 5       # Assert — hier prüfen wir</pre>
+
+<p>Das <code>assert</code>-Statement ist alles was du brauchst. Wenn es fehlschlägt, zeigt pytest dir genau was erwartet vs. was tatsächlich kam.</p>
+
+<h2>Tests ausführen</h2>
+<pre># Alle Tests:
+pytest
+
+# Einen bestimmten Test:
+pytest tests/test_bot.py::test_doppelpunkt_lower
+
+# Mit ausführlicher Ausgabe:
+pytest -v
+
+# Mit kurzem Summary (was ist rot/grün):
+pytest -v --tb=short</pre>
+
+<h2>Assertions in pytest</h2>
+<table>
+  <tr><th>Was du prüfst</th><th>Assertion</th></tr>
+  <tr><td>Gleichheit</td><td><code>assert x == 5</code></td></tr>
+  <tr><td>Ungleichheit</td><td><code>assert x != 5</code></td></tr>
+  <tr><td>Wahrheitswert</td><td><code>assert flag is True</code></td></tr>
+  <tr><td>None-Prüfung</td><td><code>assert result is None</code></td></tr>
+  <tr><td>Enthält</td><td><code>assert "moin" in text</code></td></tr>
+  <tr><td>Exception erwartet</td><td><code>with pytest.raises(ValueError): ...</code></td></tr>
+  <tr><td>Typ-Prüfung</td><td><code>assert isinstance(x, dict)</code></td></tr>
+</table>
+
+<h2>Dein erster TDD-Zyklus mit pytest</h2>
+<p>Stell dir vor, die Funktion <code>normalize_voice</code> existiert noch nicht. So würde TDD aussehen:</p>
+
+<pre># SCHRITT 1 — Red: Test schreiben
+# tests/test_bot.py
+def test_doppelpunkt():
+    assert normalize_voice("task doppelpunkt Einkauf") == "task: Einkauf"
+
+# pytest ausführen → FEHLER: ImportError oder NameError ← gewollt!</pre>
+
+<pre># SCHRITT 2 — Green: minimale Implementierung
+# bot.py
+def normalize_voice(text):
+    return text.replace(" doppelpunkt ", ": ")
+
+# pytest ausführen → PASSED ✓</pre>
+
+<pre># SCHRITT 3 — Refactor: weitere Ersetzungen hinzufügen
+# (neuer Test zuerst, dann Erweiterung)</pre>
+
+<div class="tip">
+  <strong>conftest.py</strong> ist eine spezielle pytest-Datei für gemeinsame Fixtures. In deinem Projekt setzt sie Environment-Variablen (TELEGRAM_TOKEN, GROQ_API_KEY) für alle Tests. Du musst sie nicht anfassen — sie ist schon richtig.
+</div>
+
+<h2>Nützliche Optionen</h2>
+<pre># Nur fehlgeschlagene Tests erneut laufen:
+pytest --lf
+
+# Test stoppen beim ersten Fehler:
+pytest -x
+
+# Tests nach Namen filtern:
+pytest -k "doppelpunkt"</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Welche Datei erkennt pytest automatisch als Testdatei?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) bot_tests.py</div>
+  <div class="reveal wrong">❌ Falsch. pytest erkennt Dateien die mit <code>test_</code> beginnen oder auf <code>_test.py</code> enden.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) test_bot.py</div>
+  <div class="reveal">✅ Richtig! Beginnt mit <code>test_</code>.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">C) tests.py</div>
+  <div class="reveal wrong">❌ Falsch. Kein <code>test_</code>-Prefix.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was macht <code>pytest -x</code>?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Führt nur Tests mit "x" im Namen aus</div>
+  <div class="reveal wrong">❌ Falsch. Für Namen-Filter benutzt du <code>-k</code>.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Stoppt beim ersten fehlgeschlagenen Test</div>
+  <div class="reveal">✅ Richtig! Nützlich wenn viele Tests rot sind — du fixst einen nach dem anderen.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe einen Test der prüft dass <code>"moin"</code> in <code>HILFE_TEXT</code> vorkommt. Führe ihn aus — ist er grün?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+    <pre>from bot import HILFE_TEXT
+
+def test_hilfe_enthaelt_moin():
+    assert "moin" in HILFE_TEXT</pre>
+    Dieser Test sollte sofort grün sein — er testet existierendes Verhalten.
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>pytest erkennt Dateien/Funktionen mit <code>test_</code>-Prefix automatisch</li>
+    <li><code>assert</code> ist alles was du zum Prüfen brauchst</li>
+    <li><code>pytest -v</code> für ausführliche, <code>pytest -x</code> für früh-stop Ausgabe</li>
+    <li><code>conftest.py</code> für gemeinsame Setup-Logik (Fixtures, ENV-Variablen)</li>
+    <li>TDD-Zyklus: Test schreiben → rot sehen → minimal grün machen → refactoren</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Erster echter TDD-Zyklus — wir schreiben ein neues Feature test-first im Chatbot.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.pytest.org/">pytest Dokumentation</a> — offizielle Referenz.</cite></p>
+</body>
+</html>

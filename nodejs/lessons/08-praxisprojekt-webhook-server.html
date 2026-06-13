@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js 08 — Praxisprojekt: Mini-Webhook-Server</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #339933; border-bottom: 3px solid #339933; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .step { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1rem; margin: .8rem 0; }
+    .step h4 { margin-top: 0; color: #339933; }
+    .connection { background: #f0fff0; border-left: 4px solid #339933; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>🚀 Lektion 08 — Praxisprojekt: Mini-Webhook-Server</h1>
+<p class="mission">Ziel: Alle Node.js-Kenntnisse in einem echten Webhook-Server zusammenführen der Telegram-ähnliche Nachrichten empfängt und verarbeitet.</p>
+
+<h2>Was bauen wir?</h2>
+<p>Ein Webhook-Server ist das Gegenteil von Polling: Statt dass dein Code regelmäßig fragt "Neue Nachrichten?", schickt Telegram die Nachrichten direkt an deinen Server wenn sie ankommen.</p>
+<p><strong>Unser Server empfängt:</strong> Simulated Telegram Webhook-Payload → verarbeitet Befehle → loggt Ergebnis</p>
+
+<h2>Projektstruktur</h2>
+<pre>webhook-server/
+  .env              ← Secrets (nicht in Git!)
+  .env.example      ← Template
+  .gitignore
+  package.json
+  src/
+    config.js       ← Konfiguration
+    handlers.js     ← Befehlsverarbeitung
+    server.js       ← Express-Server</pre>
+
+<h2>Setup</h2>
+<pre>mkdir webhook-server
+cd webhook-server
+npm init -y
+npm install express dotenv</pre>
+
+<div class="step">
+  <h4>.env</h4>
+<pre>WEBHOOK_SECRET=mein_geheimer_token
+PORT=3000</pre>
+</div>
+
+<div class="step">
+  <h4>src/config.js</h4>
+<pre>require('dotenv').config();
+
+const config = {
+    port: Number(process.env.PORT) || 3000,
+    webhookSecret: process.env.WEBHOOK_SECRET,
+};
+
+if (!config.webhookSecret) {
+    throw new Error('WEBHOOK_SECRET muss gesetzt sein');
+}
+
+module.exports = config;</pre>
+</div>
+
+<div class="step">
+  <h4>src/handlers.js — Befehlslogik</h4>
+<pre>// Verarbeitet Nachrichten und gibt Antwort zurück
+async function verarbeiteNachricht(nachricht) {
+    const text = (nachricht.text || '').trim().toLowerCase();
+    const chatId = nachricht.chat?.id || 0;
+    
+    console.log(`[Chat ${chatId}] Empfangen: "${text}"`);
+    
+    // Befehlsverarbeitung:
+    if (text === 'moin' || text === 'hallo') {
+        return { chat_id: chatId, text: 'Moin! Wie kann ich helfen?' };
+    }
+    
+    if (text.startsWith('task:')) {
+        const taskText = text.slice(5).trim();
+        if (!taskText) {
+            return { chat_id: chatId, text: 'Was soll der Task heißen?' };
+        }
+        return { chat_id: chatId, text: `✅ Task erstellt: "${taskText}"` };
+    }
+    
+    if (text === 'hilfe') {
+        return {
+            chat_id: chatId,
+            text: 'Befehle:\nmoin — Begrüßung\ntask: [Text] — Task erstellen\nhilfe — diese Hilfe'
+        };
+    }
+    
+    return { chat_id: chatId, text: `Unbekannter Befehl: "${text}"` };
+}
+
+module.exports = { verarbeiteNachricht };</pre>
+</div>
+
+<div class="step">
+  <h4>src/server.js — Hauptserver</h4>
+<pre>const express = require('express');
+const config = require('./config');
+const { verarbeiteNachricht } = require('./handlers');
+
+const app = express();
+app.use(express.json());
+
+// Logging Middleware:
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+    next();
+});
+
+// Health Check — prüft ob der Server läuft:
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', zeit: new Date().toISOString() });
+});
+
+// Webhook-Endpunkt — hier kommen Telegram-Nachrichten an:
+app.post('/webhook', async (req, res) => {
+    // Secret prüfen (Sicherheit):
+    const secret = req.headers['x-webhook-secret'];
+    if (secret !== config.webhookSecret) {
+        console.warn('Ungültiges Webhook-Secret!');
+        return res.status(401).json({ fehler: 'Unauthorized' });
+    }
+    
+    // Payload validieren:
+    const { message } = req.body;
+    if (!message) {
+        return res.status(400).json({ fehler: 'message fehlt' });
+    }
+    
+    try {
+        // Nachricht verarbeiten:
+        const antwort = await verarbeiteNachricht(message);
+        console.log(`Antwort: "${antwort.text}"`);
+        
+        // 200 OK an Telegram zurück:
+        res.json({ ok: true, antwort });
+    } catch (fehler) {
+        console.error('Verarbeitungsfehler:', fehler.message);
+        res.status(500).json({ fehler: 'Interner Fehler' });
+    }
+});
+
+// 404 Handler:
+app.use((req, res) => {
+    res.status(404).json({ fehler: 'Route nicht gefunden' });
+});
+
+app.listen(config.port, () => {
+    console.log(`Webhook-Server läuft auf Port ${config.port}`);
+    console.log(`Health: http://localhost:${config.port}/health`);
+    console.log(`Webhook: POST http://localhost:${config.port}/webhook`);
+});</pre>
+</div>
+
+<h2>Starten und Testen</h2>
+<pre>node src/server.js</pre>
+
+<pre># In einem zweiten Terminal — Befehle testen:
+
+# Health Check:
+curl http://localhost:3000/health
+
+# Moin-Befehl:
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -H "x-webhook-secret: mein_geheimer_token" \
+  -d '{"message": {"chat": {"id": 123}, "text": "moin"}}'
+
+# Task-Befehl:
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -H "x-webhook-secret: mein_geheimer_token" \
+  -d '{"message": {"chat": {"id": 123}, "text": "task: Einkaufen"}}'
+
+# Ohne Secret — sollte 401 geben:
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"message": {"text": "moin"}}'</pre>
+
+<div class="connection">
+  <strong>Verbindung zum Chatbot:</strong> Dein Python-Bot nutzt Polling (<code>bot.infinity_polling()</code>). Der Webhook-Ansatz ist professioneller — Telegram schickt Nachrichten direkt statt dass der Bot fragt. Beide Ansätze nutzen dieselbe Telegram API, nur andersrum.
+</div>
+
+<h2>Was du hier genutzt hast</h2>
+<ul>
+  <li>✅ <strong>Express.js</strong> für Routing und Middleware</li>
+  <li>✅ <strong>async/await</strong> für asynchrone Verarbeitung</li>
+  <li>✅ <strong>Module</strong> (config.js, handlers.js, server.js)</li>
+  <li>✅ <strong>process.env</strong> und dotenv für Konfiguration</li>
+  <li>✅ <strong>HTTP-Statuscode</strong> (200, 400, 401, 404, 500)</li>
+  <li>✅ <strong>JSON</strong> parsen und ausgeben</li>
+  <li>✅ <strong>Middleware</strong> für Logging und Auth</li>
+</ul>
+
+<div class="quiz">
+  <h3>🧠 Erweiterungsaufgaben</h3>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">1. Empfangene Nachrichten in eine JSON-Datei loggen</div>
+  <div class="reveal">In handlers.js: <code>const fs = require('fs/promises'); await fs.appendFile('log.json', JSON.stringify({...}) + '\n');</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">2. Rate-Limiting hinzufügen (max 10 Requests/Minute pro IP)</div>
+  <div class="reveal"><code>npm install express-rate-limit</code> dann: <code>const rateLimit = require('express-rate-limit'); app.use('/webhook', rateLimit({ windowMs: 60000, max: 10 }));</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">3. Antwort wirklich an Telegram senden</div>
+  <div class="reveal">In handlers.js: <code>await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(antwort) });</code></div>
+</div>
+
+<div class="summary">
+  <h2>📋 Node.js Kurs abgeschlossen!</h2>
+  <p>Du hast alle Grundlagen gelernt:</p>
+  <ul>
+    <li>✅ Was Node.js ist und warum es existiert</li>
+    <li>✅ JavaScript-Grundlagen: Variablen, Funktionen, Arrays, Objects</li>
+    <li>✅ async/await und Promises</li>
+    <li>✅ Module und npm</li>
+    <li>✅ HTTP-Server ohne Framework</li>
+    <li>✅ Express.js REST-API</li>
+    <li>✅ Umgebungsvariablen und .env</li>
+    <li>✅ Vollständigen Webhook-Server gebaut</li>
+  </ul>
+  <p>Du kannst jetzt selbstständig Node.js-Server und APIs bauen.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://expressjs.com/">Express.js Dokumentation</a>. <a href="https://nodejs.org/">Node.js Dokumentation</a>.</cite></p>
+</body>
+</html>

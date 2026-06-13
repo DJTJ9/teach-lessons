@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 03 — OOP: Klassen &amp; Konstruktoren</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .diff { background: #fff3cd; border-left: 4px solid #ffc107; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 03 — OOP: Klassen &amp; Konstruktoren</h1>
+<p class="mission">Ziel: Klassen in Java erstellen, Felder und Methoden definieren, Konstruktoren schreiben — im Vergleich zu C#.</p>
+
+<h2>Klassen: fast identisch zu C#</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public class Person {
+    // Felder (private per Konvention)
+    private String name;
+    private int alter;
+
+    // Konstruktor
+    public Person(String name, int alter) {
+        this.name = name;
+        this.alter = alter;
+    }
+
+    // Getter-Methode
+    public String getName() {
+        return name;
+    }
+
+    // Setter-Methode
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    // Methode
+    public String vorstellen() {
+        return "Ich bin " + name + ", " + alter;
+    }
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">public class Person {
+    // Felder
+    private string name;
+    private int alter;
+
+    // Konstruktor
+    public Person(string name, int alter) {
+        this.name = name;
+        this.alter = alter;
+    }
+
+    // Properties (statt Getter/Setter)
+    public string Name {
+        get => name;
+        set => name = value;
+    }
+
+    // Methode
+    public string Vorstellen() {
+        return $"Ich bin {name}, {alter}";
+    }
+}</pre>
+  </div>
+</div>
+
+<h2>Der größte Unterschied: Properties vs. Getter/Setter</h2>
+<p>In C# hast du Properties mit <code>get</code>/<code>set</code>. Java kennt das nicht — stattdessen schreibt man explizite Getter- und Setter-Methoden:</p>
+
+<table>
+  <tr><th>C# Property</th><th>Java Äquivalent</th></tr>
+  <tr><td><code>person.Name</code></td><td><code>person.getName()</code></td></tr>
+  <tr><td><code>person.Name = "Anna"</code></td><td><code>person.setName("Anna")</code></td></tr>
+</table>
+
+<pre>// Java — Nutzung der Klasse:
+Person p = new Person("Tjark", 25);
+System.out.println(p.getName());   // "Tjark"
+p.setName("Anna");
+System.out.println(p.vorstellen()); // "Ich bin Anna, 25"</pre>
+
+<h2>Zugriffsmodifikatoren</h2>
+<table>
+  <tr><th>Modifier</th><th>Java</th><th>C#</th></tr>
+  <tr><td><code>public</code></td><td>Überall sichtbar</td><td>Gleich</td></tr>
+  <tr><td><code>private</code></td><td>Nur in der Klasse</td><td>Gleich</td></tr>
+  <tr><td><code>protected</code></td><td>Klasse + Unterklassen + Package</td><td>Klasse + Unterklassen</td></tr>
+  <tr><td>(kein Modifier)</td><td>Package-private (nur im selben Package)</td><td>— (in C# wäre es internal)</td></tr>
+  <tr><td><code>internal</code></td><td>— (kein direktes Äquivalent)</td><td>Nur im selben Assembly</td></tr>
+</table>
+
+<h2>this-Keyword</h2>
+<p>Gleich wie in C#: <code>this</code> verweist auf das aktuelle Objekt. Typisch im Konstruktor wenn Parameter gleich heißen wie Felder:</p>
+
+<pre>public Person(String name, int alter) {
+    this.name = name;  // this.name = Feld, name = Parameter
+    this.alter = alter;
+}</pre>
+
+<h2>Mehrere Konstruktoren (Overloading)</h2>
+<pre>public class Person {
+    private String name;
+    private int alter;
+
+    public Person(String name, int alter) {
+        this.name = name;
+        this.alter = alter;
+    }
+
+    // Zweiter Konstruktor — nur Name, Alter default 0
+    public Person(String name) {
+        this(name, 0);  // ruft den anderen Konstruktor auf
+    }
+}</pre>
+
+<div class="diff">
+  <strong>Java-Konvention:</strong> Klassennamen = PascalCase (<code>PlayerHealth</code>), Methoden + Variablen = camelCase (<code>getName</code>, <code>maxHealth</code>). Konstanten = UPPER_SNAKE_CASE (<code>MAX_LEVEL</code>). Genau wie C#.
+</div>
+
+<h2>Vollständiges Beispiel — nutzen</h2>
+<pre>public class App {
+    public static void main(String[] args) {
+        Person p1 = new Person("Tjark", 25);
+        Person p2 = new Person("Anna");   // alter = 0
+
+        System.out.println(p1.vorstellen());
+        System.out.println(p2.getName());
+        
+        p2.setName("Lena");
+        System.out.println(p2.getName());  // "Lena"
+    }
+}</pre>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Wie liest man in Java das Feld <code>name</code> einer <code>Person</code>-Instanz?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) person.Name</div>
+  <div class="reveal wrong">❌ Das ist C# Property-Syntax. In Java: <code>person.getName()</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) person.getName()</div>
+  <div class="reveal">✅ Richtig! Java nutzt explizite Getter-Methoden, kein Property-Syntax.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Was bedeutet kein Zugriffsmodifier (package-private) in Java?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Gleich wie private</div>
+  <div class="reveal wrong">❌ Falsch. Package-private ist weiter als private — sichtbar für alle Klassen im selben Package.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Sichtbar für alle Klassen im selben Package</div>
+  <div class="reveal">✅ Richtig! In C# entspricht das ungefähr <code>internal</code>.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe eine Java-Klasse <code>Produkt</code> mit Feldern <code>name</code> (String) und <code>preis</code> (double), Konstruktor, Getter und einer Methode <code>istGuenstig()</code> die true zurückgibt wenn preis unter 10 liegt.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>public class Produkt {
+    private String name;
+    private double preis;
+
+    public Produkt(String name, double preis) {
+        this.name = name;
+        this.preis = preis;
+    }
+
+    public String getName() { return name; }
+    public double getPreis() { return preis; }
+
+    public boolean istGuenstig() {
+        return preis < 10.0;
+    }
+}</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li>Klassen-Syntax: fast identisch zu C# — public class, Felder, Konstruktor, Methoden</li>
+    <li><strong>Java hat keine Properties</strong> — stattdessen explizite <code>getX()</code>/<code>setX()</code>-Methoden</li>
+    <li><code>this</code>: verweist auf aktuelle Instanz, gleich wie C#</li>
+    <li>Konstruktor-Overloading: <code>this(args)</code> ruft anderen Konstruktor auf</li>
+    <li>Zugriffsmodifier: public/private/protected gleich wie C#, dazu package-private (kein Modifier)</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> Vererbung und Interfaces in Java — verglichen mit C#.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://www.baeldung.com/java-classes-objects">Baeldung: Java Classes and Objects</a>.</cite></p>
+</body>
+</html>

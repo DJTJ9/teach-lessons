@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDD 08 — TDD in Unity</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e74c3c; border-bottom: 3px solid #e74c3c; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .step-label { display: inline-block; padding: .3rem .8rem; border-radius: 4px; font-weight: bold; margin-bottom: .5rem; }
+    .red-label { background: #fdecea; color: #e74c3c; border: 1px solid #e74c3c; }
+    .green-label { background: #eafaf1; color: #27ae60; border: 1px solid #27ae60; }
+    .blue-label { background: #eaf0fb; color: #2980b9; border: 1px solid #2980b9; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .key-insight { background: #fff3cd; border-left: 4px solid #ffc107; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>🎮 Lektion 08 — TDD in Unity: Spielemechanik test-first</h1>
+<p class="mission">Ziel: Eine Spielemechanik (Inventory-System) vollständig mit TDD entwickeln — kein Code ohne roten Test davor.</p>
+
+<h2>Das Szenario: Inventory-System</h2>
+<p>Wir bauen ein einfaches Inventory für ein Spiel. Anforderungen:</p>
+<ul>
+  <li>Items können hinzugefügt werden</li>
+  <li>Maximale Kapazität (z.B. 10 Items)</li>
+  <li>Items können entfernt werden</li>
+  <li>Prüfen ob ein Item vorhanden ist</li>
+</ul>
+<p>Wichtig: Das Inventory hat <strong>keine MonoBehaviour-Abhängigkeit</strong> → EditMode Tests.</p>
+
+<h2>Schritt 1 — Red: Erstes Item hinzufügen</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>// Assets/Tests/EditMode/InventoryTests.cs
+using NUnit.Framework;
+
+public class InventoryTests
+{
+    [Test]
+    public void AddItem_ErhoehCountUm1()
+    {
+        var inventory = new Inventory(capacity: 10);
+        inventory.Add("Schwert");
+        Assert.AreEqual(1, inventory.Count);
+    }
+}
+
+// Ausführen: KOMPILIERUNGSFEHLER — Inventory existiert nicht ← gewollt!</pre>
+
+<h2>Schritt 2 — Green: Minimale Inventory-Klasse</h2>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<pre>// Assets/Scripts/Inventory.cs
+using System.Collections.Generic;
+
+public class Inventory
+{
+    private List&lt;string&gt; items = new List&lt;string&gt;();
+    private int capacity;
+
+    public int Count =&gt; items.Count;
+
+    public Inventory(int capacity)
+    {
+        this.capacity = capacity;
+    }
+
+    public void Add(string item)
+    {
+        items.Add(item);
+    }
+}
+
+// Test Runner: PASSED ✓</pre>
+
+<h2>Zyklus 2 — Kapazitäts-Limit</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>[Test]
+public void Add_BeiVollemInventory_WirftException()
+{
+    var inventory = new Inventory(capacity: 2);
+    inventory.Add("Schwert");
+    inventory.Add("Schild");
+    
+    Assert.Throws&lt;System.InvalidOperationException&gt;(() =&gt; {
+        inventory.Add("Heiltrank");  // soll Exception werfen
+    });
+}
+
+// FAILS — Add wirft noch keine Exception</pre>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<pre>public void Add(string item)
+{
+    if (items.Count >= capacity)
+        throw new System.InvalidOperationException("Inventory voll");
+    items.Add(item);
+}
+
+// PASSED ✓</pre>
+
+<h2>Zyklus 3 — Item vorhanden prüfen</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>[Test]
+public void Contains_VorhandenesItem_ReturnsTrue()
+{
+    var inventory = new Inventory(10);
+    inventory.Add("Schwert");
+    Assert.IsTrue(inventory.Contains("Schwert"));
+}
+
+[Test]
+public void Contains_NichtVorhandenes_ReturnsFalse()
+{
+    var inventory = new Inventory(10);
+    Assert.IsFalse(inventory.Contains("Schwert"));
+}</pre>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<pre>public bool Contains(string item) =&gt; items.Contains(item);</pre>
+
+<h2>Zyklus 4 — Item entfernen</h2>
+
+<div class="step-label red-label">🔴 RED</div>
+<pre>[Test]
+public void Remove_VorhandenesItem_ReduziertCount()
+{
+    var inventory = new Inventory(10);
+    inventory.Add("Schwert");
+    inventory.Remove("Schwert");
+    Assert.AreEqual(0, inventory.Count);
+}
+
+[Test]
+public void Remove_NichtVorhandenes_WirftException()
+{
+    var inventory = new Inventory(10);
+    Assert.Throws&lt;System.ArgumentException&gt;(() =&gt; {
+        inventory.Remove("Schwert");
+    });
+}</pre>
+
+<div class="step-label green-label">🟢 GREEN</div>
+<pre>public void Remove(string item)
+{
+    if (!items.Contains(item))
+        throw new System.ArgumentException($"{item} nicht im Inventory");
+    items.Remove(item);
+}</pre>
+
+<h2>Refactor — SetUp nutzen</h2>
+
+<div class="step-label blue-label">🔵 REFACTOR</div>
+<p>Jeder Test erstellt <code>new Inventory(10)</code> — das ist Duplikation. Mit <code>[SetUp]</code> einmal initialisieren:</p>
+
+<pre>public class InventoryTests
+{
+    private Inventory inventory;
+
+    [SetUp]
+    public void Setup()
+    {
+        inventory = new Inventory(capacity: 10);
+    }
+
+    [Test]
+    public void AddItem_ErhoehCountUm1()
+    {
+        inventory.Add("Schwert");
+        Assert.AreEqual(1, inventory.Count);
+    }
+
+    // ... alle anderen Tests nutzen jetzt inventory direkt
+}
+
+// Alle Tests nochmal ausführen: alle PASSED ✓</pre>
+
+<div class="key-insight">
+  <strong>Kernlektion:</strong> Das Inventory hat jetzt 6 Tests, die alle Kantenfälle abdecken. Wenn du später das Inventory intern umbauen willst (z.B. von <code>List&lt;string&gt;</code> zu einer eigenen Klasse), sagen dir die Tests sofort ob du etwas kaputt gemacht hast. Das ist TDD-Sicherheitsnetz in Aktion.
+</div>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Du willst ein Inventory-Item als <code>ScriptableObject</code> statt als <code>string</code> nutzen. Was musst du beim Refactoring <em>nicht</em> ändern?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Die Tests — das Verhalten bleibt gleich</div>
+  <div class="reveal wrong">❌ Die Tests müssen angepasst werden, da sich der Typ ändert. Aber das Verhalten (Add/Remove/Contains/Count) bleibt gleich.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Das Verhalten der Inventory-Klasse — nur der interne Typ ändert sich</div>
+  <div class="reveal">✅ Richtig! Das externe Verhalten bleibt gleich — Kapazität, Exceptions, Count. Nur die Tests für den Typ müssen minimal angepasst werden.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Wozu dient <code>[SetUp]</code> in NUnit?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) Läuft einmal vor allen Tests</div>
+  <div class="reveal wrong">❌ Falsch. Das wäre <code>[OneTimeSetUp]</code>. <code>[SetUp]</code> läuft vor <em>jedem einzelnen</em> Test.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) Läuft vor jedem einzelnen Test — für saubere Initialisierung</div>
+  <div class="reveal">✅ Richtig! Jeder Test startet so mit einem frischen Zustand — isolated.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe den Test: "Add mit leerem String soll ArgumentException werfen."</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>[Test]
+public void Add_LeererString_WirftException()
+{
+    Assert.Throws&lt;System.ArgumentException&gt;(() =&gt; {
+        inventory.Add("");
+    });
+}</pre>
+Dann in Add(): <code>if (string.IsNullOrWhiteSpace(item)) throw new ArgumentException(...);</code>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung — TDD Kurs abgeschlossen!</h2>
+  <ul>
+    <li>TDD in Unity funktioniert genauso wie in Python: Red → Green → Refactor</li>
+    <li><strong>EditMode</strong> für reine Logik (Inventory, Health, Scoring) — schnell</li>
+    <li><code>[SetUp]</code> verhindert Duplikation und sichert Isolation</li>
+    <li>Tests als Sicherheitsnetz für Refactoring — ohne Tests ist Umbauen riskant</li>
+    <li>Grenzfälle (volles Inventory, leerer String, nicht vorhandenes Item) immer testen</li>
+  </ul>
+  <p><strong>Du kannst jetzt:</strong></p>
+  <ul>
+    <li>✅ Red-Green-Refactor Zyklus anwenden (Python + C#)</li>
+    <li>✅ pytest und NUnit konfigurieren</li>
+    <li>✅ Unit vs. Integration Tests unterscheiden</li>
+    <li>✅ Mocking/Patching für externe Abhängigkeiten</li>
+    <li>✅ FIRST-Prinzipien und Test-Smells erkennen</li>
+    <li>✅ Neues Feature test-first entwickeln</li>
+  </ul>
+</div>
+
+<p><cite>Quellen: <a href="https://docs.unity3d.com/Packages/com.unity.test-framework@1.4/manual/index.html">Unity Test Framework</a>. Robert C. Martin, "Clean Code" Kapitel 9.</cite></p>
+</body>
+</html>

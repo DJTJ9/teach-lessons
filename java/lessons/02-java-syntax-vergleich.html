@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 02 — Syntax-Vergleich: Typen, Variablen, Kontrollfluss</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #e76f00; border-bottom: 3px solid #e76f00; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    .mission { background: #eaf4fb; border-left: 4px solid #2980b9; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .compare-box { padding: 1rem; border-radius: 8px; border: 2px solid; }
+    .compare-box.java { border-color: #e76f00; background: #fff5eb; }
+    .compare-box.csharp { border-color: #9b4f96; background: #f5eafb; }
+    .compare-box h4 { margin-top: 0; font-size: .95em; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #e76f00; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    .diff { background: #fff3cd; border-left: 4px solid #ffc107; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    cite { font-size: .85em; color: #666; }
+  </style>
+</head>
+<body>
+
+<h1>☕ Lektion 02 — Syntax-Vergleich: Typen, Variablen, Kontrollfluss</h1>
+<p class="mission">Ziel: Java-Syntax sicher lesen und schreiben — mit direktem Vergleich zu C#.</p>
+
+<h2>Primitive Datentypen</h2>
+<table>
+  <tr><th>Java</th><th>C#</th><th>Beschreibung</th></tr>
+  <tr><td><code>int</code></td><td><code>int</code></td><td>32-Bit Integer</td></tr>
+  <tr><td><code>long</code></td><td><code>long</code></td><td>64-Bit Integer</td></tr>
+  <tr><td><code>double</code></td><td><code>double</code></td><td>64-Bit Float</td></tr>
+  <tr><td><code>boolean</code></td><td><code>bool</code></td><td>true/false</td></tr>
+  <tr><td><code>char</code></td><td><code>char</code></td><td>einzelnes Zeichen</td></tr>
+  <tr><td><code>String</code></td><td><code>string</code></td><td>Text (Referenztyp!)</td></tr>
+</table>
+
+<div class="diff">
+  <strong>Unterschied:</strong> In Java ist <code>String</code> großgeschrieben (es ist eine Klasse, kein primitiver Typ). In C# ist <code>string</code> ein Alias für <code>System.String</code>, wird aber kleingeschrieben.
+</div>
+
+<h2>Variablen deklarieren</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">int alter = 25;
+double preis = 9.99;
+boolean aktiv = true;
+String name = "Tjark";
+
+// var (seit Java 10):
+var anzahl = 42;  // Typ wird inferiert</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">int alter = 25;
+double preis = 9.99;
+bool aktiv = true;
+string name = "Tjark";
+
+// var:
+var anzahl = 42;  // gleich wie Java</pre>
+  </div>
+</div>
+
+<h2>Kontrollfluss — if/else</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">int punkte = 75;
+
+if (punkte >= 90) {
+    System.out.println("Sehr gut");
+} else if (punkte >= 70) {
+    System.out.println("Gut");
+} else {
+    System.out.println("Verbesserungswürdig");
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">int punkte = 75;
+
+if (punkte >= 90) {
+    Console.WriteLine("Sehr gut");
+} else if (punkte >= 70) {
+    Console.WriteLine("Gut");
+} else {
+    Console.WriteLine("Verbesserungswürdig");
+}</pre>
+  </div>
+</div>
+<p>if/else-Syntax ist fast identisch — nur die Ausgabe-Methode unterscheidet sich.</p>
+
+<h2>Schleifen</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — for</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">for (int i = 0; i < 5; i++) {
+    System.out.println(i);
+}
+
+// Foreach (enhanced for):
+String[] namen = {"Anna", "Ben"};
+for (String n : namen) {
+    System.out.println(n);
+}
+
+// while:
+int x = 0;
+while (x < 3) {
+    x++;
+}</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — for</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">for (int i = 0; i < 5; i++) {
+    Console.WriteLine(i);
+}
+
+// Foreach:
+string[] namen = {"Anna", "Ben"};
+foreach (string n in namen) {
+    Console.WriteLine(n);
+}
+
+// while:
+int x = 0;
+while (x < 3) {
+    x++;
+}</pre>
+  </div>
+</div>
+
+<div class="diff">
+  <strong>Unterschied Foreach:</strong> Java nutzt <code>for (Type var : collection)</code> mit Doppelpunkt. C# nutzt <code>foreach (type var in collection)</code> mit <code>in</code>. Ansonsten identisch.
+</div>
+
+<h2>String-Operationen</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">String s = "Hallo";
+int len = s.length();        // length() mit ()
+String upper = s.toUpperCase();
+boolean hat = s.contains("all");
+String[] teile = s.split("l");
+
+// String-Vergleich: .equals() !
+String a = "test";
+if (a.equals("test")) { ... }  // NICHT ==</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C#</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">string s = "Hallo";
+int len = s.Length;          // Length ohne ()
+string upper = s.ToUpper();
+bool hat = s.Contains("all");
+string[] teile = s.Split('l');
+
+// String-Vergleich: == funktioniert
+string a = "test";
+if (a == "test") { ... }     // OK in C#</pre>
+  </div>
+</div>
+
+<div class="diff">
+  <strong>Wichtiger Unterschied!</strong> In Java muss man Strings mit <code>.equals()</code> vergleichen, NICHT mit <code>==</code>. Mit <code>==</code> vergleicht man Referenzen (Speicheradressen), nicht Inhalte. Das ist ein häufiger Bug für C#-Umsteiger!
+</div>
+
+<h2>String Interpolation</h2>
+<div class="compare">
+  <div class="compare-box java">
+    <h4>☕ Java — String.format()</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">String name = "Tjark";
+int alter = 25;
+String msg = String.format(
+    "Hallo %s, du bist %d Jahre alt.", 
+    name, alter);
+
+// Seit Java 15: Text Blocks
+String json = """
+    {"name": "Tjark"}
+    """;</pre>
+  </div>
+  <div class="compare-box csharp">
+    <h4>💜 C# — $"..."</h4>
+    <pre style="background:#1e1e1e;color:#d4d4d4;font-size:.85em">string name = "Tjark";
+int alter = 25;
+string msg = 
+    $"Hallo {name}, du bist {alter} Jahre alt.";
+
+// Multi-line strings:
+string json = @"{""name"": ""Tjark""}";</pre>
+  </div>
+</div>
+
+<div class="quiz">
+  <h3>🧠 Quiz</h3>
+
+  <p><strong>Frage 1:</strong> Was gibt folgender Java-Code aus?</p>
+  <pre>String a = new String("test");
+String b = new String("test");
+System.out.println(a == b);</pre>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) true</div>
+  <div class="reveal wrong">❌ Falsch! <code>==</code> vergleicht Referenzen. Beide sind verschiedene Objekte im Speicher.</div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) false</div>
+  <div class="reveal">✅ Richtig! Verschiedene Objekte → verschiedene Referenzen → false. Nutze <code>a.equals(b)</code> für Inhaltsvergleich.</div>
+
+  <p style="margin-top:1.5rem"><strong>Frage 2:</strong> Wie schreibt man foreach in Java?</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">A) foreach (String s in liste)</div>
+  <div class="reveal wrong">❌ Das ist C#. In Java: <code>for (String s : liste)</code></div>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">B) for (String s : liste)</div>
+  <div class="reveal">✅ Richtig! Doppelpunkt statt <code>in</code>.</div>
+
+  <p style="margin-top:1.5rem"><strong>Aufgabe:</strong> Schreibe Java-Code der prüft ob zwei Strings gleich sind und das Ergebnis ausgibt.</p>
+  <div class="answer" onclick="this.nextElementSibling.style.display='block'">Zeig mir die Lösung</div>
+  <div class="reveal">
+<pre>String s1 = "hallo";
+String s2 = "hallo";
+if (s1.equals(s2)) {
+    System.out.println("Gleich!");
+}</pre>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>📋 Zusammenfassung</h2>
+  <ul>
+    <li><code>boolean</code> (Java) statt <code>bool</code> (C#), <code>String</code> groß statt <code>string</code></li>
+    <li>if/else, for, while: fast identisch</li>
+    <li>Foreach: Java <code>for (Type x : list)</code> statt C# <code>foreach (type x in list)</code></li>
+    <li><strong>Strings immer mit <code>.equals()</code> vergleichen</strong>, nicht <code>==</code></li>
+    <li><code>s.length()</code> (Java, mit Klammern) statt <code>s.Length</code> (C#, ohne)</li>
+    <li>String.format() statt $"..." für String-Interpolation</li>
+  </ul>
+  <p><strong>Nächste Lektion:</strong> OOP in Java — Klassen, Konstruktoren, Zugriffsmodifikatoren.</p>
+</div>
+
+<p><cite>Quelle: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html">Java 21 String API</a>.</cite></p>
+</body>
+</html>
