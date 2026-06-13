@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 07: Subqueries und CTEs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .fn { color: #34d399; font-weight: 600; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .sub { color: #f472b6; }
+  .cte { color: #fbbf24; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .vs-box { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem; }
+  .vs-label { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; }
+  .vs-box .code-block { margin: 0; font-size: 0.78rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 07</div>
+    <h1>Subqueries und CTEs</h1>
+    <p class="subtitle">Abfragen in Abfragen und WITH-Klauseln fuer lesbare komplexe Queries</p>
+  </div>
+
+  <h2>Was ist eine Subquery?</h2>
+  <p>Eine Subquery (Unterabfrage) ist ein SELECT innerhalb eines anderen SELECT. Sie wird in runden Klammern geschrieben und kann an drei Stellen stehen: im WHERE, im FROM oder im SELECT.</p>
+
+  <h2>Subquery im WHERE</h2>
+  <div class="code-block"><span class="comment">-- Spieler die besser als der Durchschnitt sind</span>
+<span class="kw">SELECT</span> username, punkte
+<span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> punkte <span class="sub">></span> (<span class="sub"><span class="kw">SELECT</span> <span class="fn">AVG</span>(punkte) <span class="kw">FROM</span> spieler</span>);
+
+<span class="comment">-- Erklaerung: Die innere Subquery berechnet AVG(punkte) = 4463</span>
+<span class="comment">-- Die aeussere Query filtert dann: WHERE punkte > 4463</span>
+
+<span class="comment">-- Mit IN: Spieler die mindestens einen Score > 5000 haben</span>
+<span class="kw">SELECT</span> username
+<span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> id <span class="kw">IN</span> (<span class="sub"><span class="kw">SELECT</span> spieler_id <span class="kw">FROM</span> scores <span class="kw">WHERE</span> punkte <span class="sub">></span> <span class="num">5000</span></span>);</div>
+
+  <h2>Subquery im FROM (Derived Table)</h2>
+  <div class="code-block"><span class="comment">-- Spieler-Rang berechnen (ohne Window Functions)</span>
+<span class="kw">SELECT</span> username, gesamt, rang
+<span class="kw">FROM</span> (
+    <span class="sub"><span class="kw">SELECT</span>
+        s.username,
+        <span class="fn">SUM</span>(sc.punkte) <span class="kw">AS</span> gesamt,
+        <span class="fn">RANK</span>() <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> <span class="fn">SUM</span>(sc.punkte) <span class="kw">DESC</span>) <span class="kw">AS</span> rang
+    <span class="kw">FROM</span> spieler s
+    <span class="kw">LEFT JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id
+    <span class="kw">GROUP BY</span> s.id, s.username</span>
+) <span class="kw">AS</span> rangliste
+<span class="kw">WHERE</span> rang <= 3;
+<span class="output"> username | gesamt | rang
+----------+--------+------
+ Carol    |   7340 |    1
+ Alice    |   8000 |    2
+ Bob      |   1850 |    3</span></div>
+
+  <h2>CTEs: WITH-Klausel</h2>
+  <p>CTEs (Common Table Expressions) mit <code>WITH</code> machen komplexe Queries lesbar — die Subquery bekommt einen Namen und kann mehrfach referenziert werden.</p>
+
+  <div class="vs">
+    <div class="vs-box">
+      <div class="vs-label" style="color: #f87171">Subquery (unleserlich)</div>
+      <div class="code-block"><span class="kw">SELECT</span> *
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> s.username,
+    <span class="fn">MAX</span>(sc.punkte) best
+  <span class="kw">FROM</span> spieler s
+  <span class="kw">JOIN</span> scores sc
+    <span class="kw">ON</span> s.id=sc.spieler_id
+  <span class="kw">GROUP BY</span> s.id,s.username
+) t
+<span class="kw">WHERE</span> t.best > 4000;</div>
+    </div>
+    <div class="vs-box">
+      <div class="vs-label" style="color: #34d399">CTE (lesbar)</div>
+      <div class="code-block"><span class="kw">WITH</span> <span class="cte">bester_score</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    s.username,
+    <span class="fn">MAX</span>(sc.punkte) <span class="kw">AS</span> best
+  <span class="kw">FROM</span> spieler s
+  <span class="kw">JOIN</span> scores sc
+    <span class="kw">ON</span> s.id = sc.spieler_id
+  <span class="kw">GROUP BY</span> s.id, s.username
+)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="cte">bester_score</span>
+<span class="kw">WHERE</span> best > 4000;</div>
+    </div>
+  </div>
+
+  <h2>Mehrere CTEs verketten</h2>
+  <div class="code-block"><span class="kw">WITH</span>
+<span class="comment">-- CTE 1: Bester Score je Spieler</span>
+<span class="cte">bester_score</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> spieler_id, <span class="fn">MAX</span>(punkte) <span class="kw">AS</span> highscore
+    <span class="kw">FROM</span> scores
+    <span class="kw">GROUP BY</span> spieler_id
+),
+<span class="comment">-- CTE 2: Nur aktive Spieler</span>
+<span class="cte">aktive_spieler</span> <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> id, username
+    <span class="kw">FROM</span> spieler
+    <span class="kw">WHERE</span> ist_aktiv = <span class="kw">TRUE</span>
+)
+<span class="comment">-- Finale Abfrage nutzt beide CTEs</span>
+<span class="kw">SELECT</span> a.username, b.highscore
+<span class="kw">FROM</span> <span class="cte">aktive_spieler</span> a
+<span class="kw">JOIN</span> <span class="cte">bester_score</span> b <span class="kw">ON</span> a.id = b.spieler_id
+<span class="kw">ORDER BY</span> b.highscore <span class="kw">DESC</span>;</div>
+
+  <div class="insight">
+    Faustregel: Wenn eine Subquery mehr als 2 Zeilen hat oder mehr als einmal referenziert wird — CTE verwenden. CTEs sind kostenlos (kein Performance-Overhead) und viel einfacher zu debuggen.
+  </div>
+
+  <h2>Wann Subquery, wann CTE, wann JOIN?</h2>
+  <div class="code-block"><span class="comment">JOIN:      Wenn du Zeilen aus zwei Tabellen kombinieren willst
+Subquery:  Wenn du einen einzigen Wert berechnen willst (z.B. Durchschnitt)
+CTE:       Wenn die Subquery laenger als 3 Zeilen ist oder mehrfach gebraucht wird</span></div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was berechnet <code>WHERE punkte > (SELECT AVG(punkte) FROM spieler)</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Alle Spieler die mehr Punkte als irgendein anderer Spieler haben</label>
+        <label><input type="radio" name="q1" value="b"> Alle Spieler mit ueberdurchschnittlichen Punkten</label>
+        <label><input type="radio" name="q1" value="c"> Den Spieler mit den meisten Punkten</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Die Subquery berechnet den Durchschnitt aller Punkte als eine Zahl. Die aeussere Query vergleicht dann jeden Spieler mit diesem Durchschnitt.</div>
+    </div>
+    <div class="question">
+      <p>2. Wann ist ein CTE einer Subquery vorzuziehen?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> CTEs sind immer schneller als Subqueries</label>
+        <label><input type="radio" name="q2" value="b"> Wenn die Subquery laenger ist oder mehrfach referenziert wird (Lesbarkeit)</label>
+        <label><input type="radio" name="q2" value="c"> CTEs sind Pflicht ab PostgreSQL 14</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Performance ist meist gleich. CTEs sind ein Lesbarkeitstool. Subquery-in-Klammern ist schnell fuer einfache Faelle, CTE ist besser fuer alles was groesser ist.</div>
+    </div>
+    <div class="question">
+      <p>3. Kannst du in einem CTE einen anderen CTE referenzieren?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Nein — CTEs sind isoliert</label>
+        <label><input type="radio" name="q3" value="b"> Ja — spaetere CTEs koennen fruehere CTEs im gleichen WITH-Block nutzen</label>
+        <label><input type="radio" name="q3" value="c"> Nur wenn beide denselben Datentyp zurueckgeben</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Im Beispiel oben nutzt die finale SELECT-Abfrage beide CTEs gleichzeitig. Spaetere CTEs koennen auch fruehere CTEs als Eingabe nutzen — das ist eines der maechtigen Features von CTEs.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Datenbankdesign — Normalisierung, Beziehungen, Foreign Keys fuer Spiele und Apps.</p>
+  </div>
+
+</div>
+</body>
+</html>

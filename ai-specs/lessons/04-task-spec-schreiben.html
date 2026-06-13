@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 04: Task Spec schreiben</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .template { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre-wrap; margin-bottom: 1rem; }
+  .keyword { color: #f472b6; font-weight: 600; }
+  .comment { color: #475569; }
+  .value { color: #fbbf24; }
+  .insight { background: #2e1e2e; border: 1px solid #4a044e; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #f0abfc; font-size: 0.9rem; line-height: 1.6; }
+  .task-card { background: #1e1e2e; border: 1px solid #2d2d3f; border-left: 4px solid #f472b6; border-radius: 8px; padding: 1.25rem; margin-bottom: 0.75rem; }
+  .task-title { color: #f8fafc; font-weight: 600; margin-bottom: 0.5rem; }
+  .task-meta { font-size: 0.8rem; color: #475569; margin-bottom: 0.75rem; }
+  .task-meta span { background: #2d2d3f; padding: 0.15rem 0.5rem; border-radius: 4px; margin-right: 0.4rem; }
+  .task-body { font-size: 0.88rem; color: #94a3b8; }
+  .task-body ul { margin-left: 1rem; }
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .vs .bad { border-left: 4px solid #f87171; background: #1e1e2e; border-radius: 8px; padding: 1rem; }
+  .vs .good { border-left: 4px solid #34d399; background: #1e1e2e; border-radius: 8px; padding: 1rem; }
+  .vs-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #4a044e; color: #f0abfc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 04</div>
+    <h1>Task Spec schreiben</h1>
+    <p class="subtitle">Atomare, KI-ausfuehrbare Aufgaben aus der Design Spec ableiten</p>
+  </div>
+
+  <h2>Was eine Task Spec ist</h2>
+  <p>Eine Task Spec beschreibt eine einzige, abgeschlossene Aenderung am Code. Sie ist so konkret, dass ein KI-Agent sie ohne Rueckfragen umsetzen kann. Das Ziel: Null Interpretationsspielraum.</p>
+
+  <div class="insight">
+    Faustregel: Wenn ein Task in mehr als einer Datei oder mehr als einer Funktion etwas tut, ist er zu gross. Aufteilen.
+  </div>
+
+  <h2>Struktur einer Task Spec</h2>
+  <div class="template"><span class="keyword"># TASK-[NR]: [Verb] [Was] in [Wo]</span>
+
+<span class="keyword">Kontext:</span> <span class="comment">(welche Design Spec, welcher Schritt im Datenfluss)</span>
+<span class="keyword">Abhaengigkeiten:</span> <span class="comment">(TASK-NR die vorher erledigt sein muessen)</span>
+
+<span class="keyword">Beschreibung:</span>
+Exakt was zu tun ist. Eine Aktion pro Satz.
+
+<span class="keyword">Dateien:</span>
+- `pfad/datei.py` — was dort geaendert/erstellt wird
+
+<span class="keyword">Akzeptanzkriterien:</span>
+- [ ] Kriterium 1 (testbar)
+- [ ] Kriterium 2 (testbar)
+- [ ] Kriterium 3 (testbar)</div>
+
+  <h2>Die 4 Eigenschaften eines guten Tasks</h2>
+  <div class="card" style="padding: 0; overflow: hidden">
+    <table style="width:100%; border-collapse:collapse; font-size:0.88rem">
+      <tr style="background:#13131f"><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Eigenschaft</th><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Bedeutung</th><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Test</th></tr>
+      <tr style="border-bottom:1px solid #1e1e2e"><td style="padding:0.6rem 1rem; color:#f472b6">Atomar</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Eine Aufgabe, eine Aenderung</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Nur eine Datei oder eine Funktion?</td></tr>
+      <tr style="border-bottom:1px solid #1e1e2e"><td style="padding:0.6rem 1rem; color:#f472b6">Testbar</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Akzeptanzkriterien sind pruefbar</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Kann man Ja/Nein sagen?</td></tr>
+      <tr style="border-bottom:1px solid #1e1e2e"><td style="padding:0.6rem 1rem; color:#f472b6">Kontextuell</td><td style="padding:0.6rem 1rem; color:#cbd5e1">KI weiss Warum und Wo</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Kein Nachfragen noetig?</td></tr>
+      <tr><td style="padding:0.6rem 1rem; color:#f472b6">Geordnet</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Abhaengigkeiten explizit</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Kann in beliebiger Reihenfolge gestartet werden wenn Deps erledigt?</td></tr>
+    </table>
+  </div>
+
+  <h2>Beispiel: 4 Tasks fuer das suche:-Feature</h2>
+
+  <div class="task-card">
+    <div class="task-title">TASK-01: Erstelle handlers/search.py mit handle_search()</div>
+    <div class="task-meta"><span>Abh: keine</span><span>Datei: handlers/search.py (neu)</span></div>
+    <div class="task-body">
+      Erstelle neue Datei <code>handlers/search.py</code>.<br>
+      Implementiere <code>handle_search(update: Update, context: CallbackContext) -> None</code>.<br>
+      Extrahiere query aus <code>update.message.text</code> nach Praefix "suche: ".<br>
+      Rufe (noch Stub) <code>search_all_dbs(query)</code> auf und sende Ergebnis mit <code>update.message.reply_text()</code>.<br><br>
+      <strong>Akzeptanzkriterien:</strong>
+      <ul>
+        <li>Datei existiert und ist syntaktisch korrekt</li>
+        <li>Funktion akzeptiert Update und CallbackContext</li>
+        <li>Query wird korrekt extrahiert (Test: "suche: Dart" -> query="Dart")</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-title">TASK-02: Erstelle services/notion_search.py mit search_all_dbs()</div>
+    <div class="task-meta"><span>Abh: keine</span><span>Datei: services/notion_search.py (neu)</span></div>
+    <div class="task-body">
+      Erstelle <code>services/notion_search.py</code>.<br>
+      Implementiere <code>search_all_dbs(query: str) -> dict[str, list[dict]]</code>.<br>
+      Iteriere ueber alle 5 DB-IDs aus <code>config.py</code>.<br>
+      Rufe fuer jede DB <code>notion_client.search(query=query, filter={"property":"object","value":"page"})</code> auf.<br>
+      Gib dict zurueck mit DB-Name als Key und max 5 Ergebnissen als Value.<br><br>
+      <strong>Akzeptanzkriterien:</strong>
+      <ul>
+        <li>Funktion gibt dict mit genau 5 Keys zurueck (eine pro DB)</li>
+        <li>Jede Liste enthaelt max 5 Eintraege</li>
+        <li>Bei API-Fehler: leere Liste fuer diese DB, kein Crash</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-title">TASK-03: Implementiere format_results() in notion_search.py</div>
+    <div class="task-meta"><span>Abh: TASK-02</span><span>Datei: services/notion_search.py</span></div>
+    <div class="task-body">
+      Ergaenze <code>services/notion_search.py</code> um <code>format_results(grouped: dict) -> str</code>.<br>
+      Formatiere pro DB: Ueberschrift mit DB-Name, darunter nummerierte Titel-Liste.<br>
+      Bei leerem grouped: return "Nichts gefunden."<br><br>
+      <strong>Akzeptanzkriterien:</strong>
+      <ul>
+        <li>Ausgabe enthaelt DB-Namen als Ueberschriften</li>
+        <li>Leere Datenbanken werden uebersprungen</li>
+        <li>Bei globalem Leer-Ergebnis: "Nichts gefunden."</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="task-card">
+    <div class="task-title">TASK-04: Registriere Handler in bot.py</div>
+    <div class="task-meta"><span>Abh: TASK-01, TASK-02, TASK-03</span><span>Datei: bot.py</span></div>
+    <div class="task-body">
+      Importiere <code>handle_search</code> aus <code>handlers.search</code> in <code>bot.py</code>.<br>
+      Registriere <code>MessageHandler(filters.Regex(r"^suche: "), handle_search)</code> bei application.<br>
+      Position: nach den bestehenden CommandHandlern, vor dem Fallback-Handler.<br><br>
+      <strong>Akzeptanzkriterien:</strong>
+      <ul>
+        <li>Import vorhanden in bot.py</li>
+        <li>Handler registriert mit korrektem Regex-Pattern</li>
+        <li>Bestehende Handler unveraendert</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Zu gross vs. zu klein: die Balance finden</h2>
+  <div class="vs">
+    <div class="bad">
+      <div class="vs-label" style="color: #f87171">x Zu gross</div>
+      <p style="font-size:0.85rem; color:#94a3b8; margin:0">"Implementiere das gesamte suche:-Feature"<br><br>Kein klarer Scope. KI macht eigene Architektur-Entscheidungen.</p>
+    </div>
+    <div class="good">
+      <div class="vs-label" style="color: #34d399">OK Atomar</div>
+      <p style="font-size:0.85rem; color:#94a3b8; margin:0">"Erstelle handlers/search.py mit handle_search()"<br><br>Eine Datei, eine Funktion, klare Kriterien.</p>
+    </div>
+  </div>
+  <div class="vs">
+    <div class="bad">
+      <div class="vs-label" style="color: #f87171">x Zu klein</div>
+      <p style="font-size:0.85rem; color:#94a3b8; margin:0">"Schreibe Zeile 1 von handlers/search.py"<br><br>Overhead uebersteigt Nutzen. Micro-Tasks erzeugen Tausende von Tasks.</p>
+    </div>
+    <div class="good">
+      <div class="vs-label" style="color: #34d399">OK Richtig</div>
+      <p style="font-size:0.85rem; color:#94a3b8; margin:0">Eine Funktion oder eine zusammenhaengende Gruppe von Zeilen in einer Datei.</p>
+    </div>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Warum ist "Implementiere den Suchbefehl" eine schlechte Task Spec?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Zu kurz — Task Specs muessen laenger sein</label>
+        <label><input type="radio" name="q1" value="b"> Nicht atomar — unklar was genau zu tun ist, welche Dateien, welche Kriterien</label>
+        <label><input type="radio" name="q1" value="c"> Das ist eine perfekte Task Spec</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Ohne konkrete Dateinamen, Funktionssignaturen und Akzeptanzkriterien muss die KI (oder du) alles selbst interpretieren. Das fuehrt zu inkonsistenten Loesungen.</div>
+    </div>
+    <div class="question">
+      <p>2. Wozu dienen Akzeptanzkriterien in einer Task Spec?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Machen den Task laenger und professioneller</label>
+        <label><input type="radio" name="q2" value="b"> Definieren testbar wann der Task als "erledigt" gilt</label>
+        <label><input type="radio" name="q2" value="c"> Werden nur fuer externe Code Reviews gebraucht</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Ohne Kriterien gibt es kein "Done". Die KI implementiert bis sie aufhoert, nicht bis sie fertig ist. Kriterien sind die Definition of Done.</div>
+    </div>
+    <div class="question">
+      <p>3. TASK-04 haengt von TASK-01, 02, 03 ab. Was bedeutet das praktisch?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> TASK-04 darf erst gestartet werden wenn die anderen abgeschlossen sind</label>
+        <label><input type="radio" name="q3" value="b"> TASK-04 ersetzt TASK-01, 02, 03</label>
+        <label><input type="radio" name="q3" value="c"> Die Reihenfolge ist beliebig</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">A — TASK-04 importiert Code aus TASK-01 und ruft Services aus TASK-02/03 auf. Ohne die Vorgaenger schlaegt TASK-04 mit ImportError fehl.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Die Spec-Kette in der Praxis — ein Feature komplett von Req bis Tasks durchspecen.</p>
+  </div>
+
+</div>
+</body>
+</html>

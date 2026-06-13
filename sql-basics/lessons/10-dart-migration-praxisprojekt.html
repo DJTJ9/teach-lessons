@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 10: Dart-Daten migrieren (Praxisprojekt)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 0.95rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  ol { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.9; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.84rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .type { color: #34d399; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .dart-kw { color: #34d399; }
+  .step { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .step-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .step-num { background: #312e81; color: #a5b4fc; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+  .step-title { font-weight: 600; color: #e2e8f0; font-size: 0.95rem; }
+  .step p { margin: 0; font-size: 0.88rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .checklist { background: #13131f; border-radius: 8px; padding: 1.25rem; }
+  .checklist h3 { color: #6ee7b7; font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .check-item { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.4rem; font-size: 0.87rem; color: #94a3b8; line-height: 1.5; }
+  .check-item::before { content: "✓"; color: #34d399; flex-shrink: 0; font-weight: 700; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 10 &middot; PRAXISPROJEKT</div>
+    <h1>Dart-Daten migrieren</h1>
+    <p class="subtitle">Strategie, Schema-Design und Migration von App-Daten zu PostgreSQL</p>
+  </div>
+
+  <p>Diese Lektion ist kein Quiz-Kurs sondern ein Praxis-Leitfaden. Folge dem Prozess wenn deine Dart-Daten bereit fuer die Migration sind.</p>
+
+  <h2>Schritt 1: Daten analysieren</h2>
+  <p>Bevor du ein Schema designst, musst du verstehen welche Daten du hast.</p>
+
+  <div class="step">
+    <div class="step-header"><div class="step-num">1</div><div class="step-title">Dart-Datenstruktur exportieren</div></div>
+    <p>Welche Klassen/Models hat die App? Welche Felder? Welche Typen? Welche Beziehungen existieren?</p>
+  </div>
+
+  <div class="code-block"><span class="comment">// Beispiel: typisches Dart-Model (SharedPreferences oder Hive)</span>
+<span class="dart-kw">class</span> Messung {
+  <span class="dart-kw">final int</span> id;
+  <span class="dart-kw">final DateTime</span> zeitpunkt;
+  <span class="dart-kw">final double</span> wert;
+  <span class="dart-kw">final String</span> einheit;
+  <span class="dart-kw">final String?</span> notiz;
+}</div>
+
+  <div class="step">
+    <div class="step-header"><div class="step-num">2</div><div class="step-title">Daten-Export aus Dart-App</div></div>
+    <p>Daten als JSON oder CSV exportieren. Dart/Flutter kann direkt JSON serialisieren.</p>
+  </div>
+
+  <div class="code-block"><span class="comment">// Dart: Daten als JSON exportieren</span>
+<span class="dart-kw">final</span> json = messungen.map((m) => {
+  'id': m.id,
+  'zeitpunkt': m.zeitpunkt.toIso8601String(),
+  'wert': m.wert,
+  'einheit': m.einheit,
+  'notiz': m.notiz,
+}).toList();
+
+<span class="comment">// JSON in Datei schreiben:</span>
+<span class="dart-kw">await</span> File('export.json').writeAsString(jsonEncode(json));</div>
+
+  <h2>Schritt 2: Schema designen</h2>
+  <p>Dart-Typen zu PostgreSQL-Typen uebersetzen:</p>
+
+  <div class="code-block"><span class="comment">Dart         -->  PostgreSQL
+int          -->  INTEGER oder BIGINT
+double       -->  NUMERIC(12,4) oder FLOAT8
+String       -->  TEXT
+bool         -->  BOOLEAN
+DateTime     -->  TIMESTAMPTZ
+String?      -->  TEXT (erlaubt NULL)
+List&lt;T&gt;     -->  Eigene Tabelle mit Foreign Key (1:N)</span></div>
+
+  <div class="code-block"><span class="comment">-- Schema fuer Messung-Klasse</span>
+<span class="kw">CREATE TABLE</span> messungen (
+    id          <span class="type">BIGINT PRIMARY KEY</span>,         <span class="comment">-- aus Dart uebernehmen</span>
+    zeitpunkt   <span class="type">TIMESTAMPTZ NOT NULL</span>,
+    wert        <span class="type">NUMERIC(12,4) NOT NULL</span>,
+    einheit     <span class="type">TEXT NOT NULL</span>,
+    notiz       <span class="type">TEXT</span>                         <span class="comment">-- nullable (String?)</span>
+);
+
+<span class="comment">-- Indexe fuer haeufige Abfragen</span>
+<span class="kw">CREATE INDEX</span> idx_messungen_zeitpunkt <span class="kw">ON</span> messungen (zeitpunkt <span class="kw">DESC</span>);
+<span class="kw">CREATE INDEX</span> idx_messungen_einheit <span class="kw">ON</span> messungen (einheit);</div>
+
+  <h2>Schritt 3: Daten importieren</h2>
+
+  <h3>Option A: COPY (schnellste Methode fuer grosse Datenmengen)</h3>
+  <div class="code-block"><span class="comment">-- CSV aus Dart exportieren, dann in PostgreSQL importieren</span>
+<span class="comment">-- In psql:</span>
+\<span class="kw">COPY</span> messungen (id, zeitpunkt, wert, einheit, notiz)
+<span class="kw">FROM</span> <span class="str">'/pfad/zu/export.csv'</span>
+<span class="kw">WITH</span> (FORMAT csv, HEADER true, NULL <span class="str">''</span>);</div>
+
+  <h3>Option B: Python-Script fuer JSON-Import</h3>
+  <div class="code-block"><span class="comment"># Python-Script: JSON -> PostgreSQL</span>
+<span class="dart-kw">import</span> json, psycopg2
+<span class="dart-kw">from</span> datetime <span class="dart-kw">import</span> datetime
+
+conn = psycopg2.connect(
+    dbname=<span class="str">"meine_db"</span>,
+    host=<span class="str">"localhost"</span>,
+    user=<span class="str">"postgres"</span>
+)
+cur = conn.cursor()
+
+<span class="dart-kw">with</span> open(<span class="str">'export.json'</span>) <span class="dart-kw">as</span> f:
+    daten = json.load(f)
+
+<span class="dart-kw">for</span> m <span class="dart-kw">in</span> daten:
+    cur.execute(
+        <span class="str">"""INSERT INTO messungen (id, zeitpunkt, wert, einheit, notiz)
+           VALUES (%s, %s, %s, %s, %s)
+           ON CONFLICT (id) DO NOTHING"""</span>,  <span class="comment"># Duplikate ignorieren</span>
+        (m[<span class="str">'id'</span>], m[<span class="str">'zeitpunkt'</span>], m[<span class="str">'wert'</span>], m[<span class="str">'einheit'</span>], m.get(<span class="str">'notiz'</span>))
+    )
+
+conn.commit()
+print(f<span class="str">"{cur.rowcount} Zeilen importiert"</span>)</div>
+
+  <div class="insight">
+    <code>ON CONFLICT (id) DO NOTHING</code> macht den Import idempotent — du kannst das Script mehrfach ausfuehren ohne Fehler. Duplikate werden einfach uebersprungen.
+  </div>
+
+  <h2>Schritt 4: Daten verifizieren</h2>
+  <div class="code-block"><span class="comment">-- Anzahl importierter Zeilen</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> messungen;
+
+<span class="comment">-- Zeitraum der Daten</span>
+<span class="kw">SELECT</span> <span class="fn">MIN</span>(zeitpunkt), <span class="fn">MAX</span>(zeitpunkt) <span class="kw">FROM</span> messungen;
+
+<span class="comment">-- Erste 10 Zeilen pruefen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> messungen <span class="kw">ORDER BY</span> zeitpunkt <span class="kw">LIMIT</span> 10;
+
+<span class="comment">-- NULL-Check: gibt es unerwartete NULLs?</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> messungen <span class="kw">WHERE</span> wert <span class="kw">IS NULL</span>;
+
+<span class="comment">-- Doppelte IDs (sollten 0 sein)</span>
+<span class="kw">SELECT</span> id, <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> messungen <span class="kw">GROUP BY</span> id <span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) <span class="num">> 1</span>;</div>
+
+  <h2>Schritt 5: Dart-App mit PostgreSQL verbinden</h2>
+  <div class="code-block"><span class="comment">// Dart: postgres Package (pub.dev)</span>
+<span class="comment">// pubspec.yaml: postgres: ^3.0.0</span>
+
+<span class="dart-kw">import</span> <span class="str">'package:postgres/postgres.dart'</span>;
+
+<span class="dart-kw">final</span> conn = <span class="dart-kw">await</span> Connection.open(
+  Endpoint(host: <span class="str">'localhost'</span>, database: <span class="str">'meine_db'</span>),
+  settings: ConnectionSettings(sslMode: SslMode.disable),
+);
+
+<span class="dart-kw">final</span> result = <span class="dart-kw">await</span> conn.execute(
+  <span class="str">'SELECT * FROM messungen WHERE zeitpunkt > @von ORDER BY zeitpunkt DESC LIMIT 100'</span>,
+  parameters: {<span class="str">'von'</span>: DateTime.now().subtract(Duration(days: 30))},
+);
+
+<span class="dart-kw">for</span> (<span class="dart-kw">final</span> row <span class="dart-kw">in</span> result) {
+  print(row[0]);  <span class="comment">// Wert der ersten Spalte</span>
+}</div>
+
+  <h2>Checkliste: Migration abgeschlossen</h2>
+  <div class="checklist">
+    <h3>Abnahmekriterien</h3>
+    <div class="check-item">Dart-Datenstruktur analysiert und PostgreSQL-Schema designed</div>
+    <div class="check-item">Schema erstellt mit korrekten Typen, Constraints und Foreign Keys</div>
+    <div class="check-item">Alle Daten importiert (COUNT() stimmt mit Dart-Export ueberein)</div>
+    <div class="check-item">Keine unerwarteten NULLs oder Duplikate</div>
+    <div class="check-item">Indexe fuer haeufige Abfragen erstellt</div>
+    <div class="check-item">Dart-App kann Daten aus PostgreSQL lesen</div>
+    <div class="check-item">Mindestens eine Analyse-Abfrage (z.B. Durchschnitt, Zeitreihe) funktioniert</div>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Dart-Typ <code>DateTime</code> wird zu welchem PostgreSQL-Typ?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> TEXT</label>
+        <label><input type="radio" name="q1" value="b"> TIMESTAMPTZ</label>
+        <label><input type="radio" name="q1" value="c"> INTEGER</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">TIMESTAMPTZ — mit Zeitzone (TZ). DateTime in Dart enthaelt immer Zeitzone-Information. TIMESTAMP ohne TZ verliert die Zeitzone-Info und kann zu Fehlern fuehren.</div>
+    </div>
+    <div class="question">
+      <p>2. Was bewirkt <code>ON CONFLICT (id) DO NOTHING</code> beim Import?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Wirft einen Fehler wenn id schon existiert</label>
+        <label><input type="radio" name="q2" value="b"> Ueberspringt die Zeile still wenn id schon existiert — keine Fehlermeldung</label>
+        <label><input type="radio" name="q2" value="c"> Ueberschreibt den bestehenden Datensatz</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Idempotenter Import. Das Script kann mehrfach ausgefuehrt werden. Bereits importierte Zeilen werden still uebersprungen. Besonders nuetzlich wenn der Import unterbrochen und neu gestartet wird.</div>
+    </div>
+    <div class="question">
+      <p>3. Wann solltest du COPY statt INSERT fuer den Import verwenden?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Immer — COPY ist sicherer als INSERT</label>
+        <label><input type="radio" name="q3" value="b"> Bei grossen Datenmengen (>10.000 Zeilen) — COPY ist 10-100x schneller als einzelne INSERTs</label>
+        <label><input type="radio" name="q3" value="c"> Nur wenn die Daten bereits in PostgreSQL gespeichert sind</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — COPY ist massiv schneller fuer Bulk-Imports da es den Parser und Transaktions-Overhead umgeht. Fuer wenige hundert Zeilen ist INSERT einfacher. Fuer Tausende oder Millionen Zeilen: COPY.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #0f2e1e; border-radius: 8px; border: 1px solid #064e3b">
+    <p style="margin: 0 0 0.5rem; color: #6ee7b7; font-weight: 600; font-size: 0.9rem">SQL Basics Lernreihe abgeschlossen</p>
+    <p style="margin: 0; color: #475569; font-size: 0.85rem">Du kennst jetzt Datenbanken, DDL, DML, Aggregation, JOINs, CTEs, Design-Prinzipien, Indexe und hast einen konkreten Migrations-Leitfaden fuer deine Dart-Daten. Naechster Schritt: PostgreSQL installieren und das erste eigene Schema erstellen.</p>
+  </div>
+
+</div>
+</body>
+</html>

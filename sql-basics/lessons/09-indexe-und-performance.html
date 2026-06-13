@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 09: Indexe und Performance</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.84rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .fn { color: #34d399; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .fast { color: #34d399; }
+  .slow { color: #f87171; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .warning { background: #2e1e10; border: 1px solid #78350f; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; color: #fcd34d; font-size: 0.88rem; line-height: 1.6; }
+  .index-rule { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .rule-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .rule-text { font-size: 0.87rem; color: #94a3b8; line-height: 1.5; }
+  .rule-text strong { color: #e2e8f0; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 09</div>
+    <h1>Indexe und Performance</h1>
+    <p class="subtitle">Wann und warum Indexe einsetzen — EXPLAIN ANALYZE lesen</p>
+  </div>
+
+  <h2>Was ist ein Index?</h2>
+  <p>Ein Index ist eine separate Datenstruktur die der Datenbank erlaubt, Zeilen schnell zu finden ohne die gesamte Tabelle zu durchsuchen. Vergleich: Index eines Buchs — du schaust nicht jede Seite durch, du gehst direkt zur richtigen Seite.</p>
+  <p>Ohne Index: PostgreSQL liest jede Zeile sequentiell (Sequential Scan). Mit Index: PostgreSQL springt direkt zu den Treffern (Index Scan).</p>
+
+  <div class="code-block"><span class="comment">-- Tabelle: 1 Million Score-Eintraege</span>
+<span class="comment">-- Abfrage: alle Scores von Spieler 42</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores <span class="kw">WHERE</span> spieler_id = 42;
+
+<span class="comment">-- OHNE Index: PostgreSQL liest alle 1.000.000 Zeilen ~ 500ms</span>
+<span class="comment">-- MIT Index auf spieler_id: direkt zu Zeilen springen ~ 1ms</span></div>
+
+  <h2>Index erstellen</h2>
+  <div class="code-block"><span class="comment">-- Einfacher Index</span>
+<span class="kw">CREATE INDEX</span> idx_scores_spieler_id <span class="kw">ON</span> scores (spieler_id);
+
+<span class="comment">-- Zusammengesetzter Index (Composite)</span>
+<span class="kw">CREATE INDEX</span> idx_scores_spieler_level <span class="kw">ON</span> scores (spieler_id, level);
+
+<span class="comment">-- Index fuer absteigende Sortierung (Highscore-Abfragen)</span>
+<span class="kw">CREATE INDEX</span> idx_scores_punkte_desc <span class="kw">ON</span> scores (punkte <span class="kw">DESC</span>);
+
+<span class="comment">-- UNIQUE Index (wie UNIQUE Constraint, aber explizit)</span>
+<span class="kw">CREATE UNIQUE INDEX</span> idx_spieler_username <span class="kw">ON</span> spieler (username);
+
+<span class="comment">-- Index loeschen</span>
+<span class="kw">DROP INDEX</span> idx_scores_spieler_id;</div>
+
+  <div class="insight">
+    PRIMARY KEY und UNIQUE Constraints erstellen automatisch Indexe. Du brauchst keinen manuellen Index auf id oder username wenn dort ein PK/UNIQUE liegt.
+  </div>
+
+  <h2>EXPLAIN ANALYZE: Performance verstehen</h2>
+  <div class="code-block"><span class="kw">EXPLAIN ANALYZE</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores <span class="kw">WHERE</span> spieler_id = 42;
+
+<span class="comment">-- Ohne Index:</span>
+<span class="output">Seq Scan on scores  (cost=0.00..25000.00 rows=150 width=28)
+                    (actual time=0.012..487.234 rows=150 loops=1)
+  Filter: (spieler_id = 42)
+  Rows Removed by Filter: 999850
+Planning Time: 0.1 ms
+Execution Time: 487.3 ms</span>
+
+<span class="comment">-- Mit Index auf spieler_id:</span>
+<span class="output">Index Scan using idx_scores_spieler_id on scores
+  (cost=0.43..482.50 rows=150 width=28)
+  (actual time=0.020..0.891 rows=150 loops=1)
+  Index Cond: (spieler_id = 42)
+Planning Time: 0.3 ms
+Execution Time: 0.9 ms</span></div>
+
+  <p><strong>Seq Scan</strong> = schlecht fuer grosse Tabellen. <strong>Index Scan</strong> = gut. Die Execution Time zeigt den realen Unterschied.</p>
+
+  <h2>Wann Indexe erstellen — und wann nicht</h2>
+
+  <div class="index-rule">
+    <div class="rule-icon" style="color: #34d399">+</div>
+    <div class="rule-text"><strong>Erstelle Index auf:</strong> Foreign Keys (spieler_id in scores), Spalten in WHERE-Bedingungen die haeufig vorkommen, Spalten in ORDER BY bei grossen Tabellen, Spalten die in JOINs verwendet werden.</div>
+  </div>
+  <div class="index-rule">
+    <div class="rule-icon" style="color: #f87171">-</div>
+    <div class="rule-text"><strong>Kein Index bei:</strong> Tabellen mit weniger als ~1000 Zeilen (Seq Scan ist schneller), Spalten die selten in WHERE vorkommen, Boolean-Spalten (ist_aktiv: nur 2 Werte, Index bringt wenig), Tabellen mit sehr vielen Writes (jeder INSERT/UPDATE muss auch den Index aktualisieren).</div>
+  </div>
+
+  <div class="warning">
+    Zu viele Indexe verlangsamen Writes (INSERT, UPDATE, DELETE). Jede Aenderung an einer Tabelle muss auch alle Indexe aktualisieren. Faustregel: 2-4 Indexe pro Tabelle sind normal, 10+ Indexe sind ein Warnsignal.
+  </div>
+
+  <h2>Composite Index: Reihenfolge wichtig</h2>
+  <div class="code-block"><span class="comment">-- Index auf (spieler_id, level)</span>
+<span class="kw">CREATE INDEX</span> idx ON scores (spieler_id, level);
+
+<span class="comment">-- NUTZT den Index:</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores <span class="kw">WHERE</span> spieler_id = 42;               <span class="fast">-- ja</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores <span class="kw">WHERE</span> spieler_id = 42 <span class="kw">AND</span> level = 3; <span class="fast">-- ja</span>
+
+<span class="comment">-- NUTZT den Index NICHT (erste Spalte fehlt):</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores <span class="kw">WHERE</span> level = 3;                       <span class="slow">-- nein</span></div>
+  <p>Composite Indexes werden von links nach rechts gelesen. Wenn die erste Spalte nicht in der WHERE-Klausel ist, wird der Index nicht genutzt.</p>
+
+  <h2>Alle Indexe einer Tabelle anzeigen</h2>
+  <div class="code-block"><span class="comment">-- In psql:</span>
+\d scores
+<span class="comment">-- Zeigt auch alle Indexe am Ende der Ausgabe</span>
+
+<span class="comment">-- Oder via SQL:</span>
+<span class="kw">SELECT</span> indexname, indexdef
+<span class="kw">FROM</span> pg_indexes
+<span class="kw">WHERE</span> tablename = <span class="str">'scores'</span>;</div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. "Seq Scan" in EXPLAIN ANALYZE bedeutet:</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Index wurde verwendet — schnelle Suche</label>
+        <label><input type="radio" name="q1" value="b"> PostgreSQL liest jede Zeile der Tabelle — kann bei grossen Tabellen langsam sein</label>
+        <label><input type="radio" name="q1" value="c"> Fehler — die Abfrage ist falsch</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Sequential Scan = jede Zeile wird geprueft. Fuer kleine Tabellen OK. Fuer Tabellen mit vielen Zeilen und WHERE auf einer Spalte ohne Index: sehr langsam.</div>
+    </div>
+    <div class="question">
+      <p>2. Du hast Index auf (spieler_id, punkte). Wird er bei <code>WHERE punkte > 5000</code> genutzt?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Ja — punkte ist im Index</label>
+        <label><input type="radio" name="q2" value="b"> Nein — spieler_id fehlt in WHERE, Composite Index wird nicht genutzt</label>
+        <label><input type="radio" name="q2" value="c"> Nur wenn punkte die erste Spalte des Index waere</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B und C sagen das Gleiche. Composite Index (spieler_id, punkte): erste Spalte MUSS in WHERE sein. WHERE punkte > 5000 ohne spieler_id -> Seq Scan. Loesung: separater Index nur auf punkte erstellen.</div>
+    </div>
+    <div class="question">
+      <p>3. Warum verlangsamen zu viele Indexe INSERT-Operationen?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> PostgreSQL muss bei jedem INSERT auch alle Indexe aktualisieren</label>
+        <label><input type="radio" name="q3" value="b"> Indexe nehmen Speicher weg der fuer INSERTs benoetigt wird</label>
+        <label><input type="radio" name="q3" value="c"> Kein Zusammenhang — Indexe betreffen nur SELECTs</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">A — Jeder Index ist eine separate Datenstruktur. Neue Zeile eingefuegt -> Haupttabelle aktualisieren + JEDER Index der Tabelle muss aktualisiert werden. 10 Indexe = 11 Schreiboperationen pro INSERT.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Dart-Daten migrieren — dein erstes echtes PostgreSQL-Praxisprojekt.</p>
+  </div>
+
+</div>
+</body>
+</html>

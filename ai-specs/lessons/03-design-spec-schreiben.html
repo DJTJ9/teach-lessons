@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 03: Design Spec schreiben</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .template { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre-wrap; margin-bottom: 1rem; }
+  .keyword { color: #34d399; font-weight: 600; }
+  .comment { color: #475569; }
+  .insight { background: #0f2e1e; border: 1px solid #064e3b; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #6ee7b7; font-size: 0.9rem; line-height: 1.6; }
+  .flow-box { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .adr { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .adr .decision { color: #fbbf24; font-weight: 600; font-size: 0.9rem; }
+  .adr .rationale { color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #064e3b; color: #6ee7b7; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 03</div>
+    <h1>Design Spec schreiben</h1>
+    <p class="subtitle">Technische Entscheidungen, Datenfluss und Komponenten — ohne Code zu schreiben</p>
+  </div>
+
+  <h2>Was eine Design Spec leistet</h2>
+  <p>Die Design Spec ist die Bruecke zwischen "Was der Nutzer will" (Requirement) und "Was der Entwickler baut" (Tasks). Sie beantwortet: Welche Architektur loest das Problem? Welche Komponenten braucht es? Wie fliessen Daten durch das System?</p>
+  <p>Sie enthaelt noch keinen Code — aber alle Entscheidungen die Code-Struktur bestimmen.</p>
+
+  <h2>Struktur der Design Spec</h2>
+  <div class="template"><span class="keyword"># [Feature-Name] — Design Spec</span>
+
+<span class="comment">Referenz: [Link zur Requirement Spec]</span>
+
+<span class="keyword">## Uebersicht</span>
+Ein Satz: Wie loest diese Implementierung das Problem aus der Requirement Spec?
+
+<span class="keyword">## Komponenten</span>
+Liste aller neuen oder veraenderten Module/Klassen/Funktionen:
+- `modul/datei.py` — Verantwortlichkeit
+- `modul/anderes.py` — Verantwortlichkeit
+
+<span class="keyword">## Datenfluss</span>
+Schritt-fuer-Schritt: Was passiert wenn der Nutzer X tut?
+1. Nutzer sendet Nachricht
+2. Handler X empfaengt und parst
+3. Service Y ruft API Z auf
+4. Ergebnis wird formatiert und zurueckgesendet
+
+<span class="keyword">## Schnittstellen</span>
+Signaturen der wichtigsten Funktionen (kein Implementation-Code):
+- `search_all_dbs(query: str) -> list[SearchResult]`
+- `format_results(results: list[SearchResult]) -> str`
+
+<span class="keyword">## Entscheidungen</span>
+Warum diese Architektur? Welche Alternativen wurden verworfen?
+
+<span class="keyword">## Offene Fragen</span>
+Was muss noch geklaert werden?</div>
+
+  <h2>Datenfluss visualisieren</h2>
+  <p>ASCII-Flussdiagramme sind in Design Specs valide und oft besser lesbar als formale UML-Diagramme:</p>
+  <div class="flow-box">Nutzer: "suche: Dart"
+    |
+    v
+[bot.py] MessageHandler
+    |  erkennt Praefix "suche: "
+    v
+[handlers/search.py] handle_search(update, context)
+    |  extrahiert query = "Dart"
+    v
+[services/notion_search.py] search_all_dbs(query)
+    |  ruft 5x notion_client.search() auf (parallel)
+    v
+[services/notion_search.py] format_results(results)
+    |  gruppiert nach DB, max 5 pro DB
+    v
+[bot.py] update.message.reply_text(formatted)
+    |
+    v
+Nutzer sieht Ergebnis-Nachricht</div>
+
+  <h2>Vollstaendiges Beispiel: suche:-Feature</h2>
+  <div class="template"><span class="keyword"># suche: Dispatcher — Design Spec</span>
+
+<span class="comment">Referenz: Requirement Spec suche-command</span>
+
+<span class="keyword">## Uebersicht</span>
+Neuer MessageHandler in bot.py leitet "suche: "-Nachrichten an
+einen dedizierten Search-Service weiter, der alle 5 Notion-DBs
+parallel abfragt und gruppierte Ergebnisse zurueckgibt.
+
+<span class="keyword">## Komponenten</span>
+- `handlers/search.py` (neu) — Handler-Logik, Eingabe-Validierung
+- `services/notion_search.py` (neu) — Notion-API-Calls, Ergebnis-Aggregation
+- `bot.py` (veraendert) — Handler-Registrierung, Zeile ~50
+
+<span class="keyword">## Datenfluss</span>
+1. Nutzer sendet Nachricht mit Praefix "suche: "
+2. MessageHandler in bot.py matched auf filters.Regex("^suche: ")
+3. handle_search() extrahiert query (alles nach "suche: ")
+4. search_all_dbs(query) ruft notion_client.search() fuer jede DB auf
+5. Ergebnisse werden nach DB gruppiert, je max. 5 Items
+6. format_results() baut Telegram-Antworttext
+7. Bei leerem Ergebnis: "Nichts gefunden fuer: {query}"
+
+<span class="keyword">## Schnittstellen</span>
+- `handle_search(update: Update, context: CallbackContext) -> None`
+- `search_all_dbs(query: str, dbs: list[str]) -> dict[str, list[dict]]`
+- `format_results(grouped: dict[str, list[dict]]) -> str`
+
+<span class="keyword">## Entscheidungen</span>
+- Sequentielle API-Calls (nicht parallel): einfachere Fehlerbehandlung,
+  5 Calls x ~500ms = ~2.5s bleibt unter dem 5s-Limit aus NFR-01
+- Eigene Datei fuer Search-Handler: folgt bestehender Konvention (handlers/)
+- Max 5 Ergebnisse: Telegram-Nachrichten-Limit, ausreichend fuer Use Case
+
+<span class="keyword">## Offene Fragen</span>
+- Sollen Links (page_url) als Inline-Buttons oder als Text angezeigt werden?</div>
+
+  <div class="insight">
+    Design Spec enthaelt noch keinen Python-Code — nur Signaturen. Das ist Absicht: Signaturen fixieren das Interface, lassen aber Implementation offen. Eine KI kann damit sofort Tasks ableiten.
+  </div>
+
+  <h2>ADRs: Entscheidungen dokumentieren</h2>
+  <p>Architecture Decision Records (ADRs) sind kleine Eintrage die erklaeren WARUM eine Entscheidung getroffen wurde. In der Design Spec werden sie inline im "Entscheidungen"-Abschnitt gehalten:</p>
+  <div class="adr">
+    <div class="decision">Entscheidung: Sequentielle statt paralleler Notion-Calls</div>
+    <div class="rationale">Warum: Einfachere Fehlerbehandlung. Bei parallelen Calls muss jeder Fehler einzeln behandelt werden. Sequentiell kann ein try/except alle failen lassen. Performance-Ziel (5s) wird auch sequentiell erreicht.</div>
+  </div>
+  <div class="adr">
+    <div class="decision">Entscheidung: Neue Datei handlers/search.py statt Erweiterung von bot.py</div>
+    <div class="rationale">Warum: Konvention im Repo — jede Handler-Gruppe hat eigene Datei. bot.py wird nicht weiter aufgeblaehen.</div>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was unterscheidet eine Design Spec von einer Requirement Spec?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Design Spec ist fuer Manager, Requirement Spec fuer Entwickler</label>
+        <label><input type="radio" name="q1" value="b"> Design Spec beschreibt WIE gebaut wird, Requirement Spec beschreibt WAS gebaut werden soll</label>
+        <label><input type="radio" name="q1" value="c"> Design Spec enthaelt fertigen Code</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Requirement: was der Nutzer braucht. Design: wie das technisch umgesetzt wird. Code kommt erst in der Implementierung.</div>
+    </div>
+    <div class="question">
+      <p>2. Wozu dient der "Entscheidungen"-Abschnitt in einer Design Spec?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Zeigt alle moeglichen Implementierungsoptionen ohne Auswahl</label>
+        <label><input type="radio" name="q2" value="b"> Dokumentiert WARUM diese Architektur und nicht eine Alternative gewaehlt wurde</label>
+        <label><input type="radio" name="q2" value="c"> Wird nur fuer grosse Teams benoetigt</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Ohne ADRs weiss niemand (auch du in 3 Monaten nicht) warum eine Entscheidung getroffen wurde. Das fuehrt zu "warum haben wir das so gemacht?" und unnoetigem Refactoring.</div>
+    </div>
+    <div class="question">
+      <p>3. Welche Information gehoert NICHT in eine Design Spec?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Funktionssignaturen (z.B. <code>search(query: str) -> list</code>)</label>
+        <label><input type="radio" name="q3" value="b"> Der vollstaendige implementierte Funktionskoerper</label>
+        <label><input type="radio" name="q3" value="c"> Ein Datenfluss-Diagramm</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Fertiger Code gehoert in die Implementierung, nicht in die Spec. Signaturen (Interfaces) sind OK — sie definieren Vertraege ohne Implementation zu erzwingen.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Task Spec schreiben — atomare, KI-ausfuehrbare Aufgaben aus der Design Spec ableiten.</p>
+  </div>
+
+</div>
+</body>
+</html>

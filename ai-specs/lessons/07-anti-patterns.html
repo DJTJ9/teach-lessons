@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 07: Anti-Patterns und haeufige Fehler</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .anti { background: #1e1e2e; border: 1px solid #2d2d3f; border-left: 4px solid #f87171; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .anti h3 { color: #fca5a5; font-size: 1rem; margin-bottom: 0.25rem; }
+  .anti .symptom { font-size: 0.8rem; color: #f87171; margin-bottom: 0.75rem; }
+  .anti .desc { font-size: 0.88rem; color: #94a3b8; margin-bottom: 0.75rem; }
+  .anti .fix { background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.85rem; color: #6ee7b7; }
+  .anti .fix::before { content: "Fix: "; color: #34d399; font-weight: 600; }
+  .example-bad { font-family: monospace; font-size: 0.82rem; color: #f87171; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin: 0.5rem 0; white-space: pre-wrap; }
+  .insight { background: #1c1c2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .checklist { background: #13131f; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+  .checklist h3 { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 0.75rem; }
+  .check-item { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem; font-size: 0.88rem; color: #94a3b8; }
+  .check-item::before { content: "□"; color: #475569; flex-shrink: 0; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #1e1e2e; border: 1px solid #f87171; color: #f87171; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 07</div>
+    <h1>Anti-Patterns und haeufige Fehler</h1>
+    <p class="subtitle">Schlechte Specs erkennen, benennen und reparieren</p>
+  </div>
+
+  <p>Specs die schlecht sind, fallen meistens in eines von fuenf Mustern. Wer diese Muster kennt, kann sie in fremden (und eigenen) Specs sofort erkennen.</p>
+
+  <div class="anti">
+    <h3>Anti-Pattern 1: The God Spec</h3>
+    <div class="symptom">Symptom: Eine Spec beschreibt das gesamte Produkt</div>
+    <div class="desc">Feature-Boundaries werden nicht gesetzt. Eine Spec deckt Login, Datenbankdesign, UI und Deployment gleichzeitig ab. Niemand kann sie vollstaendig umsetzen.</div>
+    <div class="example-bad"># Unser Telegram-Bot — Requirement Spec
+## Anforderungen
+- FR-01: Bot soll Nachrichten empfangen
+- FR-02: Bot soll Notion verbinden
+- FR-03: Bot soll Erinnerungen senden
+- FR-04: Bot soll Suche haben
+- FR-05: Bot soll Dart-Daten migrieren
+...</div>
+    <div class="fix">Pro Feature eine Spec. "suche: Dispatcher" ist ein Feature. "Erinnerungen" ist ein Feature. Trennen.</div>
+  </div>
+
+  <div class="anti">
+    <h3>Anti-Pattern 2: Implementation Requirement</h3>
+    <div class="symptom">Symptom: Requirement Spec enthaelt Klassen, Bibliotheken, Dateinamen</div>
+    <div class="desc">Die Loesung wird in der Anforderung festgeschrieben bevor das Design ueberhaupt begonnen hat. Verhindert alternative Loesungsansaetze.</div>
+    <div class="example-bad">## Funktionale Anforderungen
+- FR-01: Das System MUSS SQLite als Datenbank verwenden
+- FR-02: Die Klasse NotionClient MUSS als Singleton implementiert werden
+- FR-03: handlers/search.py MUSS den MessageHandler verwenden</div>
+    <div class="fix">Requirements beschreiben Nutzerverhalten und Systemverhalten — nie Implementierung. "Das System MUSS Daten persistent speichern" statt "Das System MUSS SQLite verwenden".</div>
+  </div>
+
+  <div class="anti">
+    <h3>Anti-Pattern 3: Orphan Design</h3>
+    <div class="symptom">Symptom: Design Spec existiert ohne Requirement Spec</div>
+    <div class="desc">Der Entwickler sprang direkt in technische Details. Man weiss wie es gebaut wird, aber nicht mehr warum. Spaetere Frage "Brauchen wir das wirklich?" kann nicht mehr mit Requirements beantwortet werden.</div>
+    <div class="example-bad"># Search-Handler — Design Spec
+(kein Verweis auf Requirement Spec)
+## Komponenten
+- handlers/search.py mit MessageHandler...
+  
+[Zwei Monate spaeter: "Warum haben wir das gebaut?"]</div>
+    <div class="fix">Jede Design Spec hat im Header einen Verweis auf die Requirement Spec. Wenn kein Requirement existiert: erst eins schreiben.</div>
+  </div>
+
+  <div class="anti">
+    <h3>Anti-Pattern 4: Macro Task</h3>
+    <div class="symptom">Symptom: Ein Task beruehrt 5+ Dateien</div>
+    <div class="desc">Ein Task der "das gesamte Feature implementiert" ist kein Task — es ist eine Mini-Design-Spec. KI-Agenten treffen dabei Dutzende implizite Architektur-Entscheidungen ohne Uebersicht.</div>
+    <div class="example-bad">TASK-01: Implementiere das komplette suche:-Feature
+  Dateien: bot.py, handlers/search.py, services/notion_search.py,
+           config.py, tests/test_search.py, requirements.txt</div>
+    <div class="fix">Wenn ein Task mehr als 2-3 Dateien beruehrt: aufteilen. Ein Task = eine Datei oder eine zusammenhaengende Funktion.</div>
+  </div>
+
+  <div class="anti">
+    <h3>Anti-Pattern 5: Vanishing Out-of-Scope</h3>
+    <div class="symptom">Symptom: Kein "Nicht im Scope"-Abschnitt</div>
+    <div class="desc">Ohne expliziten Out-of-Scope wird jede verwandte Idee automatisch als "in Scope" behandelt. Feature-Creep passiert dann im Gespraech ("koennen wir noch schnell...") oder still durch den KI-Agenten.</div>
+    <div class="example-bad"># suche: Dispatcher — Requirement Spec
+## Anforderungen
+[keine Out-of-Scope-Sektion]
+
+[KI-Agent implementiert auch Suche-History, Export-Funktion
+und Filteroption — weil "sinnvoll erschien"]</div>
+    <div class="fix">Immer einen "Nicht im Scope"-Abschnitt. Mindestens 2-3 Punkte die man sich vorstellen koennte aber bewusst auslaesst.</div>
+  </div>
+
+  <div class="insight">
+    Wenn du eine Spec schreibst und merkst dass du in ein Anti-Pattern gleitest — das ist normal. Die Kunst ist es zu erkennen und zu stoppen, nicht es von Anfang an perfekt zu machen.
+  </div>
+
+  <h2>Spec-Review-Checkliste</h2>
+  <div class="checklist">
+    <h3>Requirement Spec</h3>
+    <div class="check-item">Problem klar beschrieben (Wer hat das Problem? Warum?)</div>
+    <div class="check-item">Ziel messbar (kein "schnell", "benutzerfreundlich", "gut")</div>
+    <div class="check-item">Jedes FR hat MUSS/SOLL/KANN</div>
+    <div class="check-item">Kein Implementierungsdetail in FRs</div>
+    <div class="check-item">Out-of-Scope vorhanden mit mindestens 2 Punkten</div>
+  </div>
+  <div class="checklist">
+    <h3>Design Spec</h3>
+    <div class="check-item">Verweis auf Requirement Spec vorhanden</div>
+    <div class="check-item">Alle Komponenten gelistet mit Verantwortlichkeit</div>
+    <div class="check-item">Datenfluss Schritt-fuer-Schritt (nicht nur "X ruft Y auf")</div>
+    <div class="check-item">Schnittstellen als Signaturen (kein vollstaendiger Code)</div>
+    <div class="check-item">Entscheidungen mit Begruendung dokumentiert</div>
+  </div>
+  <div class="checklist">
+    <h3>Task Spec</h3>
+    <div class="check-item">Max. 1-2 Dateien pro Task</div>
+    <div class="check-item">Abhaengigkeiten explizit angegeben</div>
+    <div class="check-item">Akzeptanzkriterien als Checkliste (testbar, Ja/Nein)</div>
+    <div class="check-item">KI-Kontext: verfuegbare Services, Nicht-aendern-Liste</div>
+    <div class="check-item">Verweis auf Design Spec und Datenfluss-Schritt</div>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. "Das System MUSS Python 3.11 verwenden und SQLite3 als Datenbank." — Welches Anti-Pattern?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> God Spec</label>
+        <label><input type="radio" name="q1" value="b"> Implementation Requirement</label>
+        <label><input type="radio" name="q1" value="c"> Orphan Design</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">Implementation Requirement — Requirements nennen Technologie-Entscheidungen die erst im Design getroffen werden sollten. "Python" und "SQLite" gehoeren in die Design Spec.</div>
+    </div>
+    <div class="question">
+      <p>2. Ein Task beruehrt bot.py, handlers/search.py, services/notion_search.py, config.py und requirements.txt. Problem?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Kein Problem — ein Feature braucht manchmal viele Dateien</label>
+        <label><input type="radio" name="q2" value="b"> Macro Task — muss in 4-5 atomare Tasks aufgeteilt werden</label>
+        <label><input type="radio" name="q2" value="c"> Das ist ein Anti-Pattern nur wenn die KI es implementiert</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">Macro Task. Jede Datei sollte ihr eigener Task sein. Wenn bot.py und requirements.txt kleine Aenderungen sind, koennen sie zusammen sein — aber handlers/search.py + services/notion_search.py sind jeweils eigene Tasks.</div>
+    </div>
+    <div class="question">
+      <p>3. Welche Spec-Checkliste prueft "Kein Implementierungsdetail in FRs"?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Design Spec</label>
+        <label><input type="radio" name="q3" value="b"> Task Spec</label>
+        <label><input type="radio" name="q3" value="c"> Requirement Spec</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">Requirement Spec — FRs sind Functional Requirements, die nur in Requirement Specs vorkommen. Dort gilt: keine Implementierungsdetails.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #0f2e1e; border-radius: 8px; border: 1px solid #064e3b">
+    <p style="margin: 0 0 0.5rem; color: #6ee7b7; font-weight: 600; font-size: 0.9rem">AI-Specs Lernreihe abgeschlossen</p>
+    <p style="margin: 0; color: #475569; font-size: 0.85rem">Du kennst jetzt die drei Spec-Typen, ihre Strukturen, den vollstaendigen Workflow und die haeufigsten Fehler. Naechster Schritt: Ein echtes Feature in deinen Projekten komplett durchspecen.</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 06: JOINs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .fn { color: #34d399; font-weight: 600; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .highlight { color: #f472b6; }
+  .join-visual { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .join-visual h3 { color: #e2e8f0; font-size: 1rem; margin-bottom: 1rem; }
+  .venn { display: flex; align-items: center; justify-content: center; gap: 0; margin: 1rem 0; position: relative; height: 80px; }
+  .circle { width: 100px; height: 70px; border-radius: 50%; position: absolute; opacity: 0.6; }
+  .circle-left { background: #818cf8; left: calc(50% - 80px); }
+  .circle-right { background: #34d399; left: calc(50% - 30px); }
+  .circle-overlap { background: #f472b6; left: calc(50% - 55px); width: 60px; opacity: 0.8; }
+  .venn-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; padding: 0 1rem; }
+  .join-desc { font-size: 0.85rem; color: #94a3b8; margin-top: 0.75rem; }
+  .tables-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .mini-table { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; overflow: hidden; }
+  .mini-table-title { padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
+  .t-spieler { color: #818cf8; }
+  .t-scores { color: #34d399; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  th { background: #0f0f14; color: #475569; text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid #1e1e2e; }
+  td { padding: 0.4rem 0.75rem; border-bottom: 1px solid #13131f; color: #94a3b8; }
+  tr:last-child td { border-bottom: none; }
+  .pk { color: #f472b6; }
+  .fk { color: #818cf8; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 06</div>
+    <h1>JOINs</h1>
+    <p class="subtitle">Tabellen zusammenfuehren — INNER JOIN, LEFT JOIN, RIGHT JOIN</p>
+  </div>
+
+  <h2>Warum JOINs?</h2>
+  <p>Daten in relationalen Datenbanken sind auf mehrere Tabellen aufgeteilt. JOINs bringen sie fuer eine Abfrage zusammen — ohne Daten zu kopieren.</p>
+
+  <div class="tables-side">
+    <div class="mini-table">
+      <div class="mini-table-title t-spieler">spieler</div>
+      <table>
+        <tr><th>id</th><th>username</th></tr>
+        <tr><td class="pk">1</td><td>Alice</td></tr>
+        <tr><td class="pk">2</td><td>Bob</td></tr>
+        <tr><td class="pk">3</td><td>Carol</td></tr>
+      </table>
+    </div>
+    <div class="mini-table">
+      <div class="mini-table-title t-scores">scores</div>
+      <table>
+        <tr><th>id</th><th>spieler_id</th><th>punkte</th></tr>
+        <tr><td class="pk">1</td><td class="fk">1</td><td>4200</td></tr>
+        <tr><td class="pk">2</td><td class="fk">1</td><td>3800</td></tr>
+        <tr><td class="pk">3</td><td class="fk">2</td><td>1850</td></tr>
+      </table>
+    </div>
+  </div>
+  <p>Carol (id=3) hat keine Scores. Das ist wichtig fuer den Unterschied zwischen INNER und LEFT JOIN.</p>
+
+  <h2>INNER JOIN: nur Treffer auf beiden Seiten</h2>
+  <div class="code-block"><span class="kw">SELECT</span> s.username, sc.punkte
+<span class="kw">FROM</span> spieler s
+<span class="kw">INNER JOIN</span> scores sc <span class="kw">ON</span> s.id <span class="highlight">=</span> sc.spieler_id;
+<span class="output"> username | punkte
+----------+--------
+ Alice    |   4200
+ Alice    |   3800
+ Bob      |   1850
+<span class="comment">-- Carol taucht NICHT auf -- kein Score vorhanden</span></span></div>
+  <p>INNER JOIN gibt nur Zeilen zurueck die in BEIDEN Tabellen einen Treffer haben. Carol fehlt, weil sie keinen Score hat.</p>
+
+  <h2>LEFT JOIN: alle aus der linken Tabelle</h2>
+  <div class="code-block"><span class="kw">SELECT</span> s.username, sc.punkte
+<span class="kw">FROM</span> spieler s
+<span class="kw">LEFT JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id;
+<span class="output"> username | punkte
+----------+--------
+ Alice    |   4200
+ Alice    |   3800
+ Bob      |   1850
+ Carol    |   NULL   <span class="comment">-- Carol ist dabei, punkte ist NULL</span></span></div>
+  <p>LEFT JOIN gibt alle Zeilen aus der linken Tabelle (spieler) zurueck — auch wenn kein Treffer in der rechten Tabelle (scores) existiert. Fehlende Werte werden als NULL gezeigt.</p>
+
+  <h2>Alias: Tabellen abkuerzen</h2>
+  <div class="code-block"><span class="comment">-- s = spieler, sc = scores (Alias)</span>
+<span class="kw">SELECT</span> s.username, s.ist_aktiv, sc.punkte, sc.erreicht_am
+<span class="kw">FROM</span> spieler s
+<span class="kw">LEFT JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id
+<span class="kw">WHERE</span> sc.punkte <span class="highlight">></span> <span class="num">3000</span>
+<span class="kw">ORDER BY</span> sc.punkte <span class="kw">DESC</span>;</div>
+
+  <h2>Mehrere JOINs verketten</h2>
+  <div class="code-block"><span class="comment">-- Spieler + Scores + Items (3 Tabellen)</span>
+<span class="kw">SELECT</span>
+    s.username,
+    sc.punkte,
+    i.name <span class="kw">AS</span> item_name
+<span class="kw">FROM</span> spieler s
+<span class="kw">INNER JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id
+<span class="kw">LEFT JOIN</span>  spieler_items si <span class="kw">ON</span> s.id = si.spieler_id
+<span class="kw">LEFT JOIN</span>  items i <span class="kw">ON</span> si.item_id = i.id;</div>
+
+  <h2>Praxisbeispiel: Spieler-Highscore-Liste</h2>
+  <div class="code-block"><span class="comment">-- Bester Score je Spieler mit Spieler-Name</span>
+<span class="kw">SELECT</span>
+    s.username,
+    <span class="fn">MAX</span>(sc.punkte) <span class="kw">AS</span> highscore,
+    <span class="fn">COUNT</span>(sc.id) <span class="kw">AS</span> anzahl_versuche
+<span class="kw">FROM</span> spieler s
+<span class="kw">LEFT JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id
+<span class="kw">GROUP BY</span> s.id, s.username
+<span class="kw">ORDER BY</span> highscore <span class="kw">DESC NULLS LAST</span>;
+<span class="output"> username | highscore | anzahl_versuche
+----------+-----------+----------------
+ Carol    |      NULL |               0
+ Alice    |      4200 |               2
+ Bob      |      1850 |               1</span></div>
+
+  <div class="insight">
+    <code>NULLS LAST</code> schiebt NULL-Werte ans Ende der Sortierung. Ohne NULLS LAST wuerden NULL-Werte bei DESC ganz oben erscheinen.
+  </div>
+
+  <h2>RIGHT JOIN und FULL OUTER JOIN</h2>
+  <div class="code-block"><span class="comment">-- RIGHT JOIN: alle aus der rechten Tabelle (selten genutzt)</span>
+<span class="comment">-- Kann immer als LEFT JOIN umgeschrieben werden</span>
+
+<span class="comment">-- FULL OUTER JOIN: alle aus beiden Tabellen</span>
+<span class="kw">SELECT</span> s.username, sc.punkte
+<span class="kw">FROM</span> spieler s
+<span class="kw">FULL OUTER JOIN</span> scores sc <span class="kw">ON</span> s.id = sc.spieler_id;
+<span class="comment">-- Spieler ohne Score UND Scores ohne Spieler (Datenintegritaetsproblem)</span></div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Du willst ALLE Spieler anzeigen, auch die ohne Scores. Welcher JOIN?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> INNER JOIN</label>
+        <label><input type="radio" name="q1" value="b"> LEFT JOIN (spieler links, scores rechts)</label>
+        <label><input type="radio" name="q1" value="c"> RIGHT JOIN (scores links, spieler rechts)</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — LEFT JOIN mit spieler als linker Tabelle gibt ALLE Spieler zurueck. Spieler ohne Score bekommen NULL in den Score-Feldern. INNER JOIN wuerde Spieler ohne Score weglassen.</div>
+    </div>
+    <div class="question">
+      <p>2. Wozu dienen Tabellen-Aliases (s, sc) in JOINs?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Pflicht bei JOINs</label>
+        <label><input type="radio" name="q2" value="b"> Kurzschreibweise um doppelte Spaltennamen zu unterscheiden und Lesbarkeit zu erhoehen</label>
+        <label><input type="radio" name="q2" value="c"> Erstellen eine neue temporaere Tabelle</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Ohne Alias: spieler.id vs scores.spieler_id — lesbar aber laenger. Mit Alias s.id vs sc.spieler_id — kuerzer. Ohne Alias sind Spalten mit gleichem Namen (z.B. beide haben "name") nicht unterscheidbar.</div>
+    </div>
+    <div class="question">
+      <p>3. Was ist der Unterschied zwischen INNER JOIN und LEFT JOIN wenn alle Zeilen Treffer haben?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> LEFT JOIN ist immer langsamer</label>
+        <label><input type="radio" name="q3" value="b"> Kein Unterschied im Ergebnis — beide geben alle Zeilen zurueck</label>
+        <label><input type="radio" name="q3" value="c"> INNER JOIN verdoppelt die Spalten</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Wenn jede Zeile links einen Treffer rechts hat, ist das Ergebnis identisch. Der Unterschied zeigt sich nur wenn KEINE Treffer vorhanden sind: LEFT JOIN behaelt die linke Zeile mit NULL, INNER JOIN wirft sie weg.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Subqueries und CTEs — Abfragen in Abfragen und WITH-Klauseln.</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 01: Die drei Spec-Typen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card.requirement { border-left: 4px solid #818cf8; }
+  .card.design      { border-left: 4px solid #34d399; }
+  .card.task        { border-left: 4px solid #f472b6; }
+  .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; }
+  .badge.req { background: #312e81; color: #a5b4fc; }
+  .badge.des { background: #064e3b; color: #6ee7b7; }
+  .badge.tsk { background: #4a044e; color: #f0abfc; }
+  .key-question { font-size: 1.3rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.5rem; }
+  .audience { font-size: 0.85rem; color: #64748b; }
+  .flow { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 0; flex-wrap: wrap; }
+  .flow-item { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.9rem; }
+  .flow-arrow { color: #475569; font-size: 1.2rem; }
+  .example-box { background: #13131f; border: 1px solid #1e1e2e; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 0.75rem; }
+  .example-box .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin-bottom: 0.4rem; }
+  .example-box p { color: #94a3b8; font-size: 0.9rem; margin: 0; font-style: italic; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; }
+  tr:last-child td { border-bottom: none; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 01</div>
+    <h1>Die drei Spec-Typen</h1>
+    <p class="subtitle">Requirement &middot; Design &middot; Task &mdash; wer sie schreibt, wer sie liest, was sie beantworten</p>
+  </div>
+
+  <h2>Das Kernprinzip</h2>
+  <p>Jede Spec beantwortet eine andere Frage. Wenn du die drei Fragen kennst, weisst du immer welche Spec du gerade brauchst.</p>
+
+  <div class="flow">
+    <div class="flow-item">Requirement: <strong>Was?</strong></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-item">Design: <strong>Wie?</strong></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-item">Task: <strong>Mach!</strong></div>
+  </div>
+
+  <p>Die drei Typen sind eine Kette. Ohne Requirement weiss das Design nicht, was es loesen soll. Ohne Design weiss der Task nicht, wie er es umsetzen soll.</p>
+
+  <h2>Typ 1: Requirement Spec</h2>
+  <div class="card requirement">
+    <span class="badge req">REQUIREMENT</span>
+    <div class="key-question">Was soll das System tun?</div>
+    <div class="audience">Zielgruppe: du selbst, Stakeholder, KI-Agent der plant</div>
+    <p style="margin-top: 1rem">Beschreibt das Problem und die gewuenschten Faehigkeiten &mdash; nicht die Loesung. Kein Code, keine Architektur. Nur: Was braucht der Nutzer?</p>
+    <div class="example-box">
+      <div class="label">Beispiel &mdash; Telegram Bot Feature</div>
+      <p>"Der Bot soll Nutzern ermoeglichen, neue Aufgaben per Chat-Nachricht in Notion anzulegen. Der Nutzer soll Titel, Prioritaet und Datum angeben koennen. Der Bot bestaetigt die Erstellung."</p>
+    </div>
+  </div>
+
+  <h2>Typ 2: Design Spec</h2>
+  <div class="card design">
+    <span class="badge des">DESIGN</span>
+    <div class="key-question">Wie wird es gebaut?</div>
+    <div class="audience">Zielgruppe: du (als Entwickler), KI-Agent der implementiert</div>
+    <p style="margin-top: 1rem">Uebersetzt Requirements in technische Entscheidungen. Welche Komponenten? Welche APIs? Welcher Datenfluss? Noch kein Code &mdash; aber konkret genug, dass ein Entwickler weiss wo er anfangen soll.</p>
+    <div class="example-box">
+      <div class="label">Beispiel &mdash; Telegram Bot Feature</div>
+      <p>"Handler <code>handle_task</code> in <code>handlers/task.py</code>. Parst Nachricht mit Regex <code>task: &lt;titel&gt; [prio:hoch] [datum:YYYY-MM-DD]</code>. Ruft <code>notion_client.create_page()</code> auf. Antwortet mit Inline-Keyboard fuer Bestaetigung."</p>
+    </div>
+  </div>
+
+  <h2>Typ 3: Task Spec</h2>
+  <div class="card task">
+    <span class="badge tsk">TASK</span>
+    <div class="key-question">Was genau ist zu tun?</div>
+    <div class="audience">Zielgruppe: KI-Agent der ausfuehrt, oder du beim Sprint-Planning</div>
+    <p style="margin-top: 1rem">Atomare, ausfuehrbare Einheit. Ein Task = eine Aenderung, eine Datei, eine Funktion. Kann von einer KI ohne Rueckfragen umgesetzt werden. Abhaengigkeiten sind explizit.</p>
+    <div class="example-box">
+      <div class="label">Beispiel &mdash; Telegram Bot Feature</div>
+      <p>"Erstelle <code>handlers/task.py</code> mit Funktion <code>handle_task(update, context)</code>. Importiere <code>notion_client</code> aus <code>services/notion.py</code>. Gib <code>None</code> zurueck. Registriere Handler in <code>bot.py</code> Zeile 47."</p>
+    </div>
+  </div>
+
+  <h2>Vergleich auf einen Blick</h2>
+  <div class="card" style="padding: 0; overflow: hidden">
+    <table>
+      <tr><th>Typ</th><th>Kernfrage</th><th>Granularitaet</th><th>Liest wer</th></tr>
+      <tr><td style="color: #818cf8">Requirement</td><td>Was?</td><td>Feature-Level</td><td>Planer, Stakeholder</td></tr>
+      <tr><td style="color: #34d399">Design</td><td>Wie?</td><td>Komponenten-Level</td><td>Entwickler, KI</td></tr>
+      <tr><td style="color: #f472b6">Task</td><td>Mach!</td><td>Datei/Funktion</td><td>KI-Agent, du</td></tr>
+    </table>
+  </div>
+
+  <div class="insight">
+    Im AI-Engineering-Kontext bist du oft alle drei Rollen gleichzeitig. Die Spec-Hierarchie hilft dir, nicht alles auf einmal zu denken &mdash; erst Was, dann Wie, dann Mach.
+  </div>
+
+  <h2>Haeufigster Fehler: Requirements und Design vermischen</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem">
+    <div class="example-box">
+      <div class="label" style="color: #f87171">x Vermischt</div>
+      <p>"Der Bot soll einen <code>CommandHandler</code> fuer /task registrieren und Notion API aufrufen."</p>
+    </div>
+    <div class="example-box">
+      <div class="label" style="color: #6ee7b7">OK Getrennt</div>
+      <p>Req: "Nutzer kann Task per Bot anlegen."<br>Design: "<code>CommandHandler</code>, Notion API."</p>
+    </div>
+  </div>
+  <p>Wenn Requirements Implementierungsdetails enthalten, verlierst du die Freiheit verschiedene Loesungsansaetze zu vergleichen.</p>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. "Die App soll Spieler-Highscores speichern und nach Punktzahl sortiert anzeigen." Welcher Spec-Typ?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Requirement Spec</label>
+        <label><input type="radio" name="q1" value="b"> Design Spec</label>
+        <label><input type="radio" name="q1" value="c"> Task Spec</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">Requirement Spec &mdash; beschreibt WAS (speichern + anzeigen), nicht WIE (kein Schema, keine API, keine Klassen).</div>
+    </div>
+    <div class="question">
+      <p>2. "Erstelle Tabelle <code>scores(id SERIAL, player TEXT, points INT)</code>. Fuege Index auf <code>points DESC</code> hinzu." Welcher Typ?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Requirement Spec</label>
+        <label><input type="radio" name="q2" value="b"> Design Spec</label>
+        <label><input type="radio" name="q2" value="c"> Task Spec</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">Task Spec &mdash; atomar, ausfuehrbar, konkret bis auf Spaltennamen. Ein KI-Agent koennte das direkt umsetzen.</div>
+    </div>
+    <div class="question">
+      <p>3. Was fehlt zwischen Requirement und Task?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Nichts &mdash; man kann Requirements direkt in Tasks aufbrechen</label>
+        <label><input type="radio" name="q3" value="b"> Design Spec &mdash; legt technische Entscheidungen fest bevor Tasks geschrieben werden</label>
+        <label><input type="radio" name="q3" value="c"> Code Review</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">Design Spec. Ohne sie wuerden verschiedene Entwickler (oder KI-Agenten) inkonsistente Architekturen bauen.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Requirement Spec schreiben &mdash; Struktur, haeufige Fehler, Beispiel am Telegram-Bot.</p>
+  </div>
+
+</div>
+</body>
+</html>

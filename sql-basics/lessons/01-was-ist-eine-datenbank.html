@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 01: Was ist eine Datenbank?</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .db-table { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+  .db-table-title { background: #13131f; padding: 0.6rem 1rem; font-size: 0.8rem; font-weight: 600; color: #818cf8; letter-spacing: 0.05em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; }
+  tr:last-child td { border-bottom: none; }
+  .pk { color: #f472b6; font-weight: 600; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .vs-box { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem; }
+  .vs-label { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .vs-box ul { margin-left: 1rem; font-size: 0.85rem; }
+  .concept { background: #1e1e2e; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .concept .term { color: #a5b4fc; font-weight: 600; font-size: 0.9rem; }
+  .concept .def { color: #94a3b8; font-size: 0.85rem; margin-top: 0.25rem; }
+  .why-pg { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+  .why-pg h3 { color: #e2e8f0; font-size: 0.95rem; margin-bottom: 0.75rem; }
+  .why-item { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; font-size: 0.88rem; color: #94a3b8; }
+  .why-icon { color: #818cf8; flex-shrink: 0; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 01</div>
+    <h1>Was ist eine Datenbank?</h1>
+    <p class="subtitle">Tabellen, Zeilen, Schluessel &mdash; die Grundbausteine relationaler Datenbanken</p>
+  </div>
+
+  <h2>Das Kern-Konzept: Tabellen</h2>
+  <p>Eine relationale Datenbank speichert Daten in <strong>Tabellen</strong>. Eine Tabelle ist wie ein Excel-Sheet mit einer wichtigen Einschraenkung: jede Spalte hat einen festen Datentyp und jede Zeile repraesentiert genau einen Datensatz.</p>
+
+  <div class="db-table">
+    <div class="db-table-title">Tabelle: spieler</div>
+    <table>
+      <tr><th>id</th><th>name</th><th>punkte</th><th>registriert_am</th></tr>
+      <tr><td class="pk">1</td><td>Alice</td><td>4200</td><td>2024-01-15</td></tr>
+      <tr><td class="pk">2</td><td>Bob</td><td>1850</td><td>2024-02-03</td></tr>
+      <tr><td class="pk">3</td><td>Carol</td><td>7340</td><td>2024-01-28</td></tr>
+    </table>
+  </div>
+
+  <div class="concept">
+    <div class="term">Tabelle (Table)</div>
+    <div class="def">Sammlung gleichartiger Datensaetze. Entspricht einer Klasse in OOP — jede Zeile ist eine Instanz.</div>
+  </div>
+  <div class="concept">
+    <div class="term">Zeile (Row / Record)</div>
+    <div class="def">Ein einzelner Datensatz. "Alice hat 4200 Punkte" = eine Zeile.</div>
+  </div>
+  <div class="concept">
+    <div class="term">Spalte (Column / Field)</div>
+    <div class="def">Eine Eigenschaft aller Datensaetze. "punkte" ist eine Spalte — alle Spieler haben Punkte.</div>
+  </div>
+  <div class="concept">
+    <div class="term">Primary Key (PK)</div>
+    <div class="def">Eindeutige ID jedes Datensatzes. In der Tabelle oben: <code>id</code>. Kein Datensatz darf dieselbe ID haben.</div>
+  </div>
+
+  <h2>Datenbank vs. Excel: der Unterschied</h2>
+  <div class="vs">
+    <div class="vs-box">
+      <div class="vs-label" style="color: #94a3b8">Excel / Tabellenkalkulation</div>
+      <ul>
+        <li>Spalten koennen gemischte Typen haben</li>
+        <li>Keine erzwungene Eindeutigkeit</li>
+        <li>Abfragen per Formel, schwer zu automatisieren</li>
+        <li>Gut fuer: kleine Datasets, Visualisierung</li>
+        <li>Schlecht fuer: mehrere Benutzer gleichzeitig</li>
+      </ul>
+    </div>
+    <div class="vs-box">
+      <div class="vs-label" style="color: #818cf8">Relationale Datenbank</div>
+      <ul>
+        <li>Jede Spalte hat exakten Typ (INTEGER, TEXT...)</li>
+        <li>Primary Key erzwingt Eindeutigkeit</li>
+        <li>Abfragen per SQL, vollstaendig automatisierbar</li>
+        <li>Gut fuer: grosse Datasets, mehrere Apps</li>
+        <li>Gut fuer: gleichzeitige Schreibzugriffe</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Warum PostgreSQL?</h2>
+  <div class="why-pg">
+    <h3>In Deutschland am weitesten verbreitet fuer professionelle Projekte</h3>
+    <div class="why-item"><span class="why-icon">+</span><span>Open Source, kostenlos, kein Vendor Lock-in</span></div>
+    <div class="why-item"><span class="why-icon">+</span><span>Leistungsstaerkste Open-Source-RDBMS — unterstuetzt JSON, Window Functions, CTEs</span></div>
+    <div class="why-item"><span class="why-icon">+</span><span>Dart/Flutter: Supabase (PostgreSQL-Backend) ist der Standard fuer Indie-Apps</span></div>
+    <div class="why-item"><span class="why-icon">+</span><span>Datenanalyse: unterstuetzt analytische Abfragen die MySQL nicht kann</span></div>
+    <div class="why-item"><span class="why-icon">+</span><span>Spiele-Backend: Supabase Realtime, Row Level Security fuer Multiplayer</span></div>
+  </div>
+
+  <h2>Mehrere Tabellen: das relationale Prinzip</h2>
+  <p>Eine Datenbank hat meistens mehrere Tabellen, die miteinander verknuepft sind. Das ist das "relationale" in "relational".</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem">
+    <div class="db-table">
+      <div class="db-table-title">Tabelle: spieler</div>
+      <table>
+        <tr><th>id</th><th>name</th></tr>
+        <tr><td class="pk">1</td><td>Alice</td></tr>
+        <tr><td class="pk">2</td><td>Bob</td></tr>
+      </table>
+    </div>
+    <div class="db-table">
+      <div class="db-table-title">Tabelle: scores</div>
+      <table>
+        <tr><th>id</th><th>spieler_id</th><th>punkte</th></tr>
+        <tr><td class="pk">1</td><td style="color: #818cf8">1</td><td>4200</td></tr>
+        <tr><td class="pk">2</td><td style="color: #818cf8">1</td><td>3800</td></tr>
+        <tr><td class="pk">3</td><td style="color: #818cf8">2</td><td>1850</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p><code>spieler_id</code> in der scores-Tabelle verweist auf <code>id</code> in der spieler-Tabelle. Alice (id=1) hat zwei Score-Eintraege. Das ist ein <strong>Foreign Key</strong> — mehr dazu in Lektion 08.</p>
+
+  <div class="insight">
+    Datenbanken trennen Daten von Logik. Deine Dart-App, ein Python-Script und ein Web-Frontend koennen alle auf dieselbe PostgreSQL-Datenbank zugreifen — jeder liest und schreibt dieselben Daten.
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was ist der Unterschied zwischen einer Zeile und einer Spalte?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Zeile = eine Eigenschaft aller Datensaetze, Spalte = ein einzelner Datensatz</label>
+        <label><input type="radio" name="q1" value="b"> Zeile = ein einzelner Datensatz, Spalte = eine Eigenschaft aller Datensaetze</label>
+        <label><input type="radio" name="q1" value="c"> Kein Unterschied, nur verschiedene Namen</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Zeile: "Alice, 4200, 2024-01-15" = ein Spieler. Spalte: "punkte" = die Punkte-Eigenschaft aller Spieler.</div>
+    </div>
+    <div class="question">
+      <p>2. Warum braucht jede Tabelle einen Primary Key?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Pflicht gemaess SQL-Standard ohne praktischen Nutzen</label>
+        <label><input type="radio" name="q2" value="b"> Damit jeder Datensatz eindeutig identifizierbar ist — auch wenn andere Felder identisch sind</label>
+        <label><input type="radio" name="q2" value="c"> Nur fuer grosse Tabellen mit mehr als 1000 Zeilen</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Zwei Spieler koennen "Alice" heissen. Mit PK-ID 1 und 2 sind beide trotzdem eindeutig. Ohne PK kann man keinen bestimmten Datensatz gezielt ansprechen oder veraendern.</div>
+    </div>
+    <div class="question">
+      <p>3. Alice hat zwei Eintraege in der scores-Tabelle (4200 und 3800 Punkte). Wie ist das moeglich?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Alice hat zwei Primary Keys in der spieler-Tabelle</label>
+        <label><input type="radio" name="q3" value="b"> Beide Score-Eintraege referenzieren Alices ID (1) via spieler_id — Foreign Key</label>
+        <label><input type="radio" name="q3" value="c"> Das ist ein Fehler — eine Person darf nur einen Score haben</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Alice bleibt eine Zeile in spieler (id=1). Aber scores kann beliebig viele Zeilen mit spieler_id=1 haben. Das ist eine 1:N-Beziehung — ein Spieler, viele Scores.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> PostgreSQL erste Schritte — Installation, psql, erste Datenbank erstellen.</p>
+  </div>
+
+</div>
+</body>
+</html>

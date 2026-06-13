@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 02: Requirement Spec schreiben</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #475569; margin-bottom: 0.4rem; }
+  .good { border-left: 4px solid #34d399; }
+  .bad  { border-left: 4px solid #f87171; }
+  .template { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre-wrap; margin-bottom: 1rem; }
+  .keyword { color: #818cf8; font-weight: 600; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .rule { background: #1e1e2e; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .rule-num { background: #312e81; color: #a5b4fc; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+  .rule p { margin: 0; font-size: 0.9rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 02</div>
+    <h1>Requirement Spec schreiben</h1>
+    <p class="subtitle">Struktur, Regeln und ein vollstaendiges Beispiel am Telegram-Bot</p>
+  </div>
+
+  <h2>Was eine Requirement Spec enthalten muss</h2>
+  <p>Eine Requirement Spec hat genau fuenf Abschnitte. Jeder Abschnitt beantwortet eine spezifische Frage.</p>
+
+  <div class="template"><span class="keyword"># [Feature-Name] — Requirement Spec</span>
+
+<span class="keyword">## Problem</span>
+Wer hat das Problem? Was ist das Problem? Warum existiert es?
+
+<span class="keyword">## Ziel</span>
+Was soll nach der Umsetzung moeglich sein? (Ein Satz, messbar)
+
+<span class="keyword">## Funktionale Anforderungen</span>
+- FR-01: Das System MUSS ... [Pflicht]
+- FR-02: Das System SOLL ... [Wunsch]
+- FR-03: Das System KANN ... [Optional]
+
+<span class="keyword">## Nicht-funktionale Anforderungen</span>
+- NFR-01: Antwortzeit unter 3 Sekunden
+- NFR-02: Fehler werden dem Nutzer klar kommuniziert
+
+<span class="keyword">## Nicht im Scope</span>
+- Was explizit NICHT umgesetzt wird (verhindert Scope Creep)</div>
+
+  <h2>Die drei Schluesselwoerter: MUSS / SOLL / KANN</h2>
+  <p>Diese Unterscheidung ist wichtig. Nicht alle Anforderungen haben das gleiche Gewicht.</p>
+  <div class="card" style="padding: 0; overflow: hidden">
+    <table style="width:100%; border-collapse: collapse; font-size: 0.88rem">
+      <tr style="background:#13131f"><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Wort</th><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Bedeutung</th><th style="padding:0.6rem 1rem; text-align:left; color:#94a3b8; border-bottom:1px solid #2d2d3f">Konsequenz</th></tr>
+      <tr style="border-bottom:1px solid #1e1e2e"><td style="padding:0.6rem 1rem; color:#f87171">MUSS</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Pflicht — ohne geht nicht</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Blocker fuer Release</td></tr>
+      <tr style="border-bottom:1px solid #1e1e2e"><td style="padding:0.6rem 1rem; color:#fbbf24">SOLL</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Stark gewuenscht</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Wichtig, aber verhandelbar</td></tr>
+      <tr><td style="padding:0.6rem 1rem; color:#6ee7b7">KANN</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Nice-to-have</td><td style="padding:0.6rem 1rem; color:#cbd5e1">Nur wenn Zeit vorhanden</td></tr>
+    </table>
+  </div>
+
+  <h2>Die 4 Regeln</h2>
+  <div class="rule"><div class="rule-num">1</div><p><strong>Loesungsunabhaengig:</strong> Beschreibe WAS, nicht WIE. Kein Code, keine Architektur, keine Bibliotheken.</p></div>
+  <div class="rule"><div class="rule-num">2</div><p><strong>Messbar:</strong> "schnell" ist keine Anforderung. "unter 3 Sekunden" ist eine.</p></div>
+  <div class="rule"><div class="rule-num">3</div><p><strong>Eine Anforderung pro FR:</strong> "Das System soll X und Y" &rarr; aufteilen in FR-01 und FR-02.</p></div>
+  <div class="rule"><div class="rule-num">4</div><p><strong>Out of Scope explizit:</strong> Was NICHT gemacht wird, ist genauso wichtig wie was gemacht wird.</p></div>
+
+  <h2>Vollstaendiges Beispiel: suche:-Feature des Telegram-Bots</h2>
+  <div class="template"><span class="keyword"># suche: Dispatcher — Requirement Spec</span>
+
+<span class="keyword">## Problem</span>
+Nutzer des Telegram-Bots moechten Inhalte aus ihren Notion-Datenbanken
+finden, ohne Notion oeffnen zu muessen. Aktuell gibt es keinen
+einheitlichen Sucheinstieg im Bot.
+
+<span class="keyword">## Ziel</span>
+Nutzer koennen per "suche: &lt;Begriff&gt;" alle fuenf Notion-Datenbanken
+durchsuchen und Ergebnisse innerhalb von 5 Sekunden erhalten.
+
+<span class="keyword">## Funktionale Anforderungen</span>
+- FR-01: Der Bot MUSS auf Nachrichten mit Praefix "suche: " reagieren
+- FR-02: Der Bot MUSS Tagesorganizer, Backlog, Lernthemen,
+          Spieleideen und Archiv durchsuchen
+- FR-03: Ergebnisse MUESSEN nach Datenbank gruppiert angezeigt werden
+- FR-04: Leere Ergebnisse MUESSEN dem Nutzer klar kommuniziert werden
+- FR-05: Der Bot SOLL maximal 5 Ergebnisse pro Datenbank zeigen
+- FR-06: Der Bot KANN direkte Links zu gefundenen Seiten anzeigen
+
+<span class="keyword">## Nicht-funktionale Anforderungen</span>
+- NFR-01: Antwort in unter 5 Sekunden
+- NFR-02: Fehler (Notion API nicht erreichbar) werden als klare
+           Fehlermeldung zurueckgegeben, nicht als leere Antwort
+
+<span class="keyword">## Nicht im Scope</span>
+- Volltextsuche innerhalb von Seiteninhalten (nur Titelsuche)
+- Suche in anderen Workspaces
+- Filterfunktionen (nach Datum, Status etc.)</div>
+
+  <div class="insight">
+    Bemerkst du: Die Spec erwaehnt keine Python-Funktion, keine Notion-API-Methode, keine Dateistruktur. Das kommt erst in der Design Spec.
+  </div>
+
+  <h2>Gut vs. Schlecht</h2>
+  <div class="card bad" style="margin-bottom: 0.5rem">
+    <div class="section-label" style="color: #f87171">x Schlecht</div>
+    <p style="margin:0; font-size: 0.9rem; font-style: italic">"FR-01: Die Funktion <code>handle_search()</code> in <code>handlers/search.py</code> soll die Notion API mit <code>client.search()</code> aufrufen."</p>
+  </div>
+  <div class="card good">
+    <div class="section-label" style="color: #6ee7b7">OK Gut</div>
+    <p style="margin:0; font-size: 0.9rem; font-style: italic">"FR-01: Der Bot MUSS auf Nachrichten mit Praefix 'suche: ' reagieren und die Notion-Datenbanken durchsuchen."</p>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Welche dieser Anforderungen ist loesungsunabhaengig formuliert?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> "Das System soll SQLite als Datenbank verwenden"</label>
+        <label><input type="radio" name="q1" value="b"> "Das System MUSS Nutzerdaten persistent speichern"</label>
+        <label><input type="radio" name="q1" value="c"> "Das System soll <code>sqlite3.connect()</code> aufrufen"</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — "persistent speichern" beschreibt WAS ohne WIE. A und C nennen bereits konkrete Implementierungsdetails.</div>
+    </div>
+    <div class="question">
+      <p>2. Was fehlt in dieser Anforderung: "Der Bot soll schnell antworten"?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Das MUSS/SOLL/KANN-Keyword</label>
+        <label><input type="radio" name="q2" value="b"> Ein messbares Kriterium (z.B. "unter 3 Sekunden")</label>
+        <label><input type="radio" name="q2" value="c"> Ein Verweis auf die Design Spec</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — "schnell" ist nicht testbar. Niemand kann pruefen ob "schnell" erfuellt ist. "Unter 3 Sekunden" schon.</div>
+    </div>
+    <div class="question">
+      <p>3. Warum ist der "Nicht im Scope"-Abschnitt wichtig?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Damit die Spec laenger wirkt</label>
+        <label><input type="radio" name="q3" value="b"> Verhindert Scope Creep — explizit was NICHT gebaut wird</label>
+        <label><input type="radio" name="q3" value="c"> Wird nur bei Enterprise-Projekten benoetigt</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Ohne expliziten Out-of-Scope wachsen Features unkontrolliert. "Koennen wir noch schnell X hinzufuegen?" wird durch Out-of-Scope klar mit Nein beantwortet.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Design Spec schreiben — Architektur-Entscheidungen, Datenfluss, Komponenten fuer den Bot.</p>
+  </div>
+
+</div>
+</body>
+</html>

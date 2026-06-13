@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 05: Die Spec-Kette in der Praxis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .template { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.84rem; color: #94a3b8; white-space: pre-wrap; margin-bottom: 1.5rem; }
+  .req-kw { color: #818cf8; font-weight: 600; }
+  .des-kw { color: #34d399; font-weight: 600; }
+  .tsk-kw { color: #f472b6; font-weight: 600; }
+  .comment { color: #475569; }
+  .step { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-start; }
+  .step-num { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 1rem; font-weight: 700; color: #f8fafc; flex-shrink: 0; min-width: 2.5rem; text-align: center; }
+  .step-content h3 { color: #e2e8f0; font-size: 1rem; margin-bottom: 0.25rem; }
+  .step-content p { margin: 0; font-size: 0.9rem; }
+  .phase-header { display: flex; align-items: center; gap: 0.75rem; margin: 2rem 0 1rem; }
+  .phase-badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+  .phase-req { background: #312e81; color: #a5b4fc; }
+  .phase-des { background: #064e3b; color: #6ee7b7; }
+  .phase-tsk { background: #4a044e; color: #f0abfc; }
+  .phase-label { color: #94a3b8; font-size: 0.85rem; }
+  .insight { background: #1c1c2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #94a3b8; font-size: 0.9rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #1e1e2e; border: 1px solid #2d2d3f; color: #94a3b8; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 05</div>
+    <h1>Die Spec-Kette in der Praxis</h1>
+    <p class="subtitle">Ein Feature komplett von Requirement bis Tasks durchspecen — am Beispiel "Erinnerungen"</p>
+  </div>
+
+  <h2>Der Prozess</h2>
+  <p>Die Spec-Kette ist kein Wasserfall den man einmal komplett durchlaeuft. Es ist ein iterativer Prozess: grob spechen, dann verfeinern. Aber die Reihenfolge Req > Design > Tasks ist immer gleich.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <h3>Problem identifizieren</h3>
+      <p>Was fehlt? Wer braucht es? Warum jetzt? Das ist die Eingabe fuer die Requirement Spec.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <h3>Requirement Spec schreiben (30-60 Min)</h3>
+      <p>WAS soll das System koennen? Messbarer Zielzustand, FRs mit MUSS/SOLL/KANN, Out of Scope.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <h3>Design Spec ableiten (45-90 Min)</h3>
+      <p>WIE wird es gebaut? Komponenten, Datenfluss, Signaturen, Entscheidungen.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <h3>Tasks ableiten (30 Min)</h3>
+      <p>Jeden Schritt im Datenfluss in einen atomaren Task uebersetzen. Abhaengigkeiten eintragen.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <h3>KI implementiert Tasks sequentiell</h3>
+      <p>Jeden Task einzeln an KI-Agent uebergeben. Akzeptanzkriterien pruefen. Naechsten Task starten.</p>
+    </div>
+  </div>
+
+  <div class="phase-header">
+    <span class="phase-badge phase-req">REQUIREMENT</span>
+    <span class="phase-label">Schritt 2: Was soll das Erinnerungen-Feature koennen?</span>
+  </div>
+
+  <div class="template"><span class="req-kw"># Erinnerungen — Requirement Spec</span>
+
+<span class="req-kw">## Problem</span>
+Nutzer vergessen Tasks und Termine, die sie im Telegram-Bot angelegt haben.
+Es gibt keine automatische Benachrichtigung zu faelligen Punkten.
+
+<span class="req-kw">## Ziel</span>
+Nutzer erhalten um eine selbst festgelegte Uhrzeit taeglich eine
+Telegram-Nachricht mit ihren heutigen Tasks und Terminen.
+
+<span class="req-kw">## Funktionale Anforderungen</span>
+- FR-01: Das System MUSS taeglich um eine konfigurierte Uhrzeit eine
+          Zusammenfassung senden
+- FR-02: Die Zusammenfassung MUSS alle heutigen Tasks (Tagesorganizer)
+          enthalten
+- FR-03: Nutzer MUSS die Uhrzeit per Bot-Befehl aendern koennen
+- FR-04: Nutzer KANN die Erinnerung per Befehl deaktivieren
+- FR-05: Die Uhrzeit SOLL persistent gespeichert werden (ueberleben Neustart)
+
+<span class="req-kw">## Nicht-funktionale Anforderungen</span>
+- NFR-01: Nachricht kommt innerhalb von 1 Minute der konfigurierten Uhrzeit an
+- NFR-02: Kein Absturz wenn Notion API nicht erreichbar — Fehler als Nachricht
+
+<span class="req-kw">## Nicht im Scope</span>
+- Push-Benachrichtigungen an mehrere Nutzer
+- Anpassbare Nachrichteninhalte (Format ist fix)
+- Integration mit externen Kalender-Apps</div>
+
+  <div class="phase-header">
+    <span class="phase-badge phase-des">DESIGN</span>
+    <span class="phase-label">Schritt 3: Wie wird es technisch umgesetzt?</span>
+  </div>
+
+  <div class="template"><span class="des-kw"># Erinnerungen — Design Spec</span>
+
+<span class="comment">Referenz: Requirement Spec Erinnerungen</span>
+
+<span class="des-kw">## Uebersicht</span>
+Python APScheduler sendet taeglich zur konfigurierten Uhrzeit eine
+Notion-Tagesansicht als Telegram-Nachricht. Konfiguration wird in
+reminders.json persistent gespeichert.
+
+<span class="des-kw">## Komponenten</span>
+- `services/reminder.py` (neu) — Scheduler-Setup, Job-Logik
+- `handlers/reminder_cmd.py` (neu) — /erinnere HH:MM, /keine-erinnerung
+- `reminders.json` (neu) — persistente Konfiguration {chat_id: "HH:MM"}
+- `bot.py` (veraendert) — Scheduler-Start beim Bot-Start
+
+<span class="des-kw">## Datenfluss</span>
+Setup:
+1. Bot-Start: reminder.py laedt reminders.json
+2. Fuer jede chat_id: APScheduler-Job anlegen mit cron-Trigger
+
+Taeglich:
+3. APScheduler triggert send_reminder(chat_id)
+4. Laedt heutige Tasks aus Notion (Tagesorganizer, Datum=heute)
+5. Formatiert als Telegram-Nachricht
+6. Sendet an chat_id
+
+Konfiguration:
+7. /erinnere 08:00 -> handler schreibt in reminders.json, aktualisiert Job
+8. /keine-erinnerung -> handler loescht Eintrag, entfernt Job
+
+<span class="des-kw">## Schnittstellen</span>
+- `setup_scheduler(app: Application) -> AsyncIOScheduler`
+- `send_reminder(chat_id: int, bot: Bot) -> None`
+- `handle_set_reminder(update, context) -> None`
+- `handle_cancel_reminder(update, context) -> None`
+
+<span class="des-kw">## Entscheidungen</span>
+- APScheduler: bereits bekanntes Scheduling-Muster, leichtgewichtig
+- reminders.json: einfach, kein Datenbank-Overhead fuer single-user Setup
+- Cron-Trigger statt Interval: praezise Uhrzeit-Kontrolle
+
+<span class="des-kw">## Offene Fragen</span>
+- Zeitzone: Europe/Berlin hardcoded oder konfigurierbar?</div>
+
+  <div class="phase-header">
+    <span class="phase-badge phase-tsk">TASKS</span>
+    <span class="phase-label">Schritt 4: Atomare Tasks aus dem Datenfluss ableiten</span>
+  </div>
+
+  <div class="template"><span class="tsk-kw">TASK-01:</span> Erstelle reminders.json Schema und Lese/Schreib-Helfer in services/reminder.py
+  Abh: keine | Datei: services/reminder.py (neu)
+  - Funktion load_reminders() -> dict
+  - Funktion save_reminders(data: dict) -> None
+  - Bei fehlendem File: leeres dict zurueckgeben
+
+<span class="tsk-kw">TASK-02:</span> Implementiere APScheduler-Setup in services/reminder.py
+  Abh: TASK-01 | Datei: services/reminder.py
+  - setup_scheduler(app) erstellt AsyncIOScheduler
+  - Laedt alle Eintraege aus reminders.json
+  - Erstellt CronTrigger-Job pro Eintrag
+  - Gibt scheduler-Instanz zurueck
+
+<span class="tsk-kw">TASK-03:</span> Implementiere send_reminder() in services/reminder.py
+  Abh: TASK-01 | Datei: services/reminder.py
+  - Laedt heutige Tasks aus Notion (Datum=heute, Status!=Done)
+  - Formatiert als Markdown-Nachricht
+  - Sendet via bot.send_message(chat_id)
+
+<span class="tsk-kw">TASK-04:</span> Erstelle handlers/reminder_cmd.py mit beiden Command-Handlern
+  Abh: TASK-01, TASK-02 | Datei: handlers/reminder_cmd.py (neu)
+  - handle_set_reminder: parst HH:MM, speichert, aktualisiert Job
+  - handle_cancel_reminder: loescht Eintrag aus JSON, entfernt Job
+
+<span class="tsk-kw">TASK-05:</span> Integriere Scheduler und Handler in bot.py
+  Abh: TASK-02, TASK-04 | Datei: bot.py
+  - Importiere setup_scheduler und Handler
+  - Starte Scheduler nach application.initialize()
+  - Registriere /erinnere und /keine-erinnerung CommandHandler</div>
+
+  <div class="insight">
+    Erkennst du das Muster? Jeder Schritt im Datenfluss der Design Spec wird zu genau einem Task. "Datenfluss-Schritt = Task" ist eine gute Faustregel.
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Du hast eine Requirement Spec aber keine Design Spec. Du fangst trotzdem mit Tasks an. Was passiert?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Alles gut — Tasks koennen direkt aus Requirements abgeleitet werden</label>
+        <label><input type="radio" name="q1" value="b"> Tasks werden inkonsistent — jeder (oder jede KI) trifft eigene Architektur-Entscheidungen</label>
+        <label><input type="radio" name="q1" value="c"> Die KI lehnt Tasks ohne Design Spec ab</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — Ohne Design Spec gibt es keinen vereinbarten Datenfluss. TASK-01 und TASK-02 koennen inkompatible Schnittstellen bauen ohne es zu merken.</div>
+    </div>
+    <div class="question">
+      <p>2. Wie viele Tasks sollte "Implementiere den kompletten Erinnerungen-Bot" sein?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Einer — es ist ein einzelnes Feature</label>
+        <label><input type="radio" name="q2" value="b"> Mindestens einer pro Datenfluss-Schritt (hier: 5)</label>
+        <label><input type="radio" name="q2" value="c"> Hunderte — jede Zeile Code ist ein eigener Task</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — Pro Datenfluss-Schritt ein Task. Hier: load/save, scheduler-setup, send_reminder, command-handler, integration = 5 Tasks. Das ist die richtige Granularitaet.</div>
+    </div>
+    <div class="question">
+      <p>3. Was ist die richtige Reihenfolge der Spec-Kette?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Tasks -> Design -> Requirement</label>
+        <label><input type="radio" name="q3" value="b"> Design -> Requirement -> Tasks</label>
+        <label><input type="radio" name="q3" value="c"> Requirement -> Design -> Tasks</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">C — Requirement zuerst (Was?), dann Design (Wie?), dann Tasks (Mach!). Die Kette kann nur in diese Richtung fliessen.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Specs fuer KI-Agenten optimieren — was macht eine Spec KI-freundlich?</p>
+  </div>
+
+</div>
+</body>
+</html>

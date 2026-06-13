@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 05: Filtern und Aggregieren</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .fn { color: #34d399; font-weight: 600; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .op { color: #f472b6; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .fn-card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: grid; grid-template-columns: 140px 1fr; gap: 1rem; align-items: center; }
+  .fn-name { font-family: monospace; color: #34d399; font-weight: 600; font-size: 0.88rem; }
+  .fn-desc { color: #94a3b8; font-size: 0.85rem; }
+  .order-diagram { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+  .order-item { display: flex; align-items: center; gap: 1rem; padding: 0.4rem 0; font-size: 0.88rem; }
+  .order-num { color: #818cf8; font-weight: 700; font-family: monospace; width: 1.5rem; }
+  .order-clause { font-family: monospace; color: #e2e8f0; width: 100px; }
+  .order-desc { color: #475569; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 05</div>
+    <h1>Filtern und Aggregieren</h1>
+    <p class="subtitle">AND/OR/IN/BETWEEN, Aggregatfunktionen, GROUP BY und HAVING</p>
+  </div>
+
+  <h2>Erweiterte WHERE-Bedingungen</h2>
+  <div class="code-block"><span class="comment">-- AND / OR / NOT</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> punkte <span class="op">></span> <span class="num">2000</span> <span class="kw">AND</span> ist_aktiv <span class="op">=</span> <span class="kw">TRUE</span>;
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> punkte <span class="op"><</span> <span class="num">1000</span> <span class="kw">OR</span> punkte <span class="op">></span> <span class="num">7000</span>;
+
+<span class="comment">-- IN: Einer aus einer Liste</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> username <span class="kw">IN</span> (<span class="str">'Alice'</span>, <span class="str">'Bob'</span>, <span class="str">'Carol'</span>);
+
+<span class="comment">-- NOT IN: Keiner aus der Liste</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> username <span class="kw">NOT IN</span> (<span class="str">'Alice'</span>, <span class="str">'Bob'</span>);
+
+<span class="comment">-- BETWEEN: inklusiver Bereich</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> punkte <span class="kw">BETWEEN</span> <span class="num">2000</span> <span class="kw">AND</span> <span class="num">5000</span>;
+
+<span class="comment">-- Datum-Bereich</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> scores
+<span class="kw">WHERE</span> erreicht_am <span class="kw">BETWEEN</span> <span class="str">'2024-01-01'</span> <span class="kw">AND</span> <span class="str">'2024-12-31'</span>;</div>
+
+  <h2>Aggregatfunktionen</h2>
+  <p>Aggregatfunktionen berechnen einen Wert ueber mehrere Zeilen. Ohne GROUP BY aggregieren sie die gesamte Tabelle.</p>
+
+  <div class="fn-card"><div class="fn-name">COUNT(*)</div><div class="fn-desc">Anzahl der Zeilen. COUNT(spalte) zaehlt Nicht-NULL-Werte.</div></div>
+  <div class="fn-card"><div class="fn-name">SUM(spalte)</div><div class="fn-desc">Summe aller Werte. SUM(punkte) = Gesamtpunkte.</div></div>
+  <div class="fn-card"><div class="fn-name">AVG(spalte)</div><div class="fn-desc">Durchschnitt. AVG(punkte) = mittlere Punktzahl.</div></div>
+  <div class="fn-card"><div class="fn-name">MAX(spalte)</div><div class="fn-desc">Groesster Wert. MAX(punkte) = Highscore.</div></div>
+  <div class="fn-card"><div class="fn-name">MIN(spalte)</div><div class="fn-desc">Kleinster Wert. MIN(punkte) = niedrigste Punktzahl.</div></div>
+
+  <div class="code-block"><span class="comment">-- Gesamte Tabelle aggregieren</span>
+<span class="kw">SELECT</span>
+    <span class="fn">COUNT</span>(*) <span class="kw">AS</span> spieler_anzahl,
+    <span class="fn">AVG</span>(punkte) <span class="kw">AS</span> durchschnitt,
+    <span class="fn">MAX</span>(punkte) <span class="kw">AS</span> highscore,
+    <span class="fn">SUM</span>(punkte) <span class="kw">AS</span> gesamt_punkte
+<span class="kw">FROM</span> spieler;
+<span class="output"> spieler_anzahl | durchschnitt | highscore | gesamt_punkte
+----------------+--------------+-----------+--------------
+              3 |      4463.33 |      7340 |         13390</span></div>
+
+  <h2>GROUP BY: Aggregieren nach Gruppen</h2>
+  <p>GROUP BY teilt die Tabelle in Gruppen auf und wendet Aggregatfunktionen auf jede Gruppe an.</p>
+
+  <div class="code-block"><span class="comment">-- Durchschnittliche Punkte pro Level</span>
+<span class="kw">SELECT</span> level, <span class="fn">AVG</span>(punkte) <span class="kw">AS</span> avg_punkte, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> anzahl
+<span class="kw">FROM</span> scores
+<span class="kw">GROUP BY</span> level
+<span class="kw">ORDER BY</span> level;
+<span class="output"> level | avg_punkte | anzahl
+-------+------------+--------
+     1 |    2340.50 |      8
+     2 |    4120.00 |      5
+     3 |    6890.25 |      4</span>
+
+<span class="comment">-- Wie viele Scores hat jeder Spieler?</span>
+<span class="kw">SELECT</span> spieler_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> anzahl_scores, <span class="fn">MAX</span>(punkte) <span class="kw">AS</span> bester_score
+<span class="kw">FROM</span> scores
+<span class="kw">GROUP BY</span> spieler_id
+<span class="kw">ORDER BY</span> bester_score <span class="kw">DESC</span>;</div>
+
+  <div class="insight">
+    Wichtige Regel: Jede Spalte im SELECT muss entweder in GROUP BY stehen ODER eine Aggregatfunktion sein. <code>SELECT name, AVG(punkte) FROM scores GROUP BY level</code> ist ein Fehler — name ist weder aggregiert noch in GROUP BY.
+  </div>
+
+  <h2>HAVING: GROUP BY filtern</h2>
+  <p>WHERE filtert einzelne Zeilen (vor Aggregation). HAVING filtert Gruppen (nach Aggregation).</p>
+
+  <div class="code-block"><span class="comment">-- Nur Spieler mit mehr als 3 Scores anzeigen</span>
+<span class="kw">SELECT</span> spieler_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> anzahl_scores
+<span class="kw">FROM</span> scores
+<span class="kw">GROUP BY</span> spieler_id
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) <span class="op">></span> <span class="num">3</span>;
+
+<span class="comment">-- WHERE (vor GROUP BY) + HAVING (nach GROUP BY)</span>
+<span class="kw">SELECT</span> spieler_id, <span class="fn">AVG</span>(punkte) <span class="kw">AS</span> avg
+<span class="kw">FROM</span> scores
+<span class="kw">WHERE</span> erreicht_am <span class="op">>=</span> <span class="str">'2024-01-01'</span>   <span class="comment">-- Filter auf Zeilen</span>
+<span class="kw">GROUP BY</span> spieler_id
+<span class="kw">HAVING</span> <span class="fn">AVG</span>(punkte) <span class="op">></span> <span class="num">3000</span>;           <span class="comment">-- Filter auf Gruppen</span></div>
+
+  <h2>Ausfuehrungs-Reihenfolge von SQL</h2>
+  <p>SQL wird nicht in der Reihenfolge ausgefuehrt wie es geschrieben wird:</p>
+  <div class="order-diagram">
+    <div class="order-item"><div class="order-num">1</div><div class="order-clause">FROM</div><div class="order-desc">Welche Tabelle?</div></div>
+    <div class="order-item"><div class="order-num">2</div><div class="order-clause">WHERE</div><div class="order-desc">Zeilen filtern</div></div>
+    <div class="order-item"><div class="order-num">3</div><div class="order-clause">GROUP BY</div><div class="order-desc">Gruppen bilden</div></div>
+    <div class="order-item"><div class="order-num">4</div><div class="order-clause">HAVING</div><div class="order-desc">Gruppen filtern</div></div>
+    <div class="order-item"><div class="order-num">5</div><div class="order-clause">SELECT</div><div class="order-desc">Spalten waehlen / berechnen</div></div>
+    <div class="order-item"><div class="order-num">6</div><div class="order-clause">ORDER BY</div><div class="order-desc">Sortieren</div></div>
+    <div class="order-item"><div class="order-num">7</div><div class="order-clause">LIMIT</div><div class="order-desc">Ergebnis begrenzen</div></div>
+  </div>
+  <p>Das erklaert warum du in WHERE keine Aggregatfunktionen verwenden kannst (Schritt 2 kommt vor Schritt 3) — dafuer gibt es HAVING.</p>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Du willst alle Level anzeigen, in denen mehr als 5 Scores erreicht wurden. Welche Klausel?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> WHERE COUNT(*) > 5</label>
+        <label><input type="radio" name="q1" value="b"> HAVING COUNT(*) > 5</label>
+        <label><input type="radio" name="q1" value="c"> GROUP BY COUNT(*) > 5</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">HAVING — WHERE filtert vor der Aggregation (einzelne Zeilen), HAVING filtert nach der Aggregation (Gruppen). Aggregatfunktionen wie COUNT() koennen nur in HAVING stehen, nicht in WHERE.</div>
+    </div>
+    <div class="question">
+      <p>2. Was ist falsch an: <code>SELECT level, name, COUNT(*) FROM scores GROUP BY level</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> COUNT(*) darf nicht mit GROUP BY kombiniert werden</label>
+        <label><input type="radio" name="q2" value="b"> name ist weder in GROUP BY noch aggregiert — das gibt einen Fehler</label>
+        <label><input type="radio" name="q2" value="c"> Nichts — ist perfektes SQL</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — name ist nicht in GROUP BY und hat keine Aggregatfunktion. PostgreSQL weiss nicht welchen Namen er zeigen soll wenn mehrere Zeilen im selben Level sind. Loesung: name in GROUP BY ergaenzen oder entfernen.</div>
+    </div>
+    <div class="question">
+      <p>3. <code>BETWEEN 100 AND 500</code> — werden 100 und 500 selbst eingeschlossen?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Nur 100, nicht 500</label>
+        <label><input type="radio" name="q3" value="b"> Weder 100 noch 500 (exklusiv)</label>
+        <label><input type="radio" name="q3" value="c"> Beide werden eingeschlossen (inklusiv)</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">C — BETWEEN ist immer inklusiv. BETWEEN 100 AND 500 entspricht >= 100 AND <= 500. Werte von 100 bis 500 werden alle zurueckgegeben.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> JOINs — Tabellen zusammenfuehren mit INNER JOIN, LEFT JOIN und mehr.</p>
+  </div>
+
+</div>
+</body>
+</html>

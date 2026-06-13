@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 03: DDL — Tabellen erstellen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .str { color: #fbbf24; }
+  .comment { color: #475569; font-style: italic; }
+  .type { color: #34d399; }
+  .output { color: #475569; }
+  .dtype-card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: grid; grid-template-columns: 120px 1fr; gap: 1rem; align-items: center; }
+  .dtype-name { font-family: monospace; color: #34d399; font-weight: 600; font-size: 0.88rem; }
+  .dtype-desc { color: #94a3b8; font-size: 0.85rem; }
+  .constraint { background: #1e1e2e; border: 1px solid #2d2d3f; border-left: 4px solid #fbbf24; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; }
+  .constraint .name { font-family: monospace; color: #fbbf24; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.2rem; }
+  .constraint .desc { color: #94a3b8; font-size: 0.85rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 03</div>
+    <h1>DDL: Tabellen erstellen</h1>
+    <p class="subtitle">CREATE TABLE, Datentypen, Constraints, ALTER TABLE — die Sprache der Datenbankstruktur</p>
+  </div>
+
+  <h2>DDL — Data Definition Language</h2>
+  <p>DDL ist der Teil von SQL der Strukturen definiert: Tabellen erstellen, aendern, loeschen. Gegensatz: DML (Data Manipulation Language) — Daten einfuegen, lesen, aendern.</p>
+  <p><strong>DDL-Befehle:</strong> <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code></p>
+
+  <h2>CREATE TABLE — Syntax</h2>
+  <div class="code-block"><span class="kw">CREATE TABLE</span> tabellenname (
+    spalte1  <span class="type">DATENTYP</span>  <span class="kw">CONSTRAINT</span>,
+    spalte2  <span class="type">DATENTYP</span>  <span class="kw">CONSTRAINT</span>,
+    ...
+);</div>
+
+  <h2>Die wichtigsten Datentypen</h2>
+
+  <div class="dtype-card"><div class="dtype-name">INTEGER</div><div class="dtype-desc">Ganzzahl (-2 Mrd bis +2 Mrd). Fuer IDs, Punkte, Zaehler.</div></div>
+  <div class="dtype-card"><div class="dtype-name">BIGINT</div><div class="dtype-desc">Grosse Ganzzahl. Fuer sehr grosse Werte (Timestamps als Unix-Zeit, Telegram-Chat-IDs).</div></div>
+  <div class="dtype-card"><div class="dtype-name">SERIAL</div><div class="dtype-desc">Auto-inkrementierender INTEGER. Perfekt fuer Primary Keys — Datenbank vergibt automatisch.</div></div>
+  <div class="dtype-card"><div class="dtype-name">TEXT</div><div class="dtype-desc">Zeichenkette beliebiger Laenge. Standard fuer Namen, Beschreibungen, JSON-Strings.</div></div>
+  <div class="dtype-card"><div class="dtype-name">VARCHAR(n)</div><div class="dtype-desc">Text mit maximaler Laenge n. Nur nutzen wenn Laenge semantisch wichtig (z.B. Laendercodes).</div></div>
+  <div class="dtype-card"><div class="dtype-name">BOOLEAN</div><div class="dtype-desc">true / false. Fuer Flags wie "ist_aktiv", "hat_gewonnen".</div></div>
+  <div class="dtype-card"><div class="dtype-name">DATE</div><div class="dtype-desc">Datum ohne Uhrzeit (YYYY-MM-DD). Fuer Geburtstage, Deadlines.</div></div>
+  <div class="dtype-card"><div class="dtype-name">TIMESTAMP</div><div class="dtype-desc">Datum mit Uhrzeit. Fuer Ereignisse, Logs. Empfehlung: TIMESTAMPTZ (mit Zeitzone).</div></div>
+  <div class="dtype-card"><div class="dtype-name">NUMERIC(p,s)</div><div class="dtype-desc">Praezise Dezimalzahl. Fuer Geldbetraege (niemals FLOAT fuer Geld!).</div></div>
+  <div class="dtype-card"><div class="dtype-name">JSONB</div><div class="dtype-desc">JSON-Daten binaer gespeichert (abfragbar). PostgreSQL-Spezialtaet, sehr maechtig.</div></div>
+
+  <h2>Constraints: Regeln fuer Daten</h2>
+  <div class="constraint"><div class="name">PRIMARY KEY</div><div class="desc">Eindeutig + NOT NULL. Jede Tabelle braucht einen. Meist: id SERIAL PRIMARY KEY.</div></div>
+  <div class="constraint"><div class="name">NOT NULL</div><div class="desc">Spalte darf kein NULL enthalten. Fuer Pflichtfelder wie name, email.</div></div>
+  <div class="constraint"><div class="name">UNIQUE</div><div class="desc">Kein doppelter Wert. Fuer email-Adressen, Nutzernamen.</div></div>
+  <div class="constraint"><div class="name">DEFAULT wert</div><div class="desc">Standardwert wenn kein Wert angegeben. z.B. DEFAULT 0 fuer punkte, DEFAULT NOW() fuer timestamps.</div></div>
+  <div class="constraint"><div class="name">CHECK (bedingung)</div><div class="desc">Bedingung muss erfuellt sein. z.B. CHECK (punkte >= 0) verhindert negative Punkte.</div></div>
+
+  <h2>Vollstaendiges Beispiel: Spiel-Datenbank</h2>
+  <div class="code-block"><span class="comment">-- Spieler-Tabelle</span>
+<span class="kw">CREATE TABLE</span> spieler (
+    id           <span class="type">SERIAL</span>          <span class="kw">PRIMARY KEY</span>,
+    username     <span class="type">TEXT</span>            <span class="kw">NOT NULL UNIQUE</span>,
+    email        <span class="type">TEXT</span>            <span class="kw">UNIQUE</span>,
+    erstellt_am  <span class="type">TIMESTAMPTZ</span>     <span class="kw">NOT NULL DEFAULT NOW()</span>,
+    ist_aktiv    <span class="type">BOOLEAN</span>         <span class="kw">NOT NULL DEFAULT TRUE</span>
+);
+
+<span class="comment">-- Score-Tabelle</span>
+<span class="kw">CREATE TABLE</span> scores (
+    id           <span class="type">SERIAL</span>          <span class="kw">PRIMARY KEY</span>,
+    spieler_id   <span class="type">INTEGER</span>         <span class="kw">NOT NULL</span>,
+    punkte       <span class="type">INTEGER</span>         <span class="kw">NOT NULL CHECK (punkte >= 0)</span>,
+    erreicht_am  <span class="type">TIMESTAMPTZ</span>     <span class="kw">NOT NULL DEFAULT NOW()</span>,
+    level        <span class="type">INTEGER</span>         <span class="kw">DEFAULT 1</span>
+);</div>
+
+  <h2>ALTER TABLE: Tabellen nachtraeglich aendern</h2>
+  <div class="code-block"><span class="comment">-- Neue Spalte hinzufuegen</span>
+<span class="kw">ALTER TABLE</span> spieler <span class="kw">ADD COLUMN</span> avatar_url <span class="type">TEXT</span>;
+
+<span class="comment">-- Spalte umbenennen</span>
+<span class="kw">ALTER TABLE</span> spieler <span class="kw">RENAME COLUMN</span> username <span class="kw">TO</span> name;
+
+<span class="comment">-- Spalte loeschen</span>
+<span class="kw">ALTER TABLE</span> spieler <span class="kw">DROP COLUMN</span> avatar_url;
+
+<span class="comment">-- Tabelle komplett loeschen</span>
+<span class="kw">DROP TABLE</span> scores;
+
+<span class="comment">-- Sicher loeschen (kein Fehler wenn nicht vorhanden)</span>
+<span class="kw">DROP TABLE IF EXISTS</span> scores;</div>
+
+  <div class="insight">
+    <code>DROP TABLE</code> loescht die Tabelle und alle Daten unwiderruflich. In Produktionsdatenbanken immer zuerst ein Backup machen.
+  </div>
+
+  <h2>Tabellenstruktur pruefen</h2>
+  <div class="code-block"><span class="comment">-- In psql:</span>
+\d spieler
+<span class="output">                        Table "public.spieler"
+   Column    |            Type             | Nullable |      Default
+-------------+-----------------------------+----------+--------------------
+ id          | integer                     | not null | nextval('spieler_id_seq')
+ username    | text                        | not null |
+ email       | text                        |          |
+ erstellt_am | timestamp with time zone    | not null | now()
+ ist_aktiv   | boolean                     | not null | true</span></div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Welcher Datentyp ist richtig fuer eine Geldbetrag-Spalte?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> FLOAT</label>
+        <label><input type="radio" name="q1" value="b"> NUMERIC(10,2)</label>
+        <label><input type="radio" name="q1" value="c"> INTEGER</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">NUMERIC(10,2) — FLOAT hat Rundungsfehler (0.1 + 0.2 = 0.30000000000000004). Fuer Geld immer NUMERIC. INTEGER verliert Dezimalstellen.</div>
+    </div>
+    <div class="question">
+      <p>2. Was macht <code>DEFAULT NOW()</code> bei einer TIMESTAMPTZ-Spalte?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Setzt das Datum fest auf den Zeitpunkt als die Tabelle erstellt wurde</label>
+        <label><input type="radio" name="q2" value="b"> Setzt den aktuellen Timestamp automatisch wenn eine Zeile eingefuegt wird</label>
+        <label><input type="radio" name="q2" value="c"> Macht das Feld optional ohne Wert</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — NOW() wird bei jedem INSERT neu ausgewertet. Zeile eingefuegt um 14:30 bekommt automatisch 14:30 als Zeitstempel. Kein manuelles Mitgeben noetig.</div>
+    </div>
+    <div class="question">
+      <p>3. Unterschied zwischen <code>NOT NULL</code> und <code>UNIQUE</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Kein Unterschied — beide verhindern NULL-Werte</label>
+        <label><input type="radio" name="q3" value="b"> NOT NULL verbietet leere Werte, UNIQUE verbietet doppelte Werte</label>
+        <label><input type="radio" name="q3" value="c"> UNIQUE verbietet leere Werte, NOT NULL verbietet doppelte Werte</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — NOT NULL: Wert muss vorhanden sein. UNIQUE: Wert darf nicht mehrfach vorkommen. Emailadressen sollten UNIQUE und NOT NULL sein (jede Email einmalig und muss angegeben werden).</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> DML — INSERT, SELECT, WHERE, ORDER BY. Daten einfuegen und abfragen.</p>
+  </div>
+
+</div>
+</body>
+</html>

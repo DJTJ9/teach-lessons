@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 02: PostgreSQL erste Schritte</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 0.95rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .prompt { color: #34d399; }
+  .cmd { color: #e2e8f0; }
+  .output { color: #475569; }
+  .comment { color: #475569; font-style: italic; }
+  .kw { color: #818cf8; }
+  .step { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .step-title { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .step-num { background: #312e81; color: #a5b4fc; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+  .step-name { font-weight: 600; color: #e2e8f0; font-size: 0.95rem; }
+  .step p { margin: 0; font-size: 0.88rem; }
+  .cmd-table { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; font-family: monospace; }
+  td:last-child { font-family: inherit; color: #94a3b8; }
+  tr:last-child td { border-bottom: none; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .warning { background: #2e1e10; border: 1px solid #78350f; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; color: #fcd34d; font-size: 0.88rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 02</div>
+    <h1>PostgreSQL erste Schritte</h1>
+    <p class="subtitle">Installation, psql, erste Datenbank erstellen und verstehen was passiert</p>
+  </div>
+
+  <h2>Installation (Windows mit WSL)</h2>
+  <p>Da du Windows nutzt, empfehle ich PostgreSQL via WSL (Windows Subsystem for Linux). Das ist die sauberste Entwicklungsumgebung.</p>
+
+  <div class="step">
+    <div class="step-title"><div class="step-num">1</div><div class="step-name">WSL und Ubuntu installieren (falls nicht vorhanden)</div></div>
+    <div class="code-block"><span class="comment"># In PowerShell als Administrator:</span>
+<span class="cmd">wsl --install</span>
+<span class="comment"># System neu starten, dann Ubuntu-Setup abschliessen</span></div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><div class="step-num">2</div><div class="step-name">PostgreSQL in WSL installieren</div></div>
+    <div class="code-block"><span class="prompt">$</span> <span class="cmd">sudo apt update && sudo apt install postgresql postgresql-contrib -y</span>
+<span class="prompt">$</span> <span class="cmd">sudo service postgresql start</span>
+<span class="output">* Starting PostgreSQL 14 database server</span></div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><div class="step-num">3</div><div class="step-name">Als postgres-User einloggen</div></div>
+    <div class="code-block"><span class="prompt">$</span> <span class="cmd">sudo -u postgres psql</span>
+<span class="output">psql (14.x)
+Type "help" for help.
+
+postgres=#</span>
+<span class="comment"># Du bist jetzt in der PostgreSQL-Shell (psql)</span></div>
+  </div>
+
+  <div class="warning">
+    Alternative: pgAdmin (GUI) installieren falls du lieber mit einer grafischen Oberflaeche arbeitest. Aber psql lernen lohnt sich — du kannst damit von ueberall arbeiten.
+  </div>
+
+  <h2>psql: die wichtigsten Befehle</h2>
+  <p>psql hat zwei Arten von Befehlen: Backslash-Befehle (Meta-Befehle) und SQL-Befehle. Meta-Befehle enden nicht mit Semikolon, SQL schon.</p>
+
+  <div class="cmd-table">
+    <table>
+      <tr><th>Befehl</th><th>Was er tut</th></tr>
+      <tr><td>\l</td><td>Alle Datenbanken auflisten</td></tr>
+      <tr><td>\c datenbankname</td><td>Zu einer Datenbank wechseln</td></tr>
+      <tr><td>\dt</td><td>Alle Tabellen in aktueller Datenbank</td></tr>
+      <tr><td>\d tabellenname</td><td>Struktur einer Tabelle anzeigen</td></tr>
+      <tr><td>\q</td><td>psql beenden</td></tr>
+      <tr><td>\h SELECT</td><td>Hilfe zu SQL-Befehl anzeigen</td></tr>
+    </table>
+  </div>
+
+  <h2>Erste Datenbank erstellen</h2>
+  <div class="code-block"><span class="comment">-- In psql: SQL-Befehle enden immer mit Semikolon</span>
+
+<span class="kw">CREATE DATABASE</span> spieledb;
+<span class="output">CREATE DATABASE</span>
+
+<span class="comment">-- Zur neuen Datenbank wechseln</span>
+\c spieledb
+<span class="output">You are now connected to database "spieledb" as user "postgres".</span>
+
+<span class="comment">-- Tabellen anzeigen (noch leer)</span>
+\dt
+<span class="output">Did not find any relations.</span></div>
+
+  <h2>Erste Tabelle und erste Daten</h2>
+  <div class="code-block"><span class="comment">-- Tabelle erstellen (mehr Details in Lektion 03)</span>
+<span class="kw">CREATE TABLE</span> spieler (
+    id      <span class="kw">SERIAL PRIMARY KEY</span>,
+    name    <span class="kw">TEXT NOT NULL</span>,
+    punkte  <span class="kw">INTEGER DEFAULT</span> 0
+);
+<span class="output">CREATE TABLE</span>
+
+<span class="comment">-- Daten einfuegen</span>
+<span class="kw">INSERT INTO</span> spieler (name, punkte) <span class="kw">VALUES</span> ('Alice', 4200);
+<span class="kw">INSERT INTO</span> spieler (name, punkte) <span class="kw">VALUES</span> ('Bob', 1850);
+<span class="output">INSERT 0 1</span>
+
+<span class="comment">-- Daten abfragen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler;
+<span class="output"> id | name  | punkte
+----+-------+--------
+  1 | Alice |   4200
+  2 | Bob   |   1850
+(2 rows)</span></div>
+
+  <div class="insight">
+    <code>SERIAL</code> ist eine PostgreSQL-Kurzschreibweise fuer "auto-inkrementierende Ganzzahl". Die Datenbank vergibt die ID automatisch — du musst sie nicht mitangeben beim INSERT.
+  </div>
+
+  <h2>Datenbank-Hierarchie verstehen</h2>
+  <div class="code-block"><span class="comment">PostgreSQL-Hierarchie:
+
+Server (PostgreSQL-Instanz)
+  └─ Datenbank: spieledb
+       └─ Schema: public (Standard)
+            ├─ Tabelle: spieler
+            ├─ Tabelle: scores
+            └─ Tabelle: items</span></div>
+  <p>Eine PostgreSQL-Instanz kann viele Datenbanken haben. Deine Dart-App, dein Spiel und andere Projekte bekommen jeweils eigene Datenbanken. Tabellen existieren innerhalb einer Datenbank.</p>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was bewirkt <code>\c spieledb</code> in psql?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Erstellt eine neue Datenbank namens spieledb</label>
+        <label><input type="radio" name="q1" value="b"> Wechselt die aktive Verbindung zur Datenbank spieledb</label>
+        <label><input type="radio" name="q1" value="c"> Loescht die Datenbank spieledb</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — \c steht fuer "connect". Danach werden alle SQL-Befehle in dieser Datenbank ausgefuehrt. Ohne \c arbeitet man in der zuletzt verbundenen Datenbank.</div>
+    </div>
+    <div class="question">
+      <p>2. Warum muss beim INSERT die <code>id</code> nicht angegeben werden?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> id ist optional und kann leer bleiben</label>
+        <label><input type="radio" name="q2" value="b"> SERIAL vergibt die ID automatisch und inkrementell</label>
+        <label><input type="radio" name="q2" value="c"> Die id wird als NULL gespeichert</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — SERIAL ist eine Sequenz die automatisch 1, 2, 3... vergibt. Erster INSERT bekommt id=1, zweiter id=2 usw. NULL waere ein Fehler da PRIMARY KEY NOT NULL impliziert.</div>
+    </div>
+    <div class="question">
+      <p>3. Welcher Befehl zeigt alle Tabellen in der aktuellen Datenbank?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> \l</label>
+        <label><input type="radio" name="q3" value="b"> \dt</label>
+        <label><input type="radio" name="q3" value="c"> \d</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">\dt — "l" listet Datenbanken, "dt" listet Tabellen (d = describe, t = tables). \d ohne t zeigt Tabellen UND andere Objekte wie Sequenzen.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> DDL — Tabellen richtig erstellen mit Datentypen, Constraints und ALTER TABLE.</p>
+  </div>
+
+</div>
+</body>
+</html>

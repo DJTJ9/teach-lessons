@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 06: Specs fuer KI-Agenten optimieren</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  ul { color: #cbd5e1; margin: 0.5rem 0 1rem 1.5rem; line-height: 1.8; }
+  .template { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.84rem; color: #94a3b8; white-space: pre-wrap; margin-bottom: 1rem; }
+  .kw { color: #fbbf24; font-weight: 600; }
+  .good { border-left: 4px solid #34d399; background: #1e1e2e; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.5rem; }
+  .bad  { border-left: 4px solid #f87171; background: #1e1e2e; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.5rem; }
+  .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+  .principle { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+  .principle h3 { color: #fbbf24; font-size: 0.95rem; }
+  .principle p { margin: 0; font-size: 0.88rem; }
+  .insight { background: #2e2510; border: 1px solid #78350f; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fcd34d; font-size: 0.9rem; line-height: 1.6; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #78350f; color: #fcd34d; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">AI SPECS &middot; LEKTION 06</div>
+    <h1>Specs fuer KI-Agenten optimieren</h1>
+    <p class="subtitle">Was macht eine Spec KI-freundlich — und warum ist das anders als Specs fuer Menschen</p>
+  </div>
+
+  <h2>Mensch vs. KI: ein grundlegender Unterschied</h2>
+  <p>Ein menschlicher Entwickler liest eine Spec und stellt Rueckfragen: "Was meinst du mit X? Soll ich Y oder Z verwenden?" Ein KI-Agent tut das nicht (oder selten). Er <em>interpretiert</em> Luecken — meistens falsch, immer konsistent falsch.</p>
+  <p>KI-freundliche Specs schliessen Interpretationsluecken <em>bevor</em> sie entstehen.</p>
+
+  <div class="insight">
+    Faustregel: Wenn du eine Spec liest und irgendwo denkst "das koennte A oder B bedeuten" — dann macht eine KI dort immer die schlechtere Wahl. Schliess die Luecke explizit.
+  </div>
+
+  <h2>Die 5 Prinzipien KI-freundlicher Specs</h2>
+
+  <div class="principle">
+    <h3>1. Kontext zuerst</h3>
+    <p>KI startet mit leerem Kontext. Erklaere immer: welche Datei, welches Modul, welche Konvention gilt hier.</p>
+  </div>
+
+  <div class="principle">
+    <h3>2. Dateipfade absolut oder relativ zum Root angeben</h3>
+    <p>"Erstelle eine neue Datei" ist ambig. "Erstelle <code>handlers/search.py</code>" ist klar.</p>
+  </div>
+
+  <div class="principle">
+    <h3>3. Constraints explizit machen</h3>
+    <p>Was darf die KI NICHT aendern? "Aendere nichts an bot.py ausser der Handler-Registrierung" verhindert ungewollte Refactorings.</p>
+  </div>
+
+  <div class="principle">
+    <h3>4. Definition of Done als Checkliste</h3>
+    <p>Akzeptanzkriterien als Checkboxen. Die KI kann (und soll) sie nach der Implementierung selbst abhaken.</p>
+  </div>
+
+  <div class="principle">
+    <h3>5. Keine impliziten Annahmen</h3>
+    <p>Wenn du weisst dass <code>notion_client</code> bereits als Singleton in <code>services/notion.py</code> existiert — schreib es hin. Die KI weiss es nicht sicher.</p>
+  </div>
+
+  <h2>Vorher / Nachher: Task Spec fuer Menschen vs. KI</h2>
+
+  <div class="bad">
+    <div class="label" style="color: #f87171">x Fuer Menschen geschrieben</div>
+    <p style="font-size: 0.88rem; color: #94a3b8; margin: 0; font-style: italic">"Implementiere den Search-Handler. Benutze die bestehenden Services und halte dich an die Konventionen."</p>
+  </div>
+  <div style="margin-bottom: 1rem; font-size: 0.8rem; color: #475569; padding-left: 0.5rem">Ein Mensch im Team kennt "die Konventionen". Eine KI nicht.</div>
+
+  <div class="good" style="margin-bottom: 1.5rem">
+    <div class="label" style="color: #34d399">OK Fuer KI optimiert</div>
+    <p style="font-size: 0.88rem; color: #94a3b8; margin: 0; font-style: italic">"Erstelle <code>handlers/search.py</code> (folgt dem Muster von <code>handlers/task.py</code>). Implementiere <code>handle_search(update: Update, context: CallbackContext) -> None</code>. Importiere <code>notion_client</code> aus <code>services.notion</code> (bereits als Singleton verfuegbar). Aendere keine anderen Dateien ausser den in Schritt 4 genannten."</p>
+  </div>
+
+  <h2>Das KI-Kontext-Template</h2>
+  <p>Ergaenze jeden Task um einen "KI-Kontext"-Abschnitt:</p>
+  <div class="template"><span class="kw"># TASK-01: [Titel]</span>
+
+<span class="kw">KI-Kontext:</span>
+- Repo-Root: C:\Projekte\telegram-notion-bot\
+- Folge dem Muster von: handlers/task.py
+- Verfuegbare Services: notion_client (services/notion.py), NOTION_* IDs (config.py)
+- Nicht aendern: bot.py (ausser explizit angegeben), tests/
+- Coding-Style: snake_case, keine Type-Hints erzwingen aber bevorzugen
+- Tests: kein Test-File erforderlich fuer diesen Task
+
+<span class="kw">Beschreibung:</span>
+[Was zu tun ist]
+
+<span class="kw">Dateien:</span>
+- handlers/search.py (NEU erstellen)
+
+<span class="kw">Akzeptanzkriterien:</span>
+- [ ] Datei handlers/search.py existiert
+- [ ] Funktion handle_search() vorhanden mit korrekter Signatur
+- [ ] Import aus services.notion funktioniert</div>
+
+  <h2>Wann Specs zu viel Kontext haben</h2>
+  <p>Zu viel Kontext ist auch ein Problem: wenn du jede Zeile erklaerst, nimmt du der KI keine Freiheit — du nimmst ihr die Faehigkeit, Luecken sinnvoll zu fuellen. Ziel: Constraints klar, Implementation offen.</p>
+
+  <div class="template"><span class="kw">Falsch:</span> "Schreibe Zeile 1: import os. Schreibe Zeile 2: from telegram..."
+<span class="kw">Richtig:</span> "Erstelle handle_search() in handlers/search.py. Importiere was benoetigt wird."</div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was passiert wenn eine KI-Spec "benutze die bestehenden Konventionen" schreibt?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Die KI liest automatisch alle bestehenden Dateien und lernt die Konventionen</label>
+        <label><input type="radio" name="q1" value="b"> Die KI interpretiert die Luecke mit eigenen Konventionen — meistens falsch</label>
+        <label><input type="radio" name="q1" value="c"> Die KI fragt nach welche Konventionen gemeint sind</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — KI-Agenten lesen nicht automatisch alle Dateien. Sie interpretieren ambige Anweisungen konsistent falsch. "Folge dem Muster von handlers/task.py" ist besser.</div>
+    </div>
+    <div class="question">
+      <p>2. Welche Information ist im "KI-Kontext"-Abschnitt am wichtigsten?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> Eine ausfuehrliche Erklaerung der Projekt-Geschichte</label>
+        <label><input type="radio" name="q2" value="b"> Welche Dateien NICHT veraendert werden sollen und welche Services verfuegbar sind</label>
+        <label><input type="radio" name="q2" value="c"> Die Namen aller Teammitglieder</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">B — "Nicht aendern"-Constraints und verfuegbare Services verhindern die haeufigsten KI-Fehler: ungewollte Refactorings und neu erfundene Services statt bestehender nutzen.</div>
+    </div>
+    <div class="question">
+      <p>3. Ein Task Spec sagt nur: "Implementiere Funktion X." — Was fehlt fuer KI-Verwendung?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Nichts, das reicht</label>
+        <label><input type="radio" name="q3" value="b"> Dateiname, Signatur, Kontext (welche Imports verfuegbar), Akzeptanzkriterien</label>
+        <label><input type="radio" name="q3" value="c"> Ein Beispiel-Output</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — Ohne Dateiname erzeugt KI eine neue Datei oder editiert die falsche. Ohne Signatur erfindet sie eigene Parameter. Ohne Akzeptanzkriterien weiss sie nicht wann sie fertig ist.</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Anti-Patterns und haeufige Fehler — wie schlechte Specs aussehen und wie man sie erkennt.</p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Lektion 04: DML — INSERT und SELECT</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 1rem; }
+  .code-block { background: #13131f; border: 1px solid #2d2d3f; border-radius: 8px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; color: #94a3b8; white-space: pre; overflow-x: auto; margin-bottom: 1rem; }
+  .kw { color: #818cf8; font-weight: 600; }
+  .str { color: #fbbf24; }
+  .num { color: #34d399; }
+  .comment { color: #475569; font-style: italic; }
+  .output { color: #475569; }
+  .op { color: #f472b6; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #a5b4fc; font-size: 0.9rem; line-height: 1.6; }
+  .clause-card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; }
+  .clause-name { font-family: monospace; color: #818cf8; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .clause-desc { color: #94a3b8; font-size: 0.85rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.5rem; }
+  .question p { color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; }
+  .options label { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.75rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; color: #6ee7b7; font-size: 0.9rem; }
+  .answer.show { display: block; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: monospace; font-size: 0.9em; color: #f472b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom: 2rem">
+    <div style="color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem">SQL BASICS &middot; LEKTION 04</div>
+    <h1>DML: INSERT und SELECT</h1>
+    <p class="subtitle">Daten einfuegen, abfragen, filtern und sortieren — die meistgenutzten SQL-Befehle</p>
+  </div>
+
+  <h2>DML — Data Manipulation Language</h2>
+  <p>DML bearbeitet Daten (nicht Strukturen): <code>INSERT</code> (einfuegen), <code>SELECT</code> (lesen), <code>UPDATE</code> (aendern), <code>DELETE</code> (loeschen). Diese Lektion fokussiert auf INSERT und SELECT — die taeglich genutzten 80%.</p>
+
+  <h2>INSERT: Daten einfuegen</h2>
+
+  <div class="code-block"><span class="comment">-- Einzelner Datensatz</span>
+<span class="kw">INSERT INTO</span> spieler (username, punkte)
+<span class="kw">VALUES</span> (<span class="str">'Alice'</span>, <span class="num">4200</span>);
+
+<span class="comment">-- Mehrere Datensaetze auf einmal</span>
+<span class="kw">INSERT INTO</span> spieler (username, punkte)
+<span class="kw">VALUES</span>
+    (<span class="str">'Alice'</span>, <span class="num">4200</span>),
+    (<span class="str">'Bob'</span>,   <span class="num">1850</span>),
+    (<span class="str">'Carol'</span>, <span class="num">7340</span>);
+
+<span class="comment">-- ID des eingefuegten Datensatzes zurueckbekommen</span>
+<span class="kw">INSERT INTO</span> spieler (username) <span class="kw">VALUES</span> (<span class="str">'Dave'</span>)
+<span class="kw">RETURNING</span> id;
+<span class="output"> id
+----
+  4</span></div>
+
+  <div class="insight">
+    <code>RETURNING id</code> ist PostgreSQL-spezifisch und sehr nuetzlich: Du bekommst die generierte ID direkt zurueck. In Python/Dart kannst du sie direkt fuer Foreign Keys verwenden.
+  </div>
+
+  <h2>SELECT: Daten abfragen</h2>
+
+  <div class="code-block"><span class="comment">-- Alle Spalten, alle Zeilen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler;
+<span class="output"> id | username | punkte | erstellt_am          | ist_aktiv
+----+----------+--------+----------------------+-----------
+  1 | Alice    |   4200 | 2024-01-15 10:30:00  | t
+  2 | Bob      |   1850 | 2024-02-03 14:22:00  | t
+  3 | Carol    |   7340 | 2024-01-28 09:15:00  | t</span>
+
+<span class="comment">-- Nur bestimmte Spalten</span>
+<span class="kw">SELECT</span> username, punkte <span class="kw">FROM</span> spieler;
+<span class="output"> username | punkte
+----------+--------
+ Alice    |   4200
+ Bob      |   1850
+ Carol    |   7340</span>
+
+<span class="comment">-- Spalte umbenennen in der Ausgabe (ALIAS)</span>
+<span class="kw">SELECT</span> username <span class="kw">AS</span> name, punkte <span class="kw">AS</span> score <span class="kw">FROM</span> spieler;</div>
+
+  <h2>WHERE: Filtern</h2>
+  <div class="code-block"><span class="comment">-- Vergleichsoperatoren: = != < > <= >=</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">WHERE</span> punkte <span class="op">></span> <span class="num">3000</span>;
+<span class="output"> id | username | punkte
+----+----------+--------
+  1 | Alice    |   4200
+  3 | Carol    |   7340</span>
+
+<span class="comment">-- Text-Vergleich: immer einfache Anfuehrungszeichen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">WHERE</span> username <span class="op">=</span> <span class="str">'Alice'</span>;
+
+<span class="comment">-- LIKE: Muster-Suche (% = beliebig viele Zeichen)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">WHERE</span> username <span class="kw">LIKE</span> <span class="str">'A%'</span>;
+<span class="output">-- Findet: Alice, Anna, Andreas... (beginnt mit A)</span>
+
+<span class="comment">-- ILIKE: wie LIKE aber case-insensitive</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">WHERE</span> username <span class="kw">ILIKE</span> <span class="str">'alice'</span>;
+
+<span class="comment">-- Mehrere Bedingungen</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">WHERE</span> punkte <span class="op">></span> <span class="num">2000</span> <span class="kw">AND</span> ist_aktiv <span class="op">=</span> <span class="kw">TRUE</span>;
+
+<span class="comment">-- NULL-Pruefung: IS NULL / IS NOT NULL</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">WHERE</span> email <span class="kw">IS NOT NULL</span>;</div>
+
+  <h2>ORDER BY und LIMIT: Sortieren und begrenzen</h2>
+  <div class="code-block"><span class="comment">-- Absteigend sortieren (hoechste zuerst)</span>
+<span class="kw">SELECT</span> username, punkte <span class="kw">FROM</span> spieler
+<span class="kw">ORDER BY</span> punkte <span class="kw">DESC</span>;
+<span class="output"> username | punkte
+----------+--------
+ Carol    |   7340
+ Alice    |   4200
+ Bob      |   1850</span>
+
+<span class="comment">-- Aufsteigend (Standard, ASC kann weggelassen werden)</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler <span class="kw">ORDER BY</span> username <span class="kw">ASC</span>;
+
+<span class="comment">-- Top 3 Spieler</span>
+<span class="kw">SELECT</span> username, punkte <span class="kw">FROM</span> spieler
+<span class="kw">ORDER BY</span> punkte <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="num">3</span>;
+
+<span class="comment">-- Paginierung: Seite 2, je 10 Ergebnisse</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> spieler
+<span class="kw">ORDER BY</span> id
+<span class="kw">LIMIT</span> <span class="num">10</span> <span class="kw">OFFSET</span> <span class="num">10</span>;</div>
+
+  <h2>UPDATE und DELETE</h2>
+  <div class="code-block"><span class="comment">-- Punkte von Alice aktualisieren</span>
+<span class="kw">UPDATE</span> spieler
+<span class="kw">SET</span> punkte <span class="op">=</span> <span class="num">5000</span>
+<span class="kw">WHERE</span> username <span class="op">=</span> <span class="str">'Alice'</span>;
+
+<span class="comment">-- Vorsicht: UPDATE ohne WHERE aktualisiert ALLE Zeilen!</span>
+<span class="kw">UPDATE</span> spieler <span class="kw">SET</span> punkte <span class="op">=</span> <span class="num">0</span>;  <span class="comment">-- Alle Punkte auf 0 gesetzt!</span>
+
+<span class="comment">-- Inaktive Spieler loeschen</span>
+<span class="kw">DELETE FROM</span> spieler <span class="kw">WHERE</span> ist_aktiv <span class="op">=</span> <span class="kw">FALSE</span>;
+
+<span class="comment">-- Vorsicht: DELETE ohne WHERE loescht ALLE Zeilen!</span></div>
+
+  <div class="insight">
+    UPDATE und DELETE ohne WHERE sind die haeufigsten Katastrophen in Datenbanken. Gewoehn dir an: erst <code>SELECT * FROM tabelle WHERE bedingung</code> ausfuehren, pruefen ob die richtigen Zeilen gezeigt werden, dann UPDATE/DELETE mit derselben WHERE-Klausel.
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="question">
+      <p>1. Was gibt <code>SELECT username FROM spieler WHERE punkte > 5000 ORDER BY punkte DESC LIMIT 1</code> zurueck?</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="a"> Alle Spieler mit mehr als 5000 Punkten</label>
+        <label><input type="radio" name="q1" value="b"> Den Spieler mit den meisten Punkten (ueber 5000), nur username</label>
+        <label><input type="radio" name="q1" value="c"> Die erste Zeile aus der Tabelle spieler</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a1').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a1">B — WHERE filtert auf > 5000, ORDER BY DESC sortiert hoechste zuerst, LIMIT 1 gibt nur den ersten Eintrag zurueck. Ergebnis: "Carol" mit 7340 Punkten (nur die username-Spalte).</div>
+    </div>
+    <div class="question">
+      <p>2. Du willst alle Spieler finden deren Name mit "B" beginnt. Welches WHERE?</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="a"> WHERE username = 'B'</label>
+        <label><input type="radio" name="q2" value="b"> WHERE username LIKE 'B%'</label>
+        <label><input type="radio" name="q2" value="c"> WHERE username CONTAINS 'B'</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a2').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a2">LIKE 'B%' — % ist Platzhalter fuer beliebig viele Zeichen. 'B%' bedeutet "beginnt mit B". 'B' allein wuerde nur exakte Treffer finden. CONTAINS existiert nicht in SQL.</div>
+    </div>
+    <div class="question">
+      <p>3. Du fuerst aus: <code>UPDATE spieler SET ist_aktiv = FALSE</code>. Was passiert?</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="a"> Nur inaktive Spieler werden markiert</label>
+        <label><input type="radio" name="q3" value="b"> Alle Spieler werden auf inaktiv gesetzt — WHERE fehlt</label>
+        <label><input type="radio" name="q3" value="c"> Fehler — UPDATE braucht immer ein WHERE</label>
+      </div>
+      <button class="reveal-btn" onclick="document.getElementById('a3').classList.toggle('show')">Antwort zeigen</button>
+      <div class="answer" id="a3">B — SQL verlangt kein WHERE. Ohne WHERE wird JEDE Zeile geaendert. Das ist kein Fehler — aber wahrscheinlich ein Katastrophe. Immer erst mit SELECT pruefen!</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #13131f; border-radius: 8px; border: 1px dashed #2d2d3f">
+    <p style="margin: 0; color: #64748b; font-size: 0.9rem"><strong>Naechste Lektion:</strong> Filtern und Aggregieren — AND/OR, IN, BETWEEN, COUNT, SUM, GROUP BY.</p>
+  </div>
+
+</div>
+</body>
+</html>
