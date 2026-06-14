@@ -105,20 +105,53 @@ cd ~/projekte</code></pre>
   <div class="step">
     <div class="step-num">3</div>
     <h4>Repo von GitHub klonen</h4>
-    <pre><code>git clone https://github.com/DJTJ9/claude-telegram-chat-bot.git</code></pre>
+    <p>GitHub erfordert einen Personal Access Token (PAT) statt Passwort. Token direkt in die URL einbetten:</p>
+    <pre><code>git clone https://DJTJ9:&lt;TOKEN&gt;@github.com/DJTJ9/claude-telegram-chat-bot.git</code></pre>
+    <p><code>&lt;TOKEN&gt;</code> ersetzen mit dem PAT aus GitHub → Settings → Developer settings → Personal access tokens (Scope: <code>repo</code>).</p>
     <p>Ergebnis: neuer Ordner <code>~/projekte/claude-telegram-chat-bot/</code> mit dem kompletten Bot-Code.</p>
     <pre><code>ls claude-telegram-chat-bot/     # Prüfen ob Dateien da sind</code></pre>
   </div>
 
   <div class="step">
     <div class="step-num">4</div>
+    <h4>teach-Repo klonen</h4>
+    <p>Der Bot verwaltet auch Lernlektionen — dafür braucht er ein zweites Repo:</p>
+    <pre><code>git clone https://github.com/DJTJ9/teach-lessons.git ~/projekte/teach</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
     <h4>In den Bot-Ordner wechseln</h4>
     <pre><code>cd ~/projekte/claude-telegram-chat-bot
 ls -la</code></pre>
     <p>Du solltest Dateien wie <code>bot.py</code>, <code>requirements.txt</code>, <code>.gitignore</code> sehen.</p>
   </div>
 
-  <h2>Schritt 3: Updates einspielen</h2>
+  <h2>Schritt 3: Node.js und Claude Code installieren</h2>
+  <p>Der Bot ruft Claude Code auf — das braucht Node.js auf dem Pi.</p>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <h4>Node.js installieren</h4>
+    <pre><code>curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs</code></pre>
+    <p>Prüfen: <code>node --version</code> sollte <code>v22.x.x</code> zeigen.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <h4>Claude Code installieren</h4>
+    <pre><code>sudo npm install -g @anthropic-ai/claude-code</code></pre>
+  </div>
+
+  <div class="step">
+    <div class="step-num">8</div>
+    <h4>Claude Code einmalig einloggen</h4>
+    <pre><code>claude</code></pre>
+    <p>Folge den Anweisungen zur Authentifizierung mit deinem Anthropic-Account. Nach dem Login mit <strong>/exit</strong> beenden.</p>
+  </div>
+
+  <h2>Schritt 4: Updates einspielen</h2>
   <p>Wenn du auf dem Windows-PC Code änderst und auf GitHub pushst, reicht auf dem Pi:</p>
   <pre><code>cd ~/projekte/claude-telegram-chat-bot
 git pull</code></pre>

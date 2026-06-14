@@ -133,7 +133,7 @@
     <div class="step-num">6</div>
     <h4>Installation prüfen</h4>
     <pre><code>pip list</code></pre>
-    <p>Du solltest <code>python-telegram-bot</code>, <code>notion-client</code> und andere Bot-Abhängigkeiten sehen.</p>
+    <p>Du solltest <code>requests</code> und <code>groq</code> in der Liste sehen.</p>
   </div>
 
   <h2>Schritt 3: .env-Datei mit Secrets anlegen</h2>
@@ -149,8 +149,9 @@
     <pre><code>nano ~/projekte/claude-telegram-chat-bot/.env</code></pre>
     <p>Inhalt (ersetze die Platzhalter mit deinen echten Werten):</p>
     <pre><code>TELEGRAM_TOKEN=123456789:ABCdef...
-NOTION_TOKEN=secret_abc123...
-TELEGRAM_CHAT_ID=8896609541</code></pre>
+GROQ_API_KEY=gsk_abc123...
+WORK_DIR=/home/pi/projekte/claude-telegram-chat-bot
+TEACH_DIR=/home/pi/projekte/teach</code></pre>
     <p>Speichern: <strong>Strg+X</strong> → <strong>Y</strong> → <strong>Enter</strong></p>
   </div>
 
@@ -168,9 +169,10 @@ TELEGRAM_CHAT_ID=8896609541</code></pre>
     <h4>Bot manuell starten</h4>
     <pre><code>cd ~/projekte/claude-telegram-chat-bot
 source venv/bin/activate
+set -a && source .env && set +a
 python3 bot.py</code></pre>
-    <p>Der Bot startet und gibt Logs aus. Schicke eine Nachricht auf Telegram — der Bot sollte antworten.</p>
-    <p>Stoppen mit <strong>Strg+C</strong></p>
+    <p>Der Bot liest Umgebungsvariablen direkt aus der Shell — <code>set -a</code> exportiert alle Variablen aus der <code>.env</code>-Datei. Der systemd-Service (Lektion 6) übernimmt das automatisch via <code>EnvironmentFile=</code>.</p>
+    <p>Schicke eine Nachricht auf Telegram — der Bot sollte antworten. Stoppen mit <strong>Strg+C</strong></p>
   </div>
 
   <div class="success-box">
