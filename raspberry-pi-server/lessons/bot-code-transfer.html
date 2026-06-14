@@ -105,29 +105,29 @@ cd ~/projekte</code></pre>
   <div class="step">
     <div class="step-num">3</div>
     <h4>Repo von GitHub klonen</h4>
-    <pre><code>git clone https://github.com/DJTJ9/telegram-notion-bot.git</code></pre>
-    <p>Ergebnis: neuer Ordner <code>~/projekte/telegram-notion-bot/</code> mit dem kompletten Bot-Code.</p>
-    <pre><code>ls telegram-notion-bot/     # Prüfen ob Dateien da sind</code></pre>
+    <pre><code>git clone https://github.com/DJTJ9/claude-telegram-chat-bot.git</code></pre>
+    <p>Ergebnis: neuer Ordner <code>~/projekte/claude-telegram-chat-bot/</code> mit dem kompletten Bot-Code.</p>
+    <pre><code>ls claude-telegram-chat-bot/     # Prüfen ob Dateien da sind</code></pre>
   </div>
 
   <div class="step">
     <div class="step-num">4</div>
     <h4>In den Bot-Ordner wechseln</h4>
-    <pre><code>cd ~/projekte/telegram-notion-bot
+    <pre><code>cd ~/projekte/claude-telegram-chat-bot
 ls -la</code></pre>
     <p>Du solltest Dateien wie <code>bot.py</code>, <code>requirements.txt</code>, <code>.gitignore</code> sehen.</p>
   </div>
 
   <h2>Schritt 3: Updates einspielen</h2>
   <p>Wenn du auf dem Windows-PC Code änderst und auf GitHub pushst, reicht auf dem Pi:</p>
-  <pre><code>cd ~/projekte/telegram-notion-bot
+  <pre><code>cd ~/projekte/claude-telegram-chat-bot
 git pull</code></pre>
   <p>Git lädt nur die Änderungen herunter — kein erneutes Klonen nötig.</p>
 
   <div class="tip">
     <div class="label">💡 Alias für schnelle Updates</div>
     <p>Füge in <code>~/.bashrc</code> einen Alias hinzu:</p>
-    <pre><code>echo 'alias bot-update="cd ~/projekte/telegram-notion-bot && git pull"' >> ~/.bashrc
+    <pre><code>echo 'alias bot-update="cd ~/projekte/claude-telegram-chat-bot && git pull"' >> ~/.bashrc
 source ~/.bashrc</code></pre>
     <p>Danach reicht: <code>bot-update</code></p>
   </div>
@@ -147,8 +147,8 @@ source ~/.bashrc</code></pre>
   <h2>Verifikation</h2>
   <div class="step">
     <h4>Prüfen ob alles da ist</h4>
-    <pre><code>ls -la ~/projekte/telegram-notion-bot/
-cat ~/projekte/telegram-notion-bot/requirements.txt</code></pre>
+    <pre><code>ls -la ~/projekte/claude-telegram-chat-bot/
+cat ~/projekte/claude-telegram-chat-bot/requirements.txt</code></pre>
     <p>Wenn du die Python-Dependencies siehst — Code ist erfolgreich übertragen.</p>
   </div>
 
@@ -159,7 +159,7 @@ cat ~/projekte/telegram-notion-bot/requirements.txt</code></pre>
     <div class="quiz-q">2. Warum ist die .env-Datei nicht im GitHub-Repo?</div>
     <div class="quiz-a">Sie enthält API-Keys und Tokens. Diese Secrets auf GitHub würden jeden erlauben, deinen Bot zu übernehmen. <code>.gitignore</code> stellt sicher, dass sie nie committed werden.</div>
     <div class="quiz-q">3. Wie bekommst du später Code-Updates auf den Pi?</div>
-    <div class="quiz-a"><code>cd ~/projekte/telegram-notion-bot &amp;&amp; git pull</code> — Git holt nur die Änderungen herunter.</div>
+    <div class="quiz-a"><code>cd ~/projekte/claude-telegram-chat-bot &amp;&amp; git pull</code> — Git holt nur die Änderungen herunter.</div>
   </div>
 
   <div class="summary">

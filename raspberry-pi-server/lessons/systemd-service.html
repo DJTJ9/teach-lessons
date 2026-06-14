@@ -92,7 +92,7 @@
     <div class="step-num">1</div>
     <h4>Service-Datei erstellen</h4>
     <p>Auf dem Pi (via SSH):</p>
-    <pre><code>sudo nano /etc/systemd/system/telegram-notion-bot.service</code></pre>
+    <pre><code>sudo nano /etc/systemd/system/claude-telegram-chat-bot.service</code></pre>
     <p>Inhalt:</p>
     <pre><code>[Unit]
 Description=Telegram Notion Bot
@@ -102,9 +102,9 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=pi
-WorkingDirectory=/home/pi/projekte/telegram-notion-bot
-ExecStart=/home/pi/projekte/telegram-notion-bot/venv/bin/python3 bot.py
-EnvironmentFile=/home/pi/projekte/telegram-notion-bot/.env
+WorkingDirectory=/home/pi/projekte/claude-telegram-chat-bot
+ExecStart=/home/pi/projekte/claude-telegram-chat-bot/venv/bin/python3 bot.py
+EnvironmentFile=/home/pi/projekte/claude-telegram-chat-bot/.env
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
@@ -140,19 +140,19 @@ WantedBy=multi-user.target</code></pre>
   <div class="step">
     <div class="step-num">3</div>
     <h4>Service aktivieren (Autostart beim Boot)</h4>
-    <pre><code>sudo systemctl enable telegram-notion-bot</code></pre>
+    <pre><code>sudo systemctl enable claude-telegram-chat-bot</code></pre>
   </div>
 
   <div class="step">
     <div class="step-num">4</div>
     <h4>Service sofort starten</h4>
-    <pre><code>sudo systemctl start telegram-notion-bot</code></pre>
+    <pre><code>sudo systemctl start claude-telegram-chat-bot</code></pre>
   </div>
 
   <div class="step">
     <div class="step-num">5</div>
     <h4>Status prüfen</h4>
-    <pre><code>sudo systemctl status telegram-notion-bot</code></pre>
+    <pre><code>sudo systemctl status claude-telegram-chat-bot</code></pre>
     <p><strong>active (running)</strong> = Bot läuft. ✅</p>
   </div>
 
@@ -168,7 +168,7 @@ WantedBy=multi-user.target</code></pre>
     <h4>Pi neu starten und Bot-Status prüfen</h4>
     <pre><code>sudo reboot</code></pre>
     <p>Warte 2–3 Minuten. Dann via SSH verbinden und prüfen:</p>
-    <pre><code>sudo systemctl status telegram-notion-bot</code></pre>
+    <pre><code>sudo systemctl status claude-telegram-chat-bot</code></pre>
     <p><code>active (running)</code> → Autostart funktioniert. ✅</p>
   </div>
 
@@ -176,16 +176,16 @@ WantedBy=multi-user.target</code></pre>
 
   <table class="cmd-table">
     <tr><th>Befehl</th><th>Bedeutung</th></tr>
-    <tr><td>sudo systemctl start telegram-notion-bot</td><td>Service starten</td></tr>
-    <tr><td>sudo systemctl stop telegram-notion-bot</td><td>Service stoppen</td></tr>
-    <tr><td>sudo systemctl restart telegram-notion-bot</td><td>Service neu starten</td></tr>
-    <tr><td>sudo systemctl status telegram-notion-bot</td><td>Status anzeigen</td></tr>
-    <tr><td>sudo systemctl disable telegram-notion-bot</td><td>Autostart deaktivieren</td></tr>
+    <tr><td>sudo systemctl start claude-telegram-chat-bot</td><td>Service starten</td></tr>
+    <tr><td>sudo systemctl stop claude-telegram-chat-bot</td><td>Service stoppen</td></tr>
+    <tr><td>sudo systemctl restart claude-telegram-chat-bot</td><td>Service neu starten</td></tr>
+    <tr><td>sudo systemctl status claude-telegram-chat-bot</td><td>Status anzeigen</td></tr>
+    <tr><td>sudo systemctl disable claude-telegram-chat-bot</td><td>Autostart deaktivieren</td></tr>
   </table>
 
   <div class="tip">
     <div class="label">💡 Nach Code-Updates</div>
-    <p>Nach <code>git pull</code>: <code>sudo systemctl restart telegram-notion-bot</code></p>
+    <p>Nach <code>git pull</code>: <code>sudo systemctl restart claude-telegram-chat-bot</code></p>
   </div>
 
   <div class="quiz">

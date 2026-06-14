@@ -98,7 +98,7 @@
   <div class="step">
     <div class="step-num">2</div>
     <h4>In den Bot-Ordner wechseln</h4>
-    <pre><code>cd ~/projekte/telegram-notion-bot</code></pre>
+    <pre><code>cd ~/projekte/claude-telegram-chat-bot</code></pre>
   </div>
 
   <div class="step">
@@ -146,7 +146,7 @@
   <div class="step">
     <div class="step-num">7</div>
     <h4>.env-Datei erstellen</h4>
-    <pre><code>nano ~/projekte/telegram-notion-bot/.env</code></pre>
+    <pre><code>nano ~/projekte/claude-telegram-chat-bot/.env</code></pre>
     <p>Inhalt (ersetze die Platzhalter mit deinen echten Werten):</p>
     <pre><code>TELEGRAM_TOKEN=123456789:ABCdef...
 NOTION_TOKEN=secret_abc123...
@@ -157,7 +157,7 @@ TELEGRAM_CHAT_ID=8896609541</code></pre>
   <div class="step">
     <div class="step-num">8</div>
     <h4>Dateiberechtigungen sichern</h4>
-    <pre><code>chmod 600 ~/projekte/telegram-notion-bot/.env</code></pre>
+    <pre><code>chmod 600 ~/projekte/claude-telegram-chat-bot/.env</code></pre>
     <p><code>chmod 600</code> = nur du (pi) kannst lesen und schreiben — kein anderer Nutzer auf dem System.</p>
   </div>
 
@@ -166,7 +166,7 @@ TELEGRAM_CHAT_ID=8896609541</code></pre>
   <div class="step">
     <div class="step-num">9</div>
     <h4>Bot manuell starten</h4>
-    <pre><code>cd ~/projekte/telegram-notion-bot
+    <pre><code>cd ~/projekte/claude-telegram-chat-bot
 source venv/bin/activate
 python3 bot.py</code></pre>
     <p>Der Bot startet und gibt Logs aus. Schicke eine Nachricht auf Telegram — der Bot sollte antworten.</p>

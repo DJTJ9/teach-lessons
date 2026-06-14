@@ -92,27 +92,27 @@
   <div class="step">
     <h4>Die wichtigsten journalctl-Befehle</h4>
     <pre><code># Alle Logs des Bot-Service
-journalctl -u telegram-notion-bot
+journalctl -u claude-telegram-chat-bot
 
 # Letzte 50 Zeilen
-journalctl -u telegram-notion-bot -n 50
+journalctl -u claude-telegram-chat-bot -n 50
 
 # Live-Logs (wie tail -f)
-journalctl -u telegram-notion-bot -f
+journalctl -u claude-telegram-chat-bot -f
 
 # Logs seit dem letzten Boot
-journalctl -u telegram-notion-bot -b
+journalctl -u claude-telegram-chat-bot -b
 
 # Letzte Stunde
-journalctl -u telegram-notion-bot --since "1 hour ago"
+journalctl -u claude-telegram-chat-bot --since "1 hour ago"
 
 # Nur Fehler
-journalctl -u telegram-notion-bot -p err</code></pre>
+journalctl -u claude-telegram-chat-bot -p err</code></pre>
   </div>
 
   <div class="tip">
     <div class="label">💡 Live-Logs für Debugging</div>
-    <p><code>journalctl -u telegram-notion-bot -f</code> zeigt Logs in Echtzeit. Schick eine Telegram-Nachricht und sieh sofort was der Bot macht. Beenden mit <strong>Strg+C</strong>.</p>
+    <p><code>journalctl -u claude-telegram-chat-bot -f</code> zeigt Logs in Echtzeit. Schick eine Telegram-Nachricht und sieh sofort was der Bot macht. Beenden mit <strong>Strg+C</strong>.</p>
   </div>
 
   <h2>Typische Log-Einträge</h2>
@@ -136,12 +136,12 @@ journalctl -u telegram-notion-bot -p err</code></pre>
 
   <div class="step">
     <h4>Bot-Code aktualisieren</h4>
-    <pre><code>cd ~/projekte/telegram-notion-bot
+    <pre><code>cd ~/projekte/claude-telegram-chat-bot
 git pull
 source venv/bin/activate
 pip install -r requirements.txt   # nur wenn requirements.txt geändert
-sudo systemctl restart telegram-notion-bot
-sudo systemctl status telegram-notion-bot</code></pre>
+sudo systemctl restart claude-telegram-chat-bot
+sudo systemctl status claude-telegram-chat-bot</code></pre>
   </div>
 
   <h2>Fehlersuche: Bot startet nicht</h2>
@@ -150,19 +150,19 @@ sudo systemctl status telegram-notion-bot</code></pre>
     <h4>Diagnose-Checkliste</h4>
     <div class="debug-step">
       <div class="debug-step-num">1</div>
-      <div>Status prüfen: <code>sudo systemctl status telegram-notion-bot</code></div>
+      <div>Status prüfen: <code>sudo systemctl status claude-telegram-chat-bot</code></div>
     </div>
     <div class="debug-step">
       <div class="debug-step-num">2</div>
-      <div>Logs lesen: <code>journalctl -u telegram-notion-bot -n 30</code> — Fehlermeldung suchen</div>
+      <div>Logs lesen: <code>journalctl -u claude-telegram-chat-bot -n 30</code> — Fehlermeldung suchen</div>
     </div>
     <div class="debug-step">
       <div class="debug-step-num">3</div>
-      <div>.env prüfen: <code>cat ~/projekte/telegram-notion-bot/.env</code> — Tokens korrekt?</div>
+      <div>.env prüfen: <code>cat ~/projekte/claude-telegram-chat-bot/.env</code> — Tokens korrekt?</div>
     </div>
     <div class="debug-step">
       <div class="debug-step-num">4</div>
-      <div>Manuell testen: <code>cd ~/projekte/telegram-notion-bot && source venv/bin/activate && python3 bot.py</code></div>
+      <div>Manuell testen: <code>cd ~/projekte/claude-telegram-chat-bot && source venv/bin/activate && python3 bot.py</code></div>
     </div>
     <div class="debug-step">
       <div class="debug-step-num">5</div>
@@ -195,9 +195,9 @@ sudo systemctl restart systemd-journald</code></pre>
   <div class="quiz">
     <h3>🧠 Wissenscheck</h3>
     <div class="quiz-q">1. Wie siehst du Bot-Logs in Echtzeit?</div>
-    <div class="quiz-a"><code>journalctl -u telegram-notion-bot -f</code> — das <code>-f</code> steht für "follow". Beenden mit Strg+C.</div>
+    <div class="quiz-a"><code>journalctl -u claude-telegram-chat-bot -f</code> — das <code>-f</code> steht für "follow". Beenden mit Strg+C.</div>
     <div class="quiz-q">2. Der Bot startet nicht. Was ist dein erster Diagnose-Schritt?</div>
-    <div class="quiz-a"><code>sudo systemctl status telegram-notion-bot</code> zeigt ob der Service läuft und die letzten Log-Zeilen. Oft steht der Fehler direkt dort. Dann <code>journalctl -n 50</code> für mehr Details.</div>
+    <div class="quiz-a"><code>sudo systemctl status claude-telegram-chat-bot</code> zeigt ob der Service läuft und die letzten Log-Zeilen. Oft steht der Fehler direkt dort. Dann <code>journalctl -n 50</code> für mehr Details.</div>
     <div class="quiz-q">3. Warum sollte man Logs auf einer SD-Karte begrenzen?</div>
     <div class="quiz-a">SD-Karten haben begrenzte Kapazität und leiden unter häufigen Schreibvorgängen. Unbegrenzte Logs können die Karte füllen oder beschleunigt abnutzen. 100 MB ist für Bot-Logs mehr als genug.</div>
   </div>
@@ -218,7 +218,7 @@ sudo systemctl restart systemd-journald</code></pre>
   <div class="summary">
     <h3>✅ Das hast du in dieser Lektion gelernt</h3>
     <ul>
-      <li><code>journalctl -u telegram-notion-bot -f</code> für Live-Logs</li>
+      <li><code>journalctl -u claude-telegram-chat-bot -f</code> für Live-Logs</li>
       <li>Fehlerdiagnose: Status → Logs → .env → manueller Test → Netzwerk</li>
       <li><code>sudo apt update &amp;&amp; upgrade</code> monatlich für Sicherheitsupdates</li>
       <li>Nach Code-Update: <code>git pull</code> + <code>systemctl restart</code></li>
