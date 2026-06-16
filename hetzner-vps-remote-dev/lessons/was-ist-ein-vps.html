@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 1: Was ist ein VPS?</title>
+<style>
+  :root { --bg: #0f1117; --card: #1a1d27; --accent: #6366f1; --text: #e2e8f0; --muted: #94a3b8; --green: #22c55e; --yellow: #eab308; --red: #ef4444; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.7; padding: 2rem 1rem; }
+  .container { max-width: 760px; margin: 0 auto; }
+  .badge { display: inline-block; background: var(--accent); color: white; font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 999px; margin-bottom: 1rem; }
+  h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; color: var(--accent); margin: 2rem 0 0.75rem; }
+  p { color: var(--muted); margin-bottom: 1rem; }
+  .card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border: 1px solid #2d3148; }
+  .why { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 1.5rem 0; }
+  .why p { color: var(--text); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th { background: #2d3148; text-align: left; padding: 0.7rem 1rem; font-size: 0.85rem; color: var(--muted); }
+  td { padding: 0.7rem 1rem; border-bottom: 1px solid #2d3148; font-size: 0.9rem; }
+  td:first-child { color: var(--text); font-weight: 600; }
+  .check { color: var(--green); } .warn { color: var(--yellow); } .cross { color: var(--red); }
+  .quiz { background: #12151f; border: 1px solid #2d3148; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+  .quiz h2 { margin-top: 0; }
+  .option { background: var(--card); border: 1px solid #2d3148; border-radius: 8px; padding: 0.8rem 1rem; margin: 0.5rem 0; cursor: pointer; transition: border-color 0.2s; }
+  .option:hover { border-color: var(--accent); }
+  .option.correct { border-color: var(--green); background: #0f2a1a; }
+  .option.wrong { border-color: var(--red); background: #2a0f0f; }
+  .feedback { margin-top: 1rem; padding: 0.75rem; border-radius: 8px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #0f2a1a; color: var(--green); }
+  .feedback.no { background: #2a0f0f; color: var(--red); }
+  .summary { background: linear-gradient(135deg, #1e1b4b, #1a1d27); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+  .summary h2 { margin-top: 0; }
+  .summary ul { list-style: none; }
+  .summary li::before { content: "✓ "; color: var(--green); }
+  .summary li { color: var(--text); margin-bottom: 0.4rem; }
+  .nav { display: flex; justify-content: flex-end; margin-top: 2rem; }
+  .btn { background: var(--accent); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 0.95rem; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <span class="badge">Lektion 1 von 9</span>
+  <h1>Was ist ein VPS?</h1>
+  <p>Bevor wir den Server einrichten, verstehen wir warum ein VPS die richtige Wahl für Remote-Entwicklung ist — und warum andere Optionen nicht passen.</p>
+
+  <h2>Das Problem</h2>
+  <div class="why">
+    <p>Du willst vom Handy und vom PC <strong>identisch</strong> an Projekten arbeiten: gleiche Tools, gleiche Dateien, gleiche Umgebung. Das geht nur, wenn beide Geräte auf <em>denselben</em> Server zugreifen.</p>
+  </div>
+
+  <h2>Was ist ein VPS?</h2>
+  <div class="card">
+    <p><strong>VPS = Virtual Private Server.</strong> Ein echter Computer in einem Rechenzentrum, der dauerhaft läuft und über das Internet erreichbar ist. Du bekommst Root-Zugriff — als wärst du direkt vor dem Rechner.</p>
+    <p>Stell dir vor: dein PC steht permanent in einem professionellen Rechenzentrum, immer eingeschaltet, mit stabiler Internetverbindung. Das ist ein VPS.</p>
+  </div>
+
+  <h2>Optionen im Vergleich</h2>
+  <table>
+    <tr><th>Option</th><th>Kosten</th><th>RAM</th><th>Problem</th></tr>
+    <tr><td>Raspberry Pi</td><td>€0 (vorhanden)</td><td>4-8 GB</td><td><span class="warn">⚠</span> Heimnetz, schwach für Android-Builds</td></tr>
+    <tr><td>Oracle Cloud</td><td>€0</td><td>24 GB</td><td><span class="cross">✗</span> Kapazitätsproblem ("Out of capacity")</td></tr>
+    <tr><td>Hostinger "Claude Code"</td><td>€7.99/Mo</td><td>8 GB</td><td><span class="cross">✗</span> Teurer, kein echtes Claude Code (nur "Kodee")</td></tr>
+    <tr><td><strong>Hetzner CX33</strong></td><td><strong>€10.10/Mo</strong></td><td><strong>8 GB</strong></td><td><span class="check">✓</span> Zuverlässig, sofort verfügbar, deutsch</td></tr>
+  </table>
+
+  <h2>Warum Hetzner?</h2>
+  <div class="card">
+    <ul style="list-style:none; padding:0;">
+      <li><span class="check">✓</span> Deutsches Unternehmen — Rechenzentrum Nürnberg/Falkenstein</li>
+      <li><span class="check">✓</span> Kein Kapazitätsproblem wie bei Oracle Free Tier</li>
+      <li><span class="check">✓</span> Sofort verfügbar nach Bestellung</li>
+      <li><span class="check">✓</span> 4 vCPUs + 8 GB RAM — ausreichend für Android-Builds</li>
+      <li><span class="check">✓</span> Revolut-Karte als Zahlungsmittel akzeptiert</li>
+    </ul>
+  </div>
+
+  <h2>Warum 8 GB RAM?</h2>
+  <div class="why">
+    <p>Android-Builds mit Gradle verbrauchen allein 2–4 GB RAM. Mit 4 GB bleibt kaum Puffer. Mit 8 GB laufen Node.js, Android SDK und Claude Code komfortabel gleichzeitig.</p>
+  </div>
+
+  <div class="quiz">
+    <h2>Quiz</h2>
+    <p>Warum ist Hostinger's "Claude Code Hosting" kein echtes Claude Code?</p>
+    <div class="option" onclick="answer(this,false)">Weil Hostinger Claude Code nicht lizenzieren darf</div>
+    <div class="option" onclick="answer(this,true)">Weil Hostinger ihren eigenen KI-Assistenten "Kodee" anbietet — nicht das Claude Code CLI</div>
+    <div class="option" onclick="answer(this,false)">Weil Claude Code nur auf Mac läuft</div>
+    <div class="feedback" id="fb"></div>
+  </div>
+
+  <div class="summary">
+    <h2>Zusammenfassung</h2>
+    <ul>
+      <li>VPS = dauerhaft laufender Server im Rechenzentrum mit Root-Zugriff</li>
+      <li>Hetzner CX33: 4 vCPUs, 8 GB RAM, €10.10/Mo — beste Wahl für diesen Use Case</li>
+      <li>8 GB RAM nötig wegen Gradle-Speicherbedarf bei Android-Builds</li>
+      <li>Hostinger "Claude Code" ist Marketing für ihren eigenen Kodee-Assistenten</li>
+    </ul>
+  </div>
+
+  <div class="nav"><a class="btn" href="hetzner-server-erstellen.html">Weiter →</a></div>
+</div>
+<script>
+function answer(el, correct) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'no');
+  fb.textContent = correct ? '✓ Richtig! Hostinger verwendet "Kodee" — ein eigenes Produkt.' : '✗ Nicht ganz. Der Grund ist ihr eigener Assistent "Kodee".';
+}
+</script>
+</body>
+</html>

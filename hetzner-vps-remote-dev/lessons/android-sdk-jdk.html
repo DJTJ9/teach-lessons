@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Android SDK + JDK 17</title>
+<style>  :root{--bg:#0f1117;--card:#1a1d27;--accent:#6366f1;--text:#e2e8f0;--muted:#94a3b8;--green:#22c55e;--yellow:#eab308;--red:#ef4444}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7;padding:2rem 1rem}
+  .container{max-width:760px;margin:0 auto}
+  .badge{display:inline-block;background:var(--accent);color:#fff;font-size:.75rem;padding:.2rem .7rem;border-radius:999px;margin-bottom:1rem}
+  h1{font-size:2rem;margin-bottom:.5rem}
+  h2{font-size:1.2rem;color:var(--accent);margin:2rem 0 .75rem}
+  p{color:var(--muted);margin-bottom:1rem}
+  .card{background:var(--card);border-radius:12px;padding:1.5rem;margin:1.5rem 0;border:1px solid #2d3148}
+  .why{border-left:3px solid var(--accent);padding-left:1rem;margin:1.5rem 0}
+  .why p,.why strong{color:var(--text)}
+  .step{display:flex;gap:1rem;align-items:flex-start;margin:1rem 0}
+  .step-num{background:var(--accent);color:#fff;border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:.9rem}
+  .step-content{flex:1}
+  .step-content strong{color:var(--text);display:block;margin-bottom:.25rem}
+  .step-content p{margin:0}
+  pre{background:#12151f;border:1px solid #2d3148;border-radius:8px;padding:1rem;overflow-x:auto;margin:1rem 0;white-space:pre}
+  code{background:#2d3148;padding:.15rem .4rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#a5b4fc}
+  pre code{background:none;padding:0;color:#e2e8f0}
+  .warn-box{background:#1a1400;border:1px solid var(--yellow);border-radius:8px;padding:1rem;margin:1rem 0;color:var(--yellow)}
+  .tip-box{background:#0f1a2a;border:1px solid var(--accent);border-radius:8px;padding:1rem;margin:1rem 0;color:#93c5fd}
+  table{width:100%;border-collapse:collapse;margin:1rem 0}
+  th{background:#2d3148;text-align:left;padding:.7rem 1rem;font-size:.85rem;color:var(--muted)}
+  td{padding:.7rem 1rem;border-bottom:1px solid #2d3148;font-size:.9rem}
+  .check{color:var(--green)}.cross{color:var(--red)}
+  .quiz{background:#12151f;border:1px solid #2d3148;border-radius:12px;padding:1.5rem;margin:2rem 0}
+  .quiz h2{margin-top:0}
+  .option{background:var(--card);border:1px solid #2d3148;border-radius:8px;padding:.8rem 1rem;margin:.5rem 0;cursor:pointer;transition:border-color .2s}
+  .option:hover{border-color:var(--accent)}
+  .option.correct{border-color:var(--green);background:#0f2a1a}
+  .option.wrong{border-color:var(--red);background:#2a0f0f}
+  .feedback{margin-top:1rem;padding:.75rem;border-radius:8px;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#0f2a1a;color:var(--green)}
+  .feedback.no{background:#2a0f0f;color:var(--red)}
+  .summary{background:linear-gradient(135deg,#1e1b4b,#1a1d27);border:1px solid var(--accent);border-radius:12px;padding:1.5rem;margin:2rem 0}
+  .summary h2{margin-top:0}
+  .summary ul{list-style:none}
+  .summary li::before{content:"✓ ";color:var(--green)}
+  .summary li{color:var(--text);margin-bottom:.4rem}
+  .nav{display:flex;justify-content:space-between;margin-top:2rem}
+  .btn{background:var(--accent);color:#fff;border:none;padding:.7rem 1.5rem;border-radius:8px;font-size:.95rem;text-decoration:none;display:inline-block}
+  .btn-ghost{background:transparent;border:1px solid #2d3148;color:var(--muted);padding:.7rem 1.5rem;border-radius:8px;text-decoration:none;font-size:.95rem;display:inline-block}</style>
+</head>
+<body>
+<div class="container">
+<span class="badge">Lektion 5 von 9</span>
+<h1>Android SDK + JDK 17</h1>
+<p>JDK 17 und Android SDK für headless Android-Builds auf dem Server.</p>
+<h2>Was ist JDK 17?</h2>
+<div class="card"><p><strong>JDK = Java Development Kit.</strong> Gradle (Android Build-Tool) benötigt JDK als Basis. Version 17 ist der aktuelle LTS für Android-Entwicklung.</p></div>
+<h2>Was ist das Android SDK?</h2>
+<div class="card">
+<ul style="color:var(--muted);padding-left:1.5rem">
+<li><strong>platform-tools</strong>: adb zum Gerät verbinden und debuggen</li>
+<li><strong>platforms;android-35</strong>: Android 15 API gegen die du entwickelst</li>
+<li><strong>build-tools;35.0.0</strong>: Compiler, APK-Signer, d8</li>
+</ul>
+</div>
+<h2>Schritt 1: JDK 17</h2>
+<pre><code>apt install -y openjdk-17-jdk</code></pre>
+<p>Prüfen: <code>java -version</code> sollte <code>openjdk version "17.x"</code> ausgeben.</p>
+<h2>Schritt 2: cmdline-tools herunterladen</h2>
+<pre><code>mkdir -p /opt/android-sdk/cmdline-tools
+wget "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -O /tmp/cmdline-tools.zip</code></pre>
+<h2>Schritt 3: Entpacken + umbenennen</h2>
+<pre><code>unzip /tmp/cmdline-tools.zip -d /opt/android-sdk/cmdline-tools
+mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest</code></pre>
+<div class="why"><p>sdkmanager erwartet Pfad <code>cmdline-tools/latest/bin/</code> — ohne Umbenennung nicht gefunden.</p></div>
+<h2>Schritt 4: Umgebungsvariablen</h2>
+<pre><code>echo 'export ANDROID_HOME=/opt/android-sdk' >> ~/.bashrc
+echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools' >> ~/.bashrc
+source ~/.bashrc</code></pre>
+<h2>Schritt 5: Lizenzen + Pakete</h2>
+<pre><code>yes | sdkmanager --licenses
+sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"</code></pre>
+<h2>Prüfen</h2>
+<pre><code>adb --version && sdkmanager --list_installed</code></pre>
+<div class="quiz"><h2>Quiz</h2><p>Warum Ordner zu "latest" umbenennen?</p>
+<div class="option" onclick="answer(this,false)" data-ok="" data-no="✗ Technisch bedingt.">Google nennt ihn immer latest</div>
+<div class="option" onclick="answer(this,true)" data-ok="✓ Richtig! sdkmanager sucht cmdline-tools/latest/bin." data-no="">sdkmanager erwartet Pfad cmdline-tools/latest/bin</div>
+<div class="option" onclick="answer(this,false)" data-ok="" data-no="✗ Nein.">Kürzerer Ordnername</div>
+<div class="feedback" id="fb"></div></div>
+<div class="summary"><h2>Zusammenfassung</h2><ul>
+<li>JDK 17: Basis für Gradle und Android-Builds</li>
+<li>SDK: platform-tools, platforms;android-35, build-tools;35.0.0</li>
+<li>Ordner zu latest umbenennen: Anforderung von sdkmanager</li>
+<li>ANDROID_HOME + PATH: Tools von überall aufrufbar</li>
+</ul></div>
+<div class="nav"><a class="btn-ghost" href="server-grundinstallation.html">← Zurück</a><a class="btn" href="tailscale-einrichten.html">Weiter →</a></div>
+</div>
+<script>function answer(el,correct){
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('correct','wrong'));
+  el.classList.add(correct?'correct':'wrong');
+  const fb=document.getElementById('fb');
+  fb.className='feedback show '+(correct?'ok':'no');
+  fb.textContent=correct?el.dataset.ok:el.dataset.no;
+}</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Termux + SSH Config auf Android</title>
+<style>  :root{--bg:#0f1117;--card:#1a1d27;--accent:#6366f1;--text:#e2e8f0;--muted:#94a3b8;--green:#22c55e;--yellow:#eab308;--red:#ef4444}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7;padding:2rem 1rem}
+  .container{max-width:760px;margin:0 auto}
+  .badge{display:inline-block;background:var(--accent);color:#fff;font-size:.75rem;padding:.2rem .7rem;border-radius:999px;margin-bottom:1rem}
+  h1{font-size:2rem;margin-bottom:.5rem}
+  h2{font-size:1.2rem;color:var(--accent);margin:2rem 0 .75rem}
+  p{color:var(--muted);margin-bottom:1rem}
+  .card{background:var(--card);border-radius:12px;padding:1.5rem;margin:1.5rem 0;border:1px solid #2d3148}
+  .why{border-left:3px solid var(--accent);padding-left:1rem;margin:1.5rem 0}
+  .why p,.why strong{color:var(--text)}
+  .step{display:flex;gap:1rem;align-items:flex-start;margin:1rem 0}
+  .step-num{background:var(--accent);color:#fff;border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:.9rem}
+  .step-content{flex:1}
+  .step-content strong{color:var(--text);display:block;margin-bottom:.25rem}
+  .step-content p{margin:0}
+  pre{background:#12151f;border:1px solid #2d3148;border-radius:8px;padding:1rem;overflow-x:auto;margin:1rem 0;white-space:pre}
+  code{background:#2d3148;padding:.15rem .4rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#a5b4fc}
+  pre code{background:none;padding:0;color:#e2e8f0}
+  .warn-box{background:#1a1400;border:1px solid var(--yellow);border-radius:8px;padding:1rem;margin:1rem 0;color:var(--yellow)}
+  .tip-box{background:#0f1a2a;border:1px solid var(--accent);border-radius:8px;padding:1rem;margin:1rem 0;color:#93c5fd}
+  table{width:100%;border-collapse:collapse;margin:1rem 0}
+  th{background:#2d3148;text-align:left;padding:.7rem 1rem;font-size:.85rem;color:var(--muted)}
+  td{padding:.7rem 1rem;border-bottom:1px solid #2d3148;font-size:.9rem}
+  .check{color:var(--green)}.cross{color:var(--red)}
+  .quiz{background:#12151f;border:1px solid #2d3148;border-radius:12px;padding:1.5rem;margin:2rem 0}
+  .quiz h2{margin-top:0}
+  .option{background:var(--card);border:1px solid #2d3148;border-radius:8px;padding:.8rem 1rem;margin:.5rem 0;cursor:pointer;transition:border-color .2s}
+  .option:hover{border-color:var(--accent)}
+  .option.correct{border-color:var(--green);background:#0f2a1a}
+  .option.wrong{border-color:var(--red);background:#2a0f0f}
+  .feedback{margin-top:1rem;padding:.75rem;border-radius:8px;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#0f2a1a;color:var(--green)}
+  .feedback.no{background:#2a0f0f;color:var(--red)}
+  .summary{background:linear-gradient(135deg,#1e1b4b,#1a1d27);border:1px solid var(--accent);border-radius:12px;padding:1.5rem;margin:2rem 0}
+  .summary h2{margin-top:0}
+  .summary ul{list-style:none}
+  .summary li::before{content:"✓ ";color:var(--green)}
+  .summary li{color:var(--text);margin-bottom:.4rem}
+  .nav{display:flex;justify-content:space-between;margin-top:2rem}
+  .btn{background:var(--accent);color:#fff;border:none;padding:.7rem 1.5rem;border-radius:8px;font-size:.95rem;text-decoration:none;display:inline-block}
+  .btn-ghost{background:transparent;border:1px solid #2d3148;color:var(--muted);padding:.7rem 1.5rem;border-radius:8px;text-decoration:none;font-size:.95rem;display:inline-block}</style>
+</head>
+<body>
+<div class="container">
+<span class="badge">Lektion 7 von 9</span>
+<h1>Termux + SSH Config auf Android</h1>
+<p>Terminal-Emulator für Android einrichten und SSH-Config für schnellen Verbindungsaufbau.</p>
+<div class="warn-box">⚠ Termux immer aus F-Droid installieren — Play-Store-Version eingefroren seit 2020, keine Updates.</div>
+<h2>Schritt 1: F-Droid + Termux</h2>
+<div class="card">
+<div class="step"><div class="step-num">1</div><div class="step-content"><strong>f-droid.org im Browser öffnen</strong><p>Alternativer App-Store für Open-Source-Apps</p></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content"><strong>F-Droid APK herunterladen + installieren</strong><p>Erlaubnis für unbekannte Quellen geben</p></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content"><strong>In F-Droid: Termux suchen → installieren</strong></div></div>
+</div>
+<h2>Schritt 2: OpenSSH</h2>
+<pre><code>pkg update && pkg install openssh</code></pre>
+<h2>Schritt 3: SSH Key generieren</h2>
+<pre><code>ssh-keygen -t ed25519</code></pre>
+<p>Enter dreimal drücken. Public Key anzeigen:</p>
+<pre><code>cat ~/.ssh/id_ed25519.pub</code></pre>
+<h2>Schritt 4: Public Key auf Server eintragen</h2>
+<p>Vom PC-Terminal ausführen:</p>
+<pre><code>ssh root@195.201.121.96 "echo 'DEIN_PUBLIC_KEY' >> ~/.ssh/authorized_keys"</code></pre>
+<h2>Schritt 5: SSH Config (printf statt heredoc)</h2>
+<div class="warn-box">⚠ Heredoc hat in Termux Zeilenumbruch-Probleme. printf verwenden:</div>
+<pre><code>mkdir -p ~/.ssh
+printf 'Host dev\n    HostName 100.64.150.74\n    User root\n    IdentityFile ~/.ssh/id_ed25519\n' >> ~/.ssh/config</code></pre>
+<h2>Schritt 6: Testen</h2>
+<pre><code>ssh dev</code></pre>
+<div class="quiz"><h2>Quiz</h2><p>Warum F-Droid statt Play Store?</p>
+<div class="option" onclick="answer(this,true)" data-ok="✓ Richtig! Play-Store-Version seit 2020 eingefroren." data-no="">Play-Store-Version erhält keine Updates mehr</div>
+<div class="option" onclick="answer(this,false)" data-ok="" data-no="✗ Beide kostenlos.">F-Droid ist kostenlos, Play Store nicht</div>
+<div class="option" onclick="answer(this,false)" data-ok="" data-no="✗ Stimmt nicht.">Play Store-Version braucht Root</div>
+<div class="feedback" id="fb"></div></div>
+<div class="summary"><h2>Zusammenfassung</h2><ul>
+<li>Termux aus F-Droid — Play-Store-Version veraltet</li>
+<li>Jedes Gerät braucht eigenen Key in authorized_keys</li>
+<li>printf statt heredoc in Termux</li>
+<li>Nach Setup: ssh dev reicht</li>
+</ul></div>
+<div class="nav"><a class="btn-ghost" href="tailscale-einrichten.html">← Zurück</a><a class="btn" href="claude-code-starten.html">Weiter →</a></div>
+</div>
+<script>function answer(el,correct){
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('correct','wrong'));
+  el.classList.add(correct?'correct':'wrong');
+  const fb=document.getElementById('fb');
+  fb.className='feedback show '+(correct?'ok':'no');
+  fb.textContent=correct?el.dataset.ok:el.dataset.no;
+}</script>
+</body>
+</html>
