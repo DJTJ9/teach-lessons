@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 4: Der erste Zug</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #34d399 0%, #059669 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #059669; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #065f46; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .step-card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: flex; gap: 1.2rem; align-items: flex-start; }
+    .step-num { background: #059669; color: #fff; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; font-size: 1.1rem; }
+    .step-content h4 { color: #1e1b4b; margin-bottom: 0.3rem; }
+    .step-content p { font-size: 0.9rem; color: #4b5563; }
+    .step-content .detail { font-size: 0.85rem; color: #6b7280; margin-top: 0.4rem; font-style: italic; }
+    .rhythm-box { background: #ecfdf5; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border: 2px solid #10b981; }
+    .rhythm-box h3 { color: #065f46; margin-bottom: 1rem; }
+    .rhythm-steps { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .r-step { background: #fff; border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 600; border: 2px solid; }
+    .r-step.l { border-color: #ef4444; color: #ef4444; }
+    .r-step.r { border-color: #3b82f6; color: #3b82f6; }
+    .r-step.arrow { background: none; border: none; color: #9ca3af; font-size: 1.2rem; padding: 0.4rem 0.2rem; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .hands-box { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; font-family: monospace; }
+    .hands-box h3 { color: #34d399; margin-bottom: 1rem; font-family: 'Segoe UI', sans-serif; font-size: 1rem; }
+    .hands-box pre { font-size: 0.9rem; line-height: 2; color: #d1fae5; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #34d399; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    details summary { cursor: pointer; color: #6ee7b7; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #a7f3d0; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #065f46; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: space-between; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #34d399, #059669); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .btn-back { background: #e5e7eb; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 4 von 8</div>
+    <h1>Der erste Zug</h1>
+    <p>Schritt für Schritt: dein erster echter Zopf</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Du kennst das Prinzip und weißt, wie du Haare teilst. Jetzt kombinierst du beides und flechtest deinen ersten echten Zopf — Zug für Zug.</p>
+    </div>
+
+    <h2>Der vollständige Ablauf</h2>
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Ausgangslage herstellen</h4>
+        <p>Haare gebürstet, in 3 gleiche Strähnen geteilt. Linke Strähne in linker Hand, rechte Strähne in rechter Hand, mittlere hängt dazwischen.</p>
+        <p class="detail">Tipp: mittlere Strähne zwischen Zeige- und Mittelfinger klemmen, damit sie nicht verrutscht.</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Linke Strähne über die Mitte</h4>
+        <p>Nimm die linke Strähne und lege sie über die mittlere nach rechts. Die linke Strähne ist jetzt die neue Mitte. Die alte Mitte ist jetzt links außen.</p>
+        <p class="detail">Übergib die neue Mitte an die rechte Hand.</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Rechte Strähne über die Mitte</h4>
+        <p>Nimm die rechte Strähne und lege sie über die mittlere nach links. Die rechte Strähne ist jetzt die neue Mitte.</p>
+        <p class="detail">Übergib die neue Mitte an die linke Hand.</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Wiederholen</h4>
+        <p>Schritt 2 und 3 abwechselnd wiederholen. Nach jedem Zug leicht nach unten straffen.</p>
+        <p class="detail">Zähle laut: "Links über Mitte, rechts über Mitte, links über Mitte..."</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Ende sichern</h4>
+        <p>Wenn noch 5–10 cm Haar übrig sind: Haargummi um alle 3 Strähnen zusammen wickeln. Fertig.</p>
+      </div>
+    </div>
+
+    <h2>Der Rhythmus</h2>
+    <div class="rhythm-box">
+      <h3>Merke den Rhythmus — dann läuft es automatisch</h3>
+      <div class="rhythm-steps">
+        <div class="r-step l">Links</div>
+        <div class="r-step arrow">&#8594;</div>
+        <div class="r-step r">Rechts</div>
+        <div class="r-step arrow">&#8594;</div>
+        <div class="r-step l">Links</div>
+        <div class="r-step arrow">&#8594;</div>
+        <div class="r-step r">Rechts</div>
+        <div class="r-step arrow">&#8594;</div>
+        <div class="r-step l">Links...</div>
+      </div>
+    </div>
+
+    <div class="hands-box">
+      <h3>Handübergabe: wohin geht die Strähne?</h3>
+      <pre>
+Zug Links:
+  Linke Hand gibt ab
+  Strähne geht über die Mitte nach rechts
+  Rechte Hand nimmt neue Mitte an
+
+Zug Rechts:
+  Rechte Hand gibt ab
+  Strähne geht über die Mitte nach links
+  Linke Hand nimmt neue Mitte an
+      </pre>
+    </div>
+
+    <div class="tip">
+      <strong>Wichtigste Regel:</strong> Nach jedem Zug kurz nach unten straffen. So wird der Zopf fest und gleichmäßig — und löst sich nicht von alleine.
+    </div>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Was passiert mit der mittleren Strähne beim ersten Zug?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Sie bleibt wo sie ist. Die äußere Strähne (links oder rechts) wird über sie gelegt. Die Mitte wird dabei verdrängt und wird zur neuen äußeren Strähne auf der Gegenseite.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Welche Hand hält die mittlere Strähne nach einem Links-Zug?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Die rechte Hand — sie nimmt die neue Mitte (= ehemalige linke Strähne) an.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Wann befestigt man den Haargummi?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Wenn noch ca. 5–10 cm Haar übrig sind. Dann alle 3 Strähnen mit dem Gummi zusammenfassen.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Der vollständige 5-Schritt-Ablauf vom Start bis zum fertigen Zopf</li>
+        <li>Der Rhythmus: links, rechts, links, rechts — immer abwechselnd</li>
+        <li>Die Handübergabe: äußere gibt ab, Gegenseite nimmt neue Mitte an</li>
+        <li>Nach jedem Zug nach unten straffen für festen Sitz</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="03-haare-teilen.html" class="btn btn-back">&#x2190; Zurück</a>
+      <a href="05-spannung-und-gleichmaessigkeit.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>

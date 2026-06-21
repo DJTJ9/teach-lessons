@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 2: Werkzeug & Material</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f7f0; color: #1a2e1a; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; padding: 3rem 2rem; text-align: center; }
+  .hero .lesson-num { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.5rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero .subtitle { font-size: 1.1rem; opacity: 0.9; }
+  .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .goal-box { background: white; border-left: 4px solid #4a9e4a; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .goal-box strong { color: #2d6a2d; display: block; margin-bottom: 0.4rem; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; }
+  h2 { color: #2d6a2d; font-size: 1.4rem; margin: 2rem 0 1rem; }
+  p { margin-bottom: 1rem; }
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .tool-card { background: white; border-radius: 10px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .tool-card .icon { font-size: 2.2rem; margin-bottom: 0.6rem; }
+  .tool-card h3 { font-size: 1rem; color: #2d6a2d; margin-bottom: 0.3rem; }
+  .tool-card p { font-size: 0.88rem; color: #444; margin-bottom: 0.5rem; }
+  .badge { display: inline-block; font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; }
+  .badge-must { background: #d4edda; color: #155724; }
+  .badge-nice { background: #fff3cd; color: #856404; }
+  .badge-optional { background: #e2e3e5; color: #383d41; }
+  .tip-box { background: #e8f5e8; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .tip-box strong { color: #2d6a2d; }
+  .substitute-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .substitute-table th { background: #2d6a2d; color: white; padding: 0.75rem 1rem; text-align: left; font-size: 0.9rem; }
+  .substitute-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+  .substitute-table tr:last-child td { border-bottom: none; }
+  .quiz-section { background: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+  .quiz-section h2 { margin-top: 0; }
+  .quiz-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .quiz-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-item p { font-weight: 600; margin-bottom: 0.75rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-options label { display: flex; align-items: center; gap: 0.75rem; background: #f8f8f8; border: 2px solid #e0e0e0; border-radius: 8px; padding: 0.75rem 1rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; }
+  .quiz-options label:hover { border-color: #4a9e4a; background: #f0f9f0; }
+  .quiz-options input[type="radio"] { accent-color: #4a9e4a; width: 18px; height: 18px; }
+  .check-btn { background: #2d6a2d; color: white; border: none; border-radius: 8px; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+  .check-btn:hover { background: #4a9e4a; }
+  .quiz-feedback { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; display: none; font-size: 0.95rem; }
+  .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .summary-box { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+  .summary-box h2 { color: white; margin-top: 0; }
+  .summary-box ul { list-style: none; padding: 0; }
+  .summary-box ul li { padding: 0.4rem 0; }
+  .summary-box ul li::before { content: "✓ "; font-weight: bold; }
+  .nav-hint { text-align: center; color: #888; font-size: 0.9rem; margin-top: 2rem; padding-bottom: 2rem; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="lesson-num">Lektion 2 von 8</div>
+  <h1>Werkzeug & Material</h1>
+  <div class="subtitle">Alles was du brauchst — bevor du anfängst</div>
+</div>
+
+<div class="container">
+  <div class="goal-box">
+    <strong>Lernziel</strong>
+    Du weißt, welche Werkzeuge und Materialien du fürs Umtopfen brauchst, was unverzichtbar ist, und womit du notfalls ersetzen kannst.
+  </div>
+
+  <h2>Deine Ausrüstung auf einen Blick</h2>
+  <p>Gute Nachricht: Du brauchst keine teuren Spezialwerkzeuge. Die meisten Sachen hast du wahrscheinlich schon zuhause.</p>
+
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="icon">🏺</div>
+      <h3>Neuer Topf</h3>
+      <p>Etwa 2–3 cm größer als der aktuelle. Mit Drainageloch am Boden — das ist Pflicht!</p>
+      <span class="badge badge-must">Unverzichtbar</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">🪱</div>
+      <h3>Frische Blumenerde</h3>
+      <p>Standard-Topferde für die meisten Zimmerpflanzen. Mehr dazu in Lektion 3.</p>
+      <span class="badge badge-must">Unverzichtbar</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">🧤</div>
+      <h3>Handschuhe</h3>
+      <p>Halten deine Hände sauber und schützen vor Erde und gelegentlichen Dornen.</p>
+      <span class="badge badge-nice">Empfohlen</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">📰</div>
+      <h3>Unterlage / Zeitung</h3>
+      <p>Schützt deinen Tisch oder Boden vor Erde. Alte Zeitung, Pappe oder eine Plastikfolie.</p>
+      <span class="badge badge-nice">Empfohlen</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">🪣</div>
+      <h3>Schaufel / Löffel</h3>
+      <p>Zum Einfüllen der Erde in den neuen Topf. Ein großer Küchenöffel tut's auch.</p>
+      <span class="badge badge-nice">Empfohlen</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">✂️</div>
+      <h3>Schere oder Messer</h3>
+      <p>Für das Abschneiden von toten oder faulen Wurzeln. Vorher desinfizieren!</p>
+      <span class="badge badge-optional">Optional</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">💧</div>
+      <h3>Gießkanne</h3>
+      <p>Nach dem Umtopfen wird die Pflanze gegossen. Gießkanne mit feinem Strahl ideal.</p>
+      <span class="badge badge-must">Unverzichtbar</span>
+    </div>
+    <div class="tool-card">
+      <div class="icon">🪨</div>
+      <h3>Drainageschicht</h3>
+      <p>Kieselsteine, Tonscherben oder spezielle Blähton-Kugeln auf den Topfboden. Verhindert Staunässe.</p>
+      <span class="badge badge-nice">Empfohlen</span>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>💡 Legende:</strong>
+    <span style="background:#d4edda;color:#155724;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.85rem;font-weight:600;">Unverzichtbar</span> = ohne geht's nicht &nbsp;|&nbsp;
+    <span style="background:#fff3cd;color:#856404;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.85rem;font-weight:600;">Empfohlen</span> = macht's viel leichter &nbsp;|&nbsp;
+    <span style="background:#e2e3e5;color:#383d41;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.85rem;font-weight:600;">Optional</span> = nur wenn nötig
+  </div>
+
+  <h2>Notfall-Ersatz: Was wenn ich X nicht habe?</h2>
+
+  <table class="substitute-table">
+    <thead>
+      <tr><th>Fehlendes Werkzeug</th><th>Möglicher Ersatz</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>🧤 Handschuhe</td><td>Alte Plastiktüten über die Hände stülpen</td></tr>
+      <tr><td>📰 Unterlage</td><td>Alter Karton, Papiertüten, Mülltüte</td></tr>
+      <tr><td>🪣 Schaufel</td><td>Großer Küchenöffel oder Tasse zum Schöpfen</td></tr>
+      <tr><td>🪨 Drainageschicht</td><td>Zerbrochene Tontöpfe, grober Kies, Styropor-Stücke</td></tr>
+      <tr><td>🏺 Topf ohne Loch</td><td>Selbst ein Loch bohren/stechen — ohne Drainageloch entstehen Fäulnisprobleme!</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Warum muss der Topf ein Loch haben?</h2>
+  <p>Das Drainageloch am Topfboden ist die wichtigste Eigenschaft deines neuen Topfes. Ohne es sammelt sich überschüssiges Wasser im Topf und die Wurzeln stehen im Nassen — das führt zu Wurzelfäule, einer der häufigsten Ursachen für tote Zimmerpflanzen.</p>
+  <div class="tip-box">
+    <strong>🚫 Kein Drainageloch?</strong> Entweder einen anderen Topf kaufen oder selbst ein Loch in den Boden bohren. Bei Keramik: Steinbohrer + Bohrmaschine, langsam und mit Wasser kühlen. Bei Plastik: Nagel erhitzen und durchstechen.
+  </div>
+
+  <div class="quiz-section">
+    <h2>🧠 Quiz: Das richtige Werkzeug</h2>
+
+    <div class="quiz-item" id="q1">
+      <p>Frage 1: Du hast keinen neuen Topf mit Drainageloch, aber einen schönen Übertopf ohne Loch. Was machst du?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q1" value="a"> Einfach den Übertopf nehmen — macht ja nichts</label>
+        <label><input type="radio" name="q1" value="b"> Ein Loch in den Übertopf bohren oder einen anderen Topf kaufen</label>
+        <label><input type="radio" name="q1" value="c"> Die Pflanze gar nicht umtopfen</label>
+      </div>
+      <div class="quiz-feedback" id="q1-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q2">
+      <p>Frage 2: Du hast keine Gartenschaufel. Wofür brauchst du eigentlich eine, und was kannst du stattdessen nehmen?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q2" value="a"> Zum Ausgraben von Bäumen — kein Ersatz möglich</label>
+        <label><input type="radio" name="q2" value="b"> Zum Einfüllen von Erde — ein großer Küchenöffel reicht</label>
+        <label><input type="radio" name="q2" value="c"> Zum Schneiden der Wurzeln — Ersatz durch Küchenmesser</label>
+      </div>
+      <div class="quiz-feedback" id="q2-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q3">
+      <p>Frage 3: Was ist der Zweck der Drainageschicht am Topfboden?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q3" value="a"> Die Pflanze höher zu setzen, damit man sie besser sieht</label>
+        <label><input type="radio" name="q3" value="b"> Staunässe zu verhindern — Wasser kann besser ablaufen</label>
+        <label><input type="radio" name="q3" value="c"> Nährstoffe zu speichern</label>
+      </div>
+      <div class="quiz-feedback" id="q3-feedback"></div>
+    </div>
+
+    <button class="check-btn" onclick="checkQuiz()">Antworten prüfen</button>
+  </div>
+
+  <div class="summary-box">
+    <h2>✅ Das hast du gelernt</h2>
+    <ul>
+      <li>Pflichtausrüstung: neuer Topf (mit Loch!), frische Erde, Gießkanne</li>
+      <li>Hilfreich: Handschuhe, Unterlage, Schaufel, Drainageschicht</li>
+      <li>Fast alles lässt sich mit Haushaltsmitteln ersetzen</li>
+      <li>Ein Topf ohne Drainageloch = Gefahr für Wurzelfäule</li>
+      <li>Schere/Messer nur wenn nötig — und vorher desinfizieren</li>
+    </ul>
+  </div>
+
+  <div class="nav-hint">Weiter: Lektion 3 — Die richtige Erde wählen →</div>
+</div>
+
+<script>
+const answers = { q1: 'b', q2: 'b', q3: 'b' };
+const explanations = {
+  q1: { b: '✓ Richtig! Ein Drainageloch ist Pflicht. Entweder bohren oder neuen Topf kaufen.', a: '✗ Falsch. Ohne Drainageloch entsteht Staunässe — das tötet die Pflanze.', c: '✗ Falsch. Die Pflanze braucht den Umtopf — also Loch bohren oder anderen Topf holen.' },
+  q2: { b: '✓ Richtig! Eine Schaufel ist fürs Einfüllen von Erde — ein Küchenöffel ist ein perfekter Ersatz.', a: '✗ Wir topfen Zimmerpflanzen um, keine Bäume 😄', c: '✗ Zum Wurzelschneiden ist eine Schere oder ein Messer zuständig.' },
+  q3: { b: '✓ Richtig! Kies/Blähton am Boden verhindert, dass das Drainageloch von Erde verstopft wird und Wasser ablaufen kann.', a: '✗ Falsch. Das hat nichts mit Höhe zu tun.', c: '✗ Falsch. Nährstoffe sind in der Erde, nicht in Kieselsteinen.' }
+};
+function checkQuiz() {
+  ['q1','q2','q3'].forEach(q => {
+    const sel = document.querySelector(`input[name="${q}"]:checked`);
+    const fb = document.getElementById(`${q}-feedback`);
+    if (!sel) { fb.textContent = '⚠️ Bitte eine Antwort wählen.'; fb.className = 'quiz-feedback incorrect'; fb.style.display = 'block'; return; }
+    fb.textContent = explanations[q][sel.value];
+    fb.className = 'quiz-feedback ' + (sel.value === answers[q] ? 'correct' : 'incorrect');
+    fb.style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>

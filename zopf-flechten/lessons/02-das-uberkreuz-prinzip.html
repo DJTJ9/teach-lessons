@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 2: Das Überkreuz-Prinzip</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #86efac 0%, #22d3ee 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #22d3ee; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #0e7490; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .rule-box { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .rule { background: #fff; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .rule .step-num { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .rule.left .step-num { color: #ef4444; }
+    .rule.right .step-num { color: #3b82f6; }
+    .rule h4 { font-size: 0.95rem; color: #1e1b4b; margin-bottom: 0.3rem; }
+    .rule p { font-size: 0.85rem; color: #6b7280; }
+    .diagram { background: #fff; border-radius: 12px; padding: 2rem; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); font-family: monospace; }
+    .diagram p.caption { font-size:0.85rem; color:#6b7280; margin-bottom:1rem; font-family: 'Segoe UI', sans-serif; }
+    .diagram pre { font-size: 1rem; line-height: 1.8; color: #1e1b4b; }
+    .analogy { background: #ecfdf5; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-left: 4px solid #10b981; }
+    .analogy strong { color: #065f46; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #22d3ee; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    details summary { cursor: pointer; color: #67e8f9; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #a5f3fc; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #0e7490; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: space-between; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #22d3ee, #3b82f6); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .btn-back { background: #e5e7eb; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 2 von 8</div>
+    <h1>Das Überkreuz-Prinzip</h1>
+    <p>Die eine Regel, die alles erklärt</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Ein Zopf besteht aus einer einzigen, immer gleichen Bewegung — dem Überkreuzen. Wer dieses Prinzip versteht, kann jede Flechtfrisur lernen.</p>
+    </div>
+
+    <h2>Die Grundregel</h2>
+    <p>Beim 3-Strang-Zopf hast du immer <strong>drei Strähnen</strong>: links, Mitte, rechts. Die Regel ist simpel:</p>
+
+    <div class="rule-box">
+      <div class="rule left">
+        <div class="step-num">1.</div>
+        <h4>Linke Strähne über die Mitte</h4>
+        <p>Die linke Strähne wird zur neuen Mitte. Die alte Mitte wird zur neuen linken Strähne.</p>
+      </div>
+      <div class="rule right">
+        <div class="step-num">2.</div>
+        <h4>Rechte Strähne über die Mitte</h4>
+        <p>Die rechte Strähne wird zur neuen Mitte. Die alte Mitte wird zur neuen rechten Strähne.</p>
+      </div>
+    </div>
+
+    <p>Dann: wiederholen. Immer abwechselnd — links über Mitte, rechts über Mitte.</p>
+
+    <h2>Visualisierung</h2>
+    <div class="diagram">
+      <p class="caption">L = Links (rot), M = Mitte (grau), R = Rechts (blau)</p>
+      <pre>
+Start:    L   M   R
+
+Schritt 1 (L über M):
+          M   L   R
+              ↑ neue Mitte
+
+Schritt 2 (R über neue Mitte L):
+          M   R   L
+                  ↑ neue Mitte
+
+→ Schritt 1 wiederholen...</pre>
+    </div>
+
+    <div class="analogy">
+      <strong>Eselsbrücke:</strong> "Die Außenseiter wollen immer in die Mitte." — Die äußere Strähne wandert jedes Mal zur Mitte. Links rüber, rechts rüber, immer im Wechsel.
+    </div>
+
+    <h2>Was passiert mit den Strähnen?</h2>
+    <ul style="padding-left:1.5rem; margin:1rem 0;">
+      <li style="margin-bottom:0.5rem;">Jede äußere Strähne wird zur <strong>neuen Mitte</strong></li>
+      <li style="margin-bottom:0.5rem;">Die alte Mitte wird zur <strong>neuen äußeren Strähne</strong> auf der Gegenseite</li>
+      <li style="margin-bottom:0.5rem;">Durch dieses ständige Tauschen entsteht das charakteristische Flechtmuster</li>
+    </ul>
+
+    <div class="tip">
+      <strong>Wichtig:</strong> Die Strähne wird immer <em>über</em> die Mitte gelegt, nicht darunter. Beim "umgekehrten Zopf" geht sie unter die Mitte — das sieht anders aus und wölbt sich nach außen.
+    </div>
+
+    <h2>Übung ohne Haare</h2>
+    <p>Nimm 3 Schnüre oder Fäden in 3 Farben. Befestige sie oben und übe das Überkreuzen. Das entstandene Muster ist identisch mit einem echten Zopf — und du lernst die Bewegung ohne Frust mit rutschenden Haaren.</p>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Welche Strähne bewegt man beim Flechten zuerst?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Eine der äußeren Strähnen (links oder rechts) — danach wechselt man immer zur anderen Seite.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Was wird die neue Mitte, nachdem die linke Strähne übergekreuzt wurde?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Die linke Strähne wird die neue Mitte. Die alte Mitte wandert nach links außen.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Wie viele verschiedene Bewegungen braucht man für einen Zopf?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Nur eine: äußere Strähne über die Mitte legen. Diese Bewegung wird abwechselnd links und rechts wiederholt.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Das Überkreuz-Prinzip: äußere Strähne immer über die Mitte</li>
+        <li>Immer abwechseln: links, rechts, links, rechts...</li>
+        <li>Strähnen tauschen ständig Positionen — das erzeugt das Muster</li>
+        <li>Mit 3 Schnüren üben funktioniert genauso wie mit Haaren</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="01-werkzeug-und-vorbereitung.html" class="btn btn-back">&#x2190; Zurück</a>
+      <a href="03-haare-teilen.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>

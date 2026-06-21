@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 3: Haare teilen</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #f97316; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #c2410c; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .steps { list-style: none; counter-reset: steps; padding: 0; }
+    .steps li { counter-increment: steps; display: flex; gap: 1rem; margin-bottom: 1.4rem; align-items: flex-start; }
+    .steps li::before { content: counter(steps); background: #f97316; color: #fff; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.9rem; }
+    .visual-split { background: #fff; border-radius: 12px; padding: 2rem; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .hair-bar { display: flex; width: 300px; height: 60px; border-radius: 8px; overflow: hidden; }
+    .hair-L { background: #ef4444; flex: 1; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem; }
+    .hair-M { background: #9ca3af; flex: 1; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem; }
+    .hair-R { background: #3b82f6; flex: 1; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem; }
+    .mistake-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .mistake { background: #fff; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .mistake.wrong { border-top: 3px solid #ef4444; }
+    .mistake.right { border-top: 3px solid #10b981; }
+    .mistake h4 { margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .mistake.wrong h4 { color: #ef4444; }
+    .mistake.right h4 { color: #10b981; }
+    .mistake p { font-size: 0.85rem; color: #6b7280; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #fbbf24; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    details summary { cursor: pointer; color: #fcd34d; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #fde68a; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #c2410c; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: space-between; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #fbbf24, #f97316); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .btn-back { background: #e5e7eb; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 3 von 8</div>
+    <h1>Haare teilen</h1>
+    <p>3 gleiche Strähnen — die Basis für alles</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Der häufigste Grund für einen ungleichmäßigen Zopf: ungleiche Strähnen am Anfang. Wer gut teilt, flechtet gleichmäßig.</p>
+    </div>
+
+    <h2>Die 3 Strähnen vorbereiten</h2>
+    <ol class="steps">
+      <li><div><strong>Haare zusammenfassen:</strong> Alle Haare am Hinterkopf (oder dort, wo der Zopf beginnen soll) mit einer Hand straff zusammenhalten.</div></li>
+      <li><div><strong>Erste Teilung — halbieren:</strong> Mit der anderen Hand die Haarmasse in der Mitte teilen. Zwei gleich dicke Hälften.</div></li>
+      <li><div><strong>Zweite Teilung:</strong> Eine Hälfte nochmals halbieren. Jetzt hast du 3 Abschnitte: zwei kleine (Links und Rechts) und einen größeren (Mitte). Passe die Mengen an, bis alle drei gleich dick sind.</div></li>
+      <li><div><strong>Alle 3 festhalten:</strong> Linke Strähne in die linke Hand, mittlere zwischen den Fingern, rechte Strähne in die rechte Hand. Jetzt kann es losgehen.</div></li>
+    </ol>
+
+    <h2>Das Ziel: drei gleiche Drittel</h2>
+    <div class="visual-split">
+      <div class="hair-bar">
+        <div class="hair-L">Links</div>
+        <div class="hair-M">Mitte</div>
+        <div class="hair-R">Rechts</div>
+      </div>
+      <p style="font-size:0.85rem; color:#6b7280; text-align:center; max-width:300px;">Jede Strähne = ca. ein Drittel der Haarmenge. Kleine Abweichungen sind kein Problem — 20% Unterschied sieht man kaum.</p>
+    </div>
+
+    <h2>Häufige Teilungs-Fehler</h2>
+    <div class="mistake-grid">
+      <div class="mistake wrong">
+        <h4>&#x2717; Ungleiche Strähnen</h4>
+        <p>Eine Strähne viel dicker als die anderen &rarr; Zopf wirkt schief und eingewachsen.</p>
+      </div>
+      <div class="mistake right">
+        <h4>&#x2713; Gleiche Strähnen</h4>
+        <p>Alle drei Abschnitte ähnlich dick &rarr; gleichmäßiges Muster, leichter zu flechten.</p>
+      </div>
+      <div class="mistake wrong">
+        <h4>&#x2717; Zu früh loslassen</h4>
+        <p>Strähnen rutschen zusammen vor dem ersten Zug &rarr; wieder von vorne anfangen.</p>
+      </div>
+      <div class="mistake right">
+        <h4>&#x2713; Festhalten bis zum Start</h4>
+        <p>Alle 3 Strähnen im Griff, dann sofort mit dem ersten Überkreuzen beginnen.</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <strong>Trick:</strong> Halte die mittlere Strähne zwischen Zeige- und Mittelfinger. Die äußeren Strähnen liegen in den Handflächen. So kontrollierst du alle drei mit zwei Händen und machst den ersten Zug ohne Chaos.
+    </div>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Wie viel der Haarmenge soll jede Strähne haben?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Ungefähr ein Drittel. Exakte Gleichheit ist nicht nötig — 20% Abweichung ist im fertigen Zopf kaum sichtbar.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Was passiert bei ungleichen Strähnen?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Der Zopf wird ungleichmäßig und schief. Die dicke Strähne dominiert das Muster auf einer Seite.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Wie teilt man schnell in 3 Teile?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Erst halbieren, dann eine Hälfte nochmals halbieren — jetzt hast du ¼ + ¼ + ½. Die ½ anpassen bis alle gleich sind.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Haare in 3 gleich dicke Strähnen teilen (je ca. 1/3)</li>
+        <li>Methode: erst halbieren, dann eine Hälfte nochmals teilen und angleichen</li>
+        <li>Handposition: links, Mitte zwischen Fingern, rechts</li>
+        <li>Ungleiche Teilung = häufigster Grund für schiefe Zöpfe</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="02-das-uberkreuz-prinzip.html" class="btn btn-back">&#x2190; Zurück</a>
+      <a href="04-erster-zug-schritt-fuer-schritt.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>

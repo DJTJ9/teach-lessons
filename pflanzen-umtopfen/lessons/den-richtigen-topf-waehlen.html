@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 4: Den richtigen Topf wählen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f7f0; color: #1a2e1a; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; padding: 3rem 2rem; text-align: center; }
+  .hero .lesson-num { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.5rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero .subtitle { font-size: 1.1rem; opacity: 0.9; }
+  .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .goal-box { background: white; border-left: 4px solid #4a9e4a; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .goal-box strong { color: #2d6a2d; display: block; margin-bottom: 0.4rem; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; }
+  h2 { color: #2d6a2d; font-size: 1.4rem; margin: 2rem 0 1rem; }
+  p { margin-bottom: 1rem; }
+  .size-visual { background: white; border-radius: 12px; padding: 2rem; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); text-align: center; }
+  .pots { display: flex; justify-content: center; align-items: flex-end; gap: 2rem; margin: 1.5rem 0; }
+  .pot { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .pot-shape { border-radius: 0 0 12px 12px; border: 3px solid; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; font-weight: 700; }
+  .pot-too-small .pot-shape { width: 60px; height: 60px; background: #d9534f; border-color: #c9302c; }
+  .pot-right .pot-shape { width: 80px; height: 80px; background: #4a9e4a; border-color: #2d6a2d; }
+  .pot-too-big .pot-shape { width: 130px; height: 100px; background: #f0ad4e; border-color: #ec971f; }
+  .pot-label { font-size: 0.85rem; font-weight: 600; }
+  .pot-sub { font-size: 0.78rem; color: #666; max-width: 110px; text-align: center; }
+  .pot-too-small .pot-label { color: #d9534f; }
+  .pot-right .pot-label { color: #2d6a2d; }
+  .pot-too-big .pot-label { color: #e67e22; }
+  .material-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin: 1.5rem 0; }
+  .material-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .material-card h3 { color: #2d6a2d; margin-bottom: 1rem; font-size: 1.05rem; }
+  .pros-cons { list-style: none; padding: 0; }
+  .pros-cons li { padding: 0.3rem 0; font-size: 0.9rem; }
+  .pros-cons li.pro::before { content: "✓ "; color: #4a9e4a; font-weight: bold; }
+  .pros-cons li.con::before { content: "✗ "; color: #d9534f; font-weight: bold; }
+  .best-for { margin-top: 0.75rem; font-size: 0.82rem; background: #f0f9f0; border-radius: 6px; padding: 0.4rem 0.6rem; color: #2d6a2d; font-weight: 600; }
+  .rule-box { background: #2d6a2d; color: white; border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+  .rule-box .rule-text { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .rule-box .rule-sub { font-size: 0.9rem; opacity: 0.85; }
+  .tip-box { background: #e8f5e8; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .tip-box strong { color: #2d6a2d; }
+  .warning-box { background: #fff3cd; border-left: 4px solid #f0ad4e; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .warning-box strong { color: #856404; }
+  .quiz-section { background: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+  .quiz-section h2 { margin-top: 0; }
+  .quiz-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .quiz-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-item p { font-weight: 600; margin-bottom: 0.75rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-options label { display: flex; align-items: center; gap: 0.75rem; background: #f8f8f8; border: 2px solid #e0e0e0; border-radius: 8px; padding: 0.75rem 1rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; }
+  .quiz-options label:hover { border-color: #4a9e4a; background: #f0f9f0; }
+  .quiz-options input[type="radio"] { accent-color: #4a9e4a; width: 18px; height: 18px; }
+  .check-btn { background: #2d6a2d; color: white; border: none; border-radius: 8px; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+  .check-btn:hover { background: #4a9e4a; }
+  .quiz-feedback { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; display: none; font-size: 0.95rem; }
+  .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .summary-box { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+  .summary-box h2 { color: white; margin-top: 0; }
+  .summary-box ul { list-style: none; padding: 0; }
+  .summary-box ul li { padding: 0.4rem 0; }
+  .summary-box ul li::before { content: "✓ "; font-weight: bold; }
+  .nav-hint { text-align: center; color: #888; font-size: 0.9rem; margin-top: 2rem; padding-bottom: 2rem; }
+  @media (max-width: 500px) { .material-compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="lesson-num">Lektion 4 von 8</div>
+  <h1>Den richtigen Topf wählen</h1>
+  <div class="subtitle">Größe, Material, Drainageloch — das musst du wissen</div>
+</div>
+
+<div class="container">
+  <div class="goal-box">
+    <strong>Lernziel</strong>
+    Du weißt, wie du den richtigen Topf nach Größe und Material auswählst, und warum das Drainageloch unverzichtbar ist.
+  </div>
+
+  <h2>Wie groß soll der neue Topf sein?</h2>
+  <p>Das ist die häufigste Frage beim Umtopfen — und der häufigste Fehler. Größer ist <em>nicht</em> besser.</p>
+
+  <div class="size-visual">
+    <div class="pots">
+      <div class="pot pot-too-small">
+        <div class="pot-shape">❌</div>
+        <div class="pot-label">Zu klein</div>
+        <div class="pot-sub">Gleich groß wie alter Topf</div>
+      </div>
+      <div class="pot pot-right">
+        <div class="pot-shape">✓</div>
+        <div class="pot-label">Perfekt</div>
+        <div class="pot-sub">2–3 cm größer im Durchmesser</div>
+      </div>
+      <div class="pot pot-too-big">
+        <div class="pot-shape">⚠️</div>
+        <div class="pot-label">Zu groß</div>
+        <div class="pot-sub">Viel größer als nötig</div>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;color:#555;margin:0;">Die goldene Mitte: 2–3 cm größer im Durchmesser als der aktuelle Topf</p>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-text">+2 bis +3 cm Durchmesser</div>
+    <div class="rule-sub">Das ist die goldene Regel für die Topfgröße beim Umtopfen</div>
+  </div>
+
+  <h2>Warum kein riesiger Topf?</h2>
+  <p>Das klingt kontraintuitiv. Aber wenn du eine kleine Pflanze in einen riesigen Topf setzt, passiert Folgendes: Die Wurzeln brauchen lange, um die viele Erde zu durchdringen. In der Zwischenzeit bleibt die Erde nass und verursacht Wurzelfäule. Die Pflanze stagniert oder stirbt.</p>
+  <div class="tip-box">
+    <strong>💡 Beispiel:</strong> Aktuelle Topfgröße 12 cm Durchmesser → neuer Topf: 14–15 cm. Nicht 20 cm oder 25 cm!
+  </div>
+
+  <h2>Plastik vs. Terrakotta — was nehme ich?</h2>
+
+  <div class="material-compare">
+    <div class="material-card">
+      <h3>🏺 Terrakotta (Ton)</h3>
+      <ul class="pros-cons">
+        <li class="pro">Atmungsaktiv — Wurzeln bekommen Luft</li>
+        <li class="pro">Überschuss-Feuchtigkeit verdunstet durch Wände</li>
+        <li class="pro">Natürlich, schön</li>
+        <li class="con">Schwerer</li>
+        <li class="con">Trocknet schneller aus → öfter gießen</li>
+        <li class="con">Teurer</li>
+      </ul>
+      <div class="best-for">Ideal für: Sukkulenten, Kräuter, Pflanzen die es trocken mögen</div>
+    </div>
+    <div class="material-card">
+      <h3>🥤 Plastik</h3>
+      <ul class="pros-cons">
+        <li class="pro">Hält Feuchtigkeit länger → seltener gießen</li>
+        <li class="pro">Leicht</li>
+        <li class="pro">Günstig</li>
+        <li class="pro">Viele Größen verfügbar</li>
+        <li class="con">Nicht atmungsaktiv</li>
+        <li class="con">Weniger schön</li>
+      </ul>
+      <div class="best-for">Ideal für: feuchtigkeitsliebende Pflanzen, Monstera, Pothos, Farne</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>💡 Als Anfänger:</strong> Plastiktöpfe sind die einfachere Wahl. Weniger gießen, günstiger, leichter. Für die meisten Zimmerpflanzen ist das völlig in Ordnung.
+  </div>
+
+  <h2>Das Drainageloch — nicht verhandelbar</h2>
+  <p>Egal welches Material, egal welche Größe: Der Topf <strong>muss</strong> ein Loch am Boden haben. Das Drainageloch lässt überschüssiges Wasser ablaufen und verhindert Staunässe. Staunässe = Wurzelfäule = tote Pflanze.</p>
+
+  <div class="warning-box">
+    <strong>⚠️ Übertopf ≠ Pflanztopf:</strong> Ein dekorativer Übertopf (ohne Loch) dient nur zur Optik. Die eigentliche Pflanze bleibt in einem Plastiktopf MIT Loch, der in den Übertopf gestellt wird. Nach dem Gießen: Wasser im Übertopf nach 30 Minuten ausschütten!
+  </div>
+
+  <div class="quiz-section">
+    <h2>🧠 Quiz: Den richtigen Topf wählen</h2>
+
+    <div class="quiz-item" id="q1">
+      <p>Frage 1: Dein aktueller Topf hat 14 cm Durchmesser. Welchen Topf kaufst du?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q1" value="a"> 14 cm — gleiche Größe reicht</label>
+        <label><input type="radio" name="q1" value="b"> 16 cm — perfekt, 2 cm größer</label>
+        <label><input type="radio" name="q1" value="c"> 25 cm — viel Platz zum Wachsen</label>
+      </div>
+      <div class="quiz-feedback" id="q1-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q2">
+      <p>Frage 2: Du hast einen Kaktus, der wenig Wasser braucht. Welches Topfmaterial eignet sich besser?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q2" value="a"> Plastik — hält Feuchtigkeit besser</label>
+        <label><input type="radio" name="q2" value="b"> Terrakotta — trocknet schneller und ist atmungsaktiv</label>
+        <label><input type="radio" name="q2" value="c"> Egal — Material spielt keine Rolle</label>
+      </div>
+      <div class="quiz-feedback" id="q2-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q3">
+      <p>Frage 3: Du stellst deine Pflanze in einen schönen Keramik-Übertopf ohne Loch. Nach dem Gießen: was musst du tun?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q3" value="a"> Nichts — das Wasser wird von der Pflanze aufgesogen</label>
+        <label><input type="radio" name="q3" value="b"> Nach ca. 30 Minuten das Staunässe-Wasser aus dem Übertopf ausschütten</label>
+        <label><input type="radio" name="q3" value="c"> Sofort ausschütten, noch bevor die Pflanze gießen kann</label>
+      </div>
+      <div class="quiz-feedback" id="q3-feedback"></div>
+    </div>
+
+    <button class="check-btn" onclick="checkQuiz()">Antworten prüfen</button>
+  </div>
+
+  <div class="summary-box">
+    <h2>✅ Das hast du gelernt</h2>
+    <ul>
+      <li>Neue Topfgröße: nur +2–3 cm größer als der aktuelle Topf</li>
+      <li>Zu großer Topf → Staunässe → Wurzelfäule</li>
+      <li>Terrakotta: atmungsaktiv, trocknet schnell — ideal für trockenliebende Pflanzen</li>
+      <li>Plastik: hält Feuchte, günstig — ideal für feuchtigkeitsliebende Pflanzen</li>
+      <li>Drainageloch ist Pflicht — kein Ausnahme</li>
+      <li>Übertopf ohne Loch: Wasser nach dem Gießen nach 30 min ausschütten</li>
+    </ul>
+  </div>
+
+  <div class="nav-hint">Weiter: Lektion 5 — Schritt für Schritt umtopfen →</div>
+</div>
+
+<script>
+const answers = { q1: 'b', q2: 'b', q3: 'b' };
+const explanations = {
+  q1: { b: '✓ Richtig! 16 cm = +2 cm. Perfekte Größe.', a: '✗ Falsch. Der gleiche Topf bringt nichts — da ist die Pflanze ja schon zu eng drin.', c: '✗ Falsch. 25 cm = +11 cm — viel zu groß. Die Erde bleibt nass und Wurzelfäule droht.' },
+  q2: { b: '✓ Richtig! Terrakotta lässt Feuchtigkeit durch die Wände verdunsten — ideal für Kakteen die es trocken mögen.', a: '✗ Falsch. Plastik hält Feuchtigkeit zu lang — Kaktus mag trockene Bedingungen.', c: '✗ Falsch. Material beeinflusst wie schnell die Erde trocknet — das ist wichtig.' },
+  q3: { b: '✓ Richtig! 30 Minuten gibt der Pflanze Zeit, Wasser aufzunehmen. Dann Rest ausschütten.', a: '✗ Falsch. Staunässe im Übertopf ist eine häufige Ursache für Wurzelfäule.', c: '✗ Falsch. Sofort ausschütten gibt der Pflanze keine Zeit das Wasser aufzunehmen.' }
+};
+function checkQuiz() {
+  ['q1','q2','q3'].forEach(q => {
+    const sel = document.querySelector(`input[name="${q}"]:checked`);
+    const fb = document.getElementById(`${q}-feedback`);
+    if (!sel) { fb.textContent = '⚠️ Bitte eine Antwort wählen.'; fb.className = 'quiz-feedback incorrect'; fb.style.display = 'block'; return; }
+    fb.textContent = explanations[q][sel.value];
+    fb.className = 'quiz-feedback ' + (sel.value === answers[q] ? 'correct' : 'incorrect');
+    fb.style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>

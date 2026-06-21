@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 6: Das Ende befestigen</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #ec4899; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #9d174d; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .steps { list-style: none; counter-reset: steps; padding: 0; }
+    .steps li { counter-increment: steps; display: flex; gap: 1rem; margin-bottom: 1.4rem; align-items: flex-start; }
+    .steps li::before { content: counter(steps); background: #ec4899; color: #fff; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.9rem; }
+    .gummi-types { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .gummi-card { background: #fff; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .gummi-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .gummi-card h4 { font-size: 0.95rem; color: #1e1b4b; margin-bottom: 0.3rem; }
+    .gummi-card p { font-size: 0.85rem; color: #6b7280; }
+    .gummi-card.good { border-top: 3px solid #10b981; }
+    .gummi-card.bad { border-top: 3px solid #ef4444; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .trick-box { background: #fdf2f8; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border: 2px solid #ec4899; }
+    .trick-box h3 { color: #9d174d; margin-bottom: 0.8rem; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #f472b6; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    details summary { cursor: pointer; color: #f9a8d4; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #fbcfe8; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #9d174d; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: space-between; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #f472b6, #ec4899); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .btn-back { background: #e5e7eb; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 6 von 8</div>
+    <h1>Das Ende befestigen</h1>
+    <p>Den Zopf richtig sichern — damit er hält</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Ein schön geflochtener Zopf, der sich nach 10 Minuten löst, ist frustrierend. Das richtige Befestigen des Endes ist der letzte, entscheidende Schritt.</p>
+    </div>
+
+    <h2>Das richtige Werkzeug: Haargummi</h2>
+    <div class="gummi-types">
+      <div class="gummi-card good">
+        <div class="icon">&#x1F7E2;</div>
+        <h4>Stoff-Haargummi (empfohlen)</h4>
+        <p>Schont das Haar, hält gut, löst sich ohne Ziehen. Ideal für Anfänger.</p>
+      </div>
+      <div class="gummi-card good">
+        <div class="icon">&#x1F7E2;</div>
+        <h4>Spiralgummi (Telefonkabel)</h4>
+        <p>Sehr schonend, hinterlässt keine Druckstellen. Gut für langes Haar.</p>
+      </div>
+      <div class="gummi-card bad">
+        <div class="icon">&#x1F534;</div>
+        <h4>Dünne Latex-Gummibänder</h4>
+        <p>Verhaken sich im Haar, reißen beim Entfernen Haare aus. Vermeiden!</p>
+      </div>
+      <div class="gummi-card bad">
+        <div class="icon">&#x1F534;</div>
+        <h4>Normale Bürogummis</h4>
+        <p>Zu steif, zu rau — beschädigen Haare und hinterlassen Druckstellen.</p>
+      </div>
+    </div>
+
+    <h2>Den Haargummi richtig anlegen</h2>
+    <ol class="steps">
+      <li><div><strong>Alle 3 Strähnen zusammenhalten:</strong> Wenn noch 5–10 cm Haar übrig sind, alle 3 Strähnen fest mit einer Hand zusammenfassen. Nicht loslassen!</div></li>
+      <li><div><strong>Haargummi über die Finger schieben:</strong> Den Gummi mit der anderen Hand über die Finger und Haarspitzen nach oben ziehen.</div></li>
+      <li><div><strong>2–3 Mal umwickeln:</strong> Den Gummi so oft umwickeln, bis er fest sitzt. Zu wenig = rutscht ab. Zu viele Runden = Druck auf dem Haar.</div></li>
+      <li><div><strong>Sitz prüfen:</strong> Ist der Gummi fest aber nicht zu eng? Kannst du noch einen Finger darunter schieben? Dann perfekt.</div></li>
+    </ol>
+
+    <div class="tip">
+      <strong>Richtiger Zeitpunkt:</strong> Befestige den Gummi, wenn noch mindestens 5 cm Haar übrig sind — genug, damit der Gummi hält und die Enden nicht sofort herausrutschen.
+    </div>
+
+    <h2>Den Gummi wieder entfernen</h2>
+    <p>Immer mit den Fingern nach unten rollen — niemals mit der Schere abschneiden (Gefahr, Haare zu schneiden) und niemals reißen (beschädigt die Haare).</p>
+
+    <div class="trick-box">
+      <h3>Profi-Trick: der Gummi-Test</h3>
+      <p>Schüttle den Kopf nach dem Befestigen leicht. Lösen sich mehr als 2–3 Haare in den ersten 10 Minuten? Den Gummi eine Runde fester wickeln. Wenn sich kaum etwas löst — perfekt befestigt.</p>
+    </div>
+
+    <h2>Optionales Finishing</h2>
+    <ul style="padding-left:1.5rem; margin:1rem 0;">
+      <li style="margin-bottom:0.5rem;"><strong>Haarspray:</strong> Ein leichter Spritzer auf den Zopf gibt Halt für den ganzen Tag.</li>
+      <li style="margin-bottom:0.5rem;"><strong>Lose Enden:</strong> Einzelne Haare mit einem Tropfen Haargel glattstreichen.</li>
+      <li style="margin-bottom:0.5rem;"><strong>Pancaking:</strong> Den fertigen Zopf leicht an den Seiten auseinanderziehen — das gibt Volumen und einen volleren Look.</li>
+    </ul>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Warum sind dünne Latex-Gummibänder ungeeignet?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Sie verhaken sich im Haar und reißen beim Entfernen Haare aus. Das beschädigt das Haar und schmerzt.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Wie viele Runden Haargummi sind ideal?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Normalerweise 2–3 Runden. Der Gummi sollte fest sitzen, aber du solltest noch einen Finger darunter schieben können.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Was ist "Pancaking"?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Den fertigen Zopf leicht an den Seiten auseinanderziehen, um ihm mehr Volumen und einen volleren Look zu geben.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Geeignete Haargummis: Stoff oder Spiral — keine Latex-Gummibänder</li>
+        <li>Gummi anlegen: alle 3 Strähnen festhalten, dann 2–3x umwickeln</li>
+        <li>Gummi entfernen: immer rollen, niemals schneiden oder reißen</li>
+        <li>Optional: Haarspray für Halt, Pancaking für mehr Volumen</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="05-spannung-und-gleichmaessigkeit.html" class="btn btn-back">&#x2190; Zurück</a>
+      <a href="07-haeufige-anfaengerfehler.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>

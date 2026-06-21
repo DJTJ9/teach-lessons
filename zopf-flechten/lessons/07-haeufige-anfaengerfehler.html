@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 7: Häufige Anfängerfehler</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #fb923c 0%, #dc2626 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #dc2626; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #991b1b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .error-card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-left: 4px solid #ef4444; }
+    .error-card .header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; }
+    .error-card .num { background: #ef4444; color: #fff; border-radius: 50%; width: 1.8rem; height: 1.8rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+    .error-card h3 { color: #991b1b; font-size: 1rem; }
+    .error-card .symptom { font-size: 0.9rem; color: #4b5563; margin-bottom: 0.6rem; }
+    .error-card .fix { background: #ecfdf5; border-radius: 6px; padding: 0.6rem 0.9rem; font-size: 0.85rem; color: #065f46; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .checklist { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .checklist h3 { color: #1e1b4b; margin-bottom: 1rem; font-size: 1rem; }
+    .check-item { display: flex; gap: 0.8rem; align-items: flex-start; margin-bottom: 0.8rem; font-size: 0.9rem; }
+    .check-box { width: 1.1rem; height: 1.1rem; border: 2px solid #dc2626; border-radius: 3px; flex-shrink: 0; margin-top: 0.25rem; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #fb923c; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    details summary { cursor: pointer; color: #fdba74; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #fed7aa; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #991b1b; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: space-between; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #fb923c, #dc2626); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .btn-back { background: #e5e7eb; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 7 von 8</div>
+    <h1>Häufige Anfängerfehler</h1>
+    <p>Erkenne sie — und mach sie nie wieder</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Die meisten Anfänger machen dieselben 6 Fehler. Wer sie kennt, kann sie vermeiden — und lernt in der Hälfte der Zeit.</p>
+    </div>
+
+    <h2>Die 6 häufigsten Fehler</h2>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">1</div>
+        <h3>Ungleiche Strähnen vom Start</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Der Zopf wirkt auf einer Seite dicker als auf der anderen. Das Muster ist unregelmäßig.</p>
+      <div class="fix"><strong>Fix:</strong> Vor dem ersten Zug alle 3 Strähnen nochmals vergleichen. Erst wenn sie ähnlich dick sind, anfangen. Bei Bedarf Haare zwischen den Strähnen hin- und herschieben.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">2</div>
+        <h3>Strähnen werden dünner am Ende</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Der Zopf wird nach unten spitz. Am Ende kaum noch Haare zum Flechten.</p>
+      <div class="fix"><strong>Fix:</strong> Nach jedem 3. Zug kurz die Strähnendicke prüfen. Herausgerutschte Haare zurückschieben. Langsamer flechten hilft erheblich.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">3</div>
+        <h3>Zu lockere Spannung</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Zopf sieht "fluffig" aus und löst sich nach kurzer Zeit. Lücken zwischen den Strähnen sichtbar.</p>
+      <div class="fix"><strong>Fix:</strong> Nach jedem Zug kurz nach unten ziehen. Haare sollen eng aneinander liegen — aber ohne an der Kopfhaut zu ziehen.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">4</div>
+        <h3>Rhythmus-Verlust</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Man weiß nicht mehr, welche Seite dran ist — und flechtet zweimal links oder zweimal rechts.</p>
+      <div class="fix"><strong>Fix:</strong> Laut mitsprechen: "Links, rechts, links, rechts..." Oder: Position der mittleren Strähne prüfen — die Gegenseite kommt als nächstes dran.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">5</div>
+        <h3>Strähnen ungewollt loslassen</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Alle Strähnen plötzlich durcheinander. Von vorne anfangen.</p>
+      <div class="fix"><strong>Fix:</strong> Beim Übergeben zuerst mit der empfangenden Hand greifen, dann erst loslassen. Nie beide Hände gleichzeitig öffnen. Bewusst langsam üben.</div>
+    </div>
+
+    <div class="error-card">
+      <div class="header">
+        <div class="num">6</div>
+        <h3>Zopf beginnt zu tief</h3>
+      </div>
+      <p class="symptom"><strong>Symptom:</strong> Obere Haare hängen lose — der Zopf "schwebt" statt fest am Kopf zu beginnen.</p>
+      <div class="fix"><strong>Fix:</strong> Alle Haare zuerst zum gewünschten Startpunkt bringen, DORT teilen und direkt am Startpunkt mit dem ersten Zug beginnen.</div>
+    </div>
+
+    <div class="tip">
+      <strong>Goldene Regel:</strong> Langsamer flechten = weniger Fehler. Speed kommt nach 10–20 Wiederholungen von selbst. Wer schnell und schlecht übt, trainiert nur schlechte Gewohnheiten ein.
+    </div>
+
+    <div class="checklist">
+      <h3>Selbst-Check vor jedem Zopf</h3>
+      <div class="check-item"><div class="check-box"></div><span>Haare gebürstet und entwirrt?</span></div>
+      <div class="check-item"><div class="check-box"></div><span>3 gleich dicke Strähnen geteilt?</span></div>
+      <div class="check-item"><div class="check-box"></div><span>Alle 3 Strähnen sicher im Griff?</span></div>
+      <div class="check-item"><div class="check-box"></div><span>Haargummi griffbereit?</span></div>
+      <div class="check-item"><div class="check-box"></div><span>Rhythmus im Kopf: Links, rechts, links, rechts?</span></div>
+    </div>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Was tust du, wenn du den Rhythmus verlierst?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Pausieren. Prüfen, welche Strähne in der Mitte ist. Die Gegenseite muss als nächstes dran — nicht raten, sondern schauen.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Warum wird der Zopf nach unten spitzer?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Haare rutschen aus den Strähnen heraus. Lösung: nach jedem 3. Zug die Strähnendicke prüfen und herausgerutschte Haare zurückschieben.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Wie vermeidet man das ungewollte Loslassen?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Beim Übergeben zuerst mit der empfangenden Hand greifen, dann erst mit der gebenden Hand loslassen. Nie beide Hände gleichzeitig öffnen.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Die 6 häufigsten Anfängerfehler und ihre konkreten Lösungen</li>
+        <li>Selbst-Check vor dem Flechten: 5 Punkte</li>
+        <li>Goldene Regel: Langsam üben = schneller lernen</li>
+        <li>Rhythmus-Verlust: Mitte prüfen, nicht raten</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="06-das-ende-befestigen.html" class="btn btn-back">&#x2190; Zurück</a>
+      <a href="08-variationen-und-naechste-schritte.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>

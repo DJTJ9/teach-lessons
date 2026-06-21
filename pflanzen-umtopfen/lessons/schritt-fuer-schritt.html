@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 5: Schritt für Schritt umtopfen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f7f0; color: #1a2e1a; line-height: 1.7; }
+  .hero { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; padding: 3rem 2rem; text-align: center; }
+  .hero .lesson-num { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.5rem; }
+  .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .hero .subtitle { font-size: 1.1rem; opacity: 0.9; }
+  .container { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .goal-box { background: white; border-left: 4px solid #4a9e4a; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .goal-box strong { color: #2d6a2d; display: block; margin-bottom: 0.4rem; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; }
+  h2 { color: #2d6a2d; font-size: 1.4rem; margin: 2rem 0 1rem; }
+  p { margin-bottom: 1rem; }
+  .steps { margin: 1.5rem 0; }
+  .step { display: flex; gap: 1.25rem; margin-bottom: 1.5rem; background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); align-items: flex-start; }
+  .step-num { background: #2d6a2d; color: white; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+  .step-content h3 { color: #2d6a2d; margin-bottom: 0.4rem; font-size: 1rem; }
+  .step-content p { font-size: 0.9rem; margin-bottom: 0.4rem; color: #444; }
+  .step-content .step-tip { font-size: 0.83rem; background: #e8f5e8; border-radius: 6px; padding: 0.35rem 0.6rem; color: #2d6a2d; display: inline-block; margin-top: 0.3rem; }
+  .tip-box { background: #e8f5e8; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .tip-box strong { color: #2d6a2d; }
+  .warning-box { background: #fff3cd; border-left: 4px solid #f0ad4e; border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+  .warning-box strong { color: #856404; }
+  .quiz-section { background: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+  .quiz-section h2 { margin-top: 0; }
+  .order-task { margin: 1.5rem 0; }
+  .order-task p { font-weight: 600; margin-bottom: 0.75rem; }
+  .sortable-list { list-style: none; padding: 0; }
+  .sortable-list li { background: #f8f8f8; border: 2px solid #e0e0e0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; cursor: grab; display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem; user-select: none; }
+  .sortable-list li .drag-handle { color: #aaa; font-size: 1.1rem; }
+  .sortable-list li.dragging { opacity: 0.5; border-color: #4a9e4a; }
+  .quiz-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .quiz-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-item p { font-weight: 600; margin-bottom: 0.75rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-options label { display: flex; align-items: center; gap: 0.75rem; background: #f8f8f8; border: 2px solid #e0e0e0; border-radius: 8px; padding: 0.75rem 1rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; }
+  .quiz-options label:hover { border-color: #4a9e4a; background: #f0f9f0; }
+  .quiz-options input[type="radio"] { accent-color: #4a9e4a; width: 18px; height: 18px; }
+  .check-btn { background: #2d6a2d; color: white; border: none; border-radius: 8px; padding: 0.75rem 2rem; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+  .check-btn:hover { background: #4a9e4a; }
+  .quiz-feedback { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; display: none; font-size: 0.95rem; }
+  .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .summary-box { background: linear-gradient(135deg, #2d6a2d, #4a9e4a); color: white; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+  .summary-box h2 { color: white; margin-top: 0; }
+  .summary-box ol { padding-left: 1.25rem; }
+  .summary-box ol li { padding: 0.3rem 0; }
+  .nav-hint { text-align: center; color: #888; font-size: 0.9rem; margin-top: 2rem; padding-bottom: 2rem; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="lesson-num">Lektion 5 von 8</div>
+  <h1>Schritt für Schritt umtopfen</h1>
+  <div class="subtitle">Der eigentliche Vorgang — von Anfang bis Ende</div>
+</div>
+
+<div class="container">
+  <div class="goal-box">
+    <strong>Lernziel</strong>
+    Du kennst den kompletten Umtopf-Vorgang in der richtigen Reihenfolge und weißt, was du dabei beachten musst.
+  </div>
+
+  <h2>Der komplette Umtopf-Vorgang</h2>
+  <p>Hier ist der gesamte Prozess — Schritt für Schritt. Lies ihn einmal durch, dann bist du bereit für deine erste echte Pflanze.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Vorbereitung: Tag vorher gießen</h3>
+        <p>Gieße die Pflanze einen Tag vor dem Umtopfen. Leicht feuchte Erde lässt sich leichter aus dem Topf lösen. Zu nasse Erde ist schwer und klumpig, zu trockene fällt auseinander.</p>
+        <span class="step-tip">💡 Nicht direkt vorher gießen — einen Tag Puffer einplanen</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Arbeitsplatz vorbereiten</h3>
+        <p>Lege eine Unterlage (Zeitung, Plastikfolie, Karton) auf deinen Tisch oder Boden. Stelle alles in Reichweite: neuen Topf, frische Erde, Schaufel, Schere, Gießkanne.</p>
+        <span class="step-tip">💡 Im Freien oder Bad macht weniger Sauerei</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Neuen Topf vorbereiten</h3>
+        <p>Lege Kieselsteine oder Blähton auf den Topfboden (1–2 cm) als Drainageschicht. Fülle dann frische Erde hinein — etwa so viel, dass die Pflanze nachher auf der richtigen Höhe sitzt (Oberkante Wurzelballen ≈ 2 cm unter Topfrand).</p>
+        <span class="step-tip">💡 Erde locker einfüllen, nicht festdrücken</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>Pflanze aus altem Topf lösen</h3>
+        <p>Drehe den Topf um und klopfe sanft gegen den Boden und die Seiten. Bei Plastiktöpfen: sanft zusammendrücken. Die Pflanze sollte mit dem Wurzelballen herausgleiten. Nicht an den Stielen ziehen!</p>
+        <span class="step-tip">💡 Hartnäckig? Mit einem Messer oder Stab am Topfrand entlangfahren</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>Wurzeln inspizieren</h3>
+        <p>Schaue dir die Wurzeln an. Gesunde Wurzeln sind weiß bis cremefarbig. Braune, schwarze oder matschige Wurzeln sind krank (Fäulnis) — diese schneidest du mit einer desinfizierten Schere ab. Alte Erde sanft abschütteln.</p>
+        <span class="step-tip">💡 Ein bisschen braun am Ende ist normal. Matschig + übelriechend = Fäulnis, weg damit</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h3>Pflanze einsetzen</h3>
+        <p>Setze die Pflanze mittig in den neuen Topf. Überprüfe die Höhe: der Punkt, wo Stämme/Stiele aus der Erde kommen (die "Krone"), sollte etwa 2 cm unter dem Topfrand liegen. Zu tief einpflanzen schadet vielen Pflanzen.</p>
+        <span class="step-tip">💡 Pflanze gerade halten während du Erde einfüllst</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <h3>Erde auffüllen & andrücken</h3>
+        <p>Fülle frische Erde um die Pflanze herum ein. Drücke die Erde sanft mit den Fingern an — nicht fest stampfen, nur leicht komprimieren damit keine Luftlöcher bleiben. Lass 1–2 cm Platz zum Topfrand fürs Gießen.</p>
+        <span class="step-tip">💡 Sanft andrücken — die Wurzeln brauchen noch Luft in der Erde</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-content">
+        <h3>Gießen</h3>
+        <p>Gieße die Pflanze gründlich — bis Wasser aus dem Drainageloch läuft. Das setzt die Erde und gibt den Wurzeln ersten Kontakt mit dem neuen Substrat. Überschusswasser nach 30 Minuten aus dem Untersetzer ausschütten.</p>
+        <span class="step-tip">💡 Direkt nach dem Umtopfen gründlich gießen — danach 1–2 Wochen weniger gießen als sonst</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠️ Nicht zu tief pflanzen:</strong> Die Pflanzenbasis (wo Stiel auf Erde trifft) darf nicht unter Erde begraben werden. Das führt zu Fäulnis am Stamm. Im Zweifelsfall: lieber etwas zu hoch als zu tief.
+  </div>
+
+  <div class="quiz-section">
+    <h2>🧠 Quiz: Der Umtopf-Vorgang</h2>
+
+    <div class="quiz-item" id="q1">
+      <p>Frage 1: Wann gießt du am besten das letzte Mal, bevor du umtopfst?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q1" value="a"> Direkt vorher — damit die Erde schön weich ist</label>
+        <label><input type="radio" name="q1" value="b"> Einen Tag vorher — leicht feucht ist ideal</label>
+        <label><input type="radio" name="q1" value="c"> Gar nicht — trockene Erde ist am einfachsten</label>
+      </div>
+      <div class="quiz-feedback" id="q1-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q2">
+      <p>Frage 2: Du siehst beim Wurzelcheck einige schwarze, matschige Wurzeln die unangenehm riechen. Was tust du?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q2" value="a"> Die Wurzeln lassen — die erholen sich von selbst</label>
+        <label><input type="radio" name="q2" value="b"> Mit einer desinfizierten Schere abschneiden</label>
+        <label><input type="radio" name="q2" value="c"> Die ganze Pflanze wegwerfen</label>
+      </div>
+      <div class="quiz-feedback" id="q2-feedback"></div>
+    </div>
+
+    <div class="quiz-item" id="q3">
+      <p>Frage 3: Wie tief soll die Pflanzenkrone (Übergang Stiel/Erde) im neuen Topf sitzen?</p>
+      <div class="quiz-options">
+        <label><input type="radio" name="q3" value="a"> Bündig mit dem Topfrand</label>
+        <label><input type="radio" name="q3" value="b"> Ca. 2 cm unter dem Topfrand</label>
+        <label><input type="radio" name="q3" value="c"> Möglichst tief, damit die Pflanze Halt hat</label>
+      </div>
+      <div class="quiz-feedback" id="q3-feedback"></div>
+    </div>
+
+    <button class="check-btn" onclick="checkQuiz()">Antworten prüfen</button>
+  </div>
+
+  <div class="summary-box">
+    <h2>✅ Der Umtopf-Vorgang in 8 Schritten</h2>
+    <ol>
+      <li>Tag vorher gießen</li>
+      <li>Arbeitsplatz vorbereiten</li>
+      <li>Neuen Topf vorbereiten (Drainage + etwas Erde)</li>
+      <li>Pflanze aus altem Topf lösen</li>
+      <li>Wurzeln inspizieren, kranke abschneiden</li>
+      <li>Pflanze einsetzen (Krone 2 cm unter Topfrand)</li>
+      <li>Erde auffüllen, sanft andrücken</li>
+      <li>Gründlich gießen</li>
+    </ol>
+  </div>
+
+  <div class="nav-hint">Weiter: Lektion 6 — Nach dem Umtopfen →</div>
+</div>
+
+<script>
+const answers = { q1: 'b', q2: 'b', q3: 'b' };
+const explanations = {
+  q1: { b: '✓ Richtig! Einen Tag vorher — leicht feuchte Erde lässt sich am besten herauslösen.', a: '✗ Falsch. Direkt vorher gießen macht die Erde schwer und matschig — schwer zu handhaben.', c: '✗ Falsch. Staubtrockene Erde fällt auseinander und reißt Wurzeln mit.' },
+  q2: { b: '✓ Richtig! Faulige Wurzeln abschneiden — sie können sich sonst weiter ausbreiten.', a: '✗ Falsch. Faulige Wurzeln erholen sich nicht, sie breiten sich aus und töten die Pflanze.', c: '✗ Meistens nicht nötig. Wenn nur einige Wurzeln faul sind, reicht abschneiden.' },
+  q3: { b: '✓ Richtig! 2 cm Platz zum Topfrand verhindert, dass beim Gießen Erde überläuft, und die Krone fault nicht.', a: '✗ Falsch. Bündig mit dem Rand hinterlässt keinen Gießraum.', c: '✗ Falsch. Zu tief eingepflanzte Kronen faulen — ein häufiger Anfängerfehler.' }
+};
+function checkQuiz() {
+  ['q1','q2','q3'].forEach(q => {
+    const sel = document.querySelector(`input[name="${q}"]:checked`);
+    const fb = document.getElementById(`${q}-feedback`);
+    if (!sel) { fb.textContent = '⚠️ Bitte eine Antwort wählen.'; fb.className = 'quiz-feedback incorrect'; fb.style.display = 'block'; return; }
+    fb.textContent = explanations[q][sel.value];
+    fb.className = 'quiz-feedback ' + (sel.value === answers[q] ? 'correct' : 'incorrect');
+    fb.style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>

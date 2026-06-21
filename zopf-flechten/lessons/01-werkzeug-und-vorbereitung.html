@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lektion 1: Werkzeug & Vorbereitung</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #faf8f5; color: #2d2d2d; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #f9a8d4 0%, #c084fc 100%); padding: 3rem 2rem; text-align: center; }
+    .hero .badge { display: inline-block; background: rgba(255,255,255,0.3); color: #fff; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    .hero h1 { color: #fff; font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .hero p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+    .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .mission-box { background: #fff; border-left: 4px solid #c084fc; border-radius: 8px; padding: 1.2rem 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .mission-box h3 { color: #7c3aed; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    h2 { color: #1e1b4b; font-size: 1.4rem; margin: 2rem 0 1rem; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .card { background: #fff; border-radius: 12px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); text-align: center; }
+    .card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .card h4 { font-size: 0.95rem; color: #1e1b4b; margin-bottom: 0.3rem; }
+    .card p { font-size: 0.85rem; color: #6b7280; }
+    .steps { list-style: none; counter-reset: steps; }
+    .steps li { counter-increment: steps; display: flex; gap: 1rem; margin-bottom: 1.2rem; align-items: flex-start; }
+    .steps li::before { content: counter(steps); background: #c084fc; color: #fff; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; font-size: 0.9rem; }
+    .tip { background: #fef3c7; border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; border-left: 4px solid #f59e0b; }
+    .tip strong { color: #92400e; }
+    .quiz { background: #1e1b4b; color: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+    .quiz h3 { color: #c084fc; margin-bottom: 1rem; font-size: 1.1rem; }
+    .quiz-q { margin-bottom: 1rem; }
+    .quiz-q p { margin-bottom: 0.5rem; }
+    details summary { cursor: pointer; color: #a78bfa; font-size: 0.9rem; margin-top: 0.5rem; }
+    details[open] .reveal { margin-top: 0.5rem; color: #d8b4fe; font-size: 0.9rem; }
+    .summary-box { background: #fff; border-radius: 12px; padding: 1.5rem; margin: 2rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .summary-box h3 { color: #7c3aed; margin-bottom: 0.8rem; }
+    .summary-box ul { padding-left: 1.2rem; }
+    .summary-box li { margin-bottom: 0.4rem; }
+    .nav { display: flex; justify-content: flex-end; margin: 2rem 0; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #c084fc, #818cf8); color: #fff; padding: 0.8rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">Lektion 1 von 8</div>
+    <h1>Werkzeug &amp; Vorbereitung</h1>
+    <p>Alles, was du brauchst — bevor du anfängst</p>
+  </div>
+
+  <div class="container">
+    <div class="mission-box">
+      <h3>Warum diese Lektion?</h3>
+      <p>Mit dem richtigen Werkzeug und gut vorbereiteten Haaren wird das Flechten deutlich einfacher. Viele Anfänger kämpfen nicht mit der Technik — sondern mit verfilzten Haaren und falschem Equipment.</p>
+    </div>
+
+    <h2>Was du brauchst</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">💇</div>
+        <h4>Haarbürste oder Kamm</h4>
+        <p>Zum Entwirren vor dem Flechten. Ein Weitgahnkamm ist ideal.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🪢</div>
+        <h4>Haargummi</h4>
+        <p>Mindestens 2 Stück — einen für den Start, einen für das Ende.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🪞</div>
+        <h4>Spiegel</h4>
+        <p>Ein großer Spiegel oder zwei Spiegel für die Rückseite (optional).</p>
+      </div>
+      <div class="card">
+        <div class="icon">💧</div>
+        <h4>Wassersprühflasche</h4>
+        <p>Leicht feuchte Haare lassen sich besser flechten (optional aber hilfreich).</p>
+      </div>
+    </div>
+
+    <h2>Haare vorbereiten — Schritt für Schritt</h2>
+    <ol class="steps">
+      <li><div><strong>Haare bürsten:</strong> Alle Knoten und Verfilzungen entfernen. Von den Spitzen nach oben arbeiten, nicht von der Wurzel.</div></li>
+      <li><div><strong>Optional: leicht anfeuchten:</strong> Mit der Sprühflasche leicht anfeuchten — trockene, feine Haare rutschen, feuchte Haare bleiben besser zusammen.</div></li>
+      <li><div><strong>Haare zusammenfassen:</strong> Alle Haare mit einer Hand am Hinterkopf zusammenhalten, wo der Zopf beginnen soll.</div></li>
+      <li><div><strong>Ersten Haargummi anlegen (optional):</strong> Befestige die Haare oben locker — das ist nur ein temporärer Halt. Alternativ: lass ihn weg und halte die Haare einfach mit einer Hand.</div></li>
+    </ol>
+
+    <div class="tip">
+      <strong>Tipp für Anfänger:</strong> Übe zuerst mit einem Puppenkopf oder an anderen Personen — dein eigenes Haar im Rücken zu flechten ist schwieriger. Lerne zuerst die Technik, dann den Winkel.
+    </div>
+
+    <h2>Geeignete Haartypen für den Einstieg</h2>
+    <p>Der klassische 3-Strang-Zopf funktioniert mit fast allen Haartypen. Am einfachsten sind:</p>
+    <ul style="padding-left: 1.5rem; margin: 1rem 0;">
+      <li style="margin-bottom: 0.5rem;"><strong>Mittellange bis lange Haare</strong> (ab ca. Schulterlänge)</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Glattes oder leicht gewelltes Haar</strong> — lockiges Haar funktioniert auch, ist aber anfangs schwerer zu kontrollieren</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Frisch gebürstetes Haar</strong> ohne Styling-Produkte</li>
+    </ul>
+
+    <div class="quiz">
+      <h3>&#x1F9E0; Kurz-Quiz</h3>
+      <div class="quiz-q">
+        <p><strong>Frage 1:</strong> Warum sollte man Haare vor dem Flechten bürsten?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Verfilzungen und Knoten machen das Flechten schwerer und schmerzhafter. Gebürstete Haare lassen sich gleichmäßig in Strähnen teilen.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 2:</strong> Wie viele Haargummis brauchst du mindestens?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Mindestens 1 — für das Ende des Zopfes. Ein zweiter für den Anfang ist optional, aber hilfreich.</div>
+        </details>
+      </div>
+      <div class="quiz-q">
+        <p><strong>Frage 3:</strong> Warum empfehlen viele, leicht feuchte Haare zu flechten?</p>
+        <details>
+          <summary>Antwort anzeigen</summary>
+          <div class="reveal">Feuchte Haare haften leicht aneinander und rutschen weniger — das gibt dir mehr Kontrolle beim Flechten.</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h3>Was du gelernt hast</h3>
+      <ul>
+        <li>Welches Werkzeug du brauchst (Kamm, Haargummi, Spiegel)</li>
+        <li>Wie du Haare richtig vorbereitest (bürsten, optional anfeuchten)</li>
+        <li>Welche Haartypen sich für Anfänger am besten eignen</li>
+        <li>Warum Üben an anderen Haaren am Anfang einfacher ist</li>
+      </ul>
+    </div>
+
+    <div class="nav">
+      <a href="02-das-uberkreuz-prinzip.html" class="btn">Nächste Lektion &#x2192;</a>
+    </div>
+  </div>
+</body>
+</html>
