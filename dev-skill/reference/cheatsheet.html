@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dev Skill — Cheatsheet</title>
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3e;
+    --accent: #7c6af5; --accent2: #4ecdc4; --accent3: #f7b731; --accent4: #ff6b6b;
+    --text: #e8eaf0; --muted: #8890a4; --code-bg: #12151f;
+    --green: #51cf66; --orange: #fd7e14;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.5; padding: 24px; }
+  h1 { font-size: 22px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 20px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin: 24px 0 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cmd { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 700; color: var(--accent2); background: var(--code-bg); padding: 3px 8px; border-radius: 4px; }
+  .desc { font-size: 13px; margin-bottom: 6px; }
+  .tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 700; text-transform: uppercase; }
+  .tag-init { background:#1a3a2a; color:var(--green); }
+  .tag-capture { background:#3a2a1a; color:var(--orange); }
+  .tag-discuss { background:#1a1a3a; color:#a78bfa; }
+  .tag-plan { background:#1a2a3a; color:var(--accent2); }
+  .tag-impl { background:#3a1a1a; color:var(--accent4); }
+  .tag-finish { background:#2a1a3a; color:#e879f9; }
+  .tag-refine { background:#2a2a1a; color:var(--accent3); }
+  .tag-status { background:#1a2a2a; color:#94d82d; }
+  .produces { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .produces span { color: var(--text); }
+  code { font-family: 'Fira Code', monospace; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 12px; color: var(--accent2); }
+  .tip { background: #12201a; border-left: 3px solid var(--green); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; margin-top: 10px; }
+  .tip b { color: var(--green); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 10px; letter-spacing: 0.8px; }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td:first-child { font-family: monospace; color: var(--accent2); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .full { grid-column: 1 / -1; }
+  .flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 12px 0 4px; }
+  .fnode { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; text-align: center; min-width: 110px; }
+  .fnode .flabel { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+  .fnode .fname { font-family: monospace; font-size: 12px; color: var(--accent2); margin-top: 2px; font-weight: 700; }
+  .fnode .fphase { font-size: 10px; color: var(--accent3); margin-top: 2px; }
+  .farrow { padding: 0 8px; color: var(--muted); display: flex; align-items: center; font-size: 18px; }
+  .note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Dev Skill — Cheatsheet</h1>
+
+<h2>Voller Workflow — einmal pro Feature</h2>
+<div class="flow">
+  <div class="fnode"><div class="flabel">einmalig</div><div class="fname">/dev-init</div><div class="fphase">setup</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">optional</div><div class="fname">/dev-idea</div><div class="fphase">capture</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">phase 1</div><div class="fname">/dev-discuss</div><div class="fphase">spec</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">phase 2</div><div class="fname">/dev-plan</div><div class="fphase">plan</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">phase 3</div><div class="fname">/dev-implement</div><div class="fphase">build</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">phase 4</div><div class="fname">/dev-finish</div><div class="fphase">close</div></div>
+</div>
+<div class="note">
+  ↩ Spec falsch? <code>/dev-refine</code> nach discuss. &nbsp;|&nbsp;
+  Jederzeit: <code>/dev</code> zeigt Status + nächsten Schritt.
+</div>
+
+<h2>Alle Befehle</h2>
+<div class="grid">
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-init</span><span class="tag tag-init">setup</span></div>
+    <div class="desc">Neues Projekt einrichten. <b>Einmalig pro Projekt.</b> Fragt Name + Slug, schreibt alle Basis-Dateien im Hub.</div>
+    <div class="produces">Erzeugt: <span>VISION.md, STATUS.md, DECISIONS.md, LEARNINGS.md, TIMELINE.md + Registry</span></div>
+    <div class="produces">Pfad: <span><code>$HUB_DIR/topics/&lt;slug&gt;/</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-idea "text"</span><span class="tag tag-capture">capture</span></div>
+    <div class="desc">Idee sofort sichern — <b>kein Dialog</b>, läuft in Sekunden. Landet als <code>[idea]</code> in STATUS.md + VISION.md.</div>
+    <div class="produces">Argument: <span>Text in Anführungszeichen</span></div>
+    <div class="produces">Commit: <span><code>chore(&lt;slug&gt;): capture idea</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev</span><span class="tag tag-status">status</span></div>
+    <div class="desc">Zeigt aktives Feature, Phase, nächsten Roadmap-Punkt. Bietet direkten Weiter-Link zur aktuellen Phase. Alias: <code>/dev-status</code>.</div>
+    <div class="produces">Liest: <span><code>STATUS.md</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-discuss</span><span class="tag tag-discuss">phase 1</span></div>
+    <div class="desc">Feature-Design: Clarifying Questions → UI-Check → Ansätze → Sektionsweise Präsentation → Spec schreiben.</div>
+    <div class="produces">Erzeugt: <span><code>specs/YYYY-MM-DD-&lt;feature&gt;-design.md</code></span></div>
+    <div class="produces">STATUS danach: <span><code>Phase: plan</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-plan</span><span class="tag tag-plan">phase 2</span></div>
+    <div class="desc">Implementierungsplan schreiben: File Map → TDD-Tasks (Test schreiben → FAIL → Impl → PASS → Commit). Kein Placeholder.</div>
+    <div class="produces">Erzeugt: <span><code>plans/YYYY-MM-DD-&lt;feature&gt;.md</code></span></div>
+    <div class="produces">STATUS danach: <span><code>Phase: implement</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-implement</span><span class="tag tag-impl">phase 3</span></div>
+    <div class="desc">Plan ausführen: Modus wählen (Subagent/Inline), Zeitplan eintragen, <code>implementation_mode: true</code> setzen.</div>
+    <div class="produces">Modus: <span>Subagent-Driven (empfohlen) oder Inline</span></div>
+    <div class="produces">STATUS danach: <span><code>Phase: finish</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-finish</span><span class="tag tag-finish">phase 4</span></div>
+    <div class="desc">Abschluss: VISION.md aktualisieren, Learnings + Timeline extrahieren, Hub pushen, nächstes Item zeigen.</div>
+    <div class="produces">Schreibt: <span>VISION.md, LEARNINGS.md, TIMELINE.md, STATUS.md</span></div>
+    <div class="produces">Endet mit: <span><code>git push</code> auf Hub</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-refine</span><span class="tag tag-refine">correction</span></div>
+    <div class="desc">Bestehende Spec überarbeiten. Gezielter Dialog, Spec wird in-place aktualisiert. Phase zurück auf <code>plan</code>, Plan-Feld gelöscht.</div>
+    <div class="produces">Wann: <span>Nach discuss, wenn Spec nicht stimmt</span></div>
+  </div>
+
+</div>
+
+<h2>STATUS.md — Phasenzustände</h2>
+<div class="card full">
+  <table>
+    <tr><th>Phase-Wert</th><th>Bedeutung</th><th>Nächster Befehl</th><th>Roadmap-Tag</th></tr>
+    <tr><td>(none)</td><td>Kein aktives Feature</td><td>/dev-discuss</td><td>—</td></tr>
+    <tr><td>plan</td><td>Spec da, Plan fehlt noch</td><td>/dev-plan</td><td>[discussed]</td></tr>
+    <tr><td>implement</td><td>Plan da, Code fehlt noch</td><td>/dev-implement</td><td>[planned]</td></tr>
+    <tr><td>finish</td><td>Code fertig, Abschluss fehlt</td><td>/dev-finish</td><td>[active]</td></tr>
+  </table>
+</div>
+
+<h2>Hub-Dateien</h2>
+<div class="card full">
+  <table>
+    <tr><th>Datei</th><th>Zweck</th><th>Geschrieben von</th></tr>
+    <tr><td>VISION.md</td><td>Projekt-Vision + vollständige Roadmap</td><td>init, finish</td></tr>
+    <tr><td>STATUS.md</td><td>Aktives Feature, Phase, Spec/Plan-Pfade</td><td>alle Phasen</td></tr>
+    <tr><td>DECISIONS.md</td><td>Architektur-Entscheidungen, verworfene Ansätze</td><td>discuss + plan (auto)</td></tr>
+    <tr><td>LEARNINGS.md</td><td>Was beim Bauen gelernt wurde</td><td>finish (auto)</td></tr>
+    <tr><td>TIMELINE.md</td><td>Chronologische Feature-Historie</td><td>finish (auto)</td></tr>
+    <tr><td>specs/YYYY-MM-DD-*.md</td><td>Feature-Spec</td><td>discuss</td></tr>
+    <tr><td>plans/YYYY-MM-DD-*.md</td><td>TDD-Implementierungsplan</td><td>plan</td></tr>
+  </table>
+  <div class="tip"><b>Knowledge Extraction</b> läuft automatisch nach discuss, plan und finish — kein Dialog nötig.</div>
+</div>
+
+<div style="margin-top:24px; font-size:11px; color:var(--muted); text-align:center;">
+  /teach dev-skill · reference/cheatsheet.html
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 4: /dev-discuss — Feature-Design</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#a78bfa; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#1a1030; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .phase-flow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:16px 0; }
+  .pf-step { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 14px; font-size:13px; text-align:center; }
+  .pf-step .pf-num { font-size:10px; color:var(--muted); text-transform:uppercase; }
+  .pf-step .pf-name { color:var(--accent2); font-weight:600; }
+  .pf-arrow { color:var(--muted); }
+  .pf-step.active { border-color:var(--accent); }
+  .pf-step.active .pf-name { color:var(--accent); }
+  .cq-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin:12px 0; }
+  .cq-item { display:flex; gap:10px; margin:10px 0; align-items:flex-start; }
+  .cq-badge { background:var(--accent); color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .cq-badge.opt { background:#2a2a3a; color:var(--muted); border:1px solid var(--border); }
+  .cq-text { flex:1; font-size:14px; }
+  .cq-why { font-size:12px; color:var(--muted); margin-top:2px; }
+  .spec-sections { margin:12px 0; }
+  .spec-section { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:12px 16px; margin:6px 0; }
+  .spec-section .ss-title { font-weight:700; color:var(--accent2); font-size:14px; margin-bottom:4px; }
+  .spec-section .ss-desc { font-size:13px; color:var(--muted); }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<h1>/dev-discuss</h1>
+<div class="subtitle">Lektion 4 von 9 · Feature-Design und Spec</div>
+
+<h2>Was macht dieser Befehl?</h2>
+<p><code>/dev-discuss</code> ist Phase 1 des Feature-Workflows: Er verwandelt eine vage Idee in eine präzise, schriftliche Spezifikation — durch strukturierten Dialog. Am Ende gibt es eine <code>*-design.md</code> Datei im Hub.</p>
+
+<div class="why">
+  <b>Warum erst diskutieren, dann coden?</b><br>
+  Die meisten Bugs entstehen nicht im Code, sondern im Anforderungs-Verständnis. Wenn "Benachrichtigungen" implementiert werden ohne zu klären "für wen? welche? wann?"— entstehen Annahmen. Annahmen werden zu falschen Features. /dev-discuss erzwingt Klarheit, bevor irgendeine Zeile Code geschrieben wird.
+</div>
+
+<h2>Ablauf der Phase</h2>
+<div class="phase-flow">
+  <div class="pf-step"><div class="pf-num">start</div><div class="pf-name">Feature wählen</div></div>
+  <span class="pf-arrow">→</span>
+  <div class="pf-step active"><div class="pf-num">4-6 fragen</div><div class="pf-name">Clarifying Questions</div></div>
+  <span class="pf-arrow">→</span>
+  <div class="pf-step"><div class="pf-num">optional</div><div class="pf-name">UI-Check</div></div>
+  <span class="pf-arrow">→</span>
+  <div class="pf-step"><div class="pf-num">2-3</div><div class="pf-name">Ansätze</div></div>
+  <span class="pf-arrow">→</span>
+  <div class="pf-step"><div class="pf-num">4 sektionen</div><div class="pf-name">Präsentation</div></div>
+  <span class="pf-arrow">→</span>
+  <div class="pf-step"><div class="pf-num">output</div><div class="pf-name">Spec-Datei</div></div>
+</div>
+
+<h2>Schritt 1: Feature wählen</h2>
+<p>Der Skill fragt zunächst, ob ein bestehendes <code>[idea]</code>-Item aus der Roadmap genommen werden soll oder ein neues Feature beschrieben wird. Das erlaubt schnelle Auswahl aus dem Backlog.</p>
+
+<h2>Schritt 2: Clarifying Questions</h2>
+<p>Die 4 Pflicht-Fragen werden einzeln gestellt — eine Frage pro Nachricht:</p>
+<div class="cq-box">
+  <div class="cq-item">
+    <div class="cq-badge">1</div>
+    <div class="cq-text">
+      "Was soll dieses Feature leisten — welches Problem löst es?"
+      <div class="cq-why">Verhindert "Solution Shopping": zuerst Problem verstehen, dann Lösung.</div>
+    </div>
+  </div>
+  <div class="cq-item">
+    <div class="cq-badge">2</div>
+    <div class="cq-text">
+      "Für wen genau? Welcher Nutzertyp?"
+      <div class="cq-why">Nutzerkontext bestimmt UX-Entscheidungen und Edge Cases.</div>
+    </div>
+  </div>
+  <div class="cq-item">
+    <div class="cq-badge">3</div>
+    <div class="cq-text">
+      "Was ist definitiv NICHT teil dieses Features (Scope-Grenze)?"
+      <div class="cq-why">Explizite Ausschlüsse verhindern Scope-Creep in der Implementierung.</div>
+    </div>
+  </div>
+  <div class="cq-item">
+    <div class="cq-badge">4</div>
+    <div class="cq-text">
+      "Wie weißt du, dass das Feature fertig und korrekt ist?"
+      <div class="cq-why">Erzwingt messbare Erfolgskriterien — kein "sieht gut aus" als Definition of Done.</div>
+    </div>
+  </div>
+  <div class="cq-item">
+    <div class="cq-badge opt">5</div>
+    <div class="cq-text">
+      "Gibt es technische Constraints oder Abhängigkeiten?" (optional)
+      <div class="cq-why">Nur wenn noch unklar nach den 4 Pflichtfragen.</div>
+    </div>
+  </div>
+  <div class="cq-item">
+    <div class="cq-badge opt">6</div>
+    <div class="cq-text">
+      "Hast du bereits eine Präferenz für den Ansatz?" (optional)
+      <div class="cq-why">Respektiert vorhandenes Vorwissen statt Lösungen aufzuzwingen.</div>
+    </div>
+  </div>
+</div>
+
+<div class="why">
+  <b>Warum eine Frage pro Nachricht (nicht alle auf einmal)?</b><br>
+  Menschen beantworten Listen von Fragen oberflächlich. Eine Frage zwingt zur Tiefe. Außerdem kann der Skill basierend auf der Antwort entscheiden, ob weitere Fragen nötig sind — das ist bei einem Fragenkatalog nicht möglich.
+</div>
+
+<h2>Schritt 3: UI-Check</h2>
+<p>Hat das Feature UI-Komponenten? Wenn ja → der <code>frontend-design</code>-Skill wird aufgerufen und liefert Farbpalette, Typografie, ASCII-Wireframes. Diese fließen direkt in den "UI/UX Design"-Abschnitt der Spec.</p>
+<div class="why">
+  <b>Warum UI-Design in der Spec-Phase?</b><br>
+  Wenn UI erst beim Implementieren entworfen wird, kostet das teure Refactors. Eine früh festgelegte visuelle Sprache verhindert "Wir bauen das Feature nochmal weil es hässlich ist."
+</div>
+
+<h2>Schritt 4: Ansätze präsentieren</h2>
+<p>Der Skill schlägt 2–3 konkrete Ansätze vor, jeder mit Name, Ein-Satz-Summary und Trade-off. Der empfohlene Ansatz kommt zuerst mit Begründung. User muss explizit zustimmen bevor es weitergeht.</p>
+<div class="why">
+  <b>Warum mehrere Ansätze?</b><br>
+  Ein einziger Vorschlag ist keine Entscheidung — es ist Diktat. Durch Alternativen wird klar, was wir verwerfen und warum. Das wandert dann als verworfene Optionen in DECISIONS.md — wertvoll wenn man in 3 Monaten fragt "Warum haben wir damals nicht X gemacht?"
+</div>
+
+<h2>Schritt 5: Design sektionsweise zeigen</h2>
+<p>Der Skill präsentiert das Design in 4 Sektionen, jeweils mit Approval-Gate:</p>
+<div class="spec-sections">
+  <div class="spec-section"><div class="ss-title">1. Architektur + Datenfluss</div><div class="ss-desc">Welche Schichten, welche Datenstrukturen, wie fließen die Daten?</div></div>
+  <div class="spec-section"><div class="ss-title">2. UI/UX Design</div><div class="ss-desc">Nur wenn UI-Feature. ASCII-Wireframes, Farben, Layouts.</div></div>
+  <div class="spec-section"><div class="ss-title">3. Betroffene Dateien</div><div class="ss-desc">Liste: Create / Modify mit Beschreibung der Änderung.</div></div>
+  <div class="spec-section"><div class="ss-title">4. Nicht in diesem Scope</div><div class="ss-desc">Explizite Ausschlüsse — was wir bewusst weglassen.</div></div>
+</div>
+<div class="why">
+  <b>Warum sektionsweise statt alles auf einmal?</b><br>
+  Ein komplettes Design auf einmal zu reviewen überfordert. Wenn die Architektur falsch ist, brauchen wir den Rest nicht zu lesen. Sektions-Gates erlauben early exit und gezieltes Feedback.
+</div>
+
+<h2>Output: Die Spec-Datei</h2>
+<pre>$HUB_DIR/topics/&lt;slug&gt;/specs/2026-06-23-task-filter-design.md</pre>
+<p>Pflicht-Sektionen der Spec:</p>
+<ul style="padding-left:20px; margin:8px 0;">
+  <li style="margin:6px 0;"><strong>Ziel</strong> — Warum wird das gebaut?</li>
+  <li style="margin:6px 0;"><strong>Ansatz</strong> — Gewählt + Verworfen (mit Begründung)</li>
+  <li style="margin:6px 0;"><strong>Architektur / Datenfluss</strong></li>
+  <li style="margin:6px 0;"><strong>UI/UX Design</strong> (wenn UI)</li>
+  <li style="margin:6px 0;"><strong>Betroffene Dateien</strong></li>
+  <li style="margin:6px 0;"><strong>Nicht in diesem Scope</strong></li>
+</ul>
+
+<h2>Was danach passiert (automatisch)</h2>
+<p>Nach der Spec läuft <strong>Knowledge Extraction</strong> still im Hintergrund: Der gewählte Ansatz und die verworfenen Alternativen werden in DECISIONS.md geschrieben. STATUS.md wird auf <code>Phase: plan</code> gesetzt.</p>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Wie viele Pflicht-Fragen stellt /dev-discuss?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">2</li>
+    <li onclick="check(this, true)">4</li>
+    <li onclick="check(this, false)">6</li>
+  </ul>
+
+  <div class="quiz-q">2. Was passiert wenn das Feature UI-Komponenten hat?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Der User beschreibt das UI in Textform</li>
+    <li onclick="check(this, true)">Der frontend-design Skill wird aufgerufen und liefert Wireframes + Farbpalette</li>
+    <li onclick="check(this, false)">Das UI wird in /dev-plan spezifiziert</li>
+  </ul>
+
+  <div class="quiz-q">3. Warum werden verworfene Ansätze in der Spec dokumentiert?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Als Backup falls der gewählte Ansatz scheitert</li>
+    <li onclick="check(this, true)">Damit man in Zukunft nachvollziehen kann, warum bestimmte Optionen verworfen wurden</li>
+    <li onclick="check(this, false)">Weil die Spec sonst zu kurz wäre</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li>Phase 1: Vage Idee → präzise Spec</li>
+    <li>4 Pflicht-Clarifying-Questions, eine pro Nachricht</li>
+    <li>UI-Check → ggf. frontend-design Skill für Wireframes</li>
+    <li>2–3 Ansätze mit Trade-offs → User wählt explizit</li>
+    <li>Design sektionsweise mit Approval-Gates</li>
+    <li>Output: <code>specs/YYYY-MM-DD-&lt;feature&gt;-design.md</code></li>
+    <li>Danach automatisch: Knowledge Extraction + STATUS.md auf <code>Phase: plan</code></li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>

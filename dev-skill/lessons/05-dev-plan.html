@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 5: /dev-plan — Implementierungsplan</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#4ecdc4; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#0d1a1a; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .tdd-cycle { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:16px 0; }
+  .tdd-step { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; }
+  .tdd-step .ts-num { font-size:11px; color:var(--muted); }
+  .tdd-step .ts-name { font-size:13px; font-weight:700; margin:4px 0; }
+  .tdd-step .ts-detail { font-size:11px; color:var(--muted); }
+  .tdd-step.fail .ts-name { color:#ff6b6b; }
+  .tdd-step.impl .ts-name { color:var(--accent3); }
+  .tdd-step.pass .ts-name { color:var(--green); }
+  .tdd-step.write .ts-name { color:#a78bfa; }
+  .tdd-step.commit .ts-name { color:var(--accent2); }
+  .file-map { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; margin:12px 0; }
+  .fm-create { color:var(--green); }
+  .fm-modify { color:var(--accent3); }
+  .fm-test { color:#a78bfa; }
+  .task-example { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin:12px 0; font-size:13px; }
+  .task-example h4 { color:var(--accent2); margin-bottom:10px; }
+  .task-field { margin:6px 0; }
+  .task-field .tf-label { color:var(--muted); font-size:11px; text-transform:uppercase; margin-bottom:3px; }
+  .task-field code { display:block; }
+  .warn-box { background:#201a00; border:1px solid #4a3a00; border-radius:8px; padding:14px 18px; margin:16px 0; }
+  .warn-box b { color:var(--accent3); }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<h1>/dev-plan</h1>
+<div class="subtitle">Lektion 5 von 9 · Implementierungsplan schreiben</div>
+
+<h2>Was macht dieser Befehl?</h2>
+<p><code>/dev-plan</code> liest die Spec aus Phase 1 und schreibt daraus einen vollständigen, ausführbaren Implementierungsplan — mit echtem Code, TDD-Struktur und keinen Platzhaltern. Das Ergebnis ist eine <code>plans/*.md</code>-Datei, die direkt von einem Agenten ausgeführt werden kann.</p>
+
+<div class="why">
+  <b>Warum ein separater Plan statt direkt zu coden?</b><br>
+  Ein Plan ohne Spec ist Raten. Eine Spec ohne Plan ist eine gute Absicht. Erst wenn beides da ist, kann man sicher implementieren — weil klar ist: welche Dateien, welche Interfaces, welche Reihenfolge, wie jeder Schritt getestet wird.
+</div>
+
+<h2>Schritt 1: File Map</h2>
+<p>Bevor Tasks geschrieben werden, muss eine vollständige Datei-Übersicht her:</p>
+<div class="file-map">
+  <div><span class="fm-create">Create:</span> src/filters/task-filter.ts &nbsp;— Filter-Logik</div>
+  <div><span class="fm-modify">Modify:</span> src/ui/task-list.tsx &nbsp;— Filter-UI einbauen</div>
+  <div><span class="fm-modify">Modify:</span> src/store/tasks.ts &nbsp;— Filter-State hinzufügen</div>
+  <div><span class="fm-test">Test:&nbsp;&nbsp;&nbsp;</span> tests/filters/task-filter.test.ts &nbsp;— Unit-Tests</div>
+</div>
+<div class="why">
+  <b>Warum erst File Map, dann Tasks?</b><br>
+  Wenn man direkt Tasks schreibt, entstehen Lücken: Datei A vergessen, Datei B implizit vorausgesetzt. Die File Map zwingt zur vollständigen Inventur zuerst. Jede Datei mit einem klaren Zweck — keine Datei die "irgendwie passt".
+</div>
+
+<h2>Schritt 2: TDD-Tasks</h2>
+<p>Jeder Task = kleinste unabhängig testbare Einheit. Jeder Task hat denselben 5-Schritt-Zyklus:</p>
+<div class="tdd-cycle">
+  <div class="tdd-step write"><div class="ts-num">Step 1</div><div class="ts-name">Test schreiben</div><div class="ts-detail">Echter Test-Code</div></div>
+  <div class="tdd-step fail"><div class="ts-num">Step 2</div><div class="ts-name">FAIL</div><div class="ts-detail">Erwarteter Fehler</div></div>
+  <div class="tdd-step impl"><div class="ts-num">Step 3</div><div class="ts-name">Implementieren</div><div class="ts-detail">Echter Impl-Code</div></div>
+  <div class="tdd-step pass"><div class="ts-num">Step 4</div><div class="ts-name">PASS</div><div class="ts-detail">Erwartetes Ergebnis</div></div>
+  <div class="tdd-step commit"><div class="ts-num">Step 5</div><div class="ts-name">Commit</div><div class="ts-detail">Exakter Befehl</div></div>
+</div>
+<div class="why">
+  <b>Warum TDD im Plan erzwingen?</b><br>
+  Ohne Test-First werden Tests nachträglich geschrieben — und testen dann nur was der Code macht, nicht was er machen soll. TDD kehrt das um: Erst der Wunsch (Test), dann die Erfüllung (Impl). Der erwartete FAIL in Step 2 ist der Beweis, dass der Test wirklich etwas prüft.
+</div>
+
+<h2>Wie ein Task aussieht</h2>
+<div class="task-example">
+  <h4>### Task 1: Filter-Logik</h4>
+  <div class="task-field"><div class="tf-label">Files</div>
+    <code>Create: src/filters/task-filter.ts</code>
+    <code>Test:   tests/filters/task-filter.test.ts</code>
+  </div>
+  <div class="task-field"><div class="tf-label">Interfaces</div>
+    <code>Produces: filterTasks(tasks: Task[], filter: FilterConfig): Task[]</code>
+  </div>
+  <pre style="margin-top:8px">- [ ] Step 1: Test schreiben
+  test('filtert nach Status', () => {
+    const tasks = [{ id:1, status:'done' }, { id:2, status:'open' }]
+    expect(filterTasks(tasks, { status:'open' })).toEqual([{ id:2, status:'open' }])
+  })
+
+- [ ] Step 2: Run — expect FAIL
+  Run: npm test task-filter
+  Expected: FAIL — "filterTasks is not a function"
+
+- [ ] Step 3: Implementieren
+  export function filterTasks(tasks, filter) { ... }
+
+- [ ] Step 4: Run — expect PASS
+  Expected: PASS
+
+- [ ] Step 5: Commit
+  git add src/filters/ tests/filters/
+  git commit -m "feat(task-filter): add status filter"</pre>
+</div>
+
+<div class="warn-box">
+  <b>Kein Placeholder erlaubt.</b> Weder <code>// TODO</code>, noch <code>// similar to Task 1</code>, noch <code>// appropriate error handling</code>. Jeder Schritt enthält echten Code — sonst kann kein Agent den Plan ausführen ohne Rückfragen.
+</div>
+
+<h2>Schritt 3: Self-Review</h2>
+<p>Bevor der Plan commitet wird, prüft der Skill drei Dinge:</p>
+<ol style="padding-left:20px; margin:8px 0;">
+  <li style="margin:8px 0;"><strong>Spec coverage:</strong> Jede Spec-Anforderung hat einen Task? Lücken werden gelistet.</li>
+  <li style="margin:8px 0;"><strong>Kein Placeholder:</strong> Kein TBD, kein TODO, kein "similar to..."</li>
+  <li style="margin:8px 0;"><strong>Type/Name-Konsistenz:</strong> Was Task N als <code>Produces</code> listet, muss exakt in Task N+1 als <code>Consumes</code> auftauchen.</li>
+</ol>
+
+<h2>Der Plan-Header (für Agenten)</h2>
+<pre># Task-Filter Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
+> Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Task-Filter nach Status, Priorität und Datum
+**Architecture:** Filter-Logik rein funktional in eigenem Modul...
+**Tech Stack:** TypeScript, Vitest</pre>
+<div class="why">
+  <b>Warum der Agenten-Hinweis im Header?</b><br>
+  Der Plan wird oft in einer neuen Session ausgeführt — ohne den Kontext dieser Conversation. Der Header gibt dem frischen Agenten alle Infos in 3 Zeilen: was, wie, womit.
+</div>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Was ist der Zweck von "Step 2: FAIL" in jedem TDD-Task?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Debugging-Hilfe</li>
+    <li onclick="check(this, true)">Beweis, dass der Test tatsächlich etwas prüft (nicht schon vor der Implementierung grün ist)</li>
+    <li onclick="check(this, false)">Dokumentation was schiefgehen kann</li>
+  </ul>
+
+  <div class="quiz-q">2. Was ist die Konsequenz wenn Task 2 einen Funktionsnamen anders benennt als Task 1 ihn produziert?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, true)">Der Plan ist inkonsistent und ein Agenten-Fehler wird auftreten — Self-Review erkennt das</li>
+    <li onclick="check(this, false)">Kein Problem, der Agent findet den richtigen Namen</li>
+    <li onclick="check(this, false)">Der Skill korrigiert es automatisch</li>
+  </ul>
+
+  <div class="quiz-q">3. Warum kommt die File Map vor den Tasks?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Damit die Dateiliste im Output schön aussieht</li>
+    <li onclick="check(this, true)">Um zuerst vollständige Inventur aller betroffenen Dateien zu machen, bevor einzelne Tasks geschrieben werden</li>
+    <li onclick="check(this, false)">Weil Agenten die File Map zuerst brauchen</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li>Phase 2: Spec → ausführbarer Plan</li>
+    <li>Erst File Map (vollständige Datei-Inventur), dann Tasks</li>
+    <li>Jeder Task: Test schreiben → FAIL → Impl → PASS → Commit</li>
+    <li>Kein Placeholder — echter Code in jedem Schritt</li>
+    <li>Self-Review: Spec-Coverage, kein Placeholder, Name-Konsistenz</li>
+    <li>Output: <code>plans/YYYY-MM-DD-&lt;feature&gt;.md</code></li>
+    <li>Danach automatisch: STATUS.md auf <code>Phase: implement</code></li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>

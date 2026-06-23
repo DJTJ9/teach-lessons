@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 9: Knowledge Extraction — Das stille Rückgrat</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#51cf66; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#0a1a0a; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .trigger-table { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0; }
+  .trigger-table th { text-align:left; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase; }
+  .trigger-table td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .trigger-table td:first-child { font-family:monospace; color:var(--accent2); white-space:nowrap; }
+  .trigger-table td:nth-child(2) { color:var(--accent3); font-family:monospace; white-space:nowrap; }
+  .trigger-table tr:last-child td { border-bottom:none; }
+  .entry-example { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin:12px 0; }
+  .entry-example h4 { color:var(--accent2); margin-bottom:10px; font-size:14px; }
+  .entry-field { margin:4px 0; font-size:13px; }
+  .entry-field .ef-key { color:var(--accent3); }
+  .entry-field .ef-val { color:var(--text); }
+  .files-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:12px 0; }
+  .fg-card { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:12px; }
+  .fg-file { font-family:monospace; color:var(--accent2); font-size:13px; font-weight:700; margin-bottom:6px; }
+  .fg-desc { font-size:12px; color:var(--muted); }
+  .fg-when { font-size:11px; color:var(--accent3); margin-top:6px; }
+  .minimum-box { background:#0a1a0a; border:1px solid #1a3a1a; border-radius:8px; padding:14px 18px; margin:16px 0; }
+  .minimum-box b { color:var(--green); }
+  .minimum-list { list-style:none; margin-top:8px; }
+  .minimum-list li { padding:4px 0; font-size:13px; }
+  .minimum-list li::before { content:"✓ "; color:var(--green); }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+  .memory-diagram { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2.2; margin:12px 0; text-align:center; }
+  .md-flow { display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap; }
+  .md-node { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 16px; }
+  .md-node.decisions { border-color:#a78bfa; color:#a78bfa; }
+  .md-node.learnings { border-color:var(--green); color:var(--green); }
+  .md-node.timeline { border-color:var(--accent3); color:var(--accent3); }
+  .md-node.claude { border-color:var(--accent2); color:var(--accent2); }
+  .md-arrow { color:var(--muted); }
+</style>
+</head>
+<body>
+
+<h1>Knowledge Extraction</h1>
+<div class="subtitle">Lektion 9 von 9 · Das stille Rückgrat des dev-Skills</div>
+
+<h2>Was ist Knowledge Extraction?</h2>
+<p>Knowledge Extraction ist ein automatischer Prozess, der nach bestimmten Phasen ohne Dialog läuft. Er liest was in dieser Session passiert ist und schreibt strukturiertes Wissen in drei Hub-Dateien: DECISIONS.md, LEARNINGS.md und TIMELINE.md.</p>
+<p>Du siehst es nicht explizit — es passiert "still" nach discuss, plan und finish.</p>
+
+<div class="why">
+  <b>Warum überhaupt automatisch extrahieren?</b><br>
+  Wenn Entscheidungen und Learnings nur im Kontext einer Session leben, sind sie in der nächsten Session weg. Knowledge Extraction persistiert das Wissen im Hub — wo es über die @-Imports in CLAUDE.md automatisch in jede Folge-Session geladen wird. Das ist der Mechanismus durch den Claude "sich erinnert" ohne Langzeit-Kontext.
+</div>
+
+<h2>Auslöser</h2>
+<table class="trigger-table">
+  <tr><th>Nach welcher Phase</th><th>context-Wert</th><th>Was wird extrahiert</th><th>Ziel-Datei(en)</th></tr>
+  <tr><td>/dev-discuss</td><td>discuss</td><td>Gewählter Ansatz, verworfene Alternativen, Constraints</td><td>DECISIONS.md</td></tr>
+  <tr><td>/dev-plan</td><td>plan</td><td>Tech-Abhängigkeiten, Risiken (nur wenn wirklich neu)</td><td>DECISIONS.md</td></tr>
+  <tr><td>/dev-finish</td><td>finish</td><td>Abweichungen von Spec, Schwierigkeiten, Timeline-Eintrag</td><td>LEARNINGS.md + TIMELINE.md</td></tr>
+</table>
+
+<h2>Die drei Wissensdateien</h2>
+<div class="files-grid">
+  <div class="fg-card">
+    <div class="fg-file">DECISIONS.md</div>
+    <div class="fg-desc">Architektur- und Prozess-Entscheidungen. Inklusive verworfener Alternativen und warum.</div>
+    <div class="fg-when">Befüllt: nach discuss + plan</div>
+  </div>
+  <div class="fg-card">
+    <div class="fg-file">LEARNINGS.md</div>
+    <div class="fg-desc">Was beim Bauen gelernt wurde. Was schwieriger war als erwartet. Was man anders machen würde.</div>
+    <div class="fg-when">Befüllt: nach finish</div>
+  </div>
+  <div class="fg-card">
+    <div class="fg-file">TIMELINE.md</div>
+    <div class="fg-desc">Chronologische Feature-Liste. Wann wurde was implementiert.</div>
+    <div class="fg-when">Befüllt: nach finish</div>
+  </div>
+</div>
+
+<h2>DECISIONS.md — Entry-Format</h2>
+<div class="entry-example">
+  <h4>Beispiel: nach /dev-discuss</h4>
+  <pre>## [2026-06-23] Client-Side Filter gewählt
+- <span style="color:var(--accent3)">Kategorie:</span> architecture
+- <span style="color:var(--accent3)">Grund:</span> Server-Side Filter erfordert DB-Schema-Änderung,
+         zu teuer für dieses Feature
+- <span style="color:var(--accent3)">Outcome:</span> offen — in Beobachtung
+- <span style="color:var(--accent3)">Tags:</span> performance, filter, architecture</pre>
+</div>
+<div class="entry-example">
+  <h4>Beispiel: Verworfene Alternative</h4>
+  <pre>## [2026-06-23] Server-Side Filter verworfen
+- <span style="color:var(--accent3)">Kategorie:</span> abandoned
+- <span style="color:var(--accent3)">Grund:</span> DB-Schema muss angepasst werden — zu aufwändig
+- <span style="color:var(--accent3)">Outcome:</span> schlecht — zu hoher Aufwand
+- <span style="color:var(--accent3)">Tags:</span> filter, database</pre>
+</div>
+
+<h2>LEARNINGS.md — Entry-Format</h2>
+<div class="entry-example">
+  <h4>Beispiel: nach /dev-finish</h4>
+  <pre>## [2026-06-23] Filter-Performance besser als erwartet
+- <span style="color:var(--accent3)">Kategorie:</span> performance
+- <span style="color:var(--accent3)">Erkenntnis:</span> Array.filter() auf 1000 Tasks < 1ms — kein Debounce nötig
+- <span style="color:var(--accent3)">Kontext:</span> Hatte Debounce eingeplant, war unnötig
+- <span style="color:var(--accent3)">Tags:</span> performance, filter</pre>
+</div>
+
+<h2>TIMELINE.md — Entry-Format</h2>
+<div class="entry-example">
+  <pre>## 2026-06-23 — task-filter implementiert
+Filter nach Status, Priorität und Datum. Client-Side. → [Client-Side Filter gewählt]</pre>
+</div>
+
+<h2>Mindest-Extraktion pro Kontext</h2>
+<div class="minimum-box">
+  <b>Minimum-Garantien:</b>
+  <ul class="minimum-list">
+    <li>discuss: mindestens 1 DECISIONS-Eintrag (der gewählte Ansatz)</li>
+    <li>plan: mindestens 1 DECISIONS-Eintrag wenn neue Constraint entdeckt — sonst kein Commit</li>
+    <li>finish: mindestens 1 LEARNINGS-Eintrag + 1 TIMELINE-Eintrag</li>
+  </ul>
+</div>
+<div class="why">
+  <b>Warum ein Minimum erzwingen?</b><br>
+  Ohne Minimum würde "nichts Nennenswertes passiert" bedeuten: kein Eintrag. Das führt dazu, dass DECISIONS.md und LEARNINGS.md leer bleiben obwohl Entscheidungen getroffen wurden. Das Minimum zwingt zur Reflexion: Wenn du einen Ansatz wählst, muss das dokumentiert werden — auch wenn er offensichtlich schien.
+</div>
+
+<h2>Wie Claude dieses Wissen nutzt</h2>
+<div class="md-flow">
+  <div class="md-node decisions">DECISIONS.md</div>
+  <div class="md-arrow">+</div>
+  <div class="md-node learnings">LEARNINGS.md</div>
+  <div class="md-arrow">→</div>
+  <div class="md-node claude">@-Import in CLAUDE.md</div>
+  <div class="md-arrow">→</div>
+  <div class="md-node" style="border-color:var(--accent); color:var(--accent);">Auto-Kontext in jeder Session</div>
+</div>
+<p style="margin-top:12px;">Da DECISIONS.md und LEARNINGS.md per @-Import in CLAUDE.md eingebunden sind, lädt Claude sie automatisch beim Start jeder Session im Projekt-Repo. Das erlaubt Aussagen wie:</p>
+<pre>Laut DECISIONS.md haben wir damals Server-Side Filter verworfen weil
+das DB-Schema zu aufwändig war — gilt das noch?</pre>
+<div class="why">
+  <b>Das ist der Kern des dev-Skills:</b><br>
+  Nicht nur Befehle ausführen — sondern Wissen akkumulieren, das die Qualität aller zukünftigen Entscheidungen verbessert. Jede /dev-discuss, /dev-plan und /dev-finish-Session baut auf dem Wissen aller vergangenen Sessions auf.
+</div>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Welche Datei bekommt keinen Eintrag nach /dev-discuss?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">DECISIONS.md</li>
+    <li onclick="check(this, true)">LEARNINGS.md</li>
+    <li onclick="check(this, false)">STATUS.md</li>
+  </ul>
+
+  <div class="quiz-q">2. Warum werden verworfene Alternativen in DECISIONS.md dokumentiert?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Als Backup falls der gewählte Ansatz scheitert</li>
+    <li onclick="check(this, true)">Damit zukünftige Sessions verstehen warum bestimmte Wege nicht gewählt wurden — verhindert wiederholte Evaluierung</li>
+    <li onclick="check(this, false)">Für Git-Blame</li>
+  </ul>
+
+  <div class="quiz-q">3. Was passiert wenn nach /dev-plan keine neue Constraint entdeckt wurde?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Ein leerer Eintrag wird trotzdem erzeugt</li>
+    <li onclick="check(this, true)">Kein Commit — nur wenn wirklich etwas Neues entdeckt wurde</li>
+    <li onclick="check(this, false)">Die gesamte Knowledge Extraction wird übersprungen</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li>Knowledge Extraction läuft <strong>automatisch und ohne Dialog</strong> nach discuss, plan, finish</li>
+    <li>Drei Dateien: DECISIONS.md (Entscheidungen), LEARNINGS.md (was gelernt), TIMELINE.md (Chronologie)</li>
+    <li>Strukturierte Einträge mit Kategorie, Grund, Outcome, Tags</li>
+    <li>Minimum: mindestens 1 Eintrag pro Kontext (außer plan ohne neue Constraints)</li>
+    <li>@-Import in CLAUDE.md → auto-geladen in jede Folge-Session</li>
+    <li>Kernmechanismus: Wissen akkumulieren → bessere zukünftige Entscheidungen</li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>

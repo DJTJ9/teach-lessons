@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 1: /dev-init — Projekt initialisieren</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .step { display:flex; gap:14px; margin:12px 0; align-items:flex-start; }
+  .step-num { background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .step-body { flex:1; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:3px; font-weight:700; text-transform:uppercase; background:#1a3a2a; color:var(--green); margin-left:8px; }
+  .file-tree { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; }
+  .file-tree .dir { color:var(--accent3); }
+  .file-tree .file { color:var(--accent2); }
+  .file-tree .note { color:var(--muted); font-size:11px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<h1>/dev-init</h1>
+<div class="subtitle">Lektion 1 von 9 · Projekt-Initialisierung</div>
+
+<h2>Was macht dieser Befehl?</h2>
+<p><code>/dev-init</code> richtet ein neues Projekt im Hub ein. Er läuft genau <strong>einmal pro Projekt</strong> — danach nie wieder. Er legt alle Dateien an, die der Rest des Workflows braucht.</p>
+
+<div class="why">
+  <b>Warum ein eigener Init-Schritt?</b><br>
+  Ohne Init gibt es keinen definierten Ausgangszustand. Spätere Befehle wie <code>/dev-discuss</code> lesen STATUS.md, DECISIONS.md und VISION.md — wenn diese fehlen, bricht der Workflow ab. Init stellt sicher, dass diese Dateien von Anfang an existieren und korrekt formatiert sind.
+</div>
+
+<h2>Ablauf Schritt für Schritt</h2>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>Projekt identifizieren</h3>
+    <p>Der Skill erkennt anhand der CWD, ob das Projekt schon in der Registry ist. Wenn nicht, fragt er: <em>"Projektname?"</em> und <em>"Slug? (Vorschlag: kebab-case)"</em>.</p>
+    <div class="why"><b>Warum Slug?</b> Alle Hub-Pfade basieren auf dem Slug: <code>$HUB_DIR/topics/&lt;slug&gt;/</code>. Kebab-case ist URL-sicher und Git-freundlich.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Registry-Eintrag anlegen</h3>
+    <p>Der Skill fügt einen Eintrag in <code>$HUB_DIR/projects-registry.json</code> ein:</p>
+    <pre>{ <span class="key">"slug"</span>: <span class="val">"mein-projekt"</span>, <span class="key">"name"</span>: <span class="val">"Mein Projekt"</span>, <span class="key">"path"</span>: <span class="val">"/root/projekte/mein-projekt"</span>, <span class="key">"path_windows"</span>: <span class="val">""</span>, <span class="key">"repo"</span>: <span class="val">""</span>, <span class="key">"description"</span>: <span class="val">""</span> }</pre>
+    <div class="why"><b>Warum Registry?</b> Jeder <code>/dev</code>-Befehl findet den Slug automatisch anhand der CWD — du musst ihn nie manuell angeben. Die Registry ist die einzige Quelle der Wahrheit für Projekt-Metadaten.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Vision-Interview (3 Fragen)</h3>
+    <p>Der Skill stellt drei Fragen für VISION.md:</p>
+    <ul style="padding-left:20px; margin:8px 0;">
+      <li>"Was ist das Projekt?"</li>
+      <li>"Für wen?"</li>
+      <li>"Was ist das Hauptziel?"</li>
+    </ul>
+    <div class="why"><b>Warum VISION.md?</b> Eine schriftliche Vision verhindert Scope-Creep. Wenn Feature-Ideen kommen, kann man sie gegen die Vision prüfen. VISION.md ist auch der Ort, wo die Roadmap akkumuliert — jedes fertige Feature landet dort als ✅.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>Alle Basis-Dateien schreiben</h3>
+    <p>Der Skill erstellt das vollständige Hub-Verzeichnis:</p>
+    <div class="file-tree">
+      <div><span class="dir">$HUB_DIR/topics/&lt;slug&gt;/</span></div>
+      <div>&nbsp;&nbsp;<span class="file">VISION.md</span> &nbsp;<span class="note">← Vision + leere Roadmap</span></div>
+      <div>&nbsp;&nbsp;<span class="file">STATUS.md</span> &nbsp;<span class="note">← Phase: (none), Active: (none)</span></div>
+      <div>&nbsp;&nbsp;<span class="file">DECISIONS.md</span> &nbsp;<span class="note">← leer, wartet auf Discuss-Phase</span></div>
+      <div>&nbsp;&nbsp;<span class="file">LEARNINGS.md</span> &nbsp;<span class="note">← leer, wartet auf Finish-Phase</span></div>
+      <div>&nbsp;&nbsp;<span class="file">TIMELINE.md</span> &nbsp;<span class="note">← leer, wartet auf Finish-Phase</span></div>
+      <div>&nbsp;&nbsp;<span class="dir">specs/</span> &nbsp;<span class="note">← leer, wartet auf Discuss-Phase</span></div>
+      <div>&nbsp;&nbsp;<span class="dir">plans/</span> &nbsp;<span class="note">← leer, wartet auf Plan-Phase</span></div>
+    </div>
+    <div class="why"><b>Warum diese 5 Dateien?</b> Jede hat eine eigene Lebensdauer:<br>STATUS.md ist flüchtig (ändert sich mit jeder Phase), DECISIONS/LEARNINGS/TIMELINE akkumulieren über Monate. Durch die Trennung bleibt der Projektkontext dauerhaft lesbar — auch wenn STATUS.md täglich wechselt.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h3>CLAUDE.md im Projekt-Repo (optional)</h3>
+    <p>Wenn ein lokales Repo vorhanden ist, erstellt der Skill <code>CLAUDE.md</code> mit @-Imports:</p>
+    <pre>@/root/projects-hub/topics/&lt;slug&gt;/DECISIONS.md
+@/root/projects-hub/topics/&lt;slug&gt;/LEARNINGS.md</pre>
+    <div class="why"><b>Warum @-Imports?</b> Claude lädt DECISIONS.md und LEARNINGS.md automatisch in den Kontext, wenn du in diesem Repo arbeitest. Dadurch kennt Claude alle vergangenen Entscheidungen — ohne dass du sie jedes Mal neu erklären musst. Das ist der Kern des "project memory" Konzepts.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">6</div>
+  <div class="step-body">
+    <h3>Commit</h3>
+    <pre>git -C "$HUB_DIR" add topics/&lt;slug&gt;/ projects-registry.json
+git -C "$HUB_DIR" commit -m "chore(&lt;slug&gt;): initialize developer memory"</pre>
+    <p>Der Skill commitet direkt auf dem Hub-Repo — das Projekt-Repo wird hier nicht berührt.</p>
+  </div>
+</div>
+
+<h2>Das Ergebnis</h2>
+<p>Nach <code>/dev-init</code> zeigt <code>/dev</code> (Status) folgendes:</p>
+<pre>▶ Aktiv:    (none)
+▷ Nächstes: (keine Roadmap-Items)
+
+Fortfahren?
+A) Ja — aktuelle Phase weitermachen
+B) Anderen Schritt wählen</pre>
+<p>Starte danach mit <code>/dev-idea "text"</code> um Ideen zu sammeln, oder direkt mit <code>/dev-discuss</code>.</p>
+
+<h2>Häufige Fehler</h2>
+<ul style="padding-left:20px;">
+  <li style="margin:6px 0;"><strong>Init mehrfach aufrufen:</strong> Kein Problem — der Registry-Eintrag wird doppelt, die Dateien werden überschrieben. Besser: Init wirklich nur einmal nutzen.</li>
+  <li style="margin:6px 0;"><strong>Slug mit Großbuchstaben/Leerzeichen:</strong> Kebab-case erzwingen. <code>mein-projekt</code> ✓, <code>MeinProjekt</code> ✗</li>
+  <li style="margin:6px 0;"><strong>CWD vergessen:</strong> Der Skill braucht CWD im Projekt-Verzeichnis, um den Pfad korrekt in die Registry einzutragen.</li>
+</ul>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Wie oft läuft <code>/dev-init</code> pro Projekt?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Einmal pro Feature</li>
+    <li onclick="check(this, true)">Einmal pro Projekt</li>
+    <li onclick="check(this, false)">Bei jedem /dev-discuss</li>
+  </ul>
+
+  <div class="quiz-q">2. Warum werden DECISIONS.md und LEARNINGS.md per @-Import in CLAUDE.md eingebunden?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Damit Claude die Dateien bearbeiten kann</li>
+    <li onclick="check(this, true)">Damit vergangene Entscheidungen automatisch im Kontext sind — ohne manuelle Wiederholung</li>
+    <li onclick="check(this, false)">Als Backup der Dateien im Projekt-Repo</li>
+  </ul>
+
+  <div class="quiz-q">3. Was ist der Unterschied zwischen VISION.md und STATUS.md?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">VISION.md ist für Features, STATUS.md für Bugs</li>
+    <li onclick="check(this, true)">VISION.md akkumuliert langfristig (Roadmap, fertige Features), STATUS.md ist flüchtig (aktuelle Phase)</li>
+    <li onclick="check(this, false)">Kein Unterschied — beide enthalten das Gleiche</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li><code>/dev-init</code> läuft <strong>einmal pro Projekt</strong></li>
+    <li>Erstellt Hub-Verzeichnis mit 5 Dateien + 2 Ordnern + Registry-Eintrag</li>
+    <li>Der Slug ist das Fundament aller weiteren Hub-Pfade</li>
+    <li>CLAUDE.md mit @-Imports gibt Claude dauerhaften Projektspeicher</li>
+    <li>Danach: <code>/dev-idea</code> oder <code>/dev-discuss</code></li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>

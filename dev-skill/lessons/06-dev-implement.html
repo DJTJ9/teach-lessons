@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 6: /dev-implement — Plan ausführen</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#ff6b6b; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#200f0f; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .mode-compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+  .mode-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; }
+  .mode-card.recommended { border-color:var(--green); }
+  .mode-title { font-size:14px; font-weight:700; margin-bottom:8px; }
+  .mode-card.recommended .mode-title { color:var(--green); }
+  .mode-badge { font-size:10px; padding:2px 6px; border-radius:3px; font-weight:700; text-transform:uppercase; background:#12301a; color:var(--green); margin-left:6px; }
+  .mode-prop { font-size:13px; color:var(--muted); margin:4px 0; }
+  .mode-prop span { color:var(--text); }
+  .schedule-table { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0; }
+  .schedule-table th { text-align:left; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase; }
+  .schedule-table td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .schedule-table td:first-child { font-family:monospace; color:var(--accent2); white-space:nowrap; }
+  .schedule-table tr:last-child td { border-bottom:none; }
+  .impl-mode-box { background:#0a1a0a; border:1px solid #1a3a1a; border-radius:8px; padding:16px; margin:16px 0; }
+  .impl-mode-box .imb-title { color:var(--green); font-weight:700; margin-bottom:8px; }
+  .json-demo { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:monospace; font-size:13px; line-height:2; margin:8px 0; }
+  .jd-key { color:var(--accent3); }
+  .jd-true { color:var(--green); }
+  .jd-false { color:#ff6b6b; }
+  .jd-str { color:#a78bfa; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+  .important { background:#201500; border-left:4px solid var(--accent3); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .important b { color:var(--accent3); }
+</style>
+</head>
+<body>
+
+<h1>/dev-implement</h1>
+<div class="subtitle">Lektion 6 von 9 · Plan ausführen</div>
+
+<h2>Was macht dieser Befehl?</h2>
+<p><code>/dev-implement</code> ist Phase 3: Er liest den Plan aus STATUS.md und startet die eigentliche Implementierung. Dabei werden drei Dinge geklärt: <strong>Ausführungsmodus</strong>, <strong>Zeitplanung</strong>, und das <strong>implementation_mode-Flag</strong> wird gesetzt.</p>
+
+<div class="why">
+  <b>Warum ist Implement eine eigene Phase und kein Teil von Plan?</b><br>
+  Plan und Implement können zeitlich weit auseinanderliegen: Plan morgens schreiben, Implement abends starten — oder an einem anderen Tag. Durch die Trennung kann man den Plan reviewen, ändern, oder verwerfen bevor Ressourcen in die Umsetzung fließen.
+</div>
+
+<h2>Schritt 1: Ausführungsmodus wählen</h2>
+<div class="mode-compare">
+  <div class="mode-card recommended">
+    <div class="mode-title">A) Subagent-Driven <span class="mode-badge">empfohlen</span></div>
+    <div class="mode-prop">Modus: <span>Frischer Agent pro Task</span></div>
+    <div class="mode-prop">Review: <span>Nach jedem Task</span></div>
+    <div class="mode-prop">Kontext: <span>Jeder Agent startet clean</span></div>
+    <div class="mode-prop">Vorteil: <span>Kein Kontext-Drift, klare Task-Grenzen</span></div>
+  </div>
+  <div class="mode-card">
+    <div class="mode-title">B) Inline</div>
+    <div class="mode-prop">Modus: <span>Alle Tasks in dieser Session</span></div>
+    <div class="mode-prop">Review: <span>Am Ende</span></div>
+    <div class="mode-prop">Kontext: <span>Wächst mit jedem Task</span></div>
+    <div class="mode-prop">Vorteil: <span>Schneller bei kleinen Plänen</span></div>
+  </div>
+</div>
+<div class="why">
+  <b>Warum Subagent-Driven bevorzugt?</b><br>
+  Ein einzelner langer Kontext akkumuliert Fehler: Frühe Annahmen beeinflussen späte Tasks. Ein frischer Agent pro Task verhindert das. Außerdem erlaubt Review zwischen Tasks, Fehler früh zu erkennen — bevor sie sich in 5 weitere Tasks fortpflanzen.
+</div>
+
+<h2>Schritt 2: Zeitplanung (Scheduling)</h2>
+<table class="schedule-table">
+  <tr><th>Antwort</th><th>Was passiert</th><th>Eintrag in scheduled_plans.json</th></tr>
+  <tr><td>jetzt</td><td>Startet in ~1 Minute, commitet sofort</td><td><code>scheduled_time: "HH:MM"</code> (jetzt +1 min)</td></tr>
+  <tr><td>14:30</td><td>Geplant für 14:30 Uhr</td><td><code>scheduled_time: "14:30"</code></td></tr>
+  <tr><td>später</td><td>Kein Zeitpunkt, wartet auf manuellen Start</td><td><code>scheduled_time: null</code></td></tr>
+</table>
+<div class="why">
+  <b>Warum Scheduling in der Implement-Phase?</b><br>
+  Implementierungen laufen oft lang (30+ Minuten für große Features). Scheduling entkoppelt "Plan reviewen" von "Maschine arbeiten lassen" — man kann um 23:00 den Plan finalisieren und auf 02:00 schedulen.
+</div>
+
+<h2>Schritt 3: implementation_mode setzen</h2>
+<p>Bevor die Implementierung startet, setzt der Skill ein Flag in <code>settings.json</code>:</p>
+<div class="json-demo">
+  {<br>
+  &nbsp;&nbsp;<span class="jd-key">"implementation_mode"</span>: <span class="jd-true">true</span>,<br>
+  &nbsp;&nbsp;<span class="jd-key">"implementation_mode_until"</span>: <span class="jd-str">"2026-06-23T18:30:00"</span><br>
+  }
+</div>
+<div class="important">
+  <b>Wichtig:</b> Dieses Flag wird mit dem <strong>Edit-Tool gesetzt, nicht via Bash</strong>. Nach Abschluss aller Implementierungsschritte wird es zurückgesetzt:<br>
+  <code>implementation_mode: false</code> und <code>implementation_mode_until: null</code>
+</div>
+<div class="why">
+  <b>Warum dieses Flag?</b><br>
+  Der Permission-Hook (GateGuard und andere) prüft dieses Flag. Wenn es gesetzt ist, werden alle Tool-Calls auto-genehmigt — kein Telegram-Relay, kein manuelles Bestätigen. Das erlaubt fully-autonomous Implementierung ohne ständige Unterbrechungen. Das Flag läuft nach 4 Stunden ab, als Sicherheitsnetz.
+</div>
+
+<h2>Schritt 4: Ausführen</h2>
+<p>Je nach gewähltem Modus ruft der Skill einen der zwei Superpowers-Skills auf:</p>
+<ul style="padding-left:20px; margin:8px 0;">
+  <li style="margin:8px 0;"><strong>Subagent-Driven:</strong> <code>superpowers:subagent-driven-development</code> — spawnt Agenten pro Task</li>
+  <li style="margin:8px 0;"><strong>Inline:</strong> <code>superpowers:executing-plans</code> — führt Plan in dieser Session aus</li>
+</ul>
+
+<h2>Nach der Implementierung</h2>
+<p>STATUS.md wird automatisch aktualisiert:</p>
+<ul style="padding-left:20px; margin:8px 0;">
+  <li style="margin:6px 0;"><code>Phase: finish</code></li>
+  <li style="margin:6px 0;">Roadmap-Tag: <code>[planned]</code> → <code>[active]</code></li>
+  <li style="margin:6px 0;"><code>implementation_mode: false</code> (letzter Schritt)</li>
+</ul>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Warum wird implementation_mode mit dem Edit-Tool gesetzt, nicht via Bash?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Weil Bash-Befehle langsamer sind</li>
+    <li onclick="check(this, true)">Weil Bash-Befehle ihrerseits durch Hooks blockiert werden könnten — das Edit-Tool ist immer verfügbar</li>
+    <li onclick="check(this, false)">Weil settings.json kein Shell-Script ist</li>
+  </ul>
+
+  <div class="quiz-q">2. Was ist der Vorteil von Subagent-Driven gegenüber Inline?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Subagent-Driven ist schneller</li>
+    <li onclick="check(this, true)">Jeder Task startet mit frischem Kontext — kein Drift durch frühe Annahmen, Review zwischen Tasks möglich</li>
+    <li onclick="check(this, false)">Subagent-Driven kann mehrere Sprachen gleichzeitig</li>
+  </ul>
+
+  <div class="quiz-q">3. Was steht in scheduled_plans.json wenn der User "später" antwortet?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Kein Eintrag wird erstellt</li>
+    <li onclick="check(this, true)"><code>scheduled_time: null, status: "pending"</code></li>
+    <li onclick="check(this, false)"><code>scheduled_time: "23:59"</code></li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li>Phase 3: Plan → Ausführung</li>
+    <li>Modus: Subagent-Driven (empfohlen) oder Inline</li>
+    <li>Scheduling: jetzt / HH:MM / später → scheduled_plans.json</li>
+    <li><code>implementation_mode: true</code> via Edit-Tool → Auto-Approve aller Tool-Calls</li>
+    <li>Läuft <code>superpowers:subagent-driven-development</code> oder <code>superpowers:executing-plans</code></li>
+    <li>Nach Abschluss: <code>Phase: finish</code>, implementation_mode zurücksetzen</li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 3: /dev — Status und Routing</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#94d82d; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#0f1a0f; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .status-file { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; margin:12px 0; }
+  .sf-key { color:var(--accent3); }
+  .sf-val { color:var(--accent2); }
+  .sf-comment { color:var(--muted); font-size:11px; }
+  .routing-table { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0; }
+  .routing-table th { text-align:left; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase; }
+  .routing-table td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .routing-table td:first-child { font-family:monospace; color:var(--accent2); }
+  .routing-table tr:last-child td { border-bottom:none; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+  .output-demo { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; margin:12px 0; }
+  .od-active { color:#51cf66; }
+  .od-next { color:#a78bfa; }
+  .od-ideas { color:var(--accent3); }
+</style>
+</head>
+<body>
+
+<h1>/dev &nbsp;<span style="font-size:16px;color:var(--muted)">(oder /dev-status)</span></h1>
+<div class="subtitle">Lektion 3 von 9 · Status-Anzeige und Routing</div>
+
+<h2>Was macht dieser Befehl?</h2>
+<p><code>/dev</code> ohne Argument (oder <code>/dev-status</code>) ist der Orientierungs-Befehl: Er liest STATUS.md und zeigt, was gerade aktiv ist — und bietet den direkten Weitersprung zur richtigen Phase an.</p>
+<div class="why">
+  <b>Warum braucht man das?</b><br>
+  Nach einer Pause (Schlaf, anderen Tasks, einem anderen Projekt) weiß man oft nicht mehr: "Wo war ich? Welcher Befehl kommt als nächstes?" <code>/dev</code> beantwortet diese Frage in Sekunden — ohne Dateien manuell zu lesen.
+</div>
+
+<h2>STATUS.md — Die Datei dahinter</h2>
+<p>STATUS.md ist die einzige Datei, die <code>/dev</code> liest. Ihr Format ist strikt:</p>
+<div class="status-file">
+  <div><span class="sf-comment"># Project Status — mein-projekt</span></div>
+  <div><span class="sf-key">Active:</span> <span class="sf-val">Task-Filter</span> <span class="sf-comment">← aktuell bearbeitetes Feature</span></div>
+  <div><span class="sf-key">Phase:</span> <span class="sf-val">implement</span> <span class="sf-comment">← none | plan | implement | finish</span></div>
+  <div><span class="sf-key">Spec:</span> <span class="sf-val">topics/mein-projekt/specs/2026-06-10-task-filter-design.md</span></div>
+  <div><span class="sf-key">Plan:</span> <span class="sf-val">topics/mein-projekt/plans/2026-06-10-task-filter.md</span></div>
+  <div><span class="sf-key">Updated:</span> <span class="sf-val">2026-06-23</span></div>
+  <br>
+  <div><span class="sf-comment">## Roadmap</span></div>
+  <div><span class="sf-comment">- [idea]       Dark Mode</span></div>
+  <div><span class="sf-comment">- [discussed]  Push-Notifs</span></div>
+  <div><span class="sf-comment">- [planned]    Task-Filter ← aktiv</span></div>
+  <div><span class="sf-comment">- [done]       ✅ Login-Flow implementiert 2026-06-01</span></div>
+</div>
+<div class="why">
+  <b>Warum so strikt formatiert?</b><br>
+  Jeder Skill liest STATUS.md maschinell — kein Parsing per Regex, sondern direkte Zeilenabgleiche. Das Format ist so einfach wie möglich, damit es robust ist: Ein Feldname pro Zeile, Doppelpunkt als Trennzeichen. Mensch und Maschine können es gleich gut lesen.
+</div>
+
+<h2>Was /dev anzeigt</h2>
+<div class="output-demo">
+  <div><span class="od-active">▶ Aktiv:&nbsp;&nbsp;&nbsp;&nbsp;Task-Filter (implement)</span></div>
+  <div>&nbsp;&nbsp; Spec/Plan: topics/.../specs/...design.md</div>
+  <div><span class="od-next">▷ Nächstes: Push-Notifs</span></div>
+  <div><span class="od-ideas">💡 Ideen:&nbsp;&nbsp; Dark Mode</span></div>
+  <br>
+  <div>Fortfahren?</div>
+  <div>A) Ja — aktuelle Phase weitermachen</div>
+  <div>B) Anderen Schritt wählen</div>
+</div>
+
+<h2>Routing-Logik</h2>
+<p>Wenn du <strong>A</strong> wählst, leitet <code>/dev</code> dich automatisch zur richtigen Phase-Datei weiter:</p>
+<table class="routing-table">
+  <tr><th>Phase-Wert</th><th>Weiterleitung zu</th><th>Nächste Aktion</th></tr>
+  <tr><td>(none)</td><td>—</td><td>Schlägt /dev-discuss oder /dev-idea vor</td></tr>
+  <tr><td>plan</td><td>phases/discuss.md</td><td>Weiter mit /dev-plan</td></tr>
+  <tr><td>implement</td><td>phases/plan.md → implement.md</td><td>Weiter mit /dev-implement</td></tr>
+  <tr><td>finish</td><td>phases/finish.md</td><td>Weiter mit /dev-finish</td></tr>
+</table>
+<div class="why">
+  <b>Warum Routing über STATUS.md statt manuell?</b><br>
+  Du musst nicht wissen, in welcher Phase du bist — der Skill weiß es. Das verhindert den häufigen Fehler, <code>/dev-plan</code> zu starten obwohl noch kein <code>/dev-discuss</code> gelaufen ist. STATUS.md ist der einzige Source of Truth.
+</div>
+
+<h2>Slug-Erkennung</h2>
+<p><code>/dev</code> findet den Slug genauso wie alle anderen Dev-Befehle:</p>
+<ol style="padding-left:20px; margin:8px 0;">
+  <li style="margin:6px 0;">Liest <code>$HUB_DIR/projects-registry.json</code></li>
+  <li style="margin:6px 0;">Matched CWD gegen jeden <code>path</code>-Eintrag</li>
+  <li style="margin:6px 0;">Wenn Treffer → Slug automatisch gesetzt</li>
+  <li style="margin:6px 0;">Wenn kein Treffer → zeigt die 4 zuletzt aktiven Projekte als Auswahl</li>
+</ol>
+
+<h2>Wenn STATUS.md fehlt</h2>
+<p>Falls kein STATUS.md für das erkannte Projekt existiert, gibt <code>/dev</code> aus:</p>
+<pre>Kein STATUS.md für dieses Projekt. Starte mit `/dev init`.</pre>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+
+  <div class="quiz-q">1. Welche Datei liest <code>/dev</code> (ohne Argument)?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">VISION.md</li>
+    <li onclick="check(this, true)">STATUS.md</li>
+    <li onclick="check(this, false)">projects-registry.json</li>
+  </ul>
+
+  <div class="quiz-q">2. Was passiert wenn du Option "A) Ja" bei Phase=<code>finish</code> wählst?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Der Skill startet /dev-plan</li>
+    <li onclick="check(this, true)">Der Skill leitet zur Finish-Phase weiter (phases/finish.md)</li>
+    <li onclick="check(this, false)">Der Skill fragt nach dem nächsten Feature</li>
+  </ul>
+
+  <div class="quiz-q">3. Was zeigt <code>/dev</code> unter "💡 Ideen"?</div>
+  <ul class="quiz-opts">
+    <li onclick="check(this, false)">Alle Roadmap-Items</li>
+    <li onclick="check(this, true)">Nur [idea]-Items aus der Roadmap</li>
+    <li onclick="check(this, false)">Das aktuelle Feature</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li><code>/dev</code> = Orientierung nach jeder Pause</li>
+    <li>Liest STATUS.md und zeigt: aktives Feature, Phase, nächsten Punkt, Ideen</li>
+    <li>Option A: automatisches Routing zur richtigen Phase</li>
+    <li>STATUS.md-Format ist strikt — Feldname + Doppelpunkt, eine Zeile pro Feld</li>
+    <li>Wenn STATUS.md fehlt → Hinweis auf <code>/dev-init</code></li>
+  </ul>
+</div>
+
+<script>
+function check(el, correct) {
+  const opts = el.parentElement.querySelectorAll('li');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+}
+</script>
+</body>
+</html>
