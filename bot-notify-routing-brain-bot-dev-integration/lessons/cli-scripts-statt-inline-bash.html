@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLI-Scripts statt Inline-Bash</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { color: #0369a1; border-bottom: 2px solid #0369a1; padding-bottom: 0.5rem; }
+  h2 { color: #374151; margin-top: 2rem; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.85em; }
+  .danger { background: #fef2f2; border-left: 4px solid #dc2626; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .safe { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .quiz h3 { color: #15803d; margin-top: 0; }
+  .summary { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .summary h3 { color: #854d0e; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>CLI-Scripts statt Inline-Bash für Markdown-Phasen</h1>
+<p><strong>Ziel:</strong> Wann ein dediziertes Python-Script besser ist als Shell-Oneliner in Markdown.</p>
+
+<h2>Das Problem: JSON-Manipulation in Bash</h2>
+
+<div class="danger">
+<strong>Fragiler Inline-Ansatz:</strong>
+<pre><code>python3 -c "
+import json, pathlib
+p = pathlib.Path('$WORK_DIR/settings.json')
+s = json.loads(p.read_text())
+s['active_session'] = 'dev'
+s['active_dev_slug'] = '$SLUG'
+p.write_text(json.dumps(s, indent=2))
+"</code></pre>
+Probleme: Quote-Escaping komplex, kein Fehler-Handling, in 5 Dateien dupliziert, nicht testbar.
+</div>
+
+<h2>Die Lösung: set_session.py</h2>
+
+<div class="safe">
+<pre><code># scripts/set_session.py
+import os, sys, json
+from pathlib import Path
+
+WORK_DIR = Path(os.environ.get("WORK_DIR", str(Path(__file__).parent.parent)))
+SETTINGS_PATH = WORK_DIR / "settings.json"
+
+def main():
+    s = json.loads(SETTINGS_PATH.read_text())
+    if sys.argv[1] == "dev":
+        if len(sys.argv) < 3:
+            print("Usage: set_session.py dev &lt;slug&gt;", file=sys.stderr)
+            sys.exit(1)
+        s["active_session"] = "dev"
+        s["active_dev_slug"] = sys.argv[2]
+    elif sys.argv[1] == "clear":
+        s["active_session"] = None
+        s["active_dev_slug"] = None
+    SETTINGS_PATH.write_text(json.dumps(s, indent=2))
+
+if __name__ == "__main__":
+    main()</code></pre>
+</div>
+
+<h2>Aufruf aus Markdown</h2>
+<pre><code># Anfang der Phase:
+python3 "$WORK_DIR/scripts/set_session.py" dev telegram-bot-army
+
+# Ende der Phase:
+python3 "$WORK_DIR/scripts/set_session.py" clear
+</code></pre>
+
+<h2>Wann CLI-Script statt Inline-Bash?</h2>
+<ul>
+  <li>JSON lesen/schreiben → immer Script</li>
+  <li>An 3+ Stellen wiederholt → immer Script</li>
+  <li>Testbar sein muss → immer Script</li>
+  <li>Simples <code>ls</code> / <code>git add</code> → Inline OK</li>
+</ul>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>Frage:</strong> Warum ist <code>python3 -c "s['x'] = '$VAR'"</code> in Shell gefährlich?</p>
+<details><summary>Antwort</summary><p>Einfache Quotes verhindern Variable-Expansion in Bash; doppelte Quotes lösen das, brechen aber das Python-Dict-Literal. Escaping wird schnell unkontrollierbar.</p></details>
+
+<p><strong>Aufgabe:</strong> Wie erweitert man <code>set_session.py</code> um <code>"organizer"</code>?</p>
+<details><summary>Antwort</summary><pre><code>elif sys.argv[1] == "organizer":
+    s["active_session"] = "organizer"</code></pre></details>
+</div>
+
+<div class="summary">
+<h3>Zusammenfassung</h3>
+<ul>
+  <li>JSON-Manipulation in Bash = Escaping-Komplexität + keine Tests</li>
+  <li>CLI-Script: testbar, lesbar, kein Duplikat in mehreren Dateien</li>
+  <li><code>Path(__file__).parent.parent</code> als Fallback wenn <code>WORK_DIR</code> fehlt</li>
+  <li>Faustregel: wenn der Bash-Oneliner länger als 1 Zeile wird → Script</li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Callback-Handler erweitern</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { color: #0f766e; border-bottom: 2px solid #0f766e; padding-bottom: 0.5rem; }
+  h2 { color: #374151; margin-top: 2rem; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.85em; }
+  .concept { background: #f0fdfa; border-left: 4px solid #0f766e; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .quiz h3 { color: #15803d; margin-top: 0; }
+  .summary { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .summary h3 { color: #854d0e; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>Telegram Callback-Handler erweitern</h1>
+<p><strong>Ziel:</strong> Wie <code>callback_data</code>-Routing funktioniert und wie ein neuer Button-Typ (<code>dev_status:</code>) neben bestehenden Handlern eingebaut wird.</p>
+
+<h2>Ablauf: Inline-Button → Handler</h2>
+
+<div class="concept">
+<ol>
+  <li>Bot sendet Nachricht mit <code>InlineKeyboardMarkup</code> — jeder Button hat <code>callback_data</code></li>
+  <li>User klickt → Telegram sendet <code>callback_query</code> Update an Bot</li>
+  <li>Bot liest <code>callback_query["data"]</code> → routet zu passendem Handler</li>
+  <li>Bot ruft <code>answerCallbackQuery</code> auf (verhindert "Laden"-Animation)</li>
+</ol>
+</div>
+
+<h2>Button senden</h2>
+
+<pre><code>keyboard = [
+    [
+        {"text": "📊 Status",     "callback_data": f"proj_status:{slug}"},
+        {"text": "📋 Dev Status", "callback_data": f"dev_status:{slug}"},
+    ],
+]
+send_message(TOKEN, CHAT_ID, f"Projekt: {slug}", keyboard=keyboard)
+</code></pre>
+
+<p>Format: <code>"prefix:payload"</code> — Prefix identifiziert Handler, Payload übergibt Daten.</p>
+
+<h2>Handler registrieren</h2>
+
+<pre><code>def _handle_callback(callback_query):
+    data = callback_query["data"]
+
+    if data.startswith("proj_status:"):
+        slug = data[12:]
+        _run_status(slug)          # Claude-Subprocess, ~5–30s
+
+    elif data.startswith("dev_status:"):
+        slug = data[11:]           # len("dev_status:") == 11
+        send_message(TOKEN, CHAT_ID, _format_dev_status(slug))  # sofort
+</code></pre>
+
+<h2>File-Read statt Subprocess</h2>
+
+<pre><code>def _format_dev_status(slug: str) -> str:
+    status_path = HUB_DIR / "topics" / slug / "STATUS.md"
+    if not status_path.exists():
+        return f"Kein STATUS.md fuer {slug}"
+
+    lines = status_path.read_text().splitlines()
+    fields, roadmap, in_roadmap = {}, [], False
+    for line in lines:
+        if line.startswith("## Roadmap"):
+            in_roadmap = True
+        elif in_roadmap and line.startswith("- "):
+            roadmap.append(line)
+        elif ":" in line and not in_roadmap:
+            k, _, v = line.partition(":")
+            fields[k.strip()] = v.strip()
+
+    active = fields.get("Active", "-")
+    done = sum(1 for r in roadmap if "[done]" in r)
+    return f"Aktiv: {active}\nRoadmap: {done} done"
+</code></pre>
+
+<table style="border-collapse:collapse;width:100%;margin:1rem 0">
+  <tr style="background:#f9fafb">
+    <th style="border:1px solid #e5e7eb;padding:0.5rem">Feature</th>
+    <th style="border:1px solid #e5e7eb;padding:0.5rem">proj_status</th>
+    <th style="border:1px solid #e5e7eb;padding:0.5rem">dev_status</th>
+  </tr>
+  <tr><td style="border:1px solid #e5e7eb;padding:0.5rem">Geschwindigkeit</td><td style="border:1px solid #e5e7eb;padding:0.5rem">5–30s</td><td style="border:1px solid #e5e7eb;padding:0.5rem">&lt;100ms</td></tr>
+  <tr><td style="border:1px solid #e5e7eb;padding:0.5rem">Inhalt</td><td style="border:1px solid #e5e7eb;padding:0.5rem">KI-Report</td><td style="border:1px solid #e5e7eb;padding:0.5rem">STATUS.md direkt</td></tr>
+</table>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>Frage:</strong> <code>data = "dev_status:my-project"</code> → <code>data[11:]</code> — Ergebnis?</p>
+<details><summary>Antwort</summary><p><code>"my-project"</code> — <code>len("dev_status:")</code> ist 11.</p></details>
+
+<p><strong>Aufgabe:</strong> Neuer Button <code>"🗒 Backlog"</code> mit <code>callback_data=f"backlog:{slug}"</code>. Welche 2 Stellen?</p>
+<details><summary>Antwort</summary>
+<ol>
+  <li>Button im keyboard dict hinzufügen</li>
+  <li><code>elif data.startswith("backlog:"):</code> in <code>_handle_callback()</code></li>
+</ol>
+</details>
+</div>
+
+<div class="summary">
+<h3>Zusammenfassung</h3>
+<ul>
+  <li>Format: <code>"prefix:payload"</code> — Prefix → Handler, Payload → Daten</li>
+  <li>Neuer Button = 2 Stellen: keyboard + elif in _handle_callback()</li>
+  <li>File-Read-Handler: sofort, kein Subprocess für einfache Daten</li>
+  <li><code>data[len("prefix:"):]</code> zum Payload extrahieren</li>
+</ul>
+</div>
+
+</body>
+</html>

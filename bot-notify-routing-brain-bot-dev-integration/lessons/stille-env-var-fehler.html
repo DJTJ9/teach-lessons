@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stille Env-Var-Fehler: os.environ.get() vs []</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { color: #dc2626; border-bottom: 2px solid #dc2626; padding-bottom: 0.5rem; }
+  h2 { color: #374151; margin-top: 2rem; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.85em; }
+  .danger { background: #fef2f2; border-left: 4px solid #dc2626; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .safe { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .quiz h3 { color: #15803d; margin-top: 0; }
+  .summary { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .summary h3 { color: #854d0e; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #e5e7eb; padding: 0.6rem 0.9rem; text-align: left; }
+  th { background: #f9fafb; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Stille Env-Var-Fehler: os.environ.get() vs []</h1>
+<p><strong>Ziel:</strong> Verstehen, warum fehlende Umgebungsvariablen in Python unsichtbar versagen — und wie man es verhindert.</p>
+
+<h2>Der Bug (Root Cause dieser Feature-Session)</h2>
+
+<pre><code># telegram_notify.py — der Bug
+TOKEN = os.environ.get("TOKEN")       # Var "TOKEN" existiert nie
+if not TOKEN:
+    sys.exit(0)  # stilles Beenden — keine Nachricht, kein Error
+</code></pre>
+
+<div class="danger">
+<strong>Ergebnis:</strong> Script lief täglich, schickte nie eine Benachrichtigung. Kein Error-Log — nur Stille. Bug war Monate unbemerkt.
+</div>
+
+<h2>Der Unterschied</h2>
+
+<table>
+  <tr><th>Ausdruck</th><th>Var vorhanden</th><th>Var fehlt</th></tr>
+  <tr><td><code>os.environ["KEY"]</code></td><td>Wert</td><td><code>KeyError</code> — sichtbarer Crash</td></tr>
+  <tr><td><code>os.environ.get("KEY")</code></td><td>Wert</td><td><code>None</code> — stilles Versagen</td></tr>
+  <tr><td><code>os.environ.get("KEY", "x")</code></td><td>Wert</td><td><code>"x"</code> — expliziter Fallback</td></tr>
+</table>
+
+<p><strong>Faustregel:</strong> Für kritische Konfiguration ist <code>[]</code> besser — ein Crash ist sichtbar, Stille nicht.</p>
+
+<h2>Wann ist None-Rückgabe OK?</h2>
+
+<div class="safe">
+<strong>OK — bewusste Nicht-Aktion:</strong>
+<pre><code>token = get_notify_token(settings)  # None = kein Bot konfiguriert
+if not token:
+    sys.exit(0)  # absichtlich: kein Send wenn nicht konfiguriert</code></pre>
+</div>
+
+<div class="danger">
+<strong>Nicht OK — unbeabsichtigtes Versagen:</strong>
+<pre><code>TOKEN = os.environ.get("TOKEN")  # immer None (falsche Var)
+# Script macht nichts, meldet nichts, kehrt zurück mit Exit 0</code></pre>
+</div>
+
+<h2>Der Fix</h2>
+
+<pre><code># vorher
+TOKEN = os.environ.get("TOKEN")          # falsche Var, immer None
+
+# nachher
+from core.routing import get_notify_token
+token = get_notify_token(load_settings()) # routing-aware Token-Auflösung
+</code></pre>
+
+<pre><code># on_stop.py: vorher
+TOKEN = os.environ.get("TELEGRAM_TOKEN")  # nie definiert
+
+# on_stop.py: nachher
+TOKEN = os.environ.get("TOKEN_PERMISSIONS")  # korrekte Var
+</code></pre>
+
+<h2>Erkennungsmuster</h2>
+<pre><code>grep -r 'os.environ.get' scripts/   # alle get()-Aufrufe finden
+env -i python script.py             # leere Umgebung: alle fehlenden Vars crashen
+</code></pre>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>Frage:</strong> <code>os.environ.get("MISSING")</code> → <code>None</code> → <code>if not None: sys.exit(0)</code>. Was passiert?</p>
+<details><summary>Antwort</summary><p>Script beendet sich mit Exit 0. Kein Fehler, keine Ausgabe. Perfektes stilles Versagen.</p></details>
+
+<p><strong>Aufgabe:</strong> Welcher Ausdruck wirft sichtbaren Fehler wenn <code>TOKEN_BRAIN</code> nicht gesetzt?</p>
+<details><summary>Antwort</summary><pre><code>TOKEN = os.environ["TOKEN_BRAIN"]  # KeyError: 'TOKEN_BRAIN'</code></pre></details>
+</div>
+
+<div class="summary">
+<h3>Zusammenfassung</h3>
+<ul>
+  <li><code>get()</code> gibt <code>None</code> — kein Fehler, stilles Versagen möglich</li>
+  <li>Für kritische Config: <code>os.environ["KEY"]</code> oder expliziter None-Check mit Logging</li>
+  <li>Root Cause hier: falsche Var-Namen + get() + stilles sys.exit(0)</li>
+  <li>Fix: routing-aware Token-Auflösung statt hartkodierter Var-Namen</li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>try/finally State-Tracking</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 0.5rem; }
+  h2 { color: #374151; margin-top: 2rem; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.85em; }
+  .concept { background: #f5f3ff; border-left: 4px solid #7c3aed; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .danger { background: #fef2f2; border-left: 4px solid #dc2626; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .quiz h3 { color: #15803d; margin-top: 0; }
+  .summary { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .summary h3 { color: #854d0e; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>try/finally State-Tracking</h1>
+<p><strong>Ziel:</strong> <code>active_session</code> sicher setzen und garantiert löschen — auch wenn ein Subprocess fehlschlägt.</p>
+
+<h2>Das Problem ohne try/finally</h2>
+
+<pre><code>def _run_plan(plan_text):
+    result = subprocess.run(["claude", "-p", plan_text], ...)
+    # Wenn subprocess crasht → active_session bleibt gesetzt
+    # Nächste Session routet an falschen Bot
+</code></pre>
+
+<div class="danger">
+<strong>Problem:</strong> Subprocess-Crash → <code>active_session</code> nie gelöscht → nächste Session routet Fragen zum falschen Bot.
+</div>
+
+<h2>Die Lösung: try/finally</h2>
+
+<div class="concept">
+<strong>Kernprinzip:</strong> <code>finally</code> wird <em>immer</em> ausgeführt — egal ob try normal endet, eine Exception wirft, oder <code>return</code> aufgerufen wird.
+</div>
+
+<pre><code>def _run_plan(plan_text):
+    s = load_settings()
+    s["active_session"] = "organizer"
+    save_settings(s)
+
+    try:
+        result = subprocess.run(["claude", "-p", plan_text], ...)
+        if result.returncode != 0:
+            result = subprocess.run(["claude", "-p", plan_text], ...)
+    finally:
+        s = load_settings()       # frischer Read — nicht die alte Variable
+        s["active_session"] = None
+        save_settings(s)
+</code></pre>
+
+<h2>Warum load_settings() im finally nochmal?</h2>
+
+<p><code>settings.json</code> kann während des Subprocesses von außen geändert werden. Frischer Read verhindert Race Conditions:</p>
+
+<pre><code># Falsch:
+finally:
+    s["active_session"] = None  # s ist veraltet — überschreibt externe Änderungen!
+    save_settings(s)
+
+# Richtig:
+finally:
+    s = load_settings()         # aktuellen Stand lesen
+    s["active_session"] = None
+    save_settings(s)
+</code></pre>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>Frage:</strong> Unbehandelte Exception im try-Block — wird finally noch ausgeführt?</p>
+<details><summary>Antwort</summary><p>Ja. finally läuft immer, dann wird die Exception weitergeleitet.</p></details>
+
+<p><strong>Aufgabe:</strong> Warum <code>s = load_settings()</code> im finally statt äußere Variable weiterverwenden?</p>
+<details><summary>Antwort</summary><p>settings.json kann während Subprocess extern geändert worden sein. Frischer Read verhindert, dass externe Änderungen überschrieben werden.</p></details>
+</div>
+
+<div class="summary">
+<h3>Zusammenfassung</h3>
+<ul>
+  <li><code>finally</code> = garantiertes State-Cleanup, auch bei Exception</li>
+  <li>State vor try setzen, im finally löschen</li>
+  <li>Im finally nochmal <code>load_settings()</code> — kein veralteter State</li>
+  <li>Für Markdown-Phasen: <code>set_session.py</code> am Anfang und Ende</li>
+</ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SESSION_BOT_MAP: Multi-Bot Routing</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 0.5rem; }
+  h2 { color: #374151; margin-top: 2rem; }
+  code { background: #f3f4f6; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.85em; }
+  .concept { background: #eff6ff; border-left: 4px solid #2563eb; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .quiz h3 { color: #15803d; margin-top: 0; }
+  .summary { background: #fefce8; border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 2rem; }
+  .summary h3 { color: #854d0e; margin-top: 0; }
+  .why { background: #fdf4ff; border-left: 4px solid #a855f7; padding: 0.75rem 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+</style>
+</head>
+<body>
+
+<h1>SESSION_BOT_MAP: Multi-Bot Routing</h1>
+<p><strong>Ziel:</strong> Verstehen, wie eine Map <code>session_type → bot_name → TOKEN_KEY</code> eleganter ist als if/elif-Ketten.</p>
+
+<h2>Das Problem</h2>
+<p>Die TelegramBotArmy hat 4 Bots. Wenn <code>telegram_ask.py</code> eine Frage stellt, muss sie wissen: <em>an welchen Bot?</em></p>
+
+<p>Die naive Lösung:</p>
+<pre><code>session = settings.get("active_session")
+if session == "brainstorming":
+    token = os.environ["TOKEN_BRAIN"]
+elif session == "teach":
+    token = os.environ["TOKEN_TEACH"]
+# ... jedes Mal erweitern wenn neuer Session-Typ kommt
+</code></pre>
+
+<div class="why">
+<strong>Problem:</strong> Jeder neue Bot oder Session-Typ erfordert Änderungen an mehreren Stellen. Fragil und fehleranfällig.
+</div>
+
+<h2>Die Lösung: SESSION_BOT_MAP</h2>
+
+<div class="concept">
+<strong>Kernkonzept:</strong> Eine Dict-Map trennt Routing-Logik von Ausführungslogik. Alle Routing-Entscheidungen stehen an einem Ort.
+</div>
+
+<pre><code># core/routing.py
+
+SESSION_BOT_MAP = {
+    "brainstorming": "brain",
+    "vision":        "brain",
+    "teach":         "teach",
+    "organizer":     "organizer",
+    "dev":           "brain",
+}
+
+def get_notify_token(settings: dict, env=None) -> str | None:
+    if env is None:
+        env = os.environ
+    bot_name = SESSION_BOT_MAP.get(settings.get("active_session"), "permissions")
+    token_key = f"TOKEN_{bot_name.upper()}"
+    return env.get(token_key)
+</code></pre>
+
+<h2>Ablauf</h2>
+<ol>
+  <li><code>settings.json</code> lesen → <code>active_session = "dev"</code></li>
+  <li><code>SESSION_BOT_MAP["dev"]</code> → <code>"brain"</code></li>
+  <li><code>f"TOKEN_{'brain'.upper()}"</code> → <code>"TOKEN_BRAIN"</code></li>
+  <li><code>os.environ.get("TOKEN_BRAIN")</code> → Token-String</li>
+</ol>
+
+<h2>Erweitern</h2>
+<p>Neuen Session-Typ hinzufügen — nur die Map:</p>
+<pre><code>SESSION_BOT_MAP = {
+    # bestehend ...
+    "recap": "brain",  # nur diese Zeile
+}
+</code></pre>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>Frage:</strong> Welchen Token-Key sucht <code>get_notify_token()</code> wenn <code>active_session = "teach"</code>?</p>
+<details><summary>Antwort</summary><p><code>TOKEN_TEACH</code> — via Map → <code>"teach"</code> → <code>.upper()</code> → <code>TOKEN_TEACH</code></p></details>
+
+<p><strong>Aufgabe:</strong> Füge <code>"recap"</code> → Brain Bot hinzu. Welche Zeile ändert sich?</p>
+<details><summary>Antwort</summary><pre><code>"recap": "brain",  # in SESSION_BOT_MAP</code></pre></details>
+</div>
+
+<div class="summary">
+<h3>Zusammenfassung</h3>
+<ul>
+  <li><code>SESSION_BOT_MAP</code>: Single-Source-of-Truth für <code>session_type → bot_name</code></li>
+  <li><code>get_notify_token()</code> baut daraus <code>TOKEN_XXX</code> Env-Var-Key</li>
+  <li>Neue Session-Typen: nur Map erweitern</li>
+  <li>Fallback: unbekannte Sessions → Permissions Bot</li>
+</ul>
+</div>
+
+</body>
+</html>
