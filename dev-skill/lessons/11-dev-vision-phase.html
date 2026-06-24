@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 11: /dev vision + Continuation Prompts</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#e879f9; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#200f2a; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .flow { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2.2; margin:12px 0; }
+  .flow-step { color:var(--accent2); }
+  .flow-sub { color:var(--muted); padding-left:24px; }
+  .flow-new { color:var(--accent); font-weight:700; }
+  .branch { display:flex; gap:12px; margin:12px 0; }
+  .branch-card { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px; }
+  .branch-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .branch-title { color:var(--accent2); font-weight:700; margin-bottom:6px; }
+  .branch-body { font-size:13px; color:var(--text); }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:12px; font-family:monospace; margin:2px; }
+  .tag-idea { background:#1a2010; color:#9be36b; border:1px solid #4a7a20; }
+  .tag-vision { background:#200f2a; color:var(--accent); border:1px solid #6a2a8a; }
+  .tag-discussed { background:#0f1a2a; color:var(--accent2); border:1px solid #1a4a6a; }
+  .tag-done { background:#0f2a1a; color:var(--green); border:1px solid #1a6a3a; }
+  .lifecycle { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin:12px 0; }
+  .lc-step { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 12px; font-size:13px; text-align:center; }
+  .lc-step.new { border-color:var(--accent); color:var(--accent); }
+  .lc-arrow { color:var(--muted); }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:#ff6b6b; color:#ff6b6b; }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+</style>
+</head>
+<body>
+
+<h1>Lektion 11: /dev vision + Continuation Prompts</h1>
+<p class="subtitle">Neue Phase im Lifecycle: Feature-Triage mit Jetzt/Später-Gate + explizite Weiter-Prompts</p>
+
+<h2>Das Problem</h2>
+<p>Vor dieser Lektion gab es eine Lücke zwischen <code>/dev idea</code> (kein Dialog, schnelle Erfassung) und <code>/dev discuss</code> (voller Spec-Flow). Wenn eine neue Idee aufkam und du entscheiden wolltest <em>ob</em> und <em>wann</em> sie umgesetzt werden soll — gab es keinen Befehl dafür.</p>
+<p>Außerdem endete jede Phase abrupt. Du musstest selbst wissen, was als nächstes kommt.</p>
+
+<h2>Die Lösung: /dev vision</h2>
+
+<div class="why">
+  <b>Design-Rationale:</b> <code>/dev vision</code> ist der Triage-Schritt — schneller als Discuss, aber mit echtem Dialog. Ziel: Feature verstehen, Abhängigkeiten klären, Platz in der Roadmap finden.
+</div>
+
+<p>Aktualisierter Lifecycle:</p>
+<div class="lifecycle">
+  <div class="lc-step new">/dev vision</div>
+  <div class="lc-arrow">→</div>
+  <div class="lc-step">/dev discuss</div>
+  <div class="lc-arrow">→</div>
+  <div class="lc-step">/dev plan</div>
+  <div class="lc-arrow">→</div>
+  <div class="lc-step">/dev implement</div>
+  <div class="lc-arrow">→</div>
+  <div class="lc-step">/dev finish</div>
+</div>
+
+<h2>Der vision-Flow</h2>
+
+<div class="flow">
+  <div class="flow-step">1. Feature-Beschreibung</div>
+  <div class="flow-sub">Auswahl aus [idea]-Items oder neue Beschreibung</div>
+  <div class="flow-step">2. Klärungsfragen (2–3)</div>
+  <div class="flow-sub">Kernproblem, Abhängigkeiten, Scope-Grenze</div>
+  <div class="flow-new">3. "Wann umsetzen?"</div>
+  <div class="flow-sub flow-new">A) Jetzt → STATUS.md active → direkt zu /dev discuss</div>
+  <div class="flow-sub flow-new">B) Später → Mini-Spec + Roadmap-Platzierung → Commit</div>
+</div>
+
+<h3>Pfad A: Jetzt</h3>
+<p>STATUS.md bekommt <code>Active</code> + <code>Phase: discuss</code>. Roadmap-Eintrag wird als <span class="tag tag-vision">[vision]</span> markiert. Dann startet <code>/dev discuss</code> sofort — kein zweiter Befehl nötig.</p>
+
+<h3>Pfad B: Später</h3>
+<p>Eine Mini-Spec (max. 1 Seite) wird geschrieben: Idee, Abhängigkeiten, Scope-Grenze, Roadmap-Position. Eintrag in Roadmap als <span class="tag tag-vision">[vision]</span> mit Priorität und "nach Feature X".</p>
+
+<h2>Roadmap-Status-Tags</h2>
+<p>
+  <span class="tag tag-idea">[idea]</span> Schnell erfasst &nbsp;
+  <span class="tag tag-vision">[vision]</span> Besprochen, triage-reif &nbsp;
+  <span class="tag tag-discussed">[discussed]</span> Spec vorhanden &nbsp;
+  <span class="tag tag-done">[done]</span> Implementiert
+</p>
+
+<h2>Continuation Prompts</h2>
+<p>Jede Phase endet jetzt mit einem expliziten Weiter-Prompt:</p>
+<pre>## Nächster Schritt
+
+A) Mit `/dev [NEXT]` weitermachen
+B) Fortschritt speichern und beenden</pre>
+
+<div class="branch">
+  <div class="branch-card">
+    <div class="branch-label">init / vision / discuss</div>
+    <div class="branch-body">→ vision / discuss / plan</div>
+  </div>
+  <div class="branch-card">
+    <div class="branch-label">plan</div>
+    <div class="branch-body">→ implement</div>
+  </div>
+  <div class="branch-card">
+    <div class="branch-label">implement (Sonderfall)</div>
+    <div class="branch-body">→ Teach Lessons oder /dev finish</div>
+  </div>
+</div>
+
+<div class="why">
+  <b>Warum Continuation statt Auto-Trigger?</b> Auto-Trigger springt ohne Rückfrage weiter — schwer zu debuggen. Explizite Prompts geben Kontrolle. Gleiches Ergebnis, aber transparent.
+</div>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+  <p class="quiz-q">1. Du hast eine neue Feature-Idee und weißt noch nicht, wann du sie umsetzen willst. Welcher Befehl ist richtig?</p>
+  <ul class="quiz-opts" onclick="pick(this,event)">
+    <li data-correct="false">/dev idea "text"</li>
+    <li data-correct="true">/dev vision</li>
+    <li data-correct="false">/dev discuss</li>
+    <li data-correct="false">/dev plan</li>
+  </ul>
+  <p class="quiz-q">2. Was passiert bei /dev vision Pfad A ("Jetzt")?</p>
+  <ul class="quiz-opts" onclick="pick(this,event)">
+    <li data-correct="false">Eine Mini-Spec wird geschrieben</li>
+    <li data-correct="true">STATUS.md → Phase: discuss, /dev discuss startet sofort</li>
+    <li data-correct="false">Das Feature kommt als [idea] in die Roadmap</li>
+    <li data-correct="false">Der Plan wird direkt geschrieben</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li><code>/dev vision</code> füllt die Lücke zwischen <code>/dev idea</code> und <code>/dev discuss</code></li>
+    <li>Jetzt-Pfad → sofort zu <code>/dev discuss</code>. Später-Pfad → Mini-Spec + Roadmap</li>
+    <li>Tags: <code>[idea]</code> → <code>[vision]</code> → <code>[discussed]</code> → <code>[planned]</code> → <code>[done]</code></li>
+    <li>Continuation Prompts ersetzen Auto-Trigger — explizit und kontrollierbar</li>
+  </ul>
+</div>
+
+<script>
+function pick(list, e) {
+  const li = e.target.closest('li');
+  if (!li || list.dataset.done) return;
+  list.dataset.done = '1';
+  li.classList.add(li.dataset.correct === 'true' ? 'correct' : 'wrong');
+  if (li.dataset.correct !== 'true')
+    [...list.children].find(x => x.dataset.correct === 'true')?.classList.add('correct');
+}
+</script>
+</body>
+</html>

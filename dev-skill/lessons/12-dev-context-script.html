@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 12: dev_context.py — Token-Optimierte Projektauswahl</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#e879f9; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  .why { background:#200f2a; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .compare { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0; }
+  .compare-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px; }
+  .compare-card.bad { border-color:#ff6b6b33; }
+  .compare-card.good { border-color:#51cf6633; }
+  .compare-label { font-size:11px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .compare-card.bad .compare-label { color:var(--red); }
+  .compare-card.good .compare-label { color:var(--green); }
+  .compare-body { font-size:13px; }
+  .token-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:700; font-family:monospace; }
+  .token-bad { background:#301212; color:var(--red); border:1px solid #ff6b6b44; }
+  .token-good { background:#12301a; color:var(--green); border:1px solid #51cf6644; }
+  .arch { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; margin:12px 0; }
+  .arch-file { color:var(--accent2); }
+  .arch-sub { color:var(--muted); padding-left:24px; font-size:12px; }
+  .arg-table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+  .arg-table th { background:var(--code-bg); color:var(--muted); text-align:left; padding:8px 12px; font-weight:600; }
+  .arg-table td { padding:8px 12px; border-top:1px solid var(--border); }
+  .arg-table td:first-child { color:var(--accent2); font-family:monospace; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .summary ul { padding-left:20px; }
+  .summary li { margin:6px 0; }
+  .flow-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0; font-size:13px; }
+  .flow-box { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-family:monospace; }
+  .flow-arrow { color:var(--muted); }
+  .kw { color:var(--accent); }
+  .str { color:#a5d6ff; }
+  .fn { color:var(--accent3); }
+  .cm { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+
+<h1>Lektion 12: dev_context.py</h1>
+<p class="subtitle">Token-optimierte Projektauswahl via Python-Skript statt LLM-Leserei</p>
+
+<h2>Das Problem</h2>
+
+<div class="compare">
+  <div class="compare-card bad">
+    <div class="compare-label">Vorher: LLM liest alles</div>
+    <div class="compare-body">
+      <p>Claude liest alle STATUS.md-Dateien, parsed sie in seinem Kopf, filtert Features, zeigt Auswahl an.</p>
+      <span class="token-badge token-bad">~800 Tokens pro Projekt</span>
+    </div>
+  </div>
+  <div class="compare-card good">
+    <div class="compare-label">Nachher: Script liefert JSON</div>
+    <div class="compare-body">
+      <p>Ein Bash-Call gibt gefilterte JSON-Ausgabe. Claude zeigt Auswahl direkt an.</p>
+      <span class="token-badge token-good">~50 Tokens gesamt</span>
+    </div>
+  </div>
+</div>
+
+<div class="why">
+  <b>Kernprinzip:</b> Für strukturierte Daten (STATUS.md parsen, filtern, sortieren) ist ein Python-Skript immer besser als LLM-Lesearbeit. LLM arbeitet gut mit <em>Bedeutung</em>, schlecht mit <em>Mustererkennung auf Dateisystem-Ebene</em>.
+</div>
+
+<h2>Wo liegt das Skript?</h2>
+
+<div class="arch">
+  <div class="arch-file">$HUB_DIR/scripts/dev_context.py</div>
+  <div class="arch-sub">→ stdlib only: argparse, json, os, sys, pathlib</div>
+  <div class="arch-sub">→ kein requirements.txt, keine venv nötig</div>
+  <div class="arch-sub">→ liest direkt aus $HUB_DIR/topics/*/STATUS.md</div>
+</div>
+
+<h2>Interface</h2>
+
+<table class="arg-table">
+  <tr><th>Argument</th><th>Bedeutung</th></tr>
+  <tr><td>--command status</td><td>Alle Projekte, alle Features</td></tr>
+  <tr><td>--command vision</td><td>Alle Projekte, alle Features</td></tr>
+  <tr><td>--command discuss</td><td>Features mit Status [vision] oder [idea]</td></tr>
+  <tr><td>--command plan</td><td>Features mit Status [discussed]</td></tr>
+  <tr><td>--command implement</td><td>Features mit Status [planned]</td></tr>
+  <tr><td>--slug &lt;slug&gt;</td><td>Nur ein Projekt — gibt Feature-Array zurück</td></tr>
+</table>
+
+<h3>Beispielaufruf (Skill)</h3>
+<pre><span class="cm"># Im Skill-Step, wenn kein CWD-Projekt erkannt:</span>
+projects_json=$(python "$HUB_DIR/scripts/dev_context.py" \
+  --command discuss --hub-dir "$HUB_DIR")
+
+<span class="cm"># Wenn Projekt bekannt, nur Features filtern:</span>
+features_json=$(python "$HUB_DIR/scripts/dev_context.py" \
+  --command implement --slug my-project --hub-dir "$HUB_DIR")</pre>
+
+<h2>Was der Skill damit macht</h2>
+
+<div class="flow-row">
+  <div class="flow-box">Bash: dev_context.py</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box">JSON ausgabe</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box">AskUserQuestion</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box">Session startet</div>
+</div>
+
+<p>Multi-Select (<code>multiSelect: true</code>) ist auch möglich: kleine Features zusammenfassen, dann als gebündelte Session bearbeiten.</p>
+
+<h2>STATUS.md Roadmap-Format</h2>
+
+<p>Das Skript parsed genau dieses Format:</p>
+
+<pre><span class="cm">## Roadmap</span>
+<span class="str">- [idea]      Schnelle Idee ohne Spec</span>
+<span class="str">- [vision]    Besprochen, Triage OK</span>
+<span class="str">- [discussed] Spec vorhanden</span>
+<span class="str">- [planned]   Plan fertig, bereit für Implement</span>
+<span class="str">- [active]    Wird gerade implementiert</span>
+<span class="str">- [done]      Fertig</span></pre>
+
+<p>Hinter dem Status-Tag kann optional ein <code>#</code>-Kommentar stehen — wird beim Parsen abgeschnitten.</p>
+
+<h2>Schlüsselfunktion: parse_status_md</h2>
+
+<pre><span class="kw">def</span> <span class="fn">parse_status_md</span>(path):
+    lines = path.read_text().splitlines()
+    result = {<span class="str">"active"</span>: <span class="str">""</span>, <span class="str">"phase"</span>: <span class="str">""</span>, <span class="str">"features"</span>: []}
+    in_roadmap = <span class="kw">False</span>
+    <span class="kw">for</span> line <span class="kw">in</span> lines:
+        <span class="kw">if</span> line.startswith(<span class="str">"Active:"</span>): ...
+        <span class="kw">elif</span> line.startswith(<span class="str">"## Roadmap"</span>): in_roadmap = <span class="kw">True</span>
+        <span class="kw">elif</span> in_roadmap <span class="kw">and</span> line.startswith(<span class="str">"- ["</span>):
+            <span class="cm"># parst [status] und name (ohne #-Kommentare)</span>
+            ...
+    <span class="kw">return</span> result</pre>
+
+<div class="why">
+  <b>Design-Entscheidung:</b> stdlib-only bedeutet kein pip install, keine venv, keine Abhängigkeit. Überall lauffähig wo Python 3 vorhanden. Skript fällt auch nicht aus wenn ein STATUS.md fehlt — es gibt <code>None</code> zurück.
+</div>
+
+<h2>Sortierung</h2>
+<p>Projekte werden nach <code>mtime</code> der STATUS.md sortiert — zuletzt bearbeitetes Projekt zuerst. So landet das relevanteste Projekt oben ohne dass der LLM sortieren muss.</p>
+
+<div class="quiz">
+  <h2>Quiz</h2>
+  <p class="quiz-q">1. Warum gibt dev_context.py JSON aus statt Text?</p>
+  <ul class="quiz-opts" onclick="pick(this,event)">
+    <li data-correct="false">Weil JSON schneller zu parsen ist als Text</li>
+    <li data-correct="true">Claude kann JSON direkt in AskUserQuestion-Optionen umwandeln, ohne selbst zu parsen</li>
+    <li data-correct="false">Weil das STATUS.md-Format JSON ist</li>
+    <li data-correct="false">Wegen Telegram-Integration</li>
+  </ul>
+  <p class="quiz-q">2. Welcher --command-Wert liefert Features mit Status [discussed]?</p>
+  <ul class="quiz-opts" onclick="pick(this,event)">
+    <li data-correct="false">--command discuss</li>
+    <li data-correct="true">--command plan</li>
+    <li data-correct="false">--command implement</li>
+    <li data-correct="false">--command status</li>
+  </ul>
+  <p class="quiz-q">3. Was ist der Hauptvorteil von stdlib-only?</p>
+  <ul class="quiz-opts" onclick="pick(this,event)">
+    <li data-correct="false">Schnellere Ausführung</li>
+    <li data-correct="false">Bessere Fehlerbehandlung</li>
+    <li data-correct="true">Keine Installation nötig — überall lauffähig</li>
+    <li data-correct="false">Kleinere Dateigröße</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Zusammenfassung</h2>
+  <ul>
+    <li><code>dev_context.py</code> ersetzt LLM-Leserei: ~800 → ~50 Token pro Aufruf</li>
+    <li>Skript liegt in <code>$HUB_DIR/scripts/</code>, stdlib-only, keine venv</li>
+    <li><code>--command</code> filtert nach Phase: discuss→[vision|idea], plan→[discussed], implement→[planned]</li>
+    <li><code>--slug</code> für bekanntes Projekt — gibt nur Feature-Array zurück</li>
+    <li>Projekte sortiert nach <code>mtime</code> — zuletzt bearbeitetes zuerst</li>
+    <li>Skill nutzt JSON-Output direkt für <code>AskUserQuestion</code> mit optional <code>multiSelect: true</code></li>
+  </ul>
+</div>
+
+<script>
+function pick(list, e) {
+  const li = e.target.closest('li');
+  if (!li || list.dataset.done) return;
+  list.dataset.done = '1';
+  li.classList.add(li.dataset.correct === 'true' ? 'correct' : 'wrong');
+  if (li.dataset.correct !== 'true')
+    [...list.children].find(x => x.dataset.correct === 'true')?.classList.add('correct');
+}
+</script>
+</body>
+</html>
