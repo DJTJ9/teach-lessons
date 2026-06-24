@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>--bot Flag Pattern — sys.argv Override</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a2e; background: #f8f9ff; }
+  h1 { color: #16213e; border-bottom: 3px solid #0f3460; padding-bottom: .5rem; }
+  h2 { color: #0f3460; margin-top: 2rem; }
+  code { background: #e8eaf6; padding: .15em .4em; border-radius: 4px; font-size: .9em; }
+  pre { background: #1a1a2e; color: #e8eaf6; padding: 1.2rem; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: inherit; font-size: .88em; }
+  .callout { background: #e3f2fd; border-left: 4px solid #1565c0; padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .warning { background: #fff3e0; border-left: 4px solid #e65100; padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+  .quiz { background: #e8f5e9; border: 2px solid #2e7d32; border-radius: 8px; padding: 1rem 1.2rem; margin: 2rem 0; }
+  .quiz h3 { color: #1b5e20; margin-top: 0; }
+  details { background: #f1f8e9; border: 1px solid #aed581; border-radius: 6px; padding: .5rem 1rem; margin-top: .5rem; }
+  summary { cursor: pointer; font-weight: 600; color: #33691e; }
+  .summary-box { background: #16213e; color: #e8eaf6; border-radius: 8px; padding: 1rem 1.2rem; margin-top: 2rem; }
+  .summary-box h2 { color: #90caf9; margin-top: 0; }
+</style>
+</head>
+<body>
+
+<h1>Lektion 1: Das <code>--bot</code> Flag Pattern</h1>
+<p><em>Manuelles <code>sys.argv</code>-Parsing für CLI-Overrides ohne argparse</em></p>
+
+<h2>Das Problem</h2>
+<p>Ein Script wird von vielen Callers aufgerufen. Meistens soll es Routing-Logik nutzen — aber manchmal braucht ein spezifischer Caller einen direkten Override ohne State-Dependency.</p>
+<p>Beispiel: <code>telegram_notify.py</code> routet via <code>active_session → SESSION_BOT_MAP</code>. Aber der Teach Skill will <em>immer</em> den Teach Bot erreichen, egal welche Session aktiv ist.</p>
+
+<h2>Die Lösung: Prefix-Check auf sys.argv</h2>
+
+<pre><code># Vorher: nur positionales Argument
+if len(sys.argv) &lt; 2:
+    sys.exit(0)
+token = get_notify_token(settings)   # abhängig von active_session
+message = sys.argv[1]</code></pre>
+
+<pre><code># Nachher: optionaler --bot Override
+_args = sys.argv[1:]
+bot_override = None
+if len(_args) &gt;= 2 and _args[0] == "--bot":
+    bot_override = _args[1]
+    _args = _args[2:]
+
+if not _args:
+    sys.exit(0)
+
+token = (
+    os.environ.get(f"TOKEN_{bot_override.upper()}")
+    if bot_override
+    else get_notify_token(settings)
+)
+message = _args[0]</code></pre>
+
+<h2>Warum manuelles Parsing statt argparse?</h2>
+<div class="callout">
+<strong>argparse</strong> ruft <code>sys.exit(2)</code> bei unbekannten Flags auf — kaputte Callers brechen das Script. Bei einem Notify-Script das überall aufgerufen wird ist das zu riskant.<br><br>
+<strong>Manuelles Parsing</strong>: wir greifen auf <code>sys.argv[1:]</code> zu, konvertieren zu Liste, checken nur ob erstes Element <code>"--bot"</code> ist. Kein Framework nötig.
+</div>
+
+<h2>Aufruf-Protokoll</h2>
+<pre><code># Bestehende Callers — unverändert:
+python telegram_notify.py "Nachricht"
+
+# Neuer Override-Caller:
+python telegram_notify.py --bot teach "Nachricht"
+python telegram_notify.py --bot brain "Nachricht"</code></pre>
+
+<div class="warning">
+<strong>Reihenfolge ist fest:</strong> <code>--bot &lt;name&gt;</code> muss vor der Nachricht stehen. Bei komplexeren CLIs mit optionalen Flags in beliebiger Reihenfolge → argparse verwenden.
+</div>
+
+<h2>Token-Auflösung via f-String Convention</h2>
+<pre><code>token = os.environ.get(f"TOKEN_{bot_override.upper()}")
+# --bot teach       →  TOKEN_TEACH
+# --bot brain       →  TOKEN_BRAIN
+# --bot permissions →  TOKEN_PERMISSIONS</code></pre>
+<p>Kein hard-coded Dict nötig. Convention <code>TOKEN_{BOTNAME.upper()}</code> macht den Override-Code wartungsfrei — neue Bots funktionieren automatisch.</p>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>sys.argv = ["notify.py", "--bot", "teach", "Hallo"]. Was ist bot_override und _args danach?</strong></p>
+<details>
+  <summary>Antwort</summary>
+  <p><code>bot_override = "teach"</code>, <code>_args = ["Hallo"]</code></p>
+</details>
+<p><strong>sys.argv = ["notify.py", "Hallo"] (kein --bot). Was passiert?</strong></p>
+<details>
+  <summary>Antwort</summary>
+  <p><code>bot_override = None</code>, <code>_args = ["Hallo"]</code> → normales Routing via <code>get_notify_token(settings)</code>.</p>
+</details>
+</div>
+
+<div class="summary-box">
+<h2>Zusammenfassung</h2>
+<ul>
+  <li><code>sys.argv[1:]</code> in Liste kopieren → Elemente konsumieren statt indexieren</li>
+  <li>Prefix-Check: <code>if len(_args) &gt;= 2 and _args[0] == "--bot"</code></li>
+  <li>Token-Auflösung: <code>os.environ.get(f"TOKEN_{bot_override.upper()}")</code></li>
+  <li>Bestehende Callers ohne <code>--bot</code> bleiben unverändert</li>
+  <li>Manuelles Parsing für simple 1-Flag-Overrides, argparse für komplexere CLIs</li>
+</ul>
+</div>
+
+</body>
+</html>
