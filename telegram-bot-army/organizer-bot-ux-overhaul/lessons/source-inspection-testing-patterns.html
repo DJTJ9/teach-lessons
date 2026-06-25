@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Source-Inspection Testing Patterns</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2d3148;--accent:#5b7cf6;--accent2:#38d9a9;--warn:#f08c00;--danger:#e06c75;--text:#e2e8f0;--muted:#8892a4;--code-bg:#12141c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;padding:2rem 1rem}
+  .container{max-width:780px;margin:0 auto}
+  h1{font-size:1.75rem;color:var(--accent);margin-bottom:.25rem}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+  h2{font-size:1.15rem;color:var(--accent2);margin:2rem 0 .75rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+  p{margin-bottom:.8rem}
+  code{background:var(--code-bg);color:#a8d8a8;padding:.15em .4em;border-radius:4px;font-size:.88em;font-family:'Fira Code',monospace}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1.25rem;overflow-x:auto;margin:1rem 0}
+  pre code{background:none;padding:0;color:#cdd9e5;font-size:.87em}
+  .kw{color:#e06c75}.str{color:#98c379}.cmt{color:#5c6370;font-style:italic}.fn{color:#61afef}.num{color:#d19a66}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+  @media(max-width:580px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin:.75rem 0}
+  .card.ok{border-color:var(--accent2)}.card.bad{border-color:var(--danger)}
+  .label{font-size:.75rem;font-weight:700;text-transform:uppercase;margin-bottom:.5rem}
+  .label.ok{color:var(--accent2)}.label.bad{color:var(--danger)}
+  ul{padding-left:1.4rem;margin:.5rem 0}li{margin-bottom:.35rem}
+  .pitfall{background:#2a1a1a;border-left:3px solid var(--danger);padding:1rem 1.25rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  .fix{background:#1a2a1a;border-left:3px solid var(--accent2);padding:1rem 1.25rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.87rem}
+  th{background:var(--surface);padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+  td{padding:.5rem .75rem;border-bottom:1px solid #1f2335}
+  .quiz{background:#1a2010;border:1px solid #38d9a950;border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .quiz h2{color:var(--accent2);border:none;margin-top:0}
+  .qitem{margin:1rem 0 .5rem;font-weight:600}
+  details{margin:.5rem 0}summary{cursor:pointer;color:var(--accent);padding:.3rem 0}
+  .ans{background:var(--code-bg);border-radius:6px;padding:.75rem 1rem;margin-top:.4rem;font-size:.9rem}
+  .sumbox{background:#141a2e;border:1px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .sumbox h2{color:var(--accent);border:none;margin-top:0}
+</style>
+</head>
+<body><div class="container">
+
+<h1>Source-Inspection Testing Patterns</h1>
+<p class="sub">Organizer Bot UX Overhaul · Test-Strategie ohne Runtime</p>
+
+<h2>Was ist Source-Inspection Testing?</h2>
+<p>Quelldatei als String lesen, Muster prüfen — kein Runtime nötig. Ideal für Cleanup-Checks, Architektur-Invarianten und Feature-Presence-Checks.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">_src</span>():
+    <span class="kw">with</span> open(<span class="str">"bots/organizer.py"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+        <span class="kw">return</span> f.read()
+
+<span class="kw">class</span> <span class="fn">TestCleanup</span>(unittest.TestCase):
+    <span class="kw">def</span> <span class="fn">test_no_pending_task_input</span>(self):
+        self.assertNotIn(<span class="str">"pending_task_input"</span>, _src())
+
+    <span class="kw">def</span> <span class="fn">test_routing_order</span>(self):
+        src = _src()
+        wf_idx  = src.index(<span class="str">"handle_workflow_step(text, chat_id, today)"</span>)
+        btn_idx = src.index(<span class="str">"if t in BUTTON_MAP"</span>)
+        self.assertLess(wf_idx, btn_idx)</code></pre>
+
+<h2>Vier Test-Typen</h2>
+<table>
+  <tr><th>Typ</th><th>Assertion</th><th>Wofür</th></tr>
+  <tr><td>Presence</td><td><code>assertIn("BUTTON_MAP", src)</code></td><td>Feature implementiert</td></tr>
+  <tr><td>Absence</td><td><code>assertNotIn("dead_code", src)</code></td><td>Toter Code entfernt</td></tr>
+  <tr><td>Order</td><td><code>assertLess(src.index(A), src.index(B))</code></td><td>Routing-Reihenfolge korrekt</td></tr>
+  <tr><td>Scope</td><td><code>body = src[start:end]; assertIn(X, body)</code></td><td>Pattern nur in bestimmter Funktion</td></tr>
+</table>
+
+<h2>⚠️ Pitfall 1: Substring-Problem</h2>
+<div class="pitfall">
+  <p><code>assertNotIn("TASK_SYSTEM_PROMPT", src)</code> schlägt fehl wenn <code>PROJEKT_TASK_SYSTEM_PROMPT</code> noch im Code ist — <code>"TASK_SYSTEM_PROMPT"</code> ist ein Substring davon.</p>
+</div>
+<pre><code><span class="cmt"># ❌ Trifft auch PROJEKT_TASK_SYSTEM_PROMPT</span>
+self.assertNotIn(<span class="str">"TASK_SYSTEM_PROMPT"</span>, src)
+
+<span class="cmt"># ✓ Mit Zuweisungs-Operator — nur Deklaration trifft</span>
+self.assertNotIn(<span class="str">"TASK_SYSTEM_PROMPT ="</span>, src)
+
+<span class="cmt"># ✓ Oder: alle Konstanten mit dem Suffix entfernen</span>
+<span class="cmt"># (PROJEKT_TASK_SYSTEM_PROMPT war toter Code → mitlöschen)</span></code></pre>
+<div class="fix"><strong>Regel:</strong> Bei <code>assertNotIn(name, src)</code> immer prüfen ob <code>name</code> Substring anderer Bezeichner ist. Mit <code>" ="</code> oder Leerzeichen anhängen macht den Match präziser.</div>
+
+<h2>⚠️ Pitfall 2: Index trifft Deklaration, nicht Handler</h2>
+<div class="pitfall">
+  <p><code>src.index("_workflow")</code> findet die globale Deklaration <code>_workflow: dict = {}</code> (Zeile ~489), nicht den Check im Message-Handler (Zeile ~1604).</p>
+</div>
+<pre><code><span class="cmt"># ❌ Findet Deklaration statt Handler</span>
+wf_idx = src.index(<span class="str">"_workflow"</span>)
+
+<span class="cmt"># ✓ Einmalig-vorkommenden vollständigen Ausdruck nutzen</span>
+wf_idx  = src.index(<span class="str">"handle_workflow_step(text, chat_id, today)"</span>)
+btn_idx = src.index(<span class="str">"if t in BUTTON_MAP"</span>)
+self.assertLess(wf_idx, btn_idx)</code></pre>
+
+<h2>⚠️ Pitfall 3: Scope ohne Funktionsgrenzen</h2>
+<pre><code><span class="cmt"># ✓ Scope auf eine Funktion beschränken</span>
+src = _src()
+start = src.index(<span class="str">"def _send_moin_messages("</span>)
+end   = src.index(<span class="str">"\ndef "</span>, start + <span class="num">1</span>)
+body  = src[start:end]
+
+self.assertIn(<span class="str">'f"done:{pid}"'</span>, body)
+self.assertNotIn(<span class="str">"_task_buttons(pid)"</span>, body)  <span class="cmt"># alter Aufruf entfernt?</span></code></pre>
+
+<h2>Wann benutzen?</h2>
+<div class="grid2">
+  <div class="card ok">
+    <div class="label ok">✓ Gut für</div>
+    <ul>
+      <li>Cleanup-Checks (kein toter Code)</li>
+      <li>Architektur-Invarianten</li>
+      <li>Feature-Presence nach Refactoring</li>
+      <li>Schnell, zero Runtime</li>
+    </ul>
+  </div>
+  <div class="card bad">
+    <div class="label bad">✗ Nicht für</div>
+    <ul>
+      <li>Logik-Korrektheit</li>
+      <li>Dynamisches Verhalten</li>
+      <li>String in Strings/Kommentaren</li>
+      <li>API-Integrations-Checks</li>
+    </ul>
+  </div>
+</div>
+
+<div class="quiz">
+<h2>🎯 Quiz</h2>
+<p class="qitem">1. <code>assertNotIn("CHAT", src)</code> schlägt fehl obwohl du <code>CHAT_SYSTEM_PROMPT</code> gelöscht hast. Was ist der Grund?</p>
+<details><summary>Antwort</summary><div class="ans">"CHAT" ist Substring von <code>CHAT_ID</code>, <code>chat_id</code>, etc. die noch im Code sind. <code>assertNotIn</code> prüft wörtliche Substring-Präsenz — auch in Variablennamen, String-Literals, Kommentaren.</div></details>
+<p class="qitem">2. Scope-Test: Du willst sicherstellen dass <code>_send_moin_messages</code> keine <code>_task_buttons()</code> mehr aufruft. Wie?</p>
+<details><summary>Antwort</summary><div class="ans"><pre style="margin:0;font-size:.82rem">src = _src()
+s = src.index("def _send_moin_messages(")
+e = src.index("\ndef ", s + 1)
+self.assertNotIn("_task_buttons(", src[s:e])</pre></div></details>
+<p class="qitem">3. Order-Test: <code>src.index("my_func")</code> wirft <code>ValueError</code>. Was bedeutet das?</p>
+<details><summary>Antwort</summary><div class="ans"><code>str.index()</code> wirft wenn nicht gefunden. Für Order-Tests bedeutet das: das Feature fehlt vollständig — der Test zeigt damit korrekt einen Fehler. Für Absence-Tests stattdessen <code>assertNotIn</code> verwenden (kein Error bei Nichtvorhandensein).</div></details>
+</div>
+
+<div class="sumbox">
+<h2>📖 Summary</h2>
+<ul>
+  <li><strong>Source-Inspection</strong>: Quelldatei als String, 4 Typen: Presence / Absence / Order / Scope</li>
+  <li><strong>Substring-Pitfall</strong>: <code>assertNotIn("FOO", src)</code> trifft <code>BAR_FOO</code> — <code>" ="</code> anhängen oder verwandte Bezeichner mitlöschen</li>
+  <li><strong>Index-Pitfall</strong>: Kurze Namen finden Deklaration — vollständige Ausdrücke nutzen</li>
+  <li><strong>Scope-Pitfall</strong>: Funktionsgrenzen manuell extrahieren: <code>src[start:end]</code></li>
+  <li><strong>Nicht für</strong> Logik-Korrektheit oder dynamisches Verhalten</li>
+</ul>
+</div>
+
+</div></body></html>

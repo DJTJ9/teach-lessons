@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reply-Keyboard vs Inline-Keyboard</title>
+<style>
+  :root { --bg:#0f1117;--surface:#1a1d27;--border:#2d3148;--accent:#5b7cf6;--accent2:#38d9a9;--warn:#f08c00;--text:#e2e8f0;--muted:#8892a4;--code-bg:#12141c; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;padding:2rem 1rem}
+  .container{max-width:780px;margin:0 auto}
+  h1{font-size:1.75rem;color:var(--accent);margin-bottom:.25rem}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+  h2{font-size:1.15rem;color:var(--accent2);margin:2rem 0 .75rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+  h3{font-size:1rem;margin:1.25rem 0 .4rem}
+  p{margin-bottom:.8rem}
+  code{background:var(--code-bg);color:#a8d8a8;padding:.15em .4em;border-radius:4px;font-size:.88em;font-family:'Fira Code',monospace}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1.25rem;overflow-x:auto;margin:1rem 0}
+  pre code{background:none;padding:0;color:#cdd9e5;font-size:.87em}
+  .kw{color:#e06c75}.str{color:#98c379}.cmt{color:#5c6370;font-style:italic}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+  @media(max-width:580px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin:.75rem 0}
+  .decision{background:#141a2e;border-left:3px solid var(--accent);padding:1rem 1.25rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  .decision.green{border-left-color:var(--accent2)}
+  ul{padding-left:1.4rem;margin:.5rem 0}li{margin-bottom:.35rem}
+  .quiz{background:#1a2010;border:1px solid #38d9a950;border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .quiz h2{color:var(--accent2);border:none;margin-top:0}
+  .qitem{margin:1rem 0 .5rem;font-weight:600}
+  details{margin:.5rem 0}summary{cursor:pointer;color:var(--accent);padding:.3rem 0}summary:hover{color:var(--accent2)}
+  .ans{background:var(--code-bg);border-radius:6px;padding:.75rem 1rem;margin-top:.4rem;font-size:.9rem}
+  .sumbox{background:#141a2e;border:1px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .sumbox h2{color:var(--accent);border:none;margin-top:0}
+  .mock{background:#1a1f35;border-radius:8px;padding:1rem;margin:1rem 0;font-size:.88rem}
+  .mbtn{background:#3a4070;border-radius:6px;padding:.3rem .7rem;text-align:center;font-size:.8rem}
+  .igrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.3rem;margin:.4rem 0}
+  .ibtn{background:#2055aa;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;text-align:center}
+</style>
+</head>
+<body><div class="container">
+
+<h1>Reply-Keyboard vs Inline-Keyboard</h1>
+<p class="sub">Telegram Bot UI · Organizer Bot UX Overhaul</p>
+
+<h2>Zwei Keyboard-Typen</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>📌 ReplyKeyboardMarkup</h3>
+    <ul>
+      <li>Ersetzt die Telegram-Schreibzeile</li>
+      <li>Buttons senden <strong>Text-Messages</strong></li>
+      <li>Persistent — ein Keyboard pro Chat</li>
+      <li>Kein <code>callback_query</code></li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>⬜ InlineKeyboardMarkup</h3>
+    <ul>
+      <li>Hängt an einer einzelnen Nachricht</li>
+      <li>Buttons senden <strong>callback_data</strong></li>
+      <li>Mehrere gleichzeitig möglich</li>
+      <li>Benötigt <code>answer_callback_query</code></li>
+    </ul>
+  </div>
+</div>
+
+<h2>JSON-Struktur</h2>
+<pre><code><span class="cmt"># ReplyKeyboardMarkup</span>
+REPLY_KEYBOARD = {
+    <span class="str">"keyboard"</span>: [
+        [<span class="str">"📋 Task"</span>, <span class="str">"📅 Termin"</span>, <span class="str">"💡 Ideen"</span>],
+        [<span class="str">"📚 Lern"</span>, <span class="str">"🌅 Morgen"</span>, <span class="str">"🌙 Abend"</span>],
+    ],
+    <span class="str">"resize_keyboard"</span>: <span class="kw">True</span>,
+    <span class="str">"persistent"</span>: <span class="kw">True</span>,   <span class="cmt"># Telegram 6.9+ — bleibt immer sichtbar</span>
+}
+
+<span class="cmt"># InlineKeyboardMarkup — pro Nachricht</span>
+inline_kb = {<span class="str">"inline_keyboard"</span>: [[
+    {<span class="str">"text"</span>: <span class="str">"✅ Erledigt"</span>,    <span class="str">"callback_data"</span>: <span class="str">f"done:{pid}"</span>},
+    {<span class="str">"text"</span>: <span class="str">"📅 Verschieben"</span>, <span class="str">"callback_data"</span>: <span class="str">f"reschedule:{pid}"</span>},
+]]}</code></pre>
+
+<h2>Update-Flow-Unterschied</h2>
+<pre><code><span class="cmt"># Reply → normale text message</span>
+<span class="kw">if</span> <span class="str">"message"</span> <span class="kw">in</span> upd:
+    text = upd[<span class="str">"message"</span>][<span class="str">"text"</span>]   <span class="cmt"># "📋 Task"</span>
+    <span class="kw">if</span> text <span class="kw">in</span> BUTTON_MAP:
+        start_workflow(BUTTON_MAP[text], chat_id)
+
+<span class="cmt"># Inline → callback_query</span>
+<span class="kw">if</span> <span class="str">"callback_query"</span> <span class="kw">in</span> upd:
+    cq = upd[<span class="str">"callback_query"</span>]
+    answer_callback_query(TOKEN, cq[<span class="str">"id"</span>])  <span class="cmt"># Pflicht!</span>
+    data = cq[<span class="str">"data"</span>]                       <span class="cmt"># "done:abc123"</span></code></pre>
+
+<h2>Entscheidungsframework</h2>
+<div class="decision">
+  <strong>Reply-Keyboard wenn:</strong>
+  <ul><li>Aktionen immer verfügbar sind (Haupt-Navigation)</li>
+  <li>Single-User-Bot</li>
+  <li>Kein Daten-Transport im Button nötig</li></ul>
+</div>
+<div class="decision green">
+  <strong>Inline-Keyboard wenn:</strong>
+  <ul><li>Buttons kontextspezifisch (z.B. pro Task)</li>
+  <li>Daten im Button: <code>callback_data = f"done:{page_id}"</code></li>
+  <li>Buttons nach Klick editierbar (<code>edit_message</code>)</li>
+  <li>Multi-User-Chat</li></ul>
+</div>
+<div class="card" style="border-color:var(--warn)">
+  <h3>⚠️ callback_data max 64 Bytes</h3>
+  <p>Notion page_id = 32 Hex-Zeichen. Mit Prefix <code>"done:"</code> (5) = 37 Bytes ✓. Lange Prefixes können das Limit knacken.</p>
+</div>
+
+<div class="quiz">
+<h2>🎯 Quiz</h2>
+<p class="qitem">1. User klickt "📋 Task" im Reply-Keyboard — wo landet das Update?</p>
+<details><summary>Antwort</summary><div class="ans">Als <code>message.text = "📋 Task"</code>. Kein <code>callback_query</code>. Handler prüft <code>if t in BUTTON_MAP</code>.</div></details>
+<p class="qitem">2. Warum sind die ✅-Buttons im Morgen-Workflow Inline statt Reply?</p>
+<details><summary>Antwort</summary><div class="ans">Jeder Button trägt eine andere Notion <code>page_id</code> als <code>callback_data</code>. Reply-Buttons senden nur festen Text — kein Daten-Transport möglich.</div></details>
+<p class="qitem">3. 5-User Gruppen-Chat — warum ist Reply-Keyboard hier problematisch?</p>
+<details><summary>Antwort</summary><div class="ans">ReplyKeyboardMarkup gilt für den ganzen Chat. Alle 5 User sehen und klicken dieselben Buttons — Bot kann Aktionen nicht einem User zuordnen.</div></details>
+</div>
+
+<div class="sumbox">
+<h2>📖 Summary</h2>
+<ul>
+  <li><strong>Reply</strong>: Persistent, Text-Messages, global per Chat → Haupt-Navigation in Single-User-Bots</li>
+  <li><strong>Inline</strong>: Nachrichtengebunden, <code>callback_data</code>, editierbar → kontextspezifische Aktionen mit Daten</li>
+  <li><strong>Kombination</strong>: Reply für Navigation + Inline für aufgabenspezifische Aktionen ist bewährt</li>
+  <li><code>answer_callback_query</code> nach jedem Inline-Click zwingend</li>
+  <li><code>callback_data</code> Limit: 64 Bytes — kompakte Prefixes wählen</li>
+</ul>
+</div>
+
+</div></body></html>

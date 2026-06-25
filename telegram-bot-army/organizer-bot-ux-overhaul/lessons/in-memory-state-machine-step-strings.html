@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In-Memory State Machine mit Step-Strings</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--border:#2d3148;--accent:#5b7cf6;--accent2:#38d9a9;--warn:#f08c00;--text:#e2e8f0;--muted:#8892a4;--code-bg:#12141c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6;padding:2rem 1rem}
+  .container{max-width:780px;margin:0 auto}
+  h1{font-size:1.75rem;color:var(--accent);margin-bottom:.25rem}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+  h2{font-size:1.15rem;color:var(--accent2);margin:2rem 0 .75rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+  p{margin-bottom:.8rem}
+  code{background:var(--code-bg);color:#a8d8a8;padding:.15em .4em;border-radius:4px;font-size:.88em;font-family:'Fira Code',monospace}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1.25rem;overflow-x:auto;margin:1rem 0}
+  pre code{background:none;padding:0;color:#cdd9e5;font-size:.87em}
+  .kw{color:#e06c75}.str{color:#98c379}.cmt{color:#5c6370;font-style:italic}.fn{color:#61afef}.num{color:#d19a66}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin:.75rem 0}
+  .highlight{background:#141a2e;border-left:3px solid var(--accent);padding:1rem 1.25rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  ul{padding-left:1.4rem;margin:.5rem 0}li{margin-bottom:.35rem}
+  .flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:1rem 0}
+  .step{background:#1a2a4a;border:1px solid var(--accent);border-radius:8px;padding:.4rem .9rem;font-size:.82rem;font-family:'Fira Code',monospace;text-align:center}
+  .step.cb{background:#1a3a2a;border-color:var(--accent2)}
+  .step.end{background:#2a1a1a;border-color:#e06c75}
+  .arrow{color:var(--muted);font-size:1.1rem}
+  .quiz{background:#1a2010;border:1px solid #38d9a950;border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .quiz h2{color:var(--accent2);border:none;margin-top:0}
+  .qitem{margin:1rem 0 .5rem;font-weight:600}
+  details{margin:.5rem 0}summary{cursor:pointer;color:var(--accent);padding:.3rem 0}
+  .ans{background:var(--code-bg);border-radius:6px;padding:.75rem 1rem;margin-top:.4rem;font-size:.9rem}
+  .sumbox{background:#141a2e;border:1px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin:2rem 0}
+  .sumbox h2{color:var(--accent);border:none;margin-top:0}
+</style>
+</head>
+<body><div class="container">
+
+<h1>In-Memory State Machine mit Step-Strings</h1>
+<p class="sub">Organizer Bot UX Overhaul · Workflow-Architektur</p>
+
+<h2>Das Problem</h2>
+<p>Multi-Step-Dialoge in Telegram brauchen State zwischen Nachrichten. callback_data-Carrier scheitert bei Freitext-Steps. FSM-Klassen sind Overkill für 4 Workflows × 3 Schritte.</p>
+
+<h2>Datenstruktur</h2>
+<pre><code><span class="cmt"># Global — ein Entry pro aktivem Chat</span>
+_workflow: dict = {}
+
+<span class="cmt"># Struktur:</span>
+_workflow[chat_id] = {
+    <span class="str">"step"</span>: <span class="str">"task:name"</span>,          <span class="cmt"># "kind:expected_input"</span>
+    <span class="str">"data"</span>: {<span class="str">"name"</span>: <span class="str">"PR Review"</span>},  <span class="cmt"># gesammelter Input</span>
+}
+
+<span class="cmt"># Step-String Konvention:</span>
+<span class="cmt"># "task:name"      → wartet auf Freitext</span>
+<span class="cmt"># "task:priority"  → wartet auf Inline-Button-Callback</span>
+<span class="cmt"># "lern:name"      → wartet auf Freitext</span>
+<span class="cmt"># "lern:kategorie" → wartet auf Callback</span></code></pre>
+
+<h2>Workflow starten</h2>
+<pre><code><span class="kw">def</span> <span class="fn">start_workflow</span>(kind: str, chat_id: int) -> <span class="kw">None</span>:
+    _workflow[chat_id] = {<span class="str">"step"</span>: <span class="str">f"{kind}:init"</span>, <span class="str">"data"</span>: {}}
+    _abort = [[{<span class="str">"text"</span>: <span class="str">"✗ Abbrechen"</span>, <span class="str">"callback_data"</span>: <span class="str">"wf:abort"</span>}]]
+
+    <span class="kw">if</span> kind == <span class="str">"task"</span>:
+        _workflow[chat_id][<span class="str">"step"</span>] = <span class="str">"task:name"</span>
+        send_message(TOKEN, chat_id, <span class="str">"📋 Name?"</span>,
+            reply_markup={<span class="str">"inline_keyboard"</span>: _abort})
+
+    <span class="kw">elif</span> kind == <span class="str">"morgen"</span>:
+        <span class="cmt"># Kein multi-step → direkt ausführen + clearen</span>
+        _send_moin_messages(json.loads(run_claude_parse(...)))
+        _workflow.pop(chat_id, <span class="kw">None</span>)</code></pre>
+
+<h2>Text-Input verarbeiten</h2>
+<pre><code><span class="kw">def</span> <span class="fn">handle_workflow_step</span>(text: str, chat_id: int, today: str) -> bool:
+    wf = _workflow.get(chat_id)
+    <span class="kw">if not</span> wf:
+        <span class="kw">return False</span>   <span class="cmt"># kein aktiver Workflow</span>
+
+    step = wf[<span class="str">"step"</span>]
+    <span class="kw">if</span> step == <span class="str">"task:name"</span>:
+        wf[<span class="str">"data"</span>][<span class="str">"name"</span>] = text.strip()
+        wf[<span class="str">"step"</span>] = <span class="str">"task:priority"</span>
+        buttons = [[
+            {<span class="str">"text"</span>: <span class="str">"🔴 Hoch"</span>,   <span class="str">"callback_data"</span>: <span class="str">"task:priority:hoch"</span>},
+            {<span class="str">"text"</span>: <span class="str">"🟡 Mittel"</span>, <span class="str">"callback_data"</span>: <span class="str">"task:priority:mittel"</span>},
+        ], [{<span class="str">"text"</span>: <span class="str">"✗ Abbrechen"</span>, <span class="str">"callback_data"</span>: <span class="str">"wf:abort"</span>}]]
+        send_message(TOKEN, chat_id, <span class="str">f"Priorität für '{text.strip()}'?"</span>,
+            reply_markup={<span class="str">"inline_keyboard"</span>: buttons})
+        <span class="kw">return True</span>   <span class="cmt"># konsumiert</span>
+
+    <span class="kw">elif</span> step == <span class="str">"task:priority"</span>:
+        <span class="kw">return True</span>   <span class="cmt"># Callback-Step — Text trotzdem konsumieren</span>
+
+    <span class="kw">return False</span></code></pre>
+
+<h2>Callback-Steps in _handle_callback()</h2>
+<pre><code><span class="kw">elif</span> data.startswith(<span class="str">"task:priority:"</span>):
+    prio_key = data.split(<span class="str">":"</span>)[<span class="num">2</span>]  <span class="cmt"># "hoch" / "mittel" / "niedrig"</span>
+    wf = _workflow.get(chat_id, {})
+    name = wf.get(<span class="str">"data"</span>, {}).get(<span class="str">"name"</span>, <span class="str">""</span>)
+    prio = {<span class="str">"hoch"</span>: <span class="str">"Hoch"</span>, <span class="str">"mittel"</span>: <span class="str">"Mittel"</span>, <span class="str">"niedrig"</span>: <span class="str">"Niedrig"</span>}[prio_key]
+    _workflow.pop(chat_id, <span class="kw">None</span>)   <span class="cmt"># Workflow abschließen</span>
+    response = run_claude(f<span class="str">"Name: {name}. Prio: {prio}."</span>, ...)
+    send_message(TOKEN, chat_id, response, reply_markup=REPLY_KEYBOARD)
+
+<span class="kw">elif</span> data == <span class="str">"wf:abort"</span>:
+    _workflow.pop(chat_id, <span class="kw">None</span>)
+    send_message(TOKEN, chat_id, <span class="str">"❌ Abgebrochen."</span>, reply_markup=REPLY_KEYBOARD)</code></pre>
+
+<h2>Routing-Reihenfolge im Haupt-Loop</h2>
+<div class="highlight">
+  <p>Workflow-Check <em>vor</em> Button-Map — sonst würde "📋 Task" als Task-Name den Workflow überschreiben.</p>
+</div>
+<pre><code><span class="kw">if</span> handle_workflow_step(text, chat_id, today):
+    <span class="kw">continue</span>       <span class="cmt"># 1. Workflow konsumiert</span>
+
+t = text.strip()
+<span class="kw">if</span> t.lower().startswith(<span class="str">"erinnere"</span>): ...  <span class="cmt"># 2. Infrastruktur</span>
+<span class="kw">elif</span> t <span class="kw">in</span> BUTTON_MAP:                        <span class="cmt"># 3. Button → Workflow starten</span>
+    start_workflow(BUTTON_MAP[t], chat_id)
+    <span class="kw">continue</span>
+<span class="cmt"># 4. Alles andere: ignorieren</span></code></pre>
+
+<h2>State-Diagramm: Task-Workflow</h2>
+<div class="flow">
+  <div class="step">Button<br>"📋 Task"</div><span class="arrow">→</span>
+  <div class="step">task:name<br>Text-Input</div><span class="arrow">→</span>
+  <div class="step">task:priority<br>Callback</div><span class="arrow">→</span>
+  <div class="step cb">task:priority:*<br>→ Claude</div><span class="arrow">→</span>
+  <div class="step end">cleared</div>
+</div>
+<div class="flow">
+  <span style="color:var(--muted);font-size:.82rem">Abort:</span>
+  <div class="step">any step</div><span class="arrow">→</span>
+  <div class="step cb">wf:abort</div><span class="arrow">→</span>
+  <div class="step end">cleared</div>
+</div>
+
+<h2>Grenzen</h2>
+<div class="card" style="border-color:var(--warn)">
+  <ul>
+    <li><strong>Restart-Loss</strong>: Bot-Neustart leert Dict. Für Single-User-Bots negligible.</li>
+    <li><strong>Kein Timeout</strong>: Halboffener Workflow bleibt. Fix: Timestamp in <code>data</code> + Cleanup-Thread.</li>
+    <li><strong>1 Workflow pro Chat</strong>: Neuer <code>start_workflow</code>-Aufruf überschreibt bestehenden.</li>
+  </ul>
+</div>
+
+<div class="quiz">
+<h2>🎯 Quiz</h2>
+<p class="qitem">1. <code>handle_workflow_step</code> gibt <code>False</code> zurück — was bedeutet das für den Haupt-Loop?</p>
+<details><summary>Antwort</summary><div class="ans">Kein aktiver Workflow → Nachricht normal routen (Infrastruktur-Kommandos, Button-Map, etc.).</div></details>
+<p class="qitem">2. Warum konsumiert <code>handle_workflow_step</code> auch bei Step <code>"task:priority"</code> (Callback-Step) Text-Input mit <code>True</code>?</p>
+<details><summary>Antwort</summary><div class="ans">Um zu verhindern dass unerwartetem Freitext die Routing-Pipeline passiert und z.B. einen neuen Workflow startet. Text wird ignoriert aber als konsumiert markiert.</div></details>
+<p class="qitem">3. Was passiert wenn der User "📋 Task" tippt während ein <code>"task:name"</code>-Step aktiv ist?</p>
+<details><summary>Antwort</summary><div class="ans">"📋 Task" wird als Task-Name gespeichert (<code>wf["data"]["name"] = "📋 Task"</code>), Step wechselt zu <code>"task:priority"</code>. Kein neuer Workflow wird gestartet — der Workflow-Check kommt vor dem Button-Map-Check.</div></details>
+</div>
+
+<div class="sumbox">
+<h2>📖 Summary</h2>
+<ul>
+  <li><code>_workflow: dict = {}</code> — global, <code>chat_id → {step, data}</code></li>
+  <li>Step-Strings: <code>"kind:field"</code> — Text-Steps vs Callback-Steps explizit benannt</li>
+  <li><code>handle_workflow_step</code>: <code>True</code> = konsumiert, <code>False</code> = weiter routen</li>
+  <li>Workflow-Check vor Button-Map — verhindert Überschreiben laufender Workflows</li>
+  <li>Abort: <code>wf:abort</code> Callback + <code>_workflow.pop(chat_id)</code></li>
+  <li>Grenzen: Restart-Loss, kein Timeout, 1 Workflow/Chat</li>
+</ul>
+</div>
+
+</div></body></html>
