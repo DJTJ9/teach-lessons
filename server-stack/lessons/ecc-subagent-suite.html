@@ -1,0 +1,63 @@
+<title>ecc-Plugin — Subagent-Suite und Delegation</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #eab308;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#eab308}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #eab308;background:rgba(234,179,8,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(234,179,8,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}
+th,td{border:1px solid rgba(128,128,128,.3);padding:.5rem .7rem;text-align:left}
+</style>
+
+<h1>ecc-Plugin — Subagent-Suite und Delegation</h1>
+<p><em>~19 Min · Baustein 11/11</em></p>
+
+<h2>Das Problem</h2>
+<p>Claude Code selbst ist ein Generalist. Bittest du es, einen Python-Reviewer-Durchlauf zu machen, einen React-Build-Fehler zu beheben <em>und</em> einen Security-Scan durchzuführen — alles im selben Gesprächskontext — wächst der Kontext schnell zu groß, und jede Aufgabe verwässert die spezifische Tiefe der anderen. Ein einzelner System-Prompt kann nicht gleichzeitig "extrem gründlicher Python-Reviewer" und "schneller Build-Fixer" und "Security-Spezialist" optimal sein.</p>
+
+<h2>Die Lösung: Spezialisierte Subagenten + Delegation</h2>
+<p>Das <code>ecc</code>-Plugin (installiert als <code>ecc@ecc</code>, Version 2.0.0 in <code>installed_plugins.json</code>) liefert eine große Bibliothek von <strong>Subagenten</strong> — jeweils eigener System-Prompt, eigenes Tool-Set, auf genau eine Domäne zugeschnitten:</p>
+
+<table>
+<tr><th>Subagent</th><th>Job</th></tr>
+<tr><td>python-reviewer</td><td>PEP-8, Pythonic Idiome, Type Hints, Security</td></tr>
+<tr><td>react-build-resolver</td><td>Nur Build-Fehler fixen, keine Architektur-Änderungen</td></tr>
+<tr><td>security-reviewer</td><td>OWASP Top 10, Secrets, Injection-Schwachstellen</td></tr>
+<tr><td>database-reviewer</td><td>SQL-Optimierung, Schema-Design</td></tr>
+<tr><td>silent-failure-hunter</td><td>Verschluckte Fehler, fehlende Error-Propagation</td></tr>
+</table>
+
+<p>Der Haupt-Agent (Claude Code selbst) ruft diese über das <code>Agent</code>-Tool mit einem <code>subagent_type</code>-Parameter auf — jeder Subagent startet mit <strong>frischem, leerem Kontext</strong> und nur der spezifischen Aufgabenbeschreibung, die er braucht, nicht dem gesamten bisherigen Gesprächsverlauf.</p>
+
+<div class="box">
+<strong>Warum Delegation statt "alles im Hauptkontext machen":</strong> Zwei Gründe. Erstens <strong>Spezialisierung</strong> — ein Subagent mit System-Prompt "du bist ausschließlich Security-Reviewer, ignoriere Stil-Fragen" liefert fokussiertere, tiefere Ergebnisse als ein Generalist, der nebenbei noch an zehn anderen Dingen denkt. Zweitens <strong>Kontext-Schutz</strong> — ein Subagent, der 50 Dateien durchsucht, um einen Bug zu finden, würde den Hauptkontext mit Zwischenschritten fluten; er liefert stattdessen nur die komprimierte Erkenntnis zurück, der Rest bleibt in seinem eigenen, isolierten Kontext.
+</div>
+
+<h2>Isolation als Kernprinzip</h2>
+<p>Jeder Subagent-Aufruf ist wie ein neuer, unabhängiger Mitarbeiter, dem du eine Aufgabe mit vollständigem Briefing gibst (nicht "mach den Rest", sondern konkrete Dateipfade, Zeilen, Kontext) — er hat kein Gedächtnis an frühere Gespräche in dieser Session. Das erzwingt gute Aufgabenbeschreibung (die im Prompt alles Nötige mitgeben muss) und hält den Hauptkontext klein, selbst wenn eine Unteraufgabe viel Rechercheaufwand braucht.</p>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Für den <code>/teach</code>-Skill, der diese Lesson gerade erzeugt hat, wurde kein Subagent benötigt (reine Content-Erstellung im Hauptkontext) — aber für Aufgaben wie "review diesen Pull Request" oder "finde den Bug in dieser React-Komponente" würde Claude Code automatisch den passenden <code>ecc</code>-Subagenten (<code>code-reviewer</code>, <code>react-build-resolver</code>) delegieren, statt die Spezialaufgabe selbst mit generischem Prompt anzugehen. Das Muster ist dasselbe Prinzip wie bei den Telegram-Bots (Lesson 8): <strong>eine Verantwortlichkeit pro Einheit</strong>, statt ein Monolith für alles.</p>
+
+<details>
+<summary>Quiz: Warum bekommt ein Subagent nicht automatisch den ganzen bisherigen Gesprächsverlauf?</summary>
+<p>Weil das den Zweck der Isolation zunichtemachen würde — der Hauptkontext bliebe genauso groß, nur an den Subagenten weitergereicht. Stattdessen bekommt der Subagent gezielt nur die Informationen, die er für seine konkrete Aufgabe braucht (im Prompt explizit mitgegeben) — das zwingt dazu, präzise zu briefen, spart Tokens, und der Subagent kann sich voll auf seine enge Aufgabe konzentrieren.</p>
+</details>
+
+<details>
+<summary>Quiz: Wann lohnt sich <em>kein</em> Subagent, sondern direkte Bearbeitung im Hauptkontext?</summary>
+<p>Bei kleinen, schnellen, klar abgegrenzten Aufgaben (ein einzelner Grep, eine Ein-Zeilen-Änderung) — der Overhead, einen Subagenten zu briefen und auf sein Ergebnis zu warten, übersteigt dort den Nutzen der Isolation. Subagenten lohnen sich bei Aufgaben mit viel Rechercheaufwand, hoher Domänenspezifität, oder wenn die Zwischenschritte selbst den Hauptkontext unnötig aufblähen würden.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Das ecc-Plugin liefert eine Bibliothek fachspezifischer Subagenten (Reviewer, Build-Fixer, Security-Scanner je nach Sprache/Domäne), die Claude Code gezielt mit isoliertem, frischem Kontext für eng abgegrenzte Aufgaben aufruft. Das schützt den Hauptkontext vor Aufblähung und liefert fokussiertere Ergebnisse als ein Generalist-Prompt für alles — dasselbe "eine Verantwortlichkeit pro Einheit"-Prinzip, das auch die Bot-Army-Architektur trägt.</p>

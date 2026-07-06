@@ -1,0 +1,80 @@
+<title>systemd — Prozess-Management & Auto-Restart</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #ef4444;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#ef4444}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #ef4444;background:rgba(239,68,68,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(239,68,68,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>systemd — Prozess-Management & Auto-Restart</h1>
+<p><em>~15 Min · Baustein 7/11</em></p>
+
+<h2>Das Problem</h2>
+<p>Deine 4 Telegram-Bots sind langlaufende Python-Prozesse. Was passiert, wenn: der Server neu startet (Reboot nach Update)? Ein Bot wegen eines unerwarteten Fehlers abstürzt? Du dich ausloggst, während der Bot in deiner Terminal-Session lief (<code>nohup</code>-Frickelei)? Ohne Prozess-Management müsstest du jeden Bot manuell wieder starten — und würdest einen Absturz erst bemerken, wenn der Bot tagelang nicht reagiert.</p>
+
+<h2>Die Lösung: Der Init-System als Prozess-Aufseher</h2>
+<p>systemd ist der <strong>Init-Prozess</strong> von Linux (PID 1) — der erste Prozess, der beim Booten startet, und der alle anderen Prozesse als "Services" verwalten kann. Ein <strong>Unit-File</strong> beschreibt deklarativ, wie ein Service gestartet, überwacht und bei Bedarf neu gestartet wird.</p>
+
+<p>Dein echtes <code>bot-brain.service</code>:</p>
+<pre>[Unit]
+Description=Telegram Bot Army — Brain Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/projekte/telegram-bot-army
+EnvironmentFile=/root/projekte/telegram-bot-army/.env
+Environment=PORT=8001
+ExecStart=/usr/bin/python3 /root/projekte/telegram-bot-army/bots/brain.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target</pre>
+
+<p>Zeile für Zeile, was das bewirkt:</p>
+<ul>
+<li><code>After=network.target</code> — starte erst, wenn das Netzwerk verfügbar ist (sonst würde der Bot beim Boot sofort mit Verbindungsfehlern crashen)</li>
+<li><code>EnvironmentFile=.env</code> — lädt <code>TOKEN_BRAIN</code>, <code>NOCODB_API_TOKEN</code> etc. als Umgebungsvariablen, ohne sie im Unit-File selbst zu duplizieren</li>
+<li><code>Restart=always</code> — egal warum der Prozess endet (Crash, Exception, OOM-Kill), systemd startet ihn automatisch neu</li>
+<li><code>RestartSec=5</code> — wartet 5 Sekunden vor dem Neustart (verhindert eine Crash-Restart-Crash-Schleife, die die CPU auffrisst)</li>
+<li><code>WantedBy=multi-user.target</code> — der Service wird automatisch beim System-Boot mitgestartet</li>
+</ul>
+
+<div class="box">
+<strong>Warum systemd statt <code>screen</code>/<code>tmux</code>/<code>nohup</code>:</strong> Diese Tools halten einen Prozess nur am Leben, solange die Terminal-Session existiert bzw. bis zum nächsten Reboot — kein automatischer Neustart bei Crash, kein automatischer Start beim Boot, keine strukturierten Logs. systemd ist Teil des Betriebssystems selbst: <code>Restart=always</code> und <code>WantedBy=multi-user.target</code> lösen genau die zwei Probleme ("Absturz" und "Reboot"), die bei einem 24/7-Bot am meisten wehtun.
+</div>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Jeder deiner 4 Bots hat einen eigenen Port (8001-8004, siehe <code>PORT=8001</code>) und einen eigenen systemd-Service — Caddy (Lesson 3) reverse-proxied per Pfad-Matching auf genau diesen Port. systemd sorgt dafür, dass "der Prozess hinter Port 8003" tatsächlich immer läuft, egal was passiert; Caddy muss sich darum nicht kümmern.</p>
+
+<p>Nützliche Kommandos zur Überwachung:</p>
+<pre>systemctl status bot-teach       # läuft der Service gerade?
+journalctl -u bot-teach -f       # Live-Logs mitlesen (StandardOutput=journal)
+systemctl restart bot-teach      # manueller Neustart nach Deploy</pre>
+
+<details>
+<summary>Quiz: Was passiert konkret, wenn <code>bot-brain.py</code> eine unbehandelte Exception wirft und abstürzt?</summary>
+<p>Der Python-Prozess beendet sich mit einem Fehlercode. systemd erkennt: der Service ist beendet, aber <code>Restart=always</code> ist gesetzt → nach <code>RestartSec=5</code> (5 Sekunden Wartezeit) startet systemd <code>ExecStart</code> erneut. Der Bot ist maximal ~5 Sekunden offline, ohne dass jemand manuell eingreifen muss.</p>
+</details>
+
+<details>
+<summary>Quiz: Warum steht <code>Environment=PORT=8001</code> direkt im Unit-File statt in der <code>.env</code>-Datei?</summary>
+<p>Vermutlich weil <code>PORT</code> service-spezifisch ist (jeder Bot braucht einen anderen Port), während <code>.env</code> die geteilten Secrets/Config-Werte enthält, die für alle Bots gleich sind (API-Keys, DB-Verbindungen). Das Unit-File überschreibt/ergänzt gezielt den einen Wert, der pro Service unterschiedlich sein muss.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>systemd verwandelt "ein Python-Skript starten" in "einen überwachten, selbstheilenden Service" — automatischer Neustart bei Crash (<code>Restart=always</code>), automatischer Start beim Boot (<code>WantedBy</code>), zentrale Logs (<code>journalctl</code>). Für 4 dauerhaft laufende Bots ist das der Unterschied zwischen "hoffentlich läuft er noch" und "läuft garantiert, oder ich sehe es sofort im Log".</p>

@@ -1,0 +1,69 @@
+<title>SSH Key-Auth — Server-Zugriff absichern</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #2563eb;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#2563eb}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.88rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #2563eb;background:rgba(37,99,235,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(37,99,235,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>SSH Key-Auth — Server-Zugriff absichern</h1>
+<p><em>~18 Min · Baustein 1/11 · Grundlage für alle weiteren Lessons dieser Reihe</em></p>
+
+<h2>Das Problem</h2>
+<p>Dein Server (erreichbar über Tailscale und öffentlich über <code>code.thinkshark.de</code>) hat SSH auf Port 22 offen — jeder im Internet kann sich verbinden versuchen. Mit Passwort-Login reicht ein einziges erratenes/geleaktes Passwort für vollen Root-Zugriff. Bots durchsuchen das Internet ständig nach Servern mit Passwort-SSH und probieren automatisiert Passwörter (Brute-Force).</p>
+
+<h2>Die Lösung: Asymmetrische Kryptographie</h2>
+<p>Statt eines Geheimnisses, das du eintippst (Passwort), nutzt SSH ein <strong>Schlüsselpaar</strong>:</p>
+<ul>
+<li><strong>Private Key</strong> (<code>id_ed25519</code>) — bleibt <em>nur</em> auf deinem Client-Gerät, verlässt es nie</li>
+<li><strong>Public Key</strong> (<code>id_ed25519.pub</code>) — wird auf dem Server in <code>~/.ssh/authorized_keys</code> eingetragen</li>
+</ul>
+<p>Beim Verbindungsaufbau schickt der Server eine zufällige Challenge. Dein Client signiert sie mit dem Private Key. Der Server prüft die Signatur mit dem hinterlegten Public Key. Kann er sie verifizieren, bist du authentifiziert — <strong>ohne dass ein Geheimnis je über das Netzwerk übertragen wird</strong>.</p>
+
+<div class="box">
+<strong>Warum das sicherer ist als Passwort:</strong> Ein Passwort kann erraten, abgephisht oder über einen unsicheren Kanal mitgelesen werden. Ein Ed25519-Private-Key hat 2^256 mögliche Werte — Brute-Force ist praktisch unmöglich, und der Key wird nie übertragen, kann also nicht "mitgeschnitten" werden.
+</div>
+
+<h2>Konkret auf deinem Server</h2>
+<pre>~/.ssh/
+├── authorized_keys   # Public Keys, die sich einloggen dürfen
+├── config            # Client-seitige Verbindungs-Shortcuts
+├── id_ed25519         # dein Private Key (Berechtigung 600 — nur du liest ihn)
+├── id_ed25519.pub      # dein Public Key
+└── known_hosts        # Fingerprints der Server, denen du schon vertraut hast</pre>
+
+<p>Die Dateirechte sind entscheidend: <code>id_ed25519</code> hat <code>-rw-------</code> (600) — nur der Owner darf lesen/schreiben. SSH verweigert den Login komplett, wenn die Rechte zu offen sind (z.B. 644), weil ein zu offener Private Key als kompromittiert gilt.</p>
+
+<h3><code>/etc/ssh/sshd_config</code> — die Server-Seite</h3>
+<pre># relevante Zeilen (auskommentiert = Distribution-Default aktiv)
+#Port 22
+#PermitRootLogin prohibit-password
+#PasswordAuthentication yes</pre>
+<p><code>PermitRootLogin prohibit-password</code> heißt: Root-Login ist erlaubt, aber <strong>nur</strong> mit Key — ein Passwort-Login als root wird abgelehnt, selbst wenn eins gesetzt wäre. Das ist der Kompromiss zwischen "Root braucht man für Admin-Arbeit" und "Passwort-Root-Login ist das erste, was jeder Angreifer probiert".</p>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>SSH ist die <strong>Verwaltungs-Ebene</strong> — du selbst (und andere Geräte über Tailscale, siehe nächste Lesson) kommst darüber auf den Server, um Code zu deployen, Logs zu lesen, Services neu zu starten. Es ist getrennt von der <strong>Nutzer-Ebene</strong> (Cloudflare → Caddy → Bots), über die Telegram-Nutzer oder App-Nutzer den Server erreichen. Zwei komplett unterschiedliche Zugriffspfade mit unterschiedlichen Sicherheitsanforderungen.</p>
+
+<details>
+<summary>Quiz: Warum verlässt der Private Key nie den Client?</summary>
+<p>Weil die Authentifizierung über ein <strong>Challenge-Response-Verfahren</strong> läuft: der Server schickt eine zufällige Zahl, der Client signiert sie lokal mit dem Private Key, nur die <em>Signatur</em> (nicht der Key selbst) geht über das Netz. Der Server verifiziert die Signatur mit dem öffentlichen Gegenstück. Würde der Private Key übertragen, könnte ihn jeder auf dem Weg mitlesen und danach selbst benutzen.</p>
+</details>
+
+<details>
+<summary>Quiz: Was passiert, wenn <code>id_ed25519</code> Datei-Rechte 644 statt 600 hat?</summary>
+<p>SSH verweigert die Nutzung dieses Keys mit einem "UNPROTECTED PRIVATE KEY FILE" Fehler. Grund: 644 bedeutet "jeder auf dem System kann lesen" — SSH geht dann davon aus, der Key könnte kompromittiert sein, und bricht lieber ab statt ein unsicheres Setup stillschweigend zu erlauben.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>SSH-Key-Auth ersetzt "ein Geheimnis eintippen" durch "einen Beweis erbringen, ohne das Geheimnis preiszugeben" (Public-Key-Kryptographie). <code>authorized_keys</code> auf dem Server + <code>id_ed25519</code> auf deinem Client + <code>PermitRootLogin prohibit-password</code> in <code>sshd_config</code> ergeben zusammen: Admin-Zugriff, der gegen Brute-Force und Passwort-Leaks praktisch immun ist. Das ist die Basis, auf der Tailscale (nächste Lesson) noch eine Netzwerk-Ebene Sicherheit obendrauf legt.</p>

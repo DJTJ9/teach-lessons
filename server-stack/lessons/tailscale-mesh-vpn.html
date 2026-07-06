@@ -1,0 +1,66 @@
+<title>Tailscale — Mesh-VPN zwischen Geräten</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #16a34a;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#16a34a}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #16a34a;background:rgba(22,163,74,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(22,163,74,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}
+th,td{border:1px solid rgba(128,128,128,.3);padding:.5rem .7rem;text-align:left}
+</style>
+
+<h1>Tailscale — Mesh-VPN zwischen Geräten</h1>
+<p><em>~18 Min · Baustein 2/11</em></p>
+
+<h2>Das Problem</h2>
+<p>Dein Server steht bei einem Hoster, dein PC, iPad und Handy sind woanders — jeweils hinter NAT/Router, ohne feste erreichbare IP. Klassische Lösung wäre: Ports am Server-Firewall öffnen (SSH, App-Ports) und hoffen, dass niemand Unbefugtes sie findet. Jeder offene Port ist eine Angriffsfläche.</p>
+
+<h2>Die Lösung: Ein privates Overlay-Netzwerk</h2>
+<p>Tailscale baut ein <strong>virtuelles privates Netzwerk (VPN) auf Basis von WireGuard</strong> auf, in dem jedes deiner Geräte eine feste private IP im Bereich <code>100.64.0.0/10</code> (CGNAT-Range) bekommt — unabhängig davon, wo es gerade physisch steht oder welches lokale Netz es nutzt.</p>
+
+<p>Dein aktueller Tailnet (Auszug aus <code>tailscale status</code>):</p>
+<pre>100.64.150.74  dev                 (dieser Server, Linux)
+100.88.190.7   desktop-vdik3ep     (Windows-PC)
+100.112.87.51  ipad-air-gen-4      (iOS)
+100.67.54.96   z-flip5-von-tjark   (Android, Termux-Gerät)</pre>
+
+<p>Jedes Gerät erreicht jedes andere über diese <code>100.x.x.x</code>-Adresse, <strong>als wären sie im selben LAN</strong> — egal ob eins im Hoster-Rechenzentrum steht und das andere im Handynetz hängt.</p>
+
+<h2>Warum "Mesh" und nicht "Server-Client-VPN"</h2>
+<p>Klassisches VPN: alle Geräte verbinden sich zu einem zentralen VPN-Server, der Traffic weiterleitet (Flaschenhals, single point of failure). <strong>Mesh</strong>: jedes Gerät verbindet sich (wenn möglich) <strong>direkt</strong> mit jedem anderen — Tailscale nutzt dafür NAT-Traversal-Techniken; nur wenn eine direkte Verbindung unmöglich ist, wird über einen Relay (DERP-Server) vermittelt.</p>
+
+<div class="box">
+<strong>Warum genau Tailscale statt eigenem WireGuard-Setup:</strong> WireGuard selbst konfigurierst du pro Gerätepaar manuell (Keys austauschen, IPs zuweisen, Firewall-Regeln). Tailscale übernimmt Key-Distribution, NAT-Traversal und Gerätediscovery automatisch über einen Koordinationsserver — bei 4 Geräten in deinem Tailnet ist das der Unterschied zwischen 5 Minuten Setup und Stunden Fummelei.
+</div>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Tailscale ist der Grund, warum du <strong>SSH nie öffentlich exponieren musst</strong>: Du verbindest dich zum Server nicht über seine öffentliche IP, sondern über <code>100.64.150.74</code> — erreichbar nur für Geräte in deinem Tailnet. Öffentlich zugänglich ist ausschließlich das, was bewusst über Cloudflare+Caddy freigegeben wird (Bots, App). Zwei getrennte Zugriffsebenen: Tailscale = "nur meine Geräte", Cloudflare+Caddy = "die Öffentlichkeit, aber kontrolliert".</p>
+
+<table>
+<tr><th>Ebene</th><th>Wer kommt rein</th><th>Beispiel hier</th></tr>
+<tr><td>Tailscale</td><td>Nur deine eigenen Geräte</td><td>SSH-Zugriff zum Deployen</td></tr>
+<tr><td>Cloudflare+Caddy</td><td>Jeder im Internet (kontrolliert)</td><td>Telegram-Webhooks, Shopping-App</td></tr>
+</table>
+
+<details>
+<summary>Quiz: Warum bekommt jedes Gerät eine feste 100.x.x.x-IP statt seiner echten lokalen IP zu nutzen?</summary>
+<p>Weil lokale IPs (die dein Router per DHCP vergibt) sich ändern können und hinter NAT liegen — von außen nicht adressierbar. Die Tailscale-IP ist stabil und im gesamten Tailnet gültig, egal welches physische Netz das Gerät gerade nutzt (Heim-WLAN, Mobilfunk, Firmennetz). Das macht sie zur zuverlässigen Adresse für SSH-Configs, Skripte etc.</p>
+</details>
+
+<details>
+<summary>Quiz: Was passiert, wenn zwei Geräte hinter symmetrischem NAT (z.B. restriktives Mobilfunknetz) keine direkte Verbindung aufbauen können?</summary>
+<p>Tailscale fällt automatisch auf einen <strong>DERP-Relay-Server</strong> zurück (von Tailscale betrieben) — der Traffic bleibt Ende-zu-Ende verschlüsselt (WireGuard), wird aber über den Relay weitergeleitet statt direkt. Langsamer als eine Direktverbindung, aber funktioniert immer.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Tailscale gibt allen deinen Geräten eine stabile, private Adresse im selben virtuellen Netz — ohne Ports am Server öffnen zu müssen. Es ist die Verwaltungs-Ebene für SSH-Zugriff (Lesson 1) und macht Termux auf dem Handy (Lesson 9) zu einem vollwertigen Client, der genauso auf den Server zugreift wie dein PC.</p>

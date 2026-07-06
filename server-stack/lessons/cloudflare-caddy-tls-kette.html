@@ -1,0 +1,110 @@
+<title>Cloudflare + Caddy — die TLS-Kette</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #f97316;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#f97316}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.82rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #f97316;background:rgba(249,115,22,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(249,115,22,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>Cloudflare + Caddy — die TLS-Kette</h1>
+<p><em>~20 Min · Baustein 3/11</em></p>
+
+<h2>Das Problem</h2>
+<p><code>code.thinkshark.de</code> muss öffentlich per HTTPS erreichbar sein (Telegram schickt Webhooks nur an HTTPS-URLs). Dafür brauchst du: (1) ein gültiges TLS-Zertifikat, (2) Schutz vor DDoS/Bot-Traffic, (3) einen Weg, eine Domain auf mehrere lokale Services (Port 8001-8004, 8080...) zu verteilen. Das alles selbst zu bauen (Let's-Encrypt-Renewal, DDoS-Mitigation, Reverse-Proxy-Routing) ist viel Betriebsaufwand für ein Ein-Personen-Setup.</p>
+
+<h2>Die Lösung: Zwei Schichten, zwei Jobs</h2>
+<p>Deine Kette hat <strong>zwei TLS-Terminierungspunkte</strong> hintereinander:</p>
+
+<pre>Client (Browser/Telegram)
+   │  HTTPS
+   ▼
+Cloudflare Edge (DNS + Proxy + DDoS-Schutz)
+   │  HTTPS, Origin-Zertifikat
+   ▼
+Caddy auf deinem Server (Reverse-Proxy)
+   │  HTTP (localhost)
+   ▼
+Bot/App auf Port 8001-8004 / 8080 / ...</pre>
+
+<h3>Schicht 1 — Cloudflare</h3>
+<p>Cloudflare sitzt als DNS-Provider <em>und</em> als Proxy vor deinem Server. Anfragen an <code>code.thinkshark.de</code> gehen zuerst zu Cloudflares Edge-Netzwerk (Rechenzentren weltweit), nicht direkt zu deinem Server. Das bringt: DDoS-Absorption, Caching, verstecke deine echte Server-IP, und automatisches TLS zum Client hin.</p>
+
+<h3>Schicht 2 — Caddy mit Origin-Zertifikat</h3>
+<p>Zwischen Cloudflare und deinem Server läuft die Verbindung <strong>ebenfalls verschlüsselt</strong> ("Full (strict)"-Modus) — dafür braucht dein Server ein eigenes Zertifikat, das Cloudflare als vertrauenswürdig akzeptiert: ein <strong>Cloudflare-Origin-Zertifikat</strong> (<code>cf-origin.pem</code> / <code>cf-origin-key.pem</code>), von Cloudflare selbst ausgestellt, nur für die Verbindung Cloudflare↔Origin gültig.</p>
+
+<p>Dein echtes <code>/etc/caddy/Caddyfile</code>:</p>
+<pre>{
+    auto_https off
+}
+
+code.thinkshark.de {
+    tls /etc/caddy/cf-origin.pem /etc/caddy/cf-origin-key.pem
+
+    @webhook_brain path /webhook/brain/*
+    handle @webhook_brain {
+        reverse_proxy localhost:8001
+    }
+    @webhook_organizer path /webhook/organizer/*
+    handle @webhook_organizer {
+        reverse_proxy localhost:8002
+    }
+    @webhook_teach path /webhook/teach/*
+    handle @webhook_teach {
+        reverse_proxy localhost:8003
+    }
+    @webhook_permissions path /webhook/permissions/*
+    handle @webhook_permissions {
+        reverse_proxy localhost:8004
+    }
+    handle {
+        reverse_proxy localhost:8080
+    }
+}
+
+app.thinkshark.de {
+    tls /etc/caddy/cf-origin.pem /etc/caddy/cf-origin-key.pem
+    root * /var/www/shopping-navigator
+    @wasm path *.wasm
+    header @wasm Content-Type application/wasm
+    file_server
+}</pre>
+
+<p><code>auto_https off</code> heißt: Caddy soll <em>nicht</em> selbst versuchen, Let's-Encrypt-Zertifikate zu holen (das würde mit dem Cloudflare-Origin-Zertifikat kollidieren) — stattdessen nutzt jeder <code>tls</code>-Block explizit die Cloudflare-Origin-Datei.</p>
+
+<div class="box">
+<strong>Warum Caddy und nicht nginx:</strong> nginx braucht für TLS-Config und Reverse-Proxy-Routing deutlich mehr Boilerplate (separate <code>location</code>-Blöcke, manuelles SSL-Setup, kein eingebautes automatisches HTTPS). Caddys Config-Sprache ist knapp lesbar und pfad-basiertes Routing (<code>@webhook_brain path ...</code>) ist eine Zeile — genau das, was du hier für 4 Bots + 2 Domains brauchst, ohne einen 200-Zeilen-nginx-Config zu pflegen.
+</div>
+
+<h2>Wie eine Telegram-Nachricht konkret durchläuft</h2>
+<ol>
+<li>Nutzer schreibt dem Teach-Bot in Telegram</li>
+<li>Telegram schickt POST an <code>https://code.thinkshark.de/webhook/teach/&lt;token&gt;</code></li>
+<li>Cloudflare Edge nimmt die Anfrage an, terminiert TLS zum Client, prüft auf Bot-Traffic/DDoS</li>
+<li>Cloudflare leitet über eine eigene TLS-Verbindung an deinen Server weiter (Origin-Zertifikat)</li>
+<li>Caddy matcht <code>path /webhook/teach/*</code> und reverse-proxied unverschlüsselt an <code>localhost:8003</code></li>
+<li>Der Teach-Bot-Prozess (systemd-Service, siehe Lesson 7) verarbeitet die Nachricht</li>
+</ol>
+
+<details>
+<summary>Quiz: Warum reicht <code>localhost:8003</code> im letzten Schritt ohne eigenes TLS?</summary>
+<p>Weil die Verbindung Caddy → Bot-Prozess nie das physische Gerät verlässt — beides läuft auf demselben Server über die Loopback-Schnittstelle. Es gibt keinen Netzwerkpfad, den ein Angreifer abhören könnte, also ist die Verschlüsselung dort unnötiger Overhead. Die beiden TLS-Terminierungen (Client→Cloudflare, Cloudflare→Caddy) decken den gesamten Weg ab, der tatsächlich über ein Netzwerk läuft.</p>
+</details>
+
+<details>
+<summary>Quiz: Was würde passieren, wenn <code>auto_https off</code> fehlen würde?</summary>
+<p>Caddy würde versuchen, für <code>code.thinkshark.de</code> automatisch ein Let's-Encrypt-Zertifikat per ACME-Challenge zu holen — das würde mit dem expliziten <code>tls</code>-Directive kollidieren bzw. wäre unnötig, da Cloudflare den Domain-Traffic ohnehin zuerst empfängt und die Validierung dadurch erschwert/blockiert würde.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Cloudflare übernimmt die öffentliche Angriffsfläche (DNS, DDoS, Edge-TLS), Caddy übernimmt lokal das Routing verschiedener Pfade/Subdomains auf die richtigen Ports — verbunden durch ein Origin-Zertifikat, das nur diese eine Strecke absichert. Diese zwei Schichten sind der Grund, warum 4 Bots + 1 App über eine einzige Domain-Struktur sauber getrennt erreichbar sind, ohne dass du selbst Zertifikate verwalten musst.</p>

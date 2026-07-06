@@ -1,0 +1,74 @@
+<title>Dev-Skill + Memory-System — Projekt-Gedächtnis über Sessions hinweg</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #d946ef;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#d946ef}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #d946ef;background:rgba(217,70,239,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(217,70,239,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}
+th,td{border:1px solid rgba(128,128,128,.3);padding:.5rem .7rem;text-align:left}
+</style>
+
+<h1>Dev-Skill + Memory-System — Projekt-Gedächtnis über Sessions hinweg</h1>
+<p><em>~18 Min · Baustein 10/11</em></p>
+
+<h2>Das Problem</h2>
+<p>Ein KI-Coding-Assistent wie Claude Code hat standardmäßig <em>keinen</em> Zustand zwischen Sitzungen — jede neue Konversation startet ohne Wissen darüber, in welcher Phase ein Projekt gerade ist, welche Entscheidungen bereits gefallen sind, oder was letztes Mal gelernt wurde. Bei einem Projekt wie <code>shopping-navigator</code>, das sich über Wochen/Monate entwickelt, würdest du sonst jede Session erneut den ganzen Kontext manuell erklären müssen.</p>
+
+<h2>Die Lösung: Strukturierte Markdown-Dateien als externes Gedächtnis</h2>
+<p>Statt sich auf das Sprachmodell-Gedächtnis zu verlassen, legt der <strong>Dev-Skill</strong> für jedes Projekt einen festen Satz Dateien im Hub (<code>$HUB_DIR/topics/&lt;slug&gt;/</code>) an, die bei jeder Session automatisch gelesen werden:</p>
+
+<table>
+<tr><th>Datei</th><th>Zweck</th></tr>
+<tr><td>STATUS.md</td><td>Aktuelle Phase + Roadmap-Zustand — <em>wo stehen wir gerade</em></td></tr>
+<tr><td>VISION.md</td><td>Langfristiges Ziel, wofür das Projekt existiert</td></tr>
+<tr><td>DECISIONS.md</td><td>Getroffene Architektur-Entscheidungen + Begründung</td></tr>
+<tr><td>TIMELINE.md</td><td>Chronologie abgeschlossener Meilensteine</td></tr>
+<tr><td>LEARNINGS.md</td><td>Was aus Fehlern/Erfahrungen gelernt wurde</td></tr>
+</table>
+
+<p>Echtes <code>STATUS.md</code> für den shopping-navigator:</p>
+<pre>Active: Testmarkt (Seed-Daten)
+Phase: discuss
+
+## Roadmap
+- [done]  Phase 1 Shopping List + Barcode + GPS Position
+- [done]  Store Capture Walk-Through MVP
+- [done]  Supabase Foundation + Auth
+- [done]  Server-Infrastruktur (Caddy + Cloudflare, app.thinkshark.de)
+- [done]  Phase 2 A*-Routenplanung + Store Map
+- [idea]   Testmarkt (Seed-Daten)
+- [idea]   Email-Auth
+- [idea]   Mehrere Filialen pro Nutzer</pre>
+
+<p><code>Phase: discuss</code> ist der Schlüssel für die <strong>Routing-Logik</strong> des Dev-Skills: Ruft man <code>/dev</code> (ohne Argumente) auf, liest der Skill genau diese Zeile und entscheidet automatisch, in welche Phase (discuss/plan/implement/finish) er springt — kein manuelles "wo waren wir stehengeblieben" mehr nötig.</p>
+
+<div class="box">
+<strong>Warum Markdown-Dateien statt einer Datenbank für "Projekt-Gedächtnis":</strong> Diese Dateien werden von einem Sprachmodell gelesen und geschrieben, nicht von einer klassischen Anwendung. Klartext-Markdown ist für ein LLM direkt konsumierbar (keine Parsing-Logik nötig), git-versionierbar (Verlauf der Projekt-Entscheidungen ist selbst Teil der Historie) und menschen-lesbar, falls du selbst reinschaust. Für strukturierte Abfragen (z.B. "zeig mir alle offenen Tasks über alle Projekte") wäre eine DB besser — aber genau das ist hier nicht das Problem, das gelöst werden soll.
+</div>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Der Hub (<code>projects-hub</code>) ist die zentrale Registry (<code>projects-registry.json</code>) aller Projekte (telegram-bot-army, shopping-navigator, dev-skill selbst, ...) — jedes referenziert per <code>slug</code> seinen eigenen <code>topics/&lt;slug&gt;/</code>-Ordner mit genau diesem Datei-Set. Das <code>/teach</code>-Skill, das gerade diese Lesson erzeugt hat, folgt demselben Muster (<code>MISSION.md</code>, <code>NOTES.md</code>, <code>learning-records/</code>) — beide Systeme lösen dasselbe Grundproblem ("Zustand über Sessions hinweg persistieren") mit derselben Technik (strukturierte Markdown-Dateien an einem festen Ort).</p>
+
+<details>
+<summary>Quiz: Warum liegen STATUS.md/VISION.md im Hub-Repo statt im Projekt-Repo selbst (z.B. im shopping-navigator-Repo)?</summary>
+<p>Weil der Hub projektübergreifend funktionieren soll — ein Sprachmodell, das gerade an <em>irgendeinem</em> Projekt arbeitet, muss dieselbe zentrale Stelle kennen, um herauszufinden "was ist der Zustand von Projekt X". Läge der Zustand verteilt in jedem einzelnen Projekt-Repo, bräuchte man für einen Überblick über alle Projekte n verschiedene Repos statt eines zentralen Registry-Punkts.</p>
+</details>
+
+<details>
+<summary>Quiz: Was passiert, wenn <code>Phase: discuss</code> in <code>STATUS.md</code> nicht aktuell gehalten wird?</summary>
+<p>Der Dev-Skill würde bei <code>/dev</code> in die falsche Phase routen — z.B. erneut Klärungsfragen stellen, obwohl längst ein Plan geschrieben wurde. Das Feld ist die einzige Quelle der Wahrheit für "wo stehen wir" — hält man es nicht aktuell, verliert das ganze System seinen Zweck (Kontext ohne manuelles Nacherzählen wiederherzustellen).</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Das Dev-Skill+Memory-System löst "kein Zustand zwischen KI-Sessions" durch einen festen Satz Markdown-Dateien pro Projekt (STATUS/VISION/DECISIONS/TIMELINE/LEARNINGS), zentral im Hub abgelegt und bei jeder Session automatisch gelesen. <code>Phase:</code> in STATUS.md steuert dabei, in welche Arbeitsphase der Skill beim nächsten Aufruf automatisch springt.</p>

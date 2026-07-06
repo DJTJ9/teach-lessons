@@ -1,0 +1,77 @@
+<title>Telegram Bot Army — Multi-Bot-Architektur</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #3b82f6;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#3b82f6}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #3b82f6;background:rgba(59,130,246,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(59,130,246,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}
+th,td{border:1px solid rgba(128,128,128,.3);padding:.5rem .7rem;text-align:left}
+</style>
+
+<h1>Telegram Bot Army — Multi-Bot-Architektur</h1>
+<p><em>~20 Min · Baustein 8/11 · baut auf Caddy (L3) + systemd (L7) auf</em></p>
+
+<h2>Das Problem</h2>
+<p>Du willst über Telegram mit mehreren, klar getrennten Assistenten interagieren: einer für Aufgaben-Organisation, einer als allgemeiner "Denk-Assistent", einer der Lern-Inhalte verschickt, einer für Berechtigungs-Steuerung. Ein einziger monolithischer Bot mit riesiger if/else-Kette für alle Funktionen wäre schnell unübersichtlich und schwer einzeln zu deployen/neu zu starten.</p>
+
+<h2>Die Lösung: Ein Bot pro Verantwortlichkeit</h2>
+<p>Statt einem Bot gibt es vier <strong>unabhängige Prozesse</strong>, jeder mit eigenem Telegram-Bot-Token, eigenem Port, eigenem systemd-Service:</p>
+
+<table>
+<tr><th>Bot</th><th>Datei</th><th>Port</th><th>systemd-Service</th></tr>
+<tr><td>Brain</td><td>bots/brain.py</td><td>8001</td><td>bot-brain.service</td></tr>
+<tr><td>Organizer</td><td>bots/organizer.py</td><td>8002</td><td>bot-organizer.service</td></tr>
+<tr><td>Teach</td><td>bots/teach.py</td><td>8003 (impliziert)</td><td>bot-teach.service</td></tr>
+<tr><td>Permissions</td><td>bots/permissions.py</td><td>8004 (impliziert)</td><td>bot-permissions.service</td></tr>
+</table>
+
+<p>Jeder Bot bekommt eingehende Telegram-Nachrichten nicht per Polling (ständiges Nachfragen "gibt's was Neues?"), sondern per <strong>Webhook</strong> — Telegram selbst schickt bei jeder neuen Nachricht aktiv einen HTTP-POST an eine von dir registrierte URL. Registriert wird das per <code>scripts/setup_webhooks.py</code>:</p>
+<pre>BASE_URL = "https://code.thinkshark.de"
+
+BOTS = [
+    ("TOKEN_BRAIN",       "brain"),
+    ("TOKEN_ORGANIZER",   "organizer"),
+    ("TOKEN_TEACH",       "teach"),
+    ("TOKEN_PERMISSIONS", "permissions"),
+]
+
+for env_key, name in BOTS:
+    token = os.environ[env_key]
+    url = f"{BASE_URL}/webhook/{name}/{token}"
+    requests.post(f"https://api.telegram.org/bot{token}/setWebhook", json={"url": url})</pre>
+
+<p>Der Bot-Name steht sogar <em>im Pfad</em> (<code>/webhook/brain/...</code>) — das ist exakt der Pfad, den Caddy (Lesson 3) per <code>path /webhook/brain/*</code> matcht und an <code>localhost:8001</code> weiterleitet. Webhook-Registrierung, Caddy-Routing und systemd-Port-Zuordnung müssen alle konsistent sein, sonst landet eine Telegram-Nachricht beim falschen Bot oder gar nicht.</p>
+
+<div class="box">
+<strong>Warum Webhook statt Polling:</strong> Polling (Bot fragt alle paar Sekunden "neue Nachrichten?") verbraucht ständig Ressourcen und hat spürbare Latenz. Ein Webhook ist push-basiert: Telegram informiert dich sofort, wenn etwas passiert — null Overhead im Leerlauf, praktisch keine Latenz. Der Preis: du brauchst eine öffentlich erreichbare HTTPS-URL (daher die ganze Cloudflare+Caddy-Kette aus Lesson 3).
+</div>
+
+<h2>Warum getrennte Prozesse statt ein Prozess mit mehreren Handlern</h2>
+<p>Ein Absturz im Teach-Bot (z.B. Bug beim HTML-Generieren) legt bei getrennten Prozessen nur <code>bot-teach.service</code> lahm — Organizer und Brain laufen unbeeinflusst weiter, systemd startet nur den betroffenen Service neu (Lesson 7). Bei einem Monolithen würde ein unbehandelter Fehler in einem Handler potenziell den ganzen Prozess und damit alle vier Bot-Funktionen gleichzeitig lahmlegen.</p>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Das ist die Stelle, an der drei vorherige Lessons zusammenlaufen: <strong>Cloudflare+Caddy</strong> liefert die öffentliche HTTPS-Endpunkte und routet pfad-basiert, <strong>systemd</strong> hält die vier Python-Prozesse dauerhaft am Laufen, und die Bots selbst sprechen über <strong>NocoDB</strong>/Notion-Skripte mit der Datenschicht. Die Bot-Army-Architektur ist im Grunde die Anwendungsschicht, die auf der gesamten darunterliegenden Infrastruktur aufsetzt.</p>
+
+<details>
+<summary>Quiz: Was würde passieren, wenn <code>setup_webhooks.py</code> für den Teach-Bot eine falsche URL registriert (z.B. Pfad <code>/webhook/organizer/&lt;teach-token&gt;</code>)?</summary>
+<p>Telegram würde Nachrichten für den Teach-Bot an einen Pfad schicken, den Caddy als "organizer" matcht und an Port 8002 weiterleitet — der Organizer-Bot-Prozess bekäme also fremde Nachrichten mit einem Token, das er nicht kennt/erwartet, und würde sie vermutlich ablehnen oder falsch verarbeiten. Webhook-URL, Caddy-Pfad-Matcher und der tatsächlich lauschende Port müssen exakt zusammenpassen.</p>
+</details>
+
+<details>
+<summary>Quiz: Warum steckt der Bot-Token direkt in der Webhook-URL (<code>/webhook/brain/&lt;token&gt;</code>) statt nur im Header?</summary>
+<p>Das dient als einfache Authentifizierung: nur wer die URL mit dem korrekten, geheimen Token kennt, kann gültige Webhook-Requests an diesen Endpunkt schicken. Da der Bot-Server selbst prüfen kann "steht im Pfad mein erwarteter Token?", lassen sich so gefälschte/fremde Anfragen an den Webhook-Endpunkt leicht verwerfen, ohne zusätzliche Auth-Header-Logik zu brauchen.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Die Bot-Army trennt Verantwortlichkeiten in vier unabhängige Prozesse (je ein Telegram-Bot-Token, Port, systemd-Service), die über Webhooks statt Polling angesprochen werden. Cloudflare+Caddy liefern den öffentlichen HTTPS-Eingang und routen pfad-basiert zum richtigen Bot, systemd hält jeden Bot einzeln am Leben. Ein Absturz eines Bots betrifft nie die anderen drei.</p>

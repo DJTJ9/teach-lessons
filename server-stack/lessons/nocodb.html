@@ -1,0 +1,78 @@
+<title>NocoDB — No-Code-Datenbank für die Bot-Army</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #a855f7;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#a855f7}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #a855f7;background:rgba(168,85,247,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(168,85,247,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.88rem}
+th,td{border:1px solid rgba(128,128,128,.3);padding:.5rem .7rem;text-align:left}
+</style>
+
+<h1>NocoDB — No-Code-Datenbank für die Bot-Army</h1>
+<p><em>~17 Min · Baustein 5/11 · baut auf Docker (Lesson 4) auf</em></p>
+
+<h2>Das Problem</h2>
+<p>Deine Telegram-Bots verwalten Tasks, Habits, Sport-Tracking, Backlog-Ideen — das sind klassische, tabellarische Daten mit Feldern, Filtern, Relationen. Eine eigene Datenbank + eigenes Admin-Interface dafür zu bauen (Tabellen-CRUD-UI, Auth, API) wäre viel Aufwand für etwas, das im Kern "Excel mit API" ist.</p>
+
+<h2>Die Lösung: Postgres/CouchDB + generierte REST-API + UI, fertig</h2>
+<p>NocoDB nimmt eine Datenbank (bei dir: die CouchDB-Instanz aus dem gleichen Docker-Compose-Projekt) und legt automatisch eine <strong>Tabellen-UI im Airtable-Stil</strong> sowie eine <strong>REST-API pro Tabelle</strong> darüber. Du definierst Tabellen/Felder per Klick-UI, bekommst sofort:</p>
+<ul>
+<li>Ein bearbeitbares Grid/Kanban/Kalender-Interface für dich selbst</li>
+<li>Eine REST-API, die deine Python-Skripte ansprechen können</li>
+<li>Views, Filter, Relationen zwischen Tabellen — ohne SQL zu schreiben</li>
+</ul>
+
+<p>Deine <code>.env</code>-Konfiguration zeigt die Struktur:</p>
+<pre>NOCODB_API_URL=...
+NOCODB_API_TOKEN=...
+NOCODB_BASE_ID=...
+NOCODB_TASKS_TABLE_ID=...
+NOCODB_HABITS_TABLE_ID=...
+NOCODB_SPORT_TABLE_ID=...
+NOCODB_BACKLOG_TABLE_ID=...
+NOCODB_IDEENSAMMLUNG_TABLE_ID=...
+NOCODB_ARCHIV_TABLE_ID=...
+NOCODB_FOCUS_TABLE_ID=...</pre>
+<p>Ein <code>BASE_ID</code> (ein NocoDB-Projekt) enthält mehrere Tabellen, jede mit eigener ID — deine Bot-Skripte (<code>nocodb_sync.py</code>, <code>nocodb_create_table.py</code>, <code>nocodb_promote_backlog.py</code>) sprechen über den API-Token gezielt einzelne Tabellen an, z.B. um einen Backlog-Eintrag in die Tasks-Tabelle zu "promoten".</p>
+
+<div class="box">
+<strong>Warum NocoDB statt Airtable direkt:</strong> Airtable ist SaaS mit Kosten pro Nutzer/Zeile und deine Daten liegen bei Airtable. NocoDB ist Open-Source, self-hosted (dein Docker-Container) — gleiche Bedienlogik, aber Daten bleiben auf deinem Server, kein Vendor-Lock-in, keine laufenden Kosten pro Zeile.
+</div>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>NocoDB ist die <strong>strukturierte Datenschicht</strong> für alles, was der Organizer-/Brain-Bot verwaltet (Aufgaben, Gewohnheiten, Sport-Challenges). Es läuft in Docker (Lesson 4), auf demselben Server wie die Bots, aber komplett isoliert — die Bots reden nur über HTTP+Token mit der NocoDB-API, nie direkt mit der darunterliegenden Datenbank.</p>
+
+<table>
+<tr><th>Tabelle</th><th>Zweck (aus Skript-Namen ableitbar)</th></tr>
+<tr><td>Tasks</td><td>Aktuelle Aufgaben</td></tr>
+<tr><td>Backlog</td><td>Noch nicht priorisierte Ideen/Aufgaben</td></tr>
+<tr><td>Ideensammlung</td><td>Rohe Ideen, noch unstrukturiert</td></tr>
+<tr><td>Habits</td><td>Gewohnheiten-Tracking</td></tr>
+<tr><td>Sport</td><td>Sport-Challenge-Tracking (auch Clip-Import)</td></tr>
+<tr><td>Archiv</td><td>Abgeschlossene/archivierte Einträge</td></tr>
+<tr><td>Focus</td><td>Fokus-Themen/Sessions</td></tr>
+</table>
+
+<details>
+<summary>Quiz: Warum braucht jede Tabelle eine eigene <code>TABLE_ID</code> statt nur einer <code>BASE_ID</code>?</summary>
+<p>Weil die <code>BASE_ID</code> nur das Projekt/die Datenbank als Ganzes identifiziert — für einen konkreten API-Call (z.B. "füge eine Zeile in Tasks ein") muss NocoDB wissen, <em>welche</em> Tabelle innerhalb dieser Base gemeint ist. Die Tabellen-ID ist der eindeutige Zeiger auf genau eine Tabelle mit ihrem eigenen Feld-Schema.</p>
+</details>
+
+<details>
+<summary>Quiz: Was passiert konkret bei <code>nocodb_promote_backlog.py</code>?</summary>
+<p>Der Name legt nahe: das Skript liest einen Eintrag aus der Backlog-Tabelle (<code>NOCODB_BACKLOG_TABLE_ID</code>) und erstellt daraus einen neuen Eintrag in der Tasks-Tabelle (<code>NOCODB_TASKS_TABLE_ID</code>) — eine Idee wird zur aktiven Aufgabe "befördert". Das ist ein typisches Muster: Bot-Logik orchestriert Datenbewegung zwischen NocoDB-Tabellen über deren REST-API, statt dass das in der NocoDB-UI manuell gemacht wird.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>NocoDB verwandelt eine Datenbank in eine bedienbare Tabellen-UI + REST-API, ohne dass du selbst ein Admin-Interface bauen musst. Für dein Bot-Army-Setup ist es die zentrale Datenablage für Tasks/Habits/Sport/Backlog — self-hosted in Docker, angesprochen über tabellenspezifische IDs und einen API-Token aus deinen Bot-Skripten.</p>

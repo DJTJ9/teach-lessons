@@ -1,0 +1,84 @@
+<title>Supabase — Backend-as-a-Service für die Shopping-App</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #22c55e;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#22c55e}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.82rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #22c55e;background:rgba(34,197,94,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(34,197,94,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>Supabase — Backend-as-a-Service für die Shopping-App</h1>
+<p><em>~19 Min · Baustein 6/11</em></p>
+
+<h2>Das Problem</h2>
+<p>Der Shopping Navigator (Mobile App, Flutter) braucht: Nutzer-Accounts, eine Datenbank für Läden/Einkaufslisten/Artikel, Echtzeit-Sync zwischen Geräten (wenn du eine Liste am Handy änderst, soll sie überall aktuell sein) — und das alles, ohne dass du selbst einen Backend-Server (Auth-Logik, DB-Hosting, API-Layer, Skalierung) betreiben musst.</p>
+
+<h2>Die Lösung: Postgres + Auth + Realtime, als ein Paket</h2>
+<p>Supabase ist eine <strong>Open-Source-Alternative zu Firebase</strong>: eine gehostete Postgres-Datenbank, vor die automatisch generiert werden:</p>
+<ul>
+<li><strong>Auth</strong> — Nutzer-Accounts (bei dir: <em>anonyme</em> Auth, jeder Nutzer bekommt ohne Login-Zwang eine <code>user_id</code>)</li>
+<li><strong>Realtime</strong> — Änderungen an Tabellen werden per WebSocket live an verbundene Clients gepusht</li>
+<li><strong>Auto-generierte REST/GraphQL-API</strong> direkt aus dem Datenbank-Schema</li>
+<li><strong>Row Level Security (RLS)</strong> — Zugriffsregeln direkt in Postgres, nicht im App-Code</li>
+</ul>
+
+<p>Reales Schema aus deiner Roadmap (<code>specs/2026-06-17-roadmap-supabase-design.md</code>):</p>
+<pre>stores (
+  id            uuid primary key,
+  user_id       uuid references auth.users,
+  geohash       text,
+  name          text,
+  map_json      jsonb
+)
+
+shopping_lists (
+  id            uuid primary key,
+  user_id       uuid references auth.users,
+  store_id      uuid references stores nullable,
+  name          text
+)
+
+shopping_items (
+  id          uuid primary key,
+  list_id     uuid references shopping_lists,
+  name        text,
+  menge       numeric,
+  einheit     text,
+  kategorie   text,
+  wichtigkeit text
+)</pre>
+
+<p>Wichtig: <code>user_id uuid references auth.users</code> — das ist Supabases eingebaute Auth-Tabelle. Jede Zeile in <code>stores</code>/<code>shopping_lists</code> ist direkt mit einem Nutzer verknüpft, und RLS-Regeln (nicht im Schema-Ausschnitt gezeigt, aber Standardmuster) sorgen dafür, dass ein Nutzer nur seine eigenen Zeilen sieht — <strong>ohne dass die App das selbst prüfen muss</strong>.</p>
+
+<div class="box">
+<strong>Warum Supabase statt eigenem Backend (z.B. FastAPI + eigene Postgres):</strong> Für eine Solo-App-Entwicklung ist "Auth + DB + Realtime + Row-Security selbst bauen" Wochen Arbeit, die nichts mit dem eigentlichen Produkt (A*-Routenplanung, Barcode-Scan) zu tun hat. Supabase liefert diese Grundbausteine fertig und Postgres-basiert (kein proprietäres Firebase-Datenmodell) — das Repository-Pattern in der App (<code>StoreRepository</code>, <code>ShoppingListRepository</code>) kapselt den Zugriff, sodass man später theoretisch tauschen könnte.
+</div>
+
+<h2>Warum genau hier (anders als NocoDB)</h2>
+<p>NocoDB (Lesson 5) ist für <em>dich persönlich</em> als Admin-Tool gedacht (Tasks/Habits via Telegram-Bot) — eine Handvoll Nutzer, kein Mobile-Client, kein Realtime-Bedarf. Supabase ist für eine <em>App mit potenziell vielen Endnutzern</em> gedacht, die Auth, Mobile-SDKs (<code>supabase_flutter</code>) und Realtime-Sync tatsächlich braucht. Zwei verschiedene Probleme, zwei verschiedene Tools — beide "Datenbank mit UI/API drumherum", aber für komplett unterschiedliche Nutzergruppen.</p>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Die App selbst wird als statische Flutter-Web-Build über Caddy ausgeliefert (<code>app.thinkshark.de</code>, siehe Lesson 3) — aber die Daten (Listen, Läden, Artikel) laufen nicht über deinen Server, sondern direkt vom Flutter-Client zu Supabases eigener Infrastruktur. Dein Server liefert nur die App-Dateien aus; Supabase ist das komplette Backend dahinter.</p>
+
+<details>
+<summary>Quiz: Warum "anonyme Auth" statt Email/Passwort von Anfang an?</summary>
+<p>Weil das Feature "geteilte Listen" (mehrere Nutzer sehen dieselbe Liste) in der aktuellen Roadmap noch nicht gebraucht wird — jeder Nutzer bekommt eine stabile <code>user_id</code>, ohne dass er sich registrieren muss. Erst wenn Teilen zwischen echten Accounts nötig wird, lohnt sich der Aufwand für Email-Auth. Klassisches YAGNI-Prinzip: nur so viel Auth-Komplexität wie aktuell gebraucht.</p>
+</details>
+
+<details>
+<summary>Quiz: Was macht Row Level Security konkret unnötig, was man sonst im App-Code prüfen müsste?</summary>
+<p>Ohne RLS müsste die App (oder ein eigenes Backend) bei jeder Anfrage selbst prüfen "gehört diese Zeile dem anfragenden Nutzer?". Mit RLS steht diese Regel direkt in Postgres als Policy (z.B. <code>user_id = auth.uid()</code>) — die Datenbank verweigert den Zugriff auf fremde Zeilen automatisch, unabhängig davon, über welchen Client/welche API-Route zugegriffen wird. Ein Sicherheitsfehler im App-Code kann dann keine fremden Daten mehr leaken.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Supabase bündelt Postgres, Auth, Realtime-Sync und Zugriffsregeln (RLS) zu einem sofort nutzbaren Backend für die Shopping-App — Aufgaben, die sonst Wochen eigener Backend-Arbeit wären. Repository-Pattern in der App kapselt den Zugriff. Anders als NocoDB (persönliches Admin-Tool) ist Supabase für einen echten Multi-User-Mobile-Client gebaut.</p>

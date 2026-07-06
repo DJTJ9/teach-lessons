@@ -1,0 +1,53 @@
+<title>Termux — Claude Code + SSH auf Android</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #14b8a6;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#14b8a6}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #14b8a6;background:rgba(20,184,166,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(20,184,166,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>Termux — Claude Code + SSH auf Android</h1>
+<p><em>~14 Min · Baustein 9/11 · baut auf Tailscale (L2) + SSH (L1) auf</em></p>
+
+<h2>Das Problem</h2>
+<p>Android-Handys sind normalerweise eine "Konsumenten-Sandbox" — kein echtes Terminal, keine Möglichkeit, Linux-Kommandozeilen-Tools (git, python, ssh, node) direkt auszuführen. Willst du unterwegs (z.B. vom Z-Flip5) auf deinen Server zugreifen oder sogar Claude Code direkt auf dem Handy nutzen, brauchst du eine echte Linux-Umgebung auf einem Gerät, das eigentlich keine hat.</p>
+
+<h2>Die Lösung: Ein Linux-Terminal-Emulator ohne Root</h2>
+<p>Termux ist eine App, die eine <strong>minimale Linux-Umgebung (Terminal + Paketmanager)</strong> innerhalb der normalen Android-App-Sandbox bereitstellt — <strong>ohne Root-Zugriff auf das Telefon zu benötigen</strong>. Über <code>pkg install</code> (Termux' eigenes apt-ähnliches Paketsystem) installierst du z.B. <code>openssh</code>, <code>python</code>, <code>nodejs</code>, <code>git</code> — echte Linux-Binaries, kompiliert für Android's Prozessor-Architektur.</p>
+
+<pre>pkg install openssh nodejs git python
+npm install -g @anthropic-ai/claude-code   # Claude Code CLI direkt im Termux-Terminal
+ssh dev   # SSH-Verbindung zum Server über Tailscale-Hostname/IP</pre>
+
+<div class="box">
+<strong>Warum das ohne Root funktioniert:</strong> Termux nutzt Androids offizielle App-Sandbox-Mechanismen (jede App bekommt ihr eigenes, isoliertes Dateisystem) und baut Linux-Pakete gegen Androids Bionic-libc statt gegen glibc. Das Ergebnis: ein vollwertiges Linux-Terminal, das komplett innerhalb der normalen App-Berechtigungen läuft — kein Sicherheitsrisiko, keine Root-Voraussetzung, direkt aus dem Play-Store/F-Droid installierbar.
+</div>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>Dein Z-Flip5 (<code>z-flip5-von-tjark</code>, 100.67.54.96) ist ein vollwertiger Knoten in deinem Tailscale-Tailnet (Lesson 2). Sobald Termux + SSH-Client installiert sind, kannst du vom Handy aus genau wie von deinem PC per <code>ssh root@100.64.150.74</code> auf den Server — Key-Auth (Lesson 1) funktioniert identisch, weil Termux ein echtes <code>~/.ssh</code>-Verzeichnis mit Private Key verwaltet.</p>
+
+<p>Das macht dein Handy zu einem dritten, gleichwertigen Entwickler-Client neben PC und iPad: Code-Änderungen pushen, Bot-Logs live mitlesen (<code>journalctl -u bot-teach -f</code>), sogar Claude Code direkt im Termux-Terminal starten und mit dem Server-Code arbeiten — alles unterwegs, ohne dass der Server dafür zusätzliche Ports öffnen muss.</p>
+
+<details>
+<summary>Quiz: Warum reicht die normale Android-Terminal-App (falls vorhanden) nicht für SSH/git/Claude Code?</summary>
+<p>Standard-Android-Terminal-Apps geben dir bestenfalls Zugriff auf eine sehr eingeschränkte Shell ohne Paketmanager — du kannst keine echten Linux-Binaries wie <code>openssh</code>, <code>node</code> oder <code>git</code> nachinstallieren. Termux bringt einen eigenen Paketmanager (<code>pkg</code>) mit, der Pakete speziell für Androids Architektur bereitstellt — das ist der entscheidende Unterschied zwischen "ein Terminal-Fenster" und "eine tatsächlich nutzbare Linux-Entwicklungsumgebung".</p>
+</details>
+
+<details>
+<summary>Quiz: Was bräuchtest du zusätzlich, damit <code>ssh dev</code> (statt der vollen IP) auf dem Handy funktioniert?</summary>
+<p>Einen SSH-Client-Config-Eintrag in <code>~/.ssh/config</code> innerhalb von Termux, der den Kurznamen <code>dev</code> auf die Tailscale-IP/den Tailscale-Hostnamen (<code>100.64.150.74</code> bzw. den MagicDNS-Namen) sowie den Private-Key-Pfad mappt — genau das gleiche Prinzip wie die <code>~/.ssh/config</code> auf deinem PC (Lesson 1), nur eben in Termux' eigenem Dateisystem eingerichtet.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Termux macht aus einem normalen, ungerooteten Android-Handy einen vollwertigen Linux-Client — mit echtem Paketmanager, SSH, git und sogar Claude Code. Zusammen mit Tailscale (Netzwerk-Zugang) und SSH-Key-Auth (Authentifizierung) wird dein Handy so zu einem gleichberechtigten Entwickler-Gerät neben PC und iPad, ohne dass am Server irgendetwas Handy-spezifisches konfiguriert werden muss.</p>

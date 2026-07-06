@@ -1,0 +1,56 @@
+<title>Docker — Container-Grundlagen</title>
+<style>
+:root{color-scheme:light dark}
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.2rem;line-height:1.6;color:#1a1a1a;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e8e8e8;background:#14161a}}
+:root[data-theme="dark"] body{color:#e8e8e8;background:#14161a}
+:root[data-theme="light"] body{color:#1a1a1a;background:#fff}
+h1{font-size:1.6rem;border-bottom:3px solid #0ea5e9;padding-bottom:.4rem}
+h2{font-size:1.15rem;margin-top:2rem;color:#0ea5e9}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:#f1f5f9;padding:1rem;border-radius:8px;overflow-x:auto;font-size:.85rem}
+@media (prefers-color-scheme:dark){pre{background:#1e2530}}
+:root[data-theme="dark"] pre{background:#1e2530}
+:root[data-theme="light"] pre{background:#f1f5f9}
+.box{border-left:4px solid #0ea5e9;background:rgba(14,165,233,.08);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+details{background:rgba(14,165,233,.06);border-radius:8px;padding:.6rem 1rem;margin:.6rem 0}
+summary{cursor:pointer;font-weight:600}
+</style>
+
+<h1>Docker — Container-Grundlagen</h1>
+<p><em>~16 Min · Baustein 4/11</em></p>
+
+<h2>Das Problem</h2>
+<p>NocoDB braucht eine bestimmte Node.js-Version, eine Postgres/CouchDB-Datenbank, bestimmte System-Bibliotheken. Würdest du das alles direkt auf dem Server installieren, kollidiert es potenziell mit anderen Python-/Node-Versionen, die deine Bots brauchen ("Dependency Hell"). Und: willst du NocoDB später auf einem anderen Server laufen lassen, müsstest du die gesamte Installation manuell reproduzieren.</p>
+
+<h2>Die Lösung: Isolierte, portable Umgebungen</h2>
+<p>Ein <strong>Container</strong> verpackt eine Anwendung mit <em>allem</em>, was sie zum Laufen braucht (Runtime, Bibliotheken, Konfiguration) in ein Image. Docker führt dieses Image isoliert aus — der Container sieht ein eigenes Dateisystem, eigene Prozesse, kann aber den Host-Kernel mitnutzen (kein voller Hypervisor wie bei einer VM nötig, daher viel leichtgewichtiger).</p>
+
+<p>Auf deinem Server laufen aktuell (<code>docker ps</code>):</p>
+<pre>nocodb-data-couchdb-1   couchdb:3
+nocodb-data-nocodb-1    nocodb/nocodb:latest</pre>
+
+<p>Der Namens-Präfix <code>nocodb-data-</code> zeigt: das ist ein <strong>Docker-Compose-Projekt</strong> — mehrere Container (NocoDB-App + seine CouchDB-Datenbank), die zusammen als eine Einheit gestartet/gestoppt werden, definiert in einer <code>docker-compose.yml</code>.</p>
+
+<div class="box">
+<strong>Container vs. virtuelle Maschine:</strong> Eine VM emuliert komplette Hardware inkl. eigenem Betriebssystem-Kernel — schwer (GBs), langsamer Start (Minuten). Ein Container teilt sich den Host-Kernel und isoliert nur Prozess/Dateisystem-Sicht — leicht (MBs), Start in Sekunden. Für "NocoDB + seine DB isoliert von den Python-Bots betreiben" ist ein Container die richtige Größenordnung.
+</div>
+
+<h2>Warum genau hier Docker eingesetzt wird</h2>
+<p>Deine Telegram-Bots (<code>bots/brain.py</code> etc.) laufen <strong>nativ</strong> über systemd — kein Docker. NocoDB dagegen läuft <strong>in</strong> Docker. Der Unterschied: die Bots sind dein eigener, einfacher Python-Code mit wenigen Abhängigkeiten (per <code>requirements.txt</code> im venv lösbar). NocoDB ist eine komplexe Drittanbieter-Anwendung mit eigener Datenbank-Anforderung — dafür ist ein fertiges, vom Hersteller gepflegtes Docker-Image die schnellste, sauberste Betriebsart: <code>docker compose up</code> statt manueller Installation von Node, korrekten npm-Paketen, DB-Setup.</p>
+
+<h2>Wie das in deine Kette passt</h2>
+<p>NocoDB (Lesson 5) läuft in einem Container, ist aber über <code>NOCODB_API_URL</code> für deine Bot-Skripte (<code>nocodb_sync.py</code>) erreichbar wie jeder andere lokale Service — Docker mappt den Container-internen Port auf einen Host-Port, den Caddy oder deine Python-Skripte ganz normal ansprechen. Die Isolation ist für den Rest deiner Architektur unsichtbar.</p>
+
+<details>
+<summary>Quiz: Warum reicht bei den Python-Bots ein einfaches venv statt Docker?</summary>
+<p>Weil die Bots wenig Systemabhängigkeiten haben (reines Python + pip-Pakete) und alle auf demselben Server im selben Kontext laufen sollen — kein Bedarf an Isolation zwischen ihnen. Docker lohnt sich, wenn eine Anwendung komplexe/konfligierende Systemabhängigkeiten hat (wie NocoDB mit Node + eigener DB) oder portabel auf andere Hosts soll.</p>
+</details>
+
+<details>
+<summary>Quiz: Was bedeutet der Name <code>nocodb-data-couchdb-1</code> konkret?</summary>
+<p><code>nocodb-data</code> ist der Compose-Projektname (meist der Ordnername, in dem die <code>docker-compose.yml</code> liegt), <code>couchdb</code> ist der Service-Name innerhalb der Compose-Datei, <code>1</code> ist die Instanznummer (falls der Service mehrfach skaliert würde). Docker Compose generiert diesen Namen automatisch aus <code>&lt;projekt&gt;-&lt;service&gt;-&lt;nummer&gt;</code>.</p>
+</details>
+
+<h2>Zusammenfassung</h2>
+<p>Docker isoliert Anwendungen mit komplexen/eigenen Abhängigkeiten (wie NocoDB) in portable, reproduzierbare Container — ohne dass sie mit dem Rest des Servers (deinen nativ laufenden Python-Bots) kollidieren. Docker Compose bündelt mehrere zusammengehörige Container (App + DB) zu einer startbaren Einheit. Das ist die Basis, auf der NocoDB (nächste Lesson) betrieben wird.</p>
