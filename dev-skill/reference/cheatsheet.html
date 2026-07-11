@@ -9,12 +9,13 @@
     --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3e;
     --accent: #7c6af5; --accent2: #4ecdc4; --accent3: #f7b731; --accent4: #ff6b6b;
     --text: #e8eaf0; --muted: #8890a4; --code-bg: #12151f;
-    --green: #51cf66; --orange: #fd7e14;
+    --green: #51cf66; --orange: #fd7e14; --pink: #e879f9; --blue: #74c0fc;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.5; padding: 24px; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.5; padding: 24px; max-width: 1100px; margin: 0 auto; }
   h1 { font-size: 22px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 20px; }
-  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin: 24px 0 10px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin: 28px 0 10px; }
+  h2:first-of-type { margin-top: 0; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
   .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -23,17 +24,21 @@
   .tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 700; text-transform: uppercase; }
   .tag-init { background:#1a3a2a; color:var(--green); }
   .tag-capture { background:#3a2a1a; color:var(--orange); }
+  .tag-vision { background:#2a1a3a; color:var(--pink); }
   .tag-discuss { background:#1a1a3a; color:#a78bfa; }
   .tag-plan { background:#1a2a3a; color:var(--accent2); }
   .tag-impl { background:#3a1a1a; color:var(--accent4); }
   .tag-finish { background:#2a1a3a; color:#e879f9; }
   .tag-refine { background:#2a2a1a; color:var(--accent3); }
   .tag-status { background:#1a2a2a; color:#94d82d; }
+  .tag-entry { background:#1a2530; color:var(--blue); }
   .produces { font-size: 11px; color: var(--muted); margin-top: 4px; }
   .produces span { color: var(--text); }
   code { font-family: 'Fira Code', monospace; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 12px; color: var(--accent2); }
   .tip { background: #12201a; border-left: 3px solid var(--green); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 12px; margin-top: 10px; }
   .tip b { color: var(--green); }
+  .tip.warn { background: #201812; border-left-color: var(--orange); }
+  .tip.warn b { color: var(--orange); }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 10px; letter-spacing: 0.8px; }
   td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -41,23 +46,62 @@
   tr:last-child td { border-bottom: none; }
   .full { grid-column: 1 / -1; }
   .flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 12px 0 4px; }
-  .fnode { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; text-align: center; min-width: 110px; }
+  .fnode { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; text-align: center; min-width: 100px; }
   .fnode .flabel { font-size: 10px; color: var(--muted); text-transform: uppercase; }
   .fnode .fname { font-family: monospace; font-size: 12px; color: var(--accent2); margin-top: 2px; font-weight: 700; }
   .fnode .fphase { font-size: 10px; color: var(--accent3); margin-top: 2px; }
   .farrow { padding: 0 8px; color: var(--muted); display: flex; align-items: center; font-size: 18px; }
   .note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+  /* Detailed workflow diagram */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .legend span.sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+  .diagram { display: flex; gap: 16px; align-items: flex-start; }
+  .track { flex: 1; min-width: 0; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--pc, var(--accent)); border-radius: 8px; padding: 12px 16px; }
+  .phase-head { display:flex; align-items:center; gap:8px; margin-bottom: 8px; }
+  .steps { list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 7px; }
+  .steps > li { counter-increment: step; font-size: 12.5px; padding-left: 20px; position: relative; }
+  .steps > li::before { content: counter(step); position: absolute; left: 0; top: 0; width:14px; height:14px; border-radius:50%; background: var(--code-bg); color: var(--pc, var(--accent)); font-size: 9px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .sub { display:block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .branch { border: 1px dashed var(--border); border-radius: 6px; padding: 8px 10px; margin-top: 2px; }
+  .branch-q { font-size: 11px; color: var(--accent3); font-weight: 700; margin-bottom: 6px; }
+  .branch-opts { display: flex; flex-direction: column; gap: 6px; }
+  .opt { font-size: 11.5px; background: var(--code-bg); border-radius: 5px; padding: 6px 8px; border-left: 3px solid var(--border); }
+  .opt b { color: var(--text); }
+  .opt.a { border-left-color: var(--green); }
+  .opt.b { border-left-color: var(--blue); }
+  .opt.c { border-left-color: var(--muted); }
+  .opt.warn { border-left-color: var(--accent4); }
+  .arrow-down { text-align: center; color: var(--muted); font-size: 15px; padding: 4px 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .arrow-down span { font-size: 10px; font-family: monospace; color: var(--accent3); background: var(--code-bg); padding: 2px 8px; border-radius: 10px; }
+  .siderail { width: 220px; flex-shrink: 0; position: sticky; top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .rail-card { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 11.5px; }
+  .rail-card .cmd { display:block; margin-bottom:4px; width:fit-content; }
+  .rail-card p { color: var(--muted); font-size: 11px; }
+  .autopilot-band { background: linear-gradient(180deg, rgba(124,106,245,0.08), rgba(124,106,245,0.02)); border: 1px dashed var(--accent); border-radius: 8px; padding: 8px 12px; font-size: 11px; color: var(--muted); margin: -4px 0 4px; }
+  .autopilot-band b { color: var(--accent); }
+  .mech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .mech-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .mech-card h3 { font-size: 12px; color: var(--accent2); margin-bottom: 4px; }
+  .mech-card p { font-size: 11.5px; color: var(--muted); }
+  .mech-card code { display: inline-block; margin-top: 2px; }
+  .roadmap-chain { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-family: monospace; font-size: 12px; }
+  .roadmap-chain .rc { padding: 3px 9px; border-radius: 12px; background: var(--code-bg); border: 1px solid var(--border); }
+  @media (max-width: 820px) { .diagram { flex-direction: column; } .siderail { position: static; width: 100%; flex-direction: row; flex-wrap: wrap; } .rail-card { flex: 1; min-width: 200px; } }
 </style>
 </head>
 <body>
 
 <h1>⚡ Dev Skill — Cheatsheet</h1>
 
-<h2>Voller Workflow — einmal pro Feature</h2>
+<h2>Überblick</h2>
 <div class="flow">
   <div class="fnode"><div class="flabel">einmalig</div><div class="fname">/dev-init</div><div class="fphase">setup</div></div>
   <div class="farrow">→</div>
   <div class="fnode"><div class="flabel">optional</div><div class="fname">/dev-idea</div><div class="fphase">capture</div></div>
+  <div class="farrow">→</div>
+  <div class="fnode"><div class="flabel">triage</div><div class="fname">/dev-vision</div><div class="fphase">jetzt/später</div></div>
   <div class="farrow">→</div>
   <div class="fnode"><div class="flabel">phase 1</div><div class="fname">/dev-discuss</div><div class="fphase">spec</div></div>
   <div class="farrow">→</div>
@@ -68,7 +112,8 @@
   <div class="fnode"><div class="flabel">phase 4</div><div class="fname">/dev-finish</div><div class="fphase">close</div></div>
 </div>
 <div class="note">
-  ↩ Spec falsch? <code>/dev-refine</code> nach discuss. &nbsp;|&nbsp;
+  ↩ Spec falsch/Bug? <code>/dev-refine</code> (= discuss.md mit refine=true). &nbsp;|&nbsp;
+  Schneller Einstieg: <code>/dev-go &lt;projekt&gt; [feature] [phase]</code> oder <code>/dev-active [slug]</code> springen direkt in die Zielphase — ohne Picker/Setup. &nbsp;|&nbsp;
   Jederzeit: <code>/dev</code> zeigt Status + nächsten Schritt.
 </div>
 
@@ -77,84 +122,360 @@
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-init</span><span class="tag tag-init">setup</span></div>
-    <div class="desc">Neues Projekt einrichten. <b>Einmalig pro Projekt.</b> Fragt Name + Slug, schreibt alle Basis-Dateien im Hub.</div>
-    <div class="produces">Erzeugt: <span>VISION.md, STATUS.md, DECISIONS.md, LEARNINGS.md, TIMELINE.md + Registry</span></div>
+    <div class="desc">Neues Projekt einrichten. <b>Einmalig pro Projekt.</b> Fragt Name + Slug, schreibt alle Basis-Dateien im Hub, legt NocoDB-Tabelle an.</div>
+    <div class="produces">Erzeugt: <span>VISION.md, STATUS.md, DECISIONS.md, LEARNINGS.md, TIMELINE.md + Registry-Eintrag + NocoDB-Tabelle</span></div>
     <div class="produces">Pfad: <span><code>$HUB_DIR/topics/&lt;slug&gt;/</code></span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-idea "text"</span><span class="tag tag-capture">capture</span></div>
-    <div class="desc">Idee sofort sichern — <b>kein Dialog</b>, läuft in Sekunden. Landet als <code>[idea]</code> in STATUS.md + VISION.md.</div>
+    <div class="desc">Idee sofort sichern — <b>kein Dialog</b>, läuft in Sekunden. Landet als <code>[idea]</code> in STATUS.md + VISION.md, sofort nach NocoDB gesynced.</div>
     <div class="produces">Argument: <span>Text in Anführungszeichen</span></div>
     <div class="produces">Commit: <span><code>chore(&lt;slug&gt;): capture idea</code></span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev</span><span class="tag tag-status">status</span></div>
-    <div class="desc">Zeigt aktives Feature, Phase, nächsten Roadmap-Punkt. Bietet direkten Weiter-Link zur aktuellen Phase. Alias: <code>/dev-status</code>.</div>
+    <div class="desc">Zeigt aktives Feature, Phase, nächsten Roadmap-Punkt, offene Ideen. Bietet: weitermachen (route zur aktuellen Phase) oder anderen Schritt wählen. Alias: <code>/dev-status</code>.</div>
     <div class="produces">Liest: <span><code>STATUS.md</code></span></div>
   </div>
 
   <div class="card">
+    <div class="card-header"><span class="cmd">/dev-vision</span><span class="tag tag-vision">triage</span></div>
+    <div class="desc">Neue Feature-Idee triagieren: Clarifying Questions, dann Timing-Entscheidung Jetzt (Auto-Kette in discuss) vs Später (Mini-Spec, Roadmap-Position + Priorität).</div>
+    <div class="produces">Erzeugt (Später): <span><code>specs/YYYY-MM-DD-&lt;feature&gt;-vision.md</code></span></div>
+    <div class="produces">Roadmap-Tag: <span><code>[vision]</code></span></div>
+  </div>
+
+  <div class="card">
     <div class="card-header"><span class="cmd">/dev-discuss</span><span class="tag tag-discuss">phase 1</span></div>
-    <div class="desc">Feature-Design: Clarifying Questions → UI-Check → Ansätze → Sektionsweise Präsentation → Spec schreiben.</div>
+    <div class="desc">Feature-Design: Clarifying Questions → UI-Check (ruft ggf. <code>frontend-design</code>-Skill) → Ansätze → Sektionsweise Präsentation → Spec schreiben.</div>
     <div class="produces">Erzeugt: <span><code>specs/YYYY-MM-DD-&lt;feature&gt;-design.md</code></span></div>
     <div class="produces">STATUS danach: <span><code>Phase: plan</code></span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-plan</span><span class="tag tag-plan">phase 2</span></div>
-    <div class="desc">Implementierungsplan schreiben: File Map → TDD-Tasks (Test schreiben → FAIL → Impl → PASS → Commit). Kein Placeholder.</div>
+    <div class="desc">Implementierungsplan schreiben: File Map → TDD-Tasks (Test → FAIL → Impl → PASS → Commit) → Self-Review. Kein Placeholder. Fragt danach Autopilot ab.</div>
     <div class="produces">Erzeugt: <span><code>plans/YYYY-MM-DD-&lt;feature&gt;.md</code></span></div>
-    <div class="produces">STATUS danach: <span><code>Phase: implement</code></span></div>
+    <div class="produces">STATUS danach: <span><code>Phase: implement</code> + ggf. <code>Mode/Schedule/Teach</code></span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-implement</span><span class="tag tag-impl">phase 3</span></div>
-    <div class="desc">Plan ausführen: Modus wählen (Subagent/Inline), Zeitplan eintragen, <code>implementation_mode: true</code> setzen.</div>
+    <div class="desc">Plan ausführen: Modus wählen (Subagent/Inline), Zeitplan eintragen, <code>implementation_mode: true</code> setzen (4h TTL), eigener Git-Worktree pro Session.</div>
     <div class="produces">Modus: <span>Subagent-Driven (empfohlen) oder Inline</span></div>
     <div class="produces">STATUS danach: <span><code>Phase: finish</code></span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-finish</span><span class="tag tag-finish">phase 4</span></div>
-    <div class="desc">Abschluss: VISION.md aktualisieren, Learnings + Timeline extrahieren, Hub pushen, nächstes Item zeigen.</div>
-    <div class="produces">Schreibt: <span>VISION.md, LEARNINGS.md, TIMELINE.md, STATUS.md</span></div>
-    <div class="produces">Endet mit: <span><code>git push</code> auf Hub</span></div>
+    <div class="desc">Abschluss: Worktree mergen, VISION.md aktualisieren, Learnings + Timeline extrahieren, nächstes Feature auto-advancen, Hub pushen, Pflicht-Notify.</div>
+    <div class="produces">Schreibt: <span>VISION.md, LEARNINGS.md, TIMELINE.md, STATUS.md (reset)</span></div>
+    <div class="produces">Endet mit: <span><code>git push</code> + NocoDB <code>--rebuild</code> + Telegram-Notify (immer)</span></div>
   </div>
 
   <div class="card">
     <div class="card-header"><span class="cmd">/dev-refine</span><span class="tag tag-refine">correction</span></div>
-    <div class="desc">Bestehende Spec überarbeiten. Gezielter Dialog, Spec wird in-place aktualisiert. Phase zurück auf <code>plan</code>, Plan-Feld gelöscht.</div>
-    <div class="produces">Wann: <span>Nach discuss, wenn Spec nicht stimmt</span></div>
+    <div class="desc">Bug/Spec-Korrektur = <code>discuss.md</code> mit <code>refine=true</code>: Bug beschreiben → betroffene <code>[done]</code>-Features analysieren → Bestätigung → eigene Bug-Fragen statt Standard-Fragen.</div>
+    <div class="produces">STATUS: <span><code>Type: bug</code>, Titel-Präfix <code>Bug: ...</code></span></div>
   </div>
 
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-go &lt;query&gt;</span><span class="tag tag-entry">fast entry</span></div>
+    <div class="desc">Fuzzy-Schnellstart: <code>/dev-go shop route p</code> → Projekt+Feature+Phase erraten, <b>max. 1 Dialog</b>. Springt direkt in Zielphase (skip Picker/Setup).</div>
+    <div class="produces">Auflösung: <span><code>dev_context.py --command go --query</code></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="cmd">/dev-active [slug]</span><span class="tag tag-entry">fast entry</span></div>
+    <div class="desc">Startet Top-Priority-Feature ohne Picker. Mit Slug/Session-Kontext: direkter Mode-A-Start. Ohne: Projekt-Picker (neueste zuerst, max 4).</div>
+    <div class="produces">Routing: <span><code>idea→discuss, discussed→plan, planned/in_progress→implement</code></span></div>
+  </div>
+
+</div>
+
+<h2>Detaillierter Workflow</h2>
+<div class="legend">
+  <span><span class="sw" style="background:var(--accent)"></span>Autopilot-Strecke (Fragen übersprungen sobald Mode/Schedule/Teach gesetzt)</span>
+  <span><span class="sw" style="background:var(--blue)"></span>Fast-Entry-Sprung (/dev-go, /dev-active, Handoff-Fast-Path)</span>
+  <span><span class="sw" style="background:var(--accent4)"></span>Fehler-/Abbruch-Pfad</span>
+</div>
+
+<div class="diagram">
+  <div class="track">
+
+    <div class="phase" style="--pc: var(--orange)">
+      <div class="phase-head"><span class="cmd">/dev-idea "text"</span><span class="tag tag-capture">optional, jederzeit</span></div>
+      <ol class="steps">
+        <li>STATUS.md: Zeile <code>- [idea]  &lt;text&gt;</code> an Roadmap anhängen — kein Dialog</li>
+        <li>Gleiche Zeile in VISION.md Roadmap anhängen</li>
+        <li>Commit <code>chore(&lt;slug&gt;): capture idea</code></li>
+        <li>NocoDB-Sync <code>--status idea --insert-position top</code></li>
+      </ol>
+    </div>
+    <div class="arrow-down">↓ <span>[idea] wartet in Roadmap</span></div>
+
+    <div class="phase" style="--pc: var(--pink)">
+      <div class="phase-head"><span class="cmd">/dev-vision</span><span class="tag tag-vision">triage</span></div>
+      <ol class="steps">
+        <li>STATUS+VISION lesen · Frage: Roadmap-Items zeigen oder neue Idee beschreiben</li>
+        <li>2–3 Clarifying Questions, gebündelt (Kernproblem / Abhängigkeiten / Scope-Grenze)</li>
+        <li class="branch">
+          <div class="branch-q">Timing Decision: "Wann umsetzen?"</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>A) Jetzt</b> — STATUS Phase: discuss, Roadmap-Tag <code>[vision]</code>, Commit, NocoDB-Sync → <b>discuss.md sofort ausführen, kein Handoff-Prompt</b></div>
+            <div class="opt b"><b>B) Später</b> — Mini-Spec (Idee/Abhängigkeiten/Scope/Roadmap-Position+Priorität) schreiben, Roadmap-Tag <code>[vision]</code> an Abhängigkeits-Position einfügen, Commit, NocoDB-Sync</div>
+          </div>
+        </li>
+        <li class="branch">
+          <div class="branch-q">Nur Pfad B: Nächster Schritt (Pflicht-AskUserQuestion)</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>A)</b> sofort <code>/dev discuss</code> weiter</div>
+            <div class="opt b"><b>B)</b> Kontext clearen + Autopilot — schreibt <code>pending_dev_command</code> in settings.json, User tippt <code>/clear</code></div>
+            <div class="opt c"><b>C)</b> speichern &amp; Session beenden</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="arrow-down">↓ <span>Phase: discuss</span></div>
+
+    <div class="phase" style="--pc: #a78bfa">
+      <div class="phase-head"><span class="cmd">/dev-discuss</span><span class="tag tag-discuss">phase 1</span></div>
+      <ol class="steps">
+        <li>Setup: STATUS.md lesen<span class="sub">Handoff-Fast-Path von /dev-go: Read+Picker übersprungen, <code>feature=</code> direkt übernommen</span></li>
+        <li class="branch">
+          <div class="branch-q">refine = true? (kommt von /dev-refine)</div>
+          <div class="branch-opts">
+            <div class="opt warn"><b>Ja — Bug-Capture-Flow</b> Bug beschreiben (Freitext via Other) → [done]-Features + Specs lesen → betroffene Features analysieren + bestätigen → Titel <code>Bug: ...</code> ableiten → <b>eigene Bug-Fragen</b> statt Standard-Fragen</div>
+            <div class="opt a"><b>Nein — neues Feature</b> NocoDB→STATUS sync, <code>dev_context.py --command discuss</code>, Feature-Picker (multiSelect) oder neue Idee beschreiben</div>
+          </div>
+        </li>
+        <li>Clarifying Questions — gebündelt in 1 AskUserQuestion (Problem / Nutzertyp / Scope-Grenze / Fertig-Kriterium), vorher DECISIONS.md/LEARNINGS.md auf Relevanz prüfen</li>
+        <li class="branch">
+          <div class="branch-q">Hat das Feature UI-Komponenten?</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Ja</b> → <code>frontend-design</code>-Skill aufrufen (Palette, Typo, Wireframes, Signature-Element)</div>
+            <div class="opt c"><b>Nein</b> → direkt weiter zu Approaches</div>
+          </div>
+        </li>
+        <li>2–3 Ansätze vorschlagen, einen empfehlen + begründen, Genehmigung per AskUserQuestion</li>
+        <li>Design Presentation — 4 Sektionen einzeln, <b>Genehmigung nach jeder Sektion</b> (Architektur, UI/UX, betroffene Dateien, Nicht-Scope)</li>
+        <li>Spec schreiben nach <code>specs/YYYY-MM-DD-&lt;feature&gt;-design.md</code></li>
+        <li>Knowledge Extraction (context=discuss) → prüft auf DECISIONS/LEARNINGS-würdige Einsichten</li>
+        <li>STATUS: Phase→plan, Roadmap-Tag <code>[idea]→[discussed]</code>. Commit + NocoDB-Sync (status=discussed)</li>
+        <li class="branch">
+          <div class="branch-q">Nächster Schritt (Pflicht-AskUserQuestion)</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>A)</b> sofort <code>/dev plan</code> weiter</div>
+            <div class="opt b"><b>B)</b> Kontext clearen + Autopilot (pending_dev_command)</div>
+            <div class="opt c"><b>C)</b> speichern &amp; beenden</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="arrow-down">↓ <span>Phase: plan</span></div>
+
+    <div class="phase" style="--pc: var(--accent2)">
+      <div class="phase-head"><span class="cmd">/dev-plan</span><span class="tag tag-plan">phase 2</span></div>
+      <ol class="steps">
+        <li>Setup: NocoDB→STATUS sync, [discussed]-Feature-Picker (falls Phase≠plan)<span class="sub">Handoff-Fast-Path: Spec-Pfad direkt aus <code>file=</code> statt Picker</span></li>
+        <li>Scope Check — mehrere unabhängige Subsysteme? → aufteilen, eigener Plan je Subsystem</li>
+        <li>File Map — jede Datei mit einer Verantwortung, was erstellt/geändert/getestet wird</li>
+        <li>Task Structure — pro Task: Files/Interfaces + Steps 1–5 (Test schreiben → FAIL → Implement → PASS → Commit), <b>kein Placeholder, echter Code</b></li>
+        <li>Plan-Datei nach <code>plans/YYYY-MM-DD-&lt;feature&gt;.md</code>, Self-Review (Spec-Abdeckung, keine TBDs, Namens-Konsistenz)</li>
+        <li>Knowledge Extraction (context=plan)</li>
+        <li class="branch">
+          <div class="branch-q">Autopilot-Setup (Pflicht-AskUserQuestion)</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Ja (empfohlen)</b> — 1 weiterer gebündelter Call: Ausführungsmodus (Subagent/Inline) + Zeitplan (jetzt/HH:MM/später) + Teach-Lesson (Ja/Nein) → alle drei in <code>Mode:/Schedule:/Teach:</code> gespeichert, <b>implement→finish laufen danach ohne weitere Rückfragen</b>, inkl. Pflicht-Notify</div>
+            <div class="opt c"><b>Nein</b> — wie bisher Schritt für Schritt, Felder bleiben leer</div>
+          </div>
+        </li>
+        <li>STATUS: Phase→implement, Roadmap-Tag <code>[discussed]→[planned]</code>. Commit + NocoDB-Sync (status=planned)</li>
+        <li class="branch">
+          <div class="branch-q">Nächster Schritt (Pflicht-AskUserQuestion)</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>A)</b> sofort <code>/dev implement</code> — Mode-Frage nur falls <code>Mode:</code> noch leer</div>
+            <div class="opt b"><b>B)</b> Kontext clearen + Autopilot (pending_dev_command)</div>
+            <div class="opt c"><b>C)</b> speichern &amp; beenden</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="autopilot-band">⟿ <b>Autopilot-Strecke</b> (falls in Plan mit "Ja" bestätigt): Mode/Schedule/Teach fließen jetzt automatisch durch Implement → Finish, alle drei Ask­UserQuestion-Punkte unten werden übersprungen.</div>
+    <div class="arrow-down">↓ <span>Phase: implement</span></div>
+
+    <div class="phase" style="--pc: var(--accent4)">
+      <div class="phase-head"><span class="cmd">/dev-implement</span><span class="tag tag-impl">phase 3</span></div>
+      <ol class="steps">
+        <li>Setup: NocoDB→STATUS sync, [planned]-Feature-Picker (falls Phase≠implement)<span class="sub">Handoff-Fast-Path: Plan-Pfad direkt aus <code>file=</code></span></li>
+        <li class="branch">
+          <div class="branch-q">Execution Mode</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Mode: gesetzt (Autopilot)</b> → Wert direkt übernehmen, Frage überspringen</div>
+            <div class="opt b"><b>Sonst fragen</b> → A) Subagent-Driven (empfohlen, frischer Subagent pro Task) B) Inline (in dieser Session)</div>
+          </div>
+        </li>
+        <li class="branch">
+          <div class="branch-q">Scheduling</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Schedule: gesetzt (Autopilot)</b> → Wert + Slug <code>&lt;feature-kebab&gt;</code> direkt übernehmen</div>
+            <div class="opt b"><b>Sonst fragen:</b> "jetzt" (jetzt+1min) / "HH:MM" / "später" → Eintrag in <code>scheduled_plans.json</code> (gestaged, noch nicht committed)</div>
+          </div>
+        </li>
+        <li><code>implementation_mode: true</code> + 4h-TTL auf <code>dev_sessions/&lt;session_id&gt;.json</code> setzen (Edit-Tool, nicht Bash) — schaltet Permission-Hook-Auto-Approval frei</li>
+        <li class="branch">
+          <div class="branch-q">Worktree Setup</div>
+          <div class="branch-opts">
+            <div class="opt warn"><b>Live-Deploy-Ausnahme (telegram-bot-army)</b> — kein Worktree, systemd liest immer echten $WORK_DIR-Checkout. Isolation-Guard blockt trotzdem? → Steps 1–5 nachträglich ausführen. Vor jedem Live-Verify-Task (z.B. systemctl restart) bereits zurück nach $WORK_DIR mergen, nicht erst in finish.md warten</div>
+            <div class="opt a"><b>Normalfall</b> — <code>EnterWorktree(name=&lt;slug&gt;-&lt;feature-kebab&gt;)</code>, Pfad+Branch+Base-Dir in dev_sessions/&lt;id&gt;.json notieren, Session-CWD wechselt automatisch</div>
+          </div>
+        </li>
+        <li class="branch">
+          <div class="branch-q">Execute — pro Task N im Plan</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Subagent-Driven</b> Dispatch frischer Subagent (Task-Block + Plan-Header) → Ergebnis abwarten → Commit prüfen → nächster Task; bei Fehler: erneut dispatchen mit Fehler-Kontext</div>
+            <div class="opt b"><b>Inline</b> Steps 1–5 direkt in dieser Session: Test → FAIL → Implement → PASS → Commit</div>
+          </div>
+        </li>
+        <li>STATUS: Phase→finish, Roadmap-Tag <code>[planned]→[active]</code>. Commit (bündelt scheduled_plans.json + STATUS.md)</li>
+        <li><code>implementation_mode: false</code>, TTL: null (letzter Schritt, Edit-Tool)</li>
+        <li class="branch">
+          <div class="branch-q">Nächster Schritt — Teach-Entscheidung</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>Teach: gesetzt (Autopilot)</b> → yes/no direkt anwenden, kein Fragen</div>
+            <div class="opt b"><b>Sonst:</b> A) Teach jetzt B) Kontext clearen + Autopilot (kein Passthrough — finish.md fragt selbst) C) direkt finish ohne Teach</div>
+          </div>
+          <div class="sub">A/C (und Autopilot yes/no): <code>finish.md</code> läuft <b>in derselben Session ohne /clear</b>, mit Passthrough slug/feature/teach_decision</div>
+        </li>
+      </ol>
+    </div>
+    <div class="arrow-down">↓ <span>Phase: finish (Roadmap: [active])</span></div>
+
+    <div class="phase" style="--pc: var(--pink)">
+      <div class="phase-head"><span class="cmd">/dev-finish</span><span class="tag tag-finish">phase 4</span></div>
+      <ol class="steps">
+        <li>Setup: STATUS.md Phase=finish bestätigen, Session immer auf <code>dev &lt;SLUG&gt;</code> setzen (Teach-Routing braucht das, unabhängig von notifications_enabled)</li>
+        <li class="branch">
+          <div class="branch-q">Worktree Merge + Cleanup</div>
+          <div class="branch-opts">
+            <div class="opt c"><b>worktree_path null</b> (Live-Deploy-Ausnahme / keine Worktree-Session) → Abschnitt überspringen</div>
+            <div class="opt a"><b>Sonst:</b> ExitWorktree(keep) → zurück ins Original-Verzeichnis → <code>git merge &lt;branch&gt;</code> → Erfolg: worktree remove + branch -d</div>
+            <div class="opt warn"><b>Merge-Konflikt</b> → STOP. Worktree bleibt erhalten, manuelle Auflösung nötig, <b>keine weiteren Finish-Schritte</b> (kein VISION-Update, kein Hub-Commit)</div>
+          </div>
+        </li>
+        <li>VISION.md: Feature als <code>✅ ... ← implementiert YYYY-MM-DD</code> markieren</li>
+        <li>Roadmap Sync — STATUS.md komplett zurücksetzen (Active/Phase/Spec/Plan/Mode/Schedule/Teach leer), Roadmap-Tag <code>[active]→[done]</code> ans Ende<span class="sub">merkt sich vorher: war das ein Autopilot-Lauf? (steuert "Nächster Schritt" unten)</span></li>
+        <li>Knowledge Extraction (context=finish) → TIMELINE.md-Eintrag</li>
+        <li class="branch">
+          <div class="branch-q">Teach Integration</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>teach_decision übergeben</b> → yes/no direkt anwenden, kein Fragen</div>
+            <div class="opt b"><b>Sonst fragen:</b> A) mit Teach abschließen B) ohne Teach direkt zu Hub-Commit</div>
+          </div>
+          <div class="sub">Bei Ja: Feature-Slug ableiten, Workspace-Existenz prüfen (continue vs. neu), <code>teach</code>-Skill aufrufen, <code>Lesson:</code>-Feld in STATUS.md setzen</div>
+        </li>
+        <li>Auto-Advancement — <code>dev_context.py --command advance</code> setzt automatisch das nächste [planned]/[discussed]-Feature als neues Active/Phase (falls vorhanden)</li>
+        <li>Hub Commit + Push + <code>nocodb_sync.py --rebuild</code>; falls Bug: <code>Type: bug</code> Feld leeren</li>
+        <li><b>Pflicht-Notify</b> — läuft <b>immer</b>, unabhängig von Autopilot UND <code>notifications_enabled</code>: <code>dev_notify.py --bot brain</code> (bewusst nicht telegram_notify.py, dessen Gate würde die Meldung sonst stumm unterdrücken)</li>
+        <li>Next Step Display — nächstes Roadmap-Item, offene Ideen, oder leere-Roadmap-Hinweis</li>
+        <li class="branch">
+          <div class="branch-q">Nächster Schritt</div>
+          <div class="branch-opts">
+            <div class="opt a"><b>War Autopilot-Lauf</b> → Frage überspringen, nur Abschluss-Meldung ausgeben, Stop</div>
+            <div class="opt b"><b>Sonst (Pflicht-AskUserQuestion):</b> A) clear + /dev active für SLUG (pending_dev_command mit --feature/--phase/--file aus frisch avanciertem STATUS) B) clear + /dev discuss C) nur /clear D) Session beenden</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+  </div>
+
+  <div class="siderail">
+    <div class="rail-card">
+      <span class="cmd">/dev-go &lt;query&gt;</span>
+      <p><code>dev_context.py --command go</code> löst Projekt+Feature+Phase fuzzy auf. Fehler mit <code>project_matches</code> → NocoDB-Resync pro Slug, <b>ein</b> Retry. Mehrdeutig → 1× AskUserQuestion. Danach STATUS direkt geschrieben und <b>Ziel-Phase-Datei mit feature=/file=</b> aufgerufen — Setup/Picker der Zielphase komplett übersprungen.</p>
+    </div>
+    <div class="rail-card">
+      <span class="cmd">/dev-active [slug]</span>
+      <p><b>Mode A</b> (Slug bekannt): Fast-Path falls --feature/--phase von finish.md übergeben → Discovery komplett übersprungen. Sonst volle Discovery, Routing nach Status: idea→discuss, discussed→plan, planned/in_progress→implement.<br><b>Mode B</b> (kein Slug): Picker über Projekte mit offenen Features (max 4, neueste zuerst) → Mode A.</p>
+    </div>
+    <div class="rail-card">
+      <span class="cmd">/dev</span> <span class="cmd" style="margin-left:2px">(status)</span>
+      <p>STATUS.md anzeigen (Active/Phase/nächstes Item/Ideen) → "weitermachen" routet direkt in die aktuelle Phase-Datei, "anderen Schritt wählen" listet alle Befehle.</p>
+    </div>
+    <div class="rail-card" style="border-color:var(--accent)">
+      <span class="cmd" style="color:var(--accent)">pending_dev_command</span>
+      <p>Jede "B) Kontext clearen"-Option schreibt diesen Key in <code>settings.json</code>. Nächster Session-Start: SessionStart-Hook meldet <code>DEV_PENDING_COMMAND ACTIVE</code>, Skill wird automatisch aufgerufen, Key gelöscht — Fragen entfallen, weil der Kontext frisch ist.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Roadmap-Tag-Lifecycle</h2>
+<div class="card full">
+  <div class="roadmap-chain">
+    <span class="rc">[idea]</span>→<span class="rc">[vision]</span>→<span class="rc">[discussed]</span>→<span class="rc">[planned]</span>→<span class="rc">[active]</span>→<span class="rc">[done]</span>
+  </div>
+  <div class="note">Gesetzt von: idea=<code>/dev-idea</code> · vision=<code>/dev-vision</code> (beide Pfade) · discussed=<code>/dev-discuss</code> · planned=<code>/dev-plan</code> · active=<code>/dev-implement</code> (Start) · done=<code>/dev-finish</code>. Jede Stufe wird zusätzlich per <code>nocodb_sync.py</code> nach NocoDB gespiegelt (Single Source of Truth für Reihenfolge).</div>
+</div>
+
+<h2>Cross-Cutting Mechanismen</h2>
+<div class="mech-grid">
+  <div class="mech-card">
+    <h3>STATUS.md</h3>
+    <p>Zentraler Zustand pro Projekt: <code>Active/Phase/Spec/Plan/Mode/Schedule/Teach/Lesson/Type/Updated</code> + Roadmap-Liste. Fast jede Phase liest es beim Setup und schreibt es am Ende.</p>
+  </div>
+  <div class="mech-card">
+    <h3>NocoDB als SSoT</h3>
+    <p>Roadmap-Reihenfolge lebt in NocoDB, nicht in STATUS.md. <code>nocodb_sync.py --direction nocodb-to-dev</code> vor jedem Picker, <code>--direction dev-to-nocodb</code> nach jedem Schreiben, <code>--rebuild</code> in finish.md.</p>
+  </div>
+  <div class="mech-card">
+    <h3>Autopilot (Mode/Schedule/Teach)</h3>
+    <p>Einmal in <code>/dev-plan</code> gesetzt, threaded durch implement→finish. Unterdrückt dort alle AskUserQuestion-Punkte für Ausführungsmodus, Zeitplan und Teach-Entscheidung — inkl. Pflicht-Notify am Ende.</p>
+  </div>
+  <div class="mech-card">
+    <h3>Git-Worktree pro Implement-Session</h3>
+    <p><code>EnterWorktree</code>/<code>ExitWorktree</code> isolieren parallele <code>/dev-implement</code>-Läufe. Ausnahme: <code>telegram-bot-army</code> (Live-Deploy liest immer den echten Checkout).</p>
+  </div>
+  <div class="mech-card">
+    <h3>implementation_mode-Flag</h3>
+    <p>Session-scoped in <code>dev_sessions/&lt;session_id&gt;.json</code>, 4h TTL. Schaltet Permission-Hook-Auto-Approval für die Dauer der Implementierung frei. Wird am Ende von implement.md wieder gelöscht.</p>
+  </div>
+  <div class="mech-card">
+    <h3>Pflicht-Notify (Gate-Bypass)</h3>
+    <p>finish.md nutzt bewusst <code>dev_notify.py</code> statt <code>telegram_notify.py</code> — Letzteres respektiert <code>notifications_enabled</code> und würde die Fertig-Meldung sonst stumm schlucken (Bug gefunden 2026-07-08).</p>
+  </div>
 </div>
 
 <h2>STATUS.md — Phasenzustände</h2>
 <div class="card full">
   <table>
     <tr><th>Phase-Wert</th><th>Bedeutung</th><th>Nächster Befehl</th><th>Roadmap-Tag</th></tr>
-    <tr><td>(none)</td><td>Kein aktives Feature</td><td>/dev-discuss</td><td>—</td></tr>
+    <tr><td>(none)</td><td>Kein aktives Feature</td><td>/dev-vision oder /dev-discuss</td><td>—</td></tr>
+    <tr><td>discuss</td><td>Von Vision übernommen, Spec fehlt noch</td><td>/dev-discuss</td><td>[vision]</td></tr>
     <tr><td>plan</td><td>Spec da, Plan fehlt noch</td><td>/dev-plan</td><td>[discussed]</td></tr>
     <tr><td>implement</td><td>Plan da, Code fehlt noch</td><td>/dev-implement</td><td>[planned]</td></tr>
     <tr><td>finish</td><td>Code fertig, Abschluss fehlt</td><td>/dev-finish</td><td>[active]</td></tr>
   </table>
+  <div class="tip"><b>Mode/Schedule/Teach</b> sind nur bei Autopilot-Läufen gesetzt — bleiben sie leer, fragt jede Phase wie gewohnt einzeln nach.</div>
 </div>
 
 <h2>Hub-Dateien</h2>
 <div class="card full">
   <table>
     <tr><th>Datei</th><th>Zweck</th><th>Geschrieben von</th></tr>
-    <tr><td>VISION.md</td><td>Projekt-Vision + vollständige Roadmap</td><td>init, finish</td></tr>
-    <tr><td>STATUS.md</td><td>Aktives Feature, Phase, Spec/Plan-Pfade</td><td>alle Phasen</td></tr>
+    <tr><td>VISION.md</td><td>Projekt-Vision + vollständige Roadmap</td><td>init, vision, finish</td></tr>
+    <tr><td>STATUS.md</td><td>Aktives Feature, Phase, Spec/Plan/Mode/Schedule/Teach-Pfade</td><td>alle Phasen</td></tr>
     <tr><td>DECISIONS.md</td><td>Architektur-Entscheidungen, verworfene Ansätze</td><td>discuss + plan (auto)</td></tr>
     <tr><td>LEARNINGS.md</td><td>Was beim Bauen gelernt wurde</td><td>finish (auto)</td></tr>
     <tr><td>TIMELINE.md</td><td>Chronologische Feature-Historie</td><td>finish (auto)</td></tr>
-    <tr><td>specs/YYYY-MM-DD-*.md</td><td>Feature-Spec</td><td>discuss</td></tr>
+    <tr><td>specs/YYYY-MM-DD-*.md</td><td>Feature-Spec (oder Vision-Mini-Spec)</td><td>vision, discuss</td></tr>
     <tr><td>plans/YYYY-MM-DD-*.md</td><td>TDD-Implementierungsplan</td><td>plan</td></tr>
+    <tr><td>scheduled_plans.json</td><td>Geplante Implement-Läufe (Hub-weit, nicht pro Projekt)</td><td>implement</td></tr>
+    <tr><td><code>$WORK_DIR</code>/dev_sessions/&lt;id&gt;.json</td><td>Session-Bookkeeping: implementation_mode, Worktree-Pfad/Branch</td><td>implement, finish</td></tr>
   </table>
-  <div class="tip"><b>Knowledge Extraction</b> läuft automatisch nach discuss, plan und finish — kein Dialog nötig.</div>
+  <div class="tip"><b>Knowledge Extraction</b> läuft automatisch nach vision (implizit über Mini-Spec), discuss, plan und finish — kein Dialog nötig.</div>
 </div>
 
 <div style="margin-top:24px; font-size:11px; color:var(--muted); text-align:center;">
