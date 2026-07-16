@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job-Scanner nutzen</title>
+<style>
+  :root {
+    --tiefe: #0B1D26;
+    --wasser: #143240;
+    --gischt: #E9F4F4;
+    --signal: #FFB454;
+    --beute: #53DDA8;
+    --veto: #F26D6D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--tiefe);
+    color: var(--gischt);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    margin: 0;
+    padding: 2rem 1rem 4rem;
+    line-height: 1.6;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1, h2 {
+    font-family: "Chakra Petch", "IBM Plex Sans", sans-serif;
+    letter-spacing: 0.02em;
+  }
+  h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid var(--signal);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  .subtitle { color: var(--signal); font-family: "IBM Plex Mono", monospace; font-size: 0.9rem; margin-bottom: 2rem; }
+  h2 { color: var(--signal); font-size: 1.3rem; margin-top: 2.5rem; }
+  .step-num {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--tiefe);
+    background: var(--signal);
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+  }
+  p { margin: 0.75rem 0; }
+  .panel {
+    background: var(--wasser);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+  }
+  ul { margin: 0.75rem 0; padding-left: 1.2rem; }
+  li { margin: 0.4rem 0; }
+  .callout {
+    border-left: 3px solid var(--signal);
+    padding: 0.75rem 1rem;
+    background: rgba(255, 180, 84, 0.08);
+    border-radius: 0 6px 6px 0;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  .tabs-demo { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+  .tab-chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.85rem;
+    background: rgba(83, 221, 168, 0.1);
+    border: 1px solid var(--beute);
+    color: var(--beute);
+    border-radius: 6px;
+    padding: 0.3rem 0.7rem;
+  }
+  .thumb-up { color: var(--beute); font-weight: 600; }
+  .thumb-down { color: var(--veto); font-weight: 600; }
+  code { font-family: "IBM Plex Mono", monospace; background: rgba(233,244,244,0.08); padding: 0.1rem 0.35rem; border-radius: 4px; }
+  .quiz {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--signal);
+    border-radius: 10px;
+    background: rgba(255, 180, 84, 0.06);
+  }
+  .quiz h2 { margin-top: 0; }
+  .quiz-q { font-weight: 600; margin: 1.25rem 0 0.5rem; }
+  .quiz-opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--wasser);
+    color: var(--gischt);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+    margin: 0.4rem 0;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .quiz-opt:hover { border-color: var(--signal); }
+  .quiz-opt.correct { border-color: var(--beute); background: rgba(83,221,168,0.15); }
+  .quiz-opt.wrong { border-color: var(--veto); background: rgba(242,109,109,0.12); }
+  .quiz-feedback { font-size: 0.9rem; margin: 0.3rem 0 0; min-height: 1.2rem; }
+  .summary {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--beute);
+    border-radius: 10px;
+    background: rgba(83, 221, 168, 0.06);
+  }
+  .summary h2 { color: var(--beute); margin-top: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>◈ Job-Scanner nutzen</h1>
+  <div class="subtitle">Profil anlegen · Treffer lesen &amp; bewerten · über die Zeit feintunen · Profile verwalten</div>
+
+  <p>Job-Scanner durchsucht laufend Jobportale und zeigt dir nur die Stellen, die zu deinem Profil passen. Diese Anleitung führt dich durch alles, was du damit tun kannst — von der Profilanlage bis zum Feintuning. Kein Vorwissen nötig.</p>
+
+  <h2><span class="step-num">1</span>Ein Profil anlegen</h2>
+  <p>Alles beginnt mit einem Profil — es sagt dem Scanner, wonach er für dich suchen soll. Auf der Startseite klickst du auf <strong>"Wer bist du und was möchtest du finden?"</strong> und dann auf <strong>Profil erstellen</strong>. Der Wizard führt dich Schritt für Schritt:</p>
+  <div class="panel">
+    <ul>
+      <li><strong>Basis</strong> — Name des Profils, dein Level, Jahre Erfahrung.</li>
+      <li><strong>Skills</strong> — was du kannst (Vorschlags-Chips zum Anklicken oder frei eintippen).</li>
+      <li><strong>Zielrollen</strong> — welche Jobtitel dich interessieren.</li>
+      <li><strong>Domänen</strong> — Branchen/Felder (z.&nbsp;B. Games, Sport, EdTech), die zu dir passen.</li>
+      <li><strong>Ort &amp; Umfang</strong> — Städte, Anstellungsart, Sprachen.</li>
+      <li><strong>No-Gos</strong> — was du auf keinen Fall willst (siehe Schritt&nbsp;6).</li>
+      <li><strong>Gewichte</strong> — wie wichtig dir jedes Kriterium ist (Schieberegler 0–5).</li>
+    </ul>
+  </div>
+  <p>Sobald du fertig bist, bewertet der Scanner automatisch den gesamten Job-Pool für dich und leitet dich in dein Dashboard.</p>
+
+  <h2><span class="step-num">2</span>Das Dashboard lesen</h2>
+  <p>Im Dashboard siehst du deine Treffer, sortiert nach Passung. Jede Karte zeigt:</p>
+  <div class="panel">
+    <ul>
+      <li><strong>Score &amp; Ping</strong> — eine Punktzahl von 0–100 plus ein farbiger Ping-Ring: grün = starke Passung, gelb = vielleicht, rot = No-Go.</li>
+      <li><strong>Job-Titel als Link</strong> — ein Klick auf den Titel öffnet die <strong>Original-Stellenanzeige</strong> im neuen Tab. So bewirbst du dich direkt beim Arbeitgeber.</li>
+      <li><strong>▸ Begründung</strong> — aufklappbar; zeigt pro Kriterium, warum die Stelle diesen Score bekommen hat.</li>
+    </ul>
+  </div>
+  <div class="callout">Der Score ist nur ein Vorschlag. Die Begründung aufzuklappen lohnt sich — so verstehst du, welche Kriterien den Ausschlag gegeben haben, und kannst dein Feintuning gezielt anpassen.</div>
+
+  <h2><span class="step-num">3</span>Treffer bewerten (👍 / 👎)</h2>
+  <p>Unter jeder Job-Karte findest du zwei Knöpfe: <span class="thumb-up">👍 passt</span> und <span class="thumb-down">👎 passt nicht</span>. Deine Bewertung ist mehr als nur "gemerkt":</p>
+  <p>Der Scanner sammelt deine Daumen und erkennt mit der Zeit Muster — z.&nbsp;B. dass du Remote-Stellen bevorzugst oder bestimmte Rollen konsequent ablehnst. Diese bestätigten Erkenntnisse fließen zurück ins Scoring. <strong>Je mehr du bewertest, desto genauer trifft das System deinen Geschmack.</strong></p>
+
+  <h2><span class="step-num">4</span>Feintuning — über die Zeit besser werden</h2>
+  <p>Im Tab <span class="tab-chip">Feintuning</span> passt du die <strong>Gewichte</strong> deiner Kriterien direkt an: Wie stark soll der Standort zählen? Wie wichtig ist ein bestimmter Skill? Zieh die Schieberegler und speichere — der komplette Job-Pool wird sofort neu bewertet.</p>
+  <p>Feintuning und Bewerten (Schritt&nbsp;3) ergänzen sich: Bewertungen lassen das System selbst lernen, Feintuning ist deine direkte Stellschraube. Beides zusammen macht die Treffer über die Wochen immer passender.</p>
+
+  <h2><span class="step-num">5</span>Die drei Tabs</h2>
+  <div class="tabs-demo">
+    <span class="tab-chip">Job-Angebote</span>
+    <span class="tab-chip">Aussortiert</span>
+    <span class="tab-chip">Lernen</span>
+  </div>
+  <div class="panel">
+    <ul>
+      <li><strong>Job-Angebote</strong> — deine aktiven, passenden Treffer. Hier verbringst du die meiste Zeit.</li>
+      <li><strong>Aussortiert</strong> — Stellen, die wegen eines No-Gos herausgefiltert wurden. Sie verschwinden nicht: du kannst hier jederzeit nachschauen. Ein Unter-Tab "Bereits bewertet" zeigt zusätzlich alles, was du schon per Daumen eingeordnet hast.</li>
+      <li><strong>Lernen</strong> — die bestätigten Muster, die das System aus deinen Bewertungen abgeleitet hat.</li>
+    </ul>
+  </div>
+
+  <h2><span class="step-num">6</span>No-Gos — automatisch aussortieren</h2>
+  <p>No-Gos sind harte Ausschlusskriterien. Enthält eine Stelle ein oder mehrere deiner No-Gos, filtert der Scanner sie automatisch aus den Job-Angeboten heraus und legt sie unter <strong>Aussortiert</strong> ab. Du bekommst so nur Stellen zu sehen, die deine Grundbedingungen erfüllen — findest die aussortierten aber bei Bedarf trotzdem wieder.</p>
+
+  <h2><span class="step-num">7</span>Profile bearbeiten oder löschen</h2>
+  <p>Du kannst mehrere Profile haben (z.&nbsp;B. eines für Games-Jobs, eines für Web-Entwicklung). In der Profil-Übersicht auf der Startseite hat jedes Profil zwei Knöpfe:</p>
+  <div class="panel">
+    <ul>
+      <li><strong>Bearbeiten</strong> — öffnet den Wizard erneut, diesmal mit deinen bisherigen Angaben vorausgefüllt. Ändere, was du willst, und speichere zurück ins selbe Profil.</li>
+      <li><strong>Löschen</strong> — entfernt das Profil samt seiner Bewertungen (mit Sicherheitsabfrage, damit nichts aus Versehen verschwindet).</li>
+    </ul>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <h2>Kurzer Check</h2>
+
+    <div class="quiz-q">1. Du willst dich auf eine gefundene Stelle bewerben. Wie kommst du zur Original-Anzeige?</div>
+    <button class="quiz-opt" data-correct="false">Über den Feintuning-Tab</button>
+    <button class="quiz-opt" data-correct="true">Klick auf den Job-Titel — die Original-Anzeige öffnet im neuen Tab</button>
+    <button class="quiz-opt" data-correct="false">Gar nicht, der Scanner bewirbt sich automatisch</button>
+    <p class="quiz-feedback"></p>
+
+    <div class="quiz-q">2. Eine Stelle passt gar nicht zu dir. Was bewirkt dein 👎 langfristig?</div>
+    <button class="quiz-opt" data-correct="false">Nichts — es blendet die Karte nur aus</button>
+    <button class="quiz-opt" data-correct="true">Das System erkennt Muster in deinen Bewertungen und schärft das Scoring nach</button>
+    <button class="quiz-opt" data-correct="false">Die Stelle wird für alle Nutzer gelöscht</button>
+    <p class="quiz-feedback"></p>
+
+    <div class="quiz-q">3. Wo findest du Stellen wieder, die wegen eines No-Gos herausgefiltert wurden?</div>
+    <button class="quiz-opt" data-correct="true">Im Tab "Aussortiert"</button>
+    <button class="quiz-opt" data-correct="false">Sie sind endgültig gelöscht</button>
+    <button class="quiz-opt" data-correct="false">Im Tab "Lernen"</button>
+    <p class="quiz-feedback"></p>
+  </div>
+
+  <div class="summary">
+    <h2>Zusammengefasst</h2>
+    <p>Du legst ein <strong>Profil</strong> über den Wizard an, liest deine Treffer im <strong>Dashboard</strong> (Score/Ping deuten, Titel anklicken → Original-Anzeige), <strong>bewertest</strong> sie mit 👍/👎 und passt das Scoring im <strong>Feintuning</strong> an — beides macht die Treffer über die Zeit besser. Die drei Tabs <strong>Job-Angebote</strong>, <strong>Aussortiert</strong> und <strong>Lernen</strong> trennen aktive, herausgefilterte und gelernte Inhalte. <strong>No-Gos</strong> sortieren automatisch aus (bleiben unter "Aussortiert" auffindbar), und deine <strong>Profile</strong> kannst du jederzeit bearbeiten oder löschen.</p>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.quiz-q').forEach(function (q) {
+    var opts = [];
+    var el = q.nextElementSibling;
+    while (el && el.classList.contains('quiz-opt')) { opts.push(el); el = el.nextElementSibling; }
+    var feedback = el && el.classList.contains('quiz-feedback') ? el : null;
+    opts.forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        var correct = opt.dataset.correct === 'true';
+        opt.classList.add(correct ? 'correct' : 'wrong');
+        if (feedback) {
+          feedback.textContent = correct ? '✓ Richtig!' : '✗ Nicht ganz — probier eine andere Antwort.';
+          feedback.style.color = correct ? 'var(--beute)' : 'var(--veto)';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
