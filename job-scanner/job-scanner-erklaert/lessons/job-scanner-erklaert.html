@@ -75,31 +75,6 @@
     margin: 1rem 0;
     font-size: 0.95rem;
   }
-  .quiz {
-    background: var(--wasser);
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-top: 2.5rem;
-  }
-  .quiz h2 { margin-top: 0; }
-  .quiz-option {
-    display: block;
-    width: 100%;
-    text-align: left;
-    background: rgba(233, 244, 244, 0.05);
-    border: 1px solid rgba(233, 244, 244, 0.2);
-    color: var(--gischt);
-    padding: 0.7rem 1rem;
-    border-radius: 6px;
-    margin: 0.5rem 0;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.95rem;
-  }
-  .quiz-option:hover { border-color: var(--signal); }
-  .quiz-option.correct { background: rgba(83, 221, 168, 0.2); border-color: var(--beute); }
-  .quiz-option.wrong { background: rgba(242, 109, 109, 0.2); border-color: var(--veto); }
-  #quiz-feedback { margin-top: 0.75rem; font-weight: 600; min-height: 1.4rem; }
   .summary {
     margin-top: 2.5rem;
     padding: 1.25rem 1.5rem;
@@ -117,8 +92,8 @@
   <div class="subtitle">Was es ist · welche Technik dahintersteckt · wie eine Stelle vom Scraping zum Score kommt</div>
 
   <h2>Was ist Job-Scanner?</h2>
-  <p>Job-Scanner ist ein <strong>Portfolio-Projekt</strong>: eine automatisierte Jobsuche, entstanden aus einer echten Situation — ein Quereinsteiger in die Games-/Softwareentwicklung wollte nicht mehr täglich manuell durch Jobportale klicken. Statt Anzeigen von Hand zu durchsuchen, durchsucht das System sie automatisch, vergleicht sie mit persönlichen Kriterien (Skills, Zielrollen, Standort, No-Gos) und zeigt nur die relevanten Treffer in einem Dashboard.</p>
-  <p>Es ist kein Fertigprodukt von der Stange, sondern selbst gebaut und selbst betrieben — vom Scraping bis zum laufenden Webservice.</p>
+  <p>Job-Scanner ist eine automatisierte Jobsuche: sie durchsucht laufend Jobportale, vergleicht jeden Treffer mit persönlichen Kriterien (Skills, Zielrollen, Standort, No-Gos) und zeigt nur die relevanten Stellen in einem Dashboard — kein tägliches manuelles Durchklicken mehr.</p>
+  <p>Für Arbeitgeber ist dieses Projekt zugleich ein Beleg dafür, wie ich arbeite: selbst konzipiert, gebaut und betrieben — vom Scraping über Datenmodellierung und LLM-gestütztes Scoring bis zum laufenden Webservice.</p>
 
   <h2>Tech-Stack</h2>
   <p>Bewusst schlank gehalten: kein Frontend-Framework, kein SPA — Server-seitiges HTML mit minimalem JavaScript.</p>
@@ -129,7 +104,7 @@
     <span class="badge">SQLite</span>
     <span class="badge">Playwright</span>
     <span class="badge">Firecrawl</span>
-    <span class="badge">Groq</span>
+    <span class="badge">Claude</span>
     <span class="badge">Claude Agents</span>
     <span class="badge">systemd</span>
     <span class="badge">NocoDB</span>
@@ -137,7 +112,7 @@
   </div>
   <div class="panel">
     <p><strong>Backend:</strong> <code>FastAPI</code> (Python-Webframework) rendert Seiten server-seitig mit <code>Jinja2</code>-Templates. <code>SQLite</code> ist die alleinige Datenquelle (keine externe Datenbank nötig) — Jobs, Profile, Scores und Kriterien liegen in einer einzigen Datei.</p>
-    <p><strong>Scraping-Layer:</strong> Ein Mix aus drei Werkzeugen holt Anzeigen von den Jobportalen: <code>Playwright</code> (Browser-Automatisierung) für die meisten Seiten, <code>Firecrawl</code> (Scraping-Dienst) gezielt für besonders schwer zugängliche Seiten, <code>Groq</code> (schnelle LLM-Inferenz) zur strukturierten Extraktion der Anzeigeninhalte aus rohem HTML.</p>
+    <p><strong>Scraping-Layer:</strong> Ein Mix aus drei Werkzeugen holt Anzeigen von den Jobportalen: <code>Playwright</code> (Browser-Automatisierung) für die meisten Seiten, <code>Firecrawl</code> (Scraping-Dienst) gezielt für besonders schwer zugängliche Seiten, <code>Claude</code> (LLM) zur strukturierten Extraktion der Anzeigeninhalte aus rohem HTML.</p>
     <p><strong>Intelligenz:</strong> <code>Claude</code>-Agenten laufen als eigenständige Prozesse (nicht im Webserver) und übernehmen zwei Jobs: neue Stellen bewerten und aus Nutzer-Feedback lernen, welche Kriterien wirklich wichtig sind.</p>
     <p><strong>Betrieb:</strong> <code>systemd</code>-Timer starten die Scraping- und Bewertungs-Agenten automatisch, ohne dass jemand einen Knopf drücken muss. <code>Caddy</code> ist der Webserver davor (HTTPS, Domain-Routing). <code>NocoDB</code> spiegelt die Datenbank zusätzlich in eine bedienbare Tabellenoberfläche.</p>
   </div>
@@ -159,33 +134,10 @@
 
   <div class="callout">Der Feedback-Loop macht Job-Scanner lernfähig: je mehr ein Nutzer bewertet, desto genauer trifft das System künftig den eigenen Geschmack — ganz ohne die Kriterien manuell nachjustieren zu müssen.</div>
 
-  <div class="quiz">
-    <h2>Kurzcheck</h2>
-    <p>Welche Aufgabe übernimmt der <strong>Feedback-Loop-Agent</strong>?</p>
-    <button class="quiz-option" data-correct="false">Er sucht neue Jobportale, die noch nicht angebunden sind.</button>
-    <button class="quiz-option" data-correct="true">Er wertet Bewertungen (👍/👎) aus und passt die Kriterien-Gewichte entsprechend an.</button>
-    <button class="quiz-option" data-correct="false">Er ersetzt die SQLite-Datenbank durch NocoDB.</button>
-    <div id="quiz-feedback"></div>
-  </div>
-
   <div class="summary">
     <h2>Zusammengefasst</h2>
-    <p>Job-Scanner ist ein selbst gebautes, automatisiertes Jobsuche-System: <code>FastAPI</code> + <code>SQLite</code> als schlankes Backend, <code>Playwright</code>/<code>Firecrawl</code>/<code>Groq</code> zum Scraping und Extrahieren, <code>Claude</code>-Agenten für Bewertung und Selbstlernen, <code>systemd</code> für die tägliche Automatisierung. Der Weg jeder Anzeige: <strong>Portale → Extraktion/Dedup → SQLite → Scoring → Dashboard → Feedback-Loop</strong>.</p>
+    <p>Job-Scanner ist ein selbst gebautes, automatisiertes Jobsuche-System: <code>FastAPI</code> + <code>SQLite</code> als schlankes Backend, <code>Playwright</code>/<code>Firecrawl</code>/<code>Claude</code> zum Scraping und Extrahieren, <code>Claude</code>-Agenten für Bewertung und Selbstlernen, <code>systemd</code> für die tägliche Automatisierung. Der Weg jeder Anzeige: <strong>Portale → Extraktion/Dedup → SQLite → Scoring → Dashboard → Feedback-Loop</strong>.</p>
   </div>
 </main>
-<script>
-  document.querySelectorAll(".quiz-option").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const correct = btn.dataset.correct === "true";
-      document.querySelectorAll(".quiz-option").forEach((b) => b.classList.remove("correct", "wrong"));
-      btn.classList.add(correct ? "correct" : "wrong");
-      const fb = document.getElementById("quiz-feedback");
-      fb.textContent = correct
-        ? "✓ Richtig — der Feedback-Loop-Agent liest Bewertungen und justiert die Gewichte."
-        : "✗ Nicht ganz — schau dir Schritt 6 im Datenfluss oben nochmal an.";
-      fb.style.color = correct ? "#53DDA8" : "#F26D6D";
-    });
-  });
-</script>
 </body>
 </html>
