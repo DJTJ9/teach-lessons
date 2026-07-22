@@ -1,0 +1,165 @@
+<title>Fehlerbehebung — Voice Flow Installation</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5a5a72; --card: #f4f4f8;
+    --accent: #6f5ae8; --accent-fg: #ffffff; --border: #e0e0ec;
+    --ok: #1a7f4e; --warn: #a35b00; --err: #b91c1c;
+    --term-bg: #0c0c14; --term-fg: #e6e6f0; --term-title: #1e1e2e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141f; --fg: #e8e8f2; --muted: #a0a0b8; --card: #1e1e2e;
+      --accent: #9b8cf0; --accent-fg: #14141f; --border: #2e2e42;
+      --ok: #4fd18b; --warn: #e0a94f; --err: #f87171;
+      --term-bg: #05050a; --term-fg: #e6e6f0; --term-title: #14141f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); max-width: 760px;
+    margin: 0 auto; padding: 24px 20px 80px; line-height: 1.6;
+  }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 34px 0 10px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .err-card {
+    border: 1px solid var(--border); border-radius: 10px; margin: 18px 0; overflow: hidden;
+  }
+  .err-head {
+    background: rgba(185,28,28,0.1); padding: 10px 16px; font-weight: 700; font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .err-body { padding: 14px 16px; }
+  .term {
+    border-radius: 8px; overflow: hidden; margin: 8px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: "SF Mono", Consolas, monospace;
+  }
+  .term-bar {
+    background: var(--term-title); padding: 6px 12px; font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .term-bar .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .term-body { background: var(--term-bg); color: var(--term-fg); padding: 12px 14px; font-size: 12.5px; white-space: pre-wrap; line-height: 1.5; }
+  .term-body .err { color: var(--err); }
+  code {
+    background: #1e1e2e; color: #e6e6f0; padding: 1px 6px;
+    border-radius: 4px; font-size: 13px; font-family: "SF Mono", Consolas, monospace;
+  }
+  .label-cause { font-weight: 600; color: var(--warn); margin-top: 8px; }
+  .label-fix { font-weight: 600; color: var(--ok); margin-top: 8px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 14px; }
+  .quiz {
+    border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-top: 30px;
+  }
+  .quiz h3 { margin-top: 0; font-size: 16px; }
+  .quiz label {
+    display: block; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .quiz label:hover { background: var(--card); }
+  #quiz-result { margin-top: 10px; font-weight: 600; display: none; }
+  .summary {
+    background: var(--card); border-left: 4px solid var(--ok); border-radius: 8px;
+    padding: 14px 18px; margin-top: 30px;
+  }
+  .nav { margin-top: 40px; font-size: 14px; color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+
+<span class="badge">Lektion 7 / 7</span>
+<h1>Fehlerbehebung — die 3 echten Fehler, real aufgetreten</h1>
+<p class="sub">Ziel: du erkennst die drei Fehlerbilder, die beim ersten Laptop-Setup tatsächlich passiert sind, sofort an ihrer Fehlermeldung und weißt, was zu tun ist — ohne nachzufragen.</p>
+
+<div class="err-card">
+  <div class="err-head">① PowerShell blockiert das venv</div>
+  <div class="err-body">
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span></div>
+      <div class="term-body"><span class="err">File ...\Activate.ps1 cannot be loaded because running scripts
+is disabled on this system.
+CategoryInfo    : SecurityError
+FullyQualifiedErrorId : UnauthorizedAccess</span></div>
+    </div>
+    <div class="label-cause">Ursache:</div>
+    <p>Windows/PowerShell blockiert <code>.ps1</code>-Skripte standardmäßig, unabhängig von Voice Flow.</p>
+    <div class="label-fix">Fix:</div>
+    <p><code>.venv\Scripts\python.exe</code> statt <code>python</code> direkt verwenden, oder einmalig <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> ausführen. Details: Lektion 3.</p>
+  </div>
+</div>
+
+<div class="err-card">
+  <div class="err-head">② cublas-DLL fehlt (GPU-Pfad)</div>
+  <div class="err-body">
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span></div>
+      <div class="term-body"><span class="err">RuntimeError: Library cublas64_12.dll is not found or cannot be loaded</span></div>
+    </div>
+    <div class="label-cause">Ursache:</div>
+    <p>NVIDIA-Treiber ist da (CUDA wird erkannt), aber die Python-Pakete <code>nvidia-cublas-cu12</code>/<code>nvidia-cudnn-cu12</code> fehlen im venv. Seit dem Fix vom 2026-07-22 (Commit <code>76682ff</code>) fängt die App diesen Fall automatisch ab und rechnet stattdessen auf CPU weiter — aber nur, wenn <code>whisper_device</code> auf <code>"auto"</code> steht.</p>
+    <div class="label-fix">Fix:</div>
+    <p>GPU nutzen wollen: <code>.venv\Scripts\python.exe -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12</code> (Lektion 4, Schritt 3). GPU egal: nichts tun, App läuft automatisch auf CPU weiter.</p>
+  </div>
+</div>
+
+<div class="err-card">
+  <div class="err-head">③ 401 Invalid authentication</div>
+  <div class="err-body">
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span></div>
+      <div class="term-body"><span class="err">API Error: 401 Invalid authentication credentials</span></div>
+    </div>
+    <div class="label-cause">Ursache:</div>
+    <p>Die Claude CLI auf diesem Gerät ist nicht (mehr) eingeloggt. STT lief bereits durch — nur der Cleanup-Aufruf (<code>claude -p ...</code>) scheitert.</p>
+    <div class="label-fix">Fix:</div>
+    <p>Terminal: <code>claude</code> eintippen, mit demselben Konto wie am Hauptgerät einloggen. Testen mit <code>claude -p "sag hallo"</code>. Details: Lektion 5.</p>
+  </div>
+</div>
+
+<h2>Bonus: harmlose Meldung, die wie ein Fehler aussieht</h2>
+<div class="card">
+  <p><code>RuntimeError: Calling Tcl from different apartment</code> (im Thread <code>Thread-7 (mainloop)</code>) — ein Bug im Taskleisten-Fenster, der mit demselben Fix wie ② behoben wurde. Falls das nach einem <code>git pull</code> immer noch auftaucht: die App läuft trotzdem weiter, nur das Taskleisten-Fenster fehlt dann, Tray-Icon und Diktat funktionieren unabhängig davon.</p>
+</div>
+
+<h2>Genereller Diagnose-Ablauf</h2>
+<ol>
+  <li>Immer erst mit <code>desktop\start.bat</code> starten (nicht <code>start_silent.vbs</code>) — nur die Konsole zeigt Fehlertexte.</li>
+  <li>Fehlermeldung mit den drei oben genannten vergleichen (Stichwörter: <code>Activate.ps1</code>, <code>cublas64_12.dll</code>, <code>401 Invalid authentication</code>).</li>
+  <li>Kein Treffer? Log-Dateien prüfen: <code>~/.voice-flow/update.log</code> (Auto-Update) und <code>~/.voice-flow/timing.log</code> (Laufzeiten).</li>
+</ol>
+
+<div class="quiz">
+  <h3>Kurzcheck — welcher Fehler ist das?</h3>
+  <p>Konsole zeigt: <code>cannot be loaded because running scripts is disabled on this system</code></p>
+  <label><input type="radio" name="q7" value="a"> Fehler ① — PowerShell Execution Policy</label>
+  <label><input type="radio" name="q7" value="b"> Fehler ② — cublas-DLL fehlt</label>
+  <label><input type="radio" name="q7" value="c"> Fehler ③ — 401 Invalid authentication</label>
+  <div id="quiz-result"></div>
+</div>
+
+<div class="summary">
+  <strong>Gelernt:</strong> Die drei real aufgetretenen Fehlerbilder anhand ihrer Fehlermeldung erkennen (Execution Policy, cublas-DLL, 401 Auth), plus die harmlose Tk-Apartment-Meldung. Damit ist die Installation auf einem neuen Windows-Gerät eigenständig durchführbar — von Voraussetzungen bis Troubleshooting.
+</div>
+
+<p class="nav"><a href="app-starten-testen.html">← App starten + testen</a></p>
+
+<script>
+document.querySelectorAll('input[name="q7"]').forEach(el => {
+  el.addEventListener('change', () => {
+    const result = document.getElementById('quiz-result');
+    result.style.display = 'block';
+    if (el.value === 'a') {
+      result.textContent = '✓ Richtig — "running scripts is disabled" ist eindeutig die PowerShell Execution Policy.';
+      result.style.color = 'var(--ok)';
+    } else {
+      result.textContent = '✗ Nicht ganz — der Text "running scripts is disabled" gehört zu Fehler ①.';
+      result.style.color = 'var(--warn)';
+    }
+  });
+});
+</script>

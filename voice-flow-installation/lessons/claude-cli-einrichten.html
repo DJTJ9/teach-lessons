@@ -1,0 +1,185 @@
+<title>Claude CLI einrichten — Voice Flow Installation</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5a5a72; --card: #f4f4f8;
+    --accent: #6f5ae8; --accent-fg: #ffffff; --border: #e0e0ec;
+    --ok: #1a7f4e; --warn: #a35b00; --err: #b91c1c;
+    --term-bg: #0c0c14; --term-fg: #e6e6f0; --term-title: #1e1e2e;
+    --win-bg: #f0f0f0; --win-title: #0067c0; --win-border: #c0c0c0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141f; --fg: #e8e8f2; --muted: #a0a0b8; --card: #1e1e2e;
+      --accent: #9b8cf0; --accent-fg: #14141f; --border: #2e2e42;
+      --ok: #4fd18b; --warn: #e0a94f; --err: #f87171;
+      --term-bg: #05050a; --term-fg: #e6e6f0; --term-title: #14141f;
+      --win-bg: #2a2a38; --win-title: #2f6fb0; --win-border: #444;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); max-width: 760px;
+    margin: 0 auto; padding: 24px 20px 80px; line-height: 1.6;
+  }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 36px 0 12px; border-left: 4px solid var(--accent); padding-left: 10px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .step { display: flex; gap: 14px; margin: 22px 0; align-items: flex-start; }
+  .step-num {
+    flex: 0 0 32px; height: 32px; border-radius: 50%; background: var(--accent);
+    color: var(--accent-fg); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .step-body { flex: 1; }
+  .step-body h3 { margin: 4px 0 8px; font-size: 16px; }
+  .term {
+    border-radius: 8px; overflow: hidden; margin: 10px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: "SF Mono", Consolas, monospace;
+  }
+  .term-bar {
+    background: var(--term-title); padding: 7px 12px; font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .term-bar .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .term-body { background: var(--term-bg); color: var(--term-fg); padding: 14px 16px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
+  .term-body .prompt { color: #7dd3fc; }
+  .term-body .muted2 { color: #6b6b80; }
+  .term-body .ok { color: var(--ok); }
+  .mockup { border: 1px solid var(--win-border); border-radius: 8px; overflow: hidden; margin: 10px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.15); }
+  code, .code-inline {
+    background: #1e1e2e; color: #e6e6f0; padding: 1px 6px;
+    border-radius: 4px; font-size: 13px; font-family: "SF Mono", Consolas, monospace;
+  }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin: 14px 0; }
+  .quiz {
+    border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-top: 30px;
+  }
+  .quiz h3 { margin-top: 0; font-size: 16px; }
+  .quiz label {
+    display: block; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .quiz label:hover { background: var(--card); }
+  #quiz-result { margin-top: 10px; font-weight: 600; display: none; }
+  .summary {
+    background: var(--card); border-left: 4px solid var(--ok); border-radius: 8px;
+    padding: 14px 18px; margin-top: 30px;
+  }
+  .nav { margin-top: 40px; font-size: 14px; color: var(--muted); display: flex; justify-content: space-between; }
+  a { color: var(--accent); }
+</style>
+
+<span class="badge">Lektion 5 / 7</span>
+<h1>Claude CLI installieren und einloggen</h1>
+<p class="sub">Ziel: <code>claude</code> ist installiert und eingeloggt — das ist der Schritt, der beim ersten Laptop-Setup tatsächlich vergessen wurde und zu <code>401 Invalid authentication</code> führte.</p>
+
+<div class="card">
+  <p>Voice Flow ruft für den Cleanup-Schritt (Text sprachlich aufräumen) im Hintergrund die <code>claude</code>-Kommandozeile auf. Ohne eingeloggte CLI schlägt genau dieser Schritt fehl — die Aufnahme und Transkription laufen trotzdem durch, nur der finale Text bleibt aus.</p>
+</div>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>Node.js installieren (falls nötig)</h3>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> node --version
+v20.11.0</div>
+    </div>
+    <p>Fehler <code>'node' is not recognized</code>: <a href="https://nodejs.org">nodejs.org</a> → LTS-Version herunterladen, Installer mit Standardeinstellungen durchklicken.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Claude CLI global installieren</h3>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> npm install -g @anthropic-ai/claude-code
+<span class="muted2">added 1 package in 4s</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Einloggen — der Schritt, der leicht vergessen wird</h3>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> claude
+<span class="muted2">Willkommen bei Claude Code — Login erforderlich ...
+Öffne Browser zum Anmelden ...</span></div>
+    </div>
+    <p>Es öffnet sich der Browser mit dem Login-Fenster:</p>
+    <div class="mockup">
+      <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="220" fill="var(--win-bg)"/>
+        <rect width="480" height="26" fill="var(--win-title)"/>
+        <text x="12" y="18" fill="white" font-family="sans-serif" font-size="12">claude.ai — Anmelden</text>
+        <circle cx="458" cy="13" r="6" fill="#e81123"/>
+        <rect x="40" y="55" width="400" height="34" rx="6" fill="white" stroke="#ccc"/>
+        <text x="50" y="76" font-family="sans-serif" font-size="13" fill="#888">E-Mail-Adresse</text>
+        <rect x="40" y="100" width="400" height="34" rx="6" fill="white" stroke="#ccc"/>
+        <text x="50" y="121" font-family="sans-serif" font-size="13" fill="#888">Passwort</text>
+        <rect x="40" y="150" width="400" height="36" rx="6" fill="#6F5AE8"/>
+        <text x="220" y="173" fill="white" font-family="sans-serif" font-size="13" text-anchor="middle">Anmelden</text>
+      </svg>
+    </div>
+    <p>Mit dem <strong>gleichen Konto</strong> anmelden wie auf deinem Hauptgerät — dann nutzt die CLI dein bestehendes Abo, keine zusätzlichen Kosten.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>Login testen</h3>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> claude -p "sag hallo"
+<span class="ok">Hallo! Wie kann ich helfen?</span></div>
+    </div>
+    <p>Kommt stattdessen <code>API Error: 401 Invalid authentication credentials</code> → Login ist nicht durchgelaufen oder abgelaufen. Zurück zu Schritt 3, in der Session <code>/login</code> eintippen.</p>
+  </div>
+</div>
+
+<div class="quiz">
+  <h3>Kurzcheck</h3>
+  <p>Voice Flow läuft, Aufnahme funktioniert, aber im Textfeld kommt nichts an und die Konsole zeigt <code>401 Invalid authentication</code>. Woran liegt's?</p>
+  <label><input type="radio" name="q5" value="a"> Das Mikrofon ist falsch eingestellt</label>
+  <label><input type="radio" name="q5" value="b"> Die Claude CLI ist nicht (mehr) eingeloggt — der Cleanup-Schritt scheitert</label>
+  <label><input type="radio" name="q5" value="c"> Die GPU-Pakete fehlen</label>
+  <div id="quiz-result"></div>
+</div>
+
+<div class="summary">
+  <strong>Gelernt:</strong> Node + Claude CLI installieren, mit dem bestehenden Konto einloggen, Login mit <code>claude -p "..."</code> verifizieren. Das ist die häufigste Ursache für <code>401</code>-Fehler beim Diktat.
+</div>
+
+<p class="nav">
+  <a href="dependencies-installieren.html">← Dependencies installieren</a>
+  <a href="app-starten-testen.html">App starten + testen →</a>
+</p>
+
+<script>
+document.querySelectorAll('input[name="q5"]').forEach(el => {
+  el.addEventListener('change', () => {
+    const result = document.getElementById('quiz-result');
+    result.style.display = 'block';
+    if (el.value === 'b') {
+      result.textContent = '✓ Richtig — STT lief durch, nur der claude-CLI-Aufruf für den Cleanup scheitert ohne gültigen Login.';
+      result.style.color = 'var(--ok)';
+    } else {
+      result.textContent = '✗ Nicht ganz — 401 kommt von der claude-CLI-Authentifizierung, nicht von Mikrofon oder GPU.';
+      result.style.color = 'var(--warn)';
+    }
+  });
+});
+</script>

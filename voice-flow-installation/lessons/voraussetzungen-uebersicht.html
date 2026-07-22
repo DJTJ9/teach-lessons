@@ -1,0 +1,121 @@
+<title>Voraussetzungen — Voice Flow Installation</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5a5a72; --card: #f4f4f8;
+    --accent: #6f5ae8; --accent-fg: #ffffff; --border: #e0e0ec;
+    --ok: #1a7f4e; --warn: #a35b00; --code-bg: #1e1e2e; --code-fg: #e6e6f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141f; --fg: #e8e8f2; --muted: #a0a0b8; --card: #1e1e2e;
+      --accent: #9b8cf0; --accent-fg: #14141f; --border: #2e2e42;
+      --ok: #4fd18b; --warn: #e0a94f; --code-bg: #0c0c14; --code-fg: #e6e6f0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); max-width: 760px;
+    margin: 0 auto; padding: 24px 20px 80px; line-height: 1.6;
+  }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 36px 0 12px; border-left: 4px solid var(--accent); padding-left: 10px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; margin: 14px 0;
+  }
+  .req-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  .req-table td { padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .req-table td:first-child { font-weight: 600; white-space: nowrap; width: 160px; }
+  .tag { font-size: 12px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+  .tag-must { background: rgba(111,90,232,0.15); color: var(--accent); }
+  .tag-opt { background: rgba(163,91,0,0.15); color: var(--warn); }
+  code, .code-inline {
+    background: var(--code-bg); color: var(--code-fg); padding: 1px 6px;
+    border-radius: 4px; font-size: 13px; font-family: "SF Mono", Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-fg); padding: 14px 16px;
+    border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5;
+  }
+  .quiz {
+    border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-top: 30px;
+  }
+  .quiz h3 { margin-top: 0; font-size: 16px; }
+  .quiz label {
+    display: block; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .quiz label:hover { background: var(--card); }
+  #quiz-result { margin-top: 10px; font-weight: 600; display: none; }
+  .summary {
+    background: var(--card); border-left: 4px solid var(--ok); border-radius: 8px;
+    padding: 14px 18px; margin-top: 30px;
+  }
+  .nav { margin-top: 40px; font-size: 14px; color: var(--muted); }
+  a { color: var(--accent); }
+  svg { max-width: 100%; height: auto; display: block; margin: 12px auto; }
+</style>
+
+<span class="badge">Lektion 1 / 7</span>
+<h1>Voraussetzungen — was du vor dem Start brauchst</h1>
+<p class="sub">Ziel dieser Lektion: du weißt genau, welche Programme auf dem neuen Gerät installiert sein müssen, bevor Voice Flow überhaupt starten kann — und warum.</p>
+
+<div class="card">
+  <p><strong>Voice Flow</strong> läuft komplett lokal: Aufnahme → lokales Whisper-Modell (Transkription) → Claude-CLI (Text aufräumen) → Auto-Paste ins aktive Fenster. Kein eigener Server nötig — aber drei fremde Programme müssen auf dem Gerät installiert sein, sonst startet gar nichts oder einzelne Schritte schlagen fehl.</p>
+</div>
+
+<h2>Die Checkliste</h2>
+<table class="req-table">
+  <tr><td>Python 3.12<span class="tag tag-must">Pflicht</span></td><td>Führt den gesamten App-Code aus. Genau <strong>3.12</strong> — neuere Versionen (z.B. 3.14) haben oft noch keine passenden Wheels für <code>faster-whisper</code>/<code>ctranslate2</code>, dann bricht die Installation ab.</td></tr>
+  <tr><td>Git<span class="tag tag-must">Pflicht</span></td><td>Zum Klonen des Repos <code>DJTJ9/voice-recorder</code> und für die automatische Update-Funktion (<code>git pull</code> bei jedem Start).</td></tr>
+  <tr><td>Node.js + Claude CLI<span class="tag tag-must">Pflicht</span></td><td>Der Cleanup-Schritt ruft im Hintergrund <code>claude -p ...</code> auf, um den diktierten Text sprachlich aufzuräumen. Ohne eingeloggte CLI kommt beim Diktat ein <code>401 Invalid authentication</code>-Fehler.</td></tr>
+  <tr><td>NVIDIA-Treiber<span class="tag tag-opt">Optional</span></td><td>Nur wenn eine NVIDIA-Grafikkarte im Gerät steckt und die Transkription per GPU beschleunigt werden soll. Ohne GPU läuft alles auf CPU — etwas langsamer, aber funktioniert genauso.</td></tr>
+</table>
+
+<h2>Warum genau diese Reihenfolge?</h2>
+<p>Jede Lektion danach baut auf der vorherigen auf:</p>
+<pre>1. Python 3.12  →  2. Repo + venv  →  3. Dependencies  →  4. Claude CLI  →  5. App starten</pre>
+<p>Überspringt man einen Schritt, merkt man das meist erst später — als kryptische Fehlermeldung mitten im Betrieb. Lektion 7 sammelt genau die drei Fehler, die bei einem echten Laptop-Setup tatsächlich aufgetreten sind, falls doch mal was schiefläuft.</p>
+
+<h2>Was du NICHT brauchst</h2>
+<div class="card">
+  <p>Kein eigener Account bei OpenAI/Whisper (Modell läuft lokal, kein API-Call). Kein Windows-Admin-Recht für die normale Installation (nur bei manchen Edge-Cases wie Windows-Entwicklermodus für Symlinks — nicht Pflicht). Kein bezahlter Zusatzdienst — Claude CLI nutzt dein bestehendes Abo.</p>
+</div>
+
+<div class="quiz">
+  <h3>Kurzcheck</h3>
+  <p>Warum genau <strong>Python 3.12</strong> und nicht die neueste Version (z.B. 3.14)?</p>
+  <label><input type="radio" name="q1" value="a"> Neuere Versionen sind langsamer</label>
+  <label><input type="radio" name="q1" value="b"> Manche Abhängigkeiten (ctranslate2/faster-whisper) haben für ganz neue Python-Versionen oft noch keine fertigen Wheels — Installation kann abbrechen</label>
+  <label><input type="radio" name="q1" value="c"> Voice Flow braucht zwingend Windows 10, das nur 3.12 unterstützt</label>
+  <div id="quiz-result"></div>
+</div>
+
+<div class="summary">
+  <strong>Gelernt:</strong> Vier Voraussetzungen (Python 3.12, Git, Node/Claude CLI, optional NVIDIA-Treiber), warum genau diese Python-Version, und dass alles lokal läuft ohne zusätzliche Accounts. Weiter geht's mit der Python-Installation.
+</div>
+
+<p class="nav">Nächste Lektion: <a href="python-installieren.html">Python 3.12 installieren →</a></p>
+
+<script>
+document.querySelectorAll('input[name="q1"]').forEach(el => {
+  el.addEventListener('change', () => {
+    const result = document.getElementById('quiz-result');
+    result.style.display = 'block';
+    if (el.value === 'b') {
+      result.textContent = '✓ Richtig — fehlende Wheels für neue Python-Versionen sind der Hauptgrund für gescheiterte pip-Installs bei dieser App.';
+      result.style.color = 'var(--ok)';
+    } else {
+      result.textContent = '✗ Nicht ganz — der eigentliche Grund ist fehlende Wheel-Unterstützung für ctranslate2/faster-whisper bei brandneuen Python-Versionen.';
+      result.style.color = 'var(--warn)';
+    }
+  });
+});
+</script>

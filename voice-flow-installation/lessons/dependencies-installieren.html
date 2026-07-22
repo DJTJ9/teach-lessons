@@ -1,0 +1,173 @@
+<title>Dependencies installieren — Voice Flow Installation</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5a5a72; --card: #f4f4f8;
+    --accent: #6f5ae8; --accent-fg: #ffffff; --border: #e0e0ec;
+    --ok: #1a7f4e; --warn: #a35b00; --err: #b91c1c;
+    --term-bg: #0c0c14; --term-fg: #e6e6f0; --term-title: #1e1e2e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141f; --fg: #e8e8f2; --muted: #a0a0b8; --card: #1e1e2e;
+      --accent: #9b8cf0; --accent-fg: #14141f; --border: #2e2e42;
+      --ok: #4fd18b; --warn: #e0a94f; --err: #f87171;
+      --term-bg: #05050a; --term-fg: #e6e6f0; --term-title: #14141f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); max-width: 760px;
+    margin: 0 auto; padding: 24px 20px 80px; line-height: 1.6;
+  }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 36px 0 12px; border-left: 4px solid var(--accent); padding-left: 10px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .step { display: flex; gap: 14px; margin: 22px 0; align-items: flex-start; }
+  .step-num {
+    flex: 0 0 32px; height: 32px; border-radius: 50%; background: var(--accent);
+    color: var(--accent-fg); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .step-body { flex: 1; }
+  .step-body h3 { margin: 4px 0 8px; font-size: 16px; }
+  .term {
+    border-radius: 8px; overflow: hidden; margin: 10px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: "SF Mono", Consolas, monospace;
+  }
+  .term-bar {
+    background: var(--term-title); padding: 7px 12px; font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .term-bar .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .term-body { background: var(--term-bg); color: var(--term-fg); padding: 14px 16px; font-size: 13px; white-space: pre-wrap; line-height: 1.6; }
+  .term-body .prompt { color: #7dd3fc; }
+  .term-body .muted2 { color: #6b6b80; }
+  .term-body .ok { color: var(--ok); }
+  code, .code-inline {
+    background: #1e1e2e; color: #e6e6f0; padding: 1px 6px;
+    border-radius: 4px; font-size: 13px; font-family: "SF Mono", Consolas, monospace;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  table td { padding: 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table td:first-child { font-weight: 600; white-space: nowrap; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin: 14px 0; }
+  .quiz {
+    border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-top: 30px;
+  }
+  .quiz h3 { margin-top: 0; font-size: 16px; }
+  .quiz label {
+    display: block; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .quiz label:hover { background: var(--card); }
+  #quiz-result { margin-top: 10px; font-weight: 600; display: none; }
+  .summary {
+    background: var(--card); border-left: 4px solid var(--ok); border-radius: 8px;
+    padding: 14px 18px; margin-top: 30px;
+  }
+  .nav { margin-top: 40px; font-size: 14px; color: var(--muted); display: flex; justify-content: space-between; }
+  a { color: var(--accent); }
+</style>
+
+<span class="badge">Lektion 4 / 7</span>
+<h1>Dependencies installieren</h1>
+<p class="sub">Ziel: alle Python-Pakete, die Voice Flow braucht, sind im venv installiert — inklusive der optionalen GPU-Beschleunigung, falls das Gerät eine NVIDIA-Grafikkarte hat.</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>Pflicht-Pakete installieren</h3>
+    <p>Im Repo-Ordner, venv-Python direkt ansprechen (funktioniert egal ob aktiviert oder nicht — siehe Lektion 3):</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> .venv\Scripts\python.exe -m pip install --upgrade pip
+<span class="prompt">PS&gt;</span> .venv\Scripts\python.exe -m pip install -r requirements.txt
+<span class="muted2">Collecting sounddevice ...
+Collecting faster-whisper ...
+Collecting numpy ...
+</span><span class="ok">Successfully installed faster-whisper-... numpy-... pynput-... ...</span></div>
+    </div>
+    <p>Das dauert je nach Internetverbindung ein bis mehrere Minuten — <code>faster-whisper</code> zieht einige Abhängigkeiten nach.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Was installiert wird</h3>
+    <table>
+      <tr><td>sounddevice</td><td>Mikrofon-Aufnahme</td></tr>
+      <tr><td>faster-whisper</td><td>lokale Sprache-zu-Text-Engine (Whisper-Modell)</td></tr>
+      <tr><td>numpy</td><td>Audio-Datenverarbeitung</td></tr>
+      <tr><td>pynput</td><td>globaler Hotkey-Listener (Ctrl+Alt+V)</td></tr>
+      <tr><td>pyperclip</td><td>Text ins Clipboard / Auto-Paste</td></tr>
+      <tr><td>pystray, Pillow</td><td>Tray-Icon in der Taskleiste</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Optional: GPU-Beschleunigung (nur mit NVIDIA-Grafikkarte)</h3>
+    <p>Ohne diesen Schritt läuft die Spracherkennung auf CPU — funktioniert einwandfrei, nur langsamer. Mit NVIDIA-GPU zusätzlich:</p>
+    <div class="term">
+      <div class="term-bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span> PowerShell</div>
+      <div class="term-body"><span class="prompt">PS&gt;</span> nvidia-smi
+<span class="muted2">(zeigt Treiber-Version + GPU, wenn Treiber korrekt installiert ist)</span>
+
+<span class="prompt">PS&gt;</span> .venv\Scripts\python.exe -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12</div>
+    </div>
+    <div class="card">
+      <p><code>nvidia-smi</code> meldet Fehler statt GPU-Infos? → NVIDIA-Treiber fehlt oder ist veraltet. Aktuellen Treiber von <a href="https://www.nvidia.com/Download/index.aspx">nvidia.com/Download</a> installieren, danach neu prüfen.</p>
+    </div>
+    <p><code>start.bat</code> / <code>start_silent.vbs</code> setzen den <code>PATH</code> zu den DLLs dieser Pakete automatisch — kein manueller PATH-Eintrag nötig.</p>
+  </div>
+</div>
+
+<h2>Warnungen beim Installieren — ignorierbar?</h2>
+<p>Zwei Meldungen tauchen später beim ersten App-Start harmlos auf und brauchen keine Aktion:</p>
+<div class="card">
+  <p><code>Warning: unauthenticated requests to the HF Hub</code> — nur ein Hinweis auf langsamere Downloads ohne HuggingFace-Token, keine Fehlfunktion.</p>
+  <p><code>cache-system uses symlinks ... your machine does not support them</code> — Windows braucht Admin/Entwicklermodus für Symlinks, ohne das läuft der Cache nur „degradiert" (mehr Speicherplatz, keine Fehlfunktion).</p>
+</div>
+
+<div class="quiz">
+  <h3>Kurzcheck</h3>
+  <p>Du hast keine NVIDIA-Grafikkarte. Musst du die GPU-Pakete trotzdem installieren?</p>
+  <label><input type="radio" name="q4" value="a"> Ja, sonst startet die App gar nicht</label>
+  <label><input type="radio" name="q4" value="b"> Nein — ohne GPU-Pakete läuft die Transkription automatisch auf CPU, nur etwas langsamer</label>
+  <label><input type="radio" name="q4" value="c"> Ja, aber nur für den Cleanup-Schritt (Claude CLI)</label>
+  <div id="quiz-result"></div>
+</div>
+
+<div class="summary">
+  <strong>Gelernt:</strong> Pflicht-Pakete via <code>requirements.txt</code>, was jedes Paket tut, optionale GPU-Pakete nur bei NVIDIA-Hardware, zwei harmlose Warnungen die man ignorieren kann.
+</div>
+
+<p class="nav">
+  <a href="repo-klonen-venv.html">← Repo klonen + venv</a>
+  <a href="claude-cli-einrichten.html">Claude CLI einrichten →</a>
+</p>
+
+<script>
+document.querySelectorAll('input[name="q4"]').forEach(el => {
+  el.addEventListener('change', () => {
+    const result = document.getElementById('quiz-result');
+    result.style.display = 'block';
+    if (el.value === 'b') {
+      result.textContent = '✓ Richtig — die App fällt automatisch auf CPU/int8 zurück, wenn keine CUDA-Umgebung gefunden wird.';
+      result.style.color = 'var(--ok)';
+    } else {
+      result.textContent = '✗ Nicht ganz — GPU-Pakete sind rein optional für Geschwindigkeit, kein Muss.';
+      result.style.color = 'var(--warn)';
+    }
+  });
+});
+</script>

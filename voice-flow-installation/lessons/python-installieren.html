@@ -1,0 +1,168 @@
+<title>Python 3.12 installieren — Voice Flow Installation</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a2e; --muted: #5a5a72; --card: #f4f4f8;
+    --accent: #6f5ae8; --accent-fg: #ffffff; --border: #e0e0ec;
+    --ok: #1a7f4e; --warn: #a35b00; --code-bg: #1e1e2e; --code-fg: #e6e6f0;
+    --win-bg: #f0f0f0; --win-title: #0067c0; --win-border: #c0c0c0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14141f; --fg: #e8e8f2; --muted: #a0a0b8; --card: #1e1e2e;
+      --accent: #9b8cf0; --accent-fg: #14141f; --border: #2e2e42;
+      --ok: #4fd18b; --warn: #e0a94f; --code-bg: #0c0c14; --code-fg: #e6e6f0;
+      --win-bg: #2a2a38; --win-title: #2f6fb0; --win-border: #444;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); max-width: 760px;
+    margin: 0 auto; padding: 24px 20px 80px; line-height: 1.6;
+  }
+  .badge {
+    display: inline-block; background: var(--accent); color: var(--accent-fg);
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 36px 0 12px; border-left: 4px solid var(--accent); padding-left: 10px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .step {
+    display: flex; gap: 14px; margin: 22px 0; align-items: flex-start;
+  }
+  .step-num {
+    flex: 0 0 32px; height: 32px; border-radius: 50%; background: var(--accent);
+    color: var(--accent-fg); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+  }
+  .step-body { flex: 1; }
+  .step-body h3 { margin: 4px 0 8px; font-size: 16px; }
+  .mockup {
+    border: 1px solid var(--win-border); border-radius: 8px; overflow: hidden;
+    margin: 10px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+  code, .code-inline {
+    background: var(--code-bg); color: var(--code-fg); padding: 1px 6px;
+    border-radius: 4px; font-size: 13px; font-family: "SF Mono", Consolas, monospace;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-fg); padding: 14px 16px;
+    border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5;
+  }
+  .warn-box {
+    background: rgba(163,91,0,0.12); border-left: 4px solid var(--warn); border-radius: 8px;
+    padding: 12px 16px; margin: 14px 0; font-size: 14px;
+  }
+  .quiz {
+    border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin-top: 30px;
+  }
+  .quiz h3 { margin-top: 0; font-size: 16px; }
+  .quiz label {
+    display: block; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); margin-bottom: 6px;
+  }
+  .quiz label:hover { background: var(--card); }
+  #quiz-result { margin-top: 10px; font-weight: 600; display: none; }
+  .summary {
+    background: var(--card); border-left: 4px solid var(--ok); border-radius: 8px;
+    padding: 14px 18px; margin-top: 30px;
+  }
+  .nav { margin-top: 40px; font-size: 14px; color: var(--muted); display: flex; justify-content: space-between; }
+  a { color: var(--accent); }
+</style>
+
+<span class="badge">Lektion 2 / 7</span>
+<h1>Python 3.12 installieren</h1>
+<p class="sub">Ziel: Python 3.12 ist installiert, im PATH eingetragen, und <code>py -3.12 --version</code> funktioniert im Terminal.</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>Installer herunterladen</h3>
+    <p>Öffne <a href="https://www.python.org/downloads/release/python-3129/">python.org/downloads/release/python-3129</a> und lade den <strong>„Windows installer (64-bit)"</strong> herunter.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Installer starten — Checkbox nicht vergessen!</h3>
+    <p>Doppelklick auf die heruntergeladene <code>.exe</code>-Datei. Es öffnet sich dieses Fenster (nachgebaut, entspricht dem echten Installer):</p>
+    <div class="mockup">
+      <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="520" height="300" fill="var(--win-bg)"/>
+        <rect width="520" height="30" fill="var(--win-title)"/>
+        <text x="12" y="20" fill="white" font-family="sans-serif" font-size="13">Python 3.12.9 (64-bit) Setup</text>
+        <circle cx="495" cy="15" r="7" fill="#e81123"/>
+        <text x="60" y="70" font-family="sans-serif" font-size="15" fill="#333">Install Python 3.12.9 (64-bit)</text>
+        <rect x="55" y="95" width="18" height="18" rx="3" fill="none" stroke="#0067c0" stroke-width="2"/>
+        <path d="M58 104 l4 4 l8 -9" stroke="#0067c0" stroke-width="2.5" fill="none"/>
+        <text x="80" y="109" font-family="sans-serif" font-size="14" fill="#111" font-weight="bold">Add python.exe to PATH</text>
+        <rect x="53" y="88" width="360" height="34" rx="6" fill="none" stroke="#d9534f" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <text x="420" y="105" font-family="sans-serif" font-size="11" fill="#d9534f">← unbedingt anhaken!</text>
+        <rect x="60" y="220" width="150" height="34" rx="4" fill="#0067c0"/>
+        <text x="95" y="242" fill="white" font-family="sans-serif" font-size="13">Install Now</text>
+        <rect x="230" y="220" width="150" height="34" rx="4" fill="none" stroke="#999" stroke-width="1.5"/>
+        <text x="255" y="242" fill="#333" font-family="sans-serif" font-size="13">Customize installation</text>
+      </svg>
+    </div>
+    <div class="warn-box">
+      <strong>Wichtigster Schritt im ganzen Guide:</strong> Haken bei <strong>„Add python.exe to PATH"</strong> setzen, bevor du „Install Now" klickst. Ohne diesen Haken findet das Terminal später den Befehl <code>python</code> nicht — alle nachfolgenden Schritte scheitern.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Installation abschließen</h3>
+    <p>„Install Now" klicken, warten bis der Fortschrittsbalken durch ist, „Close" klicken. Kein Neustart nötig.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>Prüfen ob's geklappt hat</h3>
+    <p>Neues Terminal öffnen (wichtig: <em>neues</em> Fenster, altes kennt den aktualisierten PATH noch nicht) und eintippen:</p>
+    <pre>py -3.12 --version</pre>
+    <p>Erwartete Ausgabe:</p>
+    <pre>Python 3.12.9</pre>
+    <p>Kommt stattdessen <code>'py' is not recognized</code> → Haken aus Schritt 2 wurde vergessen. Installer nochmal ausführen, diesmal „Modify" wählen und PATH-Option nachträglich aktivieren.</p>
+  </div>
+</div>
+
+<div class="quiz">
+  <h3>Kurzcheck</h3>
+  <p>Du hast den Installer ohne die PATH-Checkbox durchlaufen lassen. Was passiert?</p>
+  <label><input type="radio" name="q2" value="a"> Nichts, PATH wird automatisch beim nächsten Windows-Update gesetzt</label>
+  <label><input type="radio" name="q2" value="b"> Terminal-Befehle wie <code>python</code> oder <code>py</code> werden nicht gefunden, obwohl Python installiert ist</label>
+  <label><input type="radio" name="q2" value="c"> Python startet, aber ohne Internetzugriff</label>
+  <div id="quiz-result"></div>
+</div>
+
+<div class="summary">
+  <strong>Gelernt:</strong> Installer von python.org, PATH-Checkbox ist der kritische Schritt, Verifikation über <code>py -3.12 --version</code> in einem frisch geöffneten Terminal.
+</div>
+
+<p class="nav">
+  <a href="voraussetzungen-uebersicht.html">← Voraussetzungen</a>
+  <a href="repo-klonen-venv.html">Repo klonen + venv →</a>
+</p>
+
+<script>
+document.querySelectorAll('input[name="q2"]').forEach(el => {
+  el.addEventListener('change', () => {
+    const result = document.getElementById('quiz-result');
+    result.style.display = 'block';
+    if (el.value === 'b') {
+      result.textContent = '✓ Richtig — genau das ist der häufigste Stolperstein bei diesem Schritt.';
+      result.style.color = 'var(--ok)';
+    } else {
+      result.textContent = '✗ Nicht ganz — ohne die PATH-Checkbox findet das Terminal den python-Befehl schlicht nicht.';
+      result.style.color = 'var(--warn)';
+    }
+  });
+});
+</script>
