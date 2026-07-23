@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obsidian Vault Setup — Android</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1a1a; --muted: #5a5a5a;
+    --accent: #6d4aff; --accent-bg: #f1edff;
+    --card: #f7f7f9; --border: #e3e3e8;
+    --warn-bg: #fff4e5; --warn-border: #f0b429;
+    --ok-bg: #e9f9ee; --ok-border: #34a853;
+    --code-bg: #2d2d3a; --code-fg: #f1f1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161d; --fg: #ececf1; --muted: #a0a0ad;
+      --accent: #a48cff; --accent-bg: #241f3d;
+      --card: #1f1f28; --border: #33333f;
+      --warn-bg: #3a2f10; --warn-border: #f0b429;
+      --ok-bg: #10281a; --ok-border: #34a853;
+      --code-bg: #0e0e14; --code-fg: #e8e8f0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  header { margin-bottom: 2.5rem; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  h1 { font-size: 1.9rem; margin: 0.3rem 0 0.5rem; }
+  .lede { color: var(--muted); font-size: 1.05rem; }
+  h2 { font-size: 1.3rem; margin-top: 2.5rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--border); }
+  .step {
+    display: flex; gap: 1rem; margin: 1.4rem 0; padding: 1rem 1.2rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .step .num {
+    flex: none; width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--accent); color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.95rem;
+  }
+  .step .body { flex: 1; }
+  .step .body strong { display: block; margin-bottom: 0.2rem; }
+  code, .field {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    background: var(--code-bg); color: var(--code-fg);
+    padding: 0.15rem 0.4rem; border-radius: 5px; font-size: 0.9em;
+  }
+  .callout { border-radius: 10px; padding: 1rem 1.2rem; margin: 1.2rem 0; border: 1px solid; }
+  .callout.tip { background: var(--ok-bg); border-color: var(--ok-border); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout .label { font-weight: 700; display: block; margin-bottom: 0.3rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  th { color: var(--muted); font-weight: 600; }
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin-top: 1rem; }
+  .q { margin-bottom: 1.4rem; }
+  .q p.question { font-weight: 600; margin-bottom: 0.6rem; }
+  .q label { display: block; padding: 0.5rem 0.7rem; margin: 0.3rem 0; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+  .q label:hover { border-color: var(--accent); }
+  .q input { margin-right: 0.5rem; }
+  button.check {
+    background: var(--accent); color: white; border: none; padding: 0.7rem 1.4rem;
+    border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;
+  }
+  #result { margin-top: 1rem; font-weight: 600; }
+  .summary { background: var(--accent-bg); border-radius: 12px; padding: 1.4rem; margin-top: 2.5rem; }
+  .summary h2 { border: none; margin-top: 0; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.85rem; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Lesson 3 / 3 · Obsidian Vault Setup</div>
+    <h1>Android: Vault-Sync einrichten</h1>
+    <p class="lede">Ziel: dein Vault ist auch auf dem Android-Handy da und bleibt live synchron — über dieselbe Self-hosted-LiveSync-Verbindung wie am Desktop/Windows/iPad.</p>
+  </header>
+
+  <h2>Was du brauchst</h2>
+  <table>
+    <tr><th>Ding</th><th>Woher</th></tr>
+    <tr><td>Obsidian App</td><td>Google Play Store (kostenlos)</td></tr>
+    <tr><td>Server-Adresse / Username / Passwort / DB-Name</td><td>gleiche Werte wie bei Windows/iPad, aus Passwortmanager/Server-Config</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="label">Wichtig</span>
+    Auch hier keine echten Zugangsdaten in der Lesson — <code>&lt;dein-wert&gt;</code> steht für deine tatsächlichen Werte.
+  </div>
+
+  <h2>Schritt für Schritt</h2>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div class="body"><strong>Obsidian installieren</strong>
+    Play Store öffnen → <em>Obsidian</em> suchen → installieren, öffnen.</div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div class="body"><strong>Vault anlegen</strong>
+    Beim ersten Start: <em>Create new vault</em>. Name egal — wird gleich durch den Fetch ersetzt. Dateizugriff erlauben, falls abgefragt.</div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div class="body"><strong>Community Plugins aktivieren</strong>
+    Einstellungen (Zahnrad) → <em>Community plugins</em> → aktivieren/bestätigen.</div>
+  </div>
+
+  <div class="step">
+    <div class="num">4</div>
+    <div class="body"><strong>Self-hosted LiveSync installieren</strong>
+    <em>Browse</em> → <code>Self-hosted LiveSync</code> suchen → installieren → aktivieren.</div>
+  </div>
+
+  <div class="step">
+    <div class="num">5</div>
+    <div class="body"><strong>Remote Database Configuration</strong>
+    LiveSync-Einstellungen öffnen, Felder ausfüllen:
+    <table>
+      <tr><th>Feld</th><th>Wert</th></tr>
+      <tr><td>URI</td><td><code>https://&lt;dein-server&gt;</code></td></tr>
+      <tr><td>Username</td><td><code>&lt;dein-username&gt;</code></td></tr>
+      <tr><td>Password</td><td><code>&lt;dein-passwort&gt;</code></td></tr>
+      <tr><td>Database name</td><td><code>&lt;deine-db&gt;</code></td></tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">6</div>
+    <div class="body"><strong>Testen &amp; Fetch</strong>
+    <em>Test Database Connection</em> → grün bestätigt. Danach <strong>Fetch</strong> wählen (nicht Rebuild).</div>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">Android-Eigenheit</span>
+    Manche Android-Hersteller (Samsung, Xiaomi, Huawei u.a.) killen Hintergrund-Apps aggressiv über eigene Akku-Optimierung, zusätzlich zum reinen Android-System. Damit LiveSync zuverlässig synct: Einstellungen → Apps → Obsidian → Akku → <em>Keine Einschränkungen</em> / Akku-Optimierung für Obsidian deaktivieren.
+  </div>
+
+  <div class="step">
+    <div class="num">7</div>
+    <div class="body"><strong>Wissen reinspeichern ohne Browser-Extension</strong>
+    Obsidian Web Clipper gibt es nicht als Chrome-Android-Extension. Stattdessen: in Chrome (oder jeder App, z.B. Fotos für Screenshots) den <em>Teilen</em>-Button antippen → <em>Obsidian</em> aus der Liste wählen. Obsidian registriert sich als Android-Share-Target und legt automatisch eine neue Notiz mit Link/Text/Bild an.</div>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+    <div class="q" data-answer="c">
+      <p class="question">1. LiveSync synct auf dem Handy unzuverlässig im Hintergrund. Erster Schritt zur Diagnose?</p>
+      <label><input type="radio" name="q1" value="a"> Server neu aufsetzen</label>
+      <label><input type="radio" name="q1" value="b"> Passwort ändern</label>
+      <label><input type="radio" name="q1" value="c"> Akku-Optimierung für Obsidian deaktivieren</label>
+    </div>
+    <div class="q" data-answer="b">
+      <p class="question">2. Wie speicherst du einen Screenshot direkt ins Vault?</p>
+      <label><input type="radio" name="q2" value="a"> Geht auf Android nicht</label>
+      <label><input type="radio" name="q2" value="b"> Teilen-Button in der Fotos-App → Obsidian auswählen</label>
+      <label><input type="radio" name="q2" value="c"> Nur per E-Mail an sich selbst schicken</label>
+    </div>
+    <div class="q" data-answer="b">
+      <p class="question">3. Zweites/drittes Gerät verbinden, Server hat schon Daten — Fetch oder Rebuild?</p>
+      <label><input type="radio" name="q3" value="a"> Rebuild</label>
+      <label><input type="radio" name="q3" value="b"> Fetch</label>
+      <label><input type="radio" name="q3" value="c"> Egal</label>
+    </div>
+    <button class="check" onclick="checkQuiz()">Auswerten</button>
+    <div id="result"></div>
+  </div>
+
+  <div class="summary">
+    <h2>Zusammenfassung</h2>
+    <p>Android hat jetzt dieselbe LiveSync-Verbindung wie alle anderen Geräte. Akku-Optimierung ist der häufigste Grund für ausbleibenden Hintergrund-Sync auf Android — den zuerst prüfen, wenn etwas fehlt. Wissen kommt über den System-Share-Button rein, genau wie beim iPad.</p>
+  </div>
+
+  <footer>
+    Quellen: <a href="https://github.com/vrtmrz/obsidian-livesync" target="_blank">Self-hosted LiveSync (offiziell)</a> · <a href="https://help.obsidian.md/" target="_blank">Obsidian Mobile Help (offiziell)</a>
+  </footer>
+</div>
+<script>
+function checkQuiz() {
+  const qs = document.querySelectorAll('.q');
+  let correct = 0;
+  qs.forEach(q => {
+    const answer = q.dataset.answer;
+    const checked = q.querySelector('input:checked');
+    if (checked && checked.value === answer) correct++;
+  });
+  const result = document.getElementById('result');
+  result.textContent = correct === qs.length
+    ? `Alle ${qs.length} richtig — sitzt.`
+    : `${correct} von ${qs.length} richtig — nochmal die passenden Schritte oben anschauen.`;
+  result.style.color = correct === qs.length ? 'var(--ok-border)' : 'var(--warn-border)';
+}
+</script>
+</body>
+</html>
