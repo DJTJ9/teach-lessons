@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 04: Das Transparenz-Rezept — DWM + Layered</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; }
+  .kw { color: #c792ea; }
+  .str { color: #86e1a0; }
+  .num2 { color: #f78c6c; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: 0.02em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .steps { counter-reset: s; margin: 1.5rem 0; }
+  .step { position: relative; padding-left: 3rem; margin-bottom: 1.2rem; }
+  .step::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 0; width: 2rem; height: 2rem; border-radius: 50%; background: #312e81; color: #a5b4fc; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+  .step h3 { margin: 0.25rem 0 0.35rem; }
+  .step p { margin-bottom: 0.4rem; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; }
+  .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .reveal-btn:hover { background: #3d3a9e; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .summary ul { margin-bottom: 0; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; }
+  .src a { color: #58a6ff; text-decoration: none; }
+  .src a:hover { text-decoration: underline; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; }
+  .nav a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 04</div>
+    <h1>Das Transparenz-Rezept: DWM + Layered</h1>
+    <p class="subtitle"><code>OverlayWindow.Initialize()</code> — sechs Schritte in einer Reihenfolge, die nicht beliebig ist</p>
+  </div>
+
+  <h2>Die ganze Methode auf einen Blick</h2>
+  <p>
+    Das hier ist das Herzstück des Spikes. Alles, was ein Unity-Fenster in ein transparentes Overlay verwandelt,
+    passiert in dieser einen Methode — 20 Zeilen:
+  </p>
+
+<pre><code><span class="kw">public</span> <span class="kw">void</span> Initialize()
+{
+    <span class="kw">if</span> (Application.isEditor)
+    {
+        Debug.Log(<span class="str">"[OverlayWindow] editor — skipping native setup"</span>);
+        <span class="kw">return</span>;
+    }
+
+    _hwnd = Win32Interop.GetActiveWindow();
+    <span class="kw">if</span> (_hwnd == IntPtr.Zero)
+    {
+        Debug.LogError(<span class="str">"[OverlayWindow] GetActiveWindow returned NULL — no window handle"</span>);
+        <span class="kw">return</span>;
+    }
+
+    SetBorderless();
+
+    <span class="kw">var</span> margins = <span class="kw">new</span> Win32Interop.MARGINS { Left = -<span class="num2">1</span>, Right = -<span class="num2">1</span>, Top = -<span class="num2">1</span>, Bottom = -<span class="num2">1</span> };
+    Win32Interop.DwmExtendFrameIntoClientArea(_hwnd, <span class="kw">ref</span> margins);
+
+    ApplyExStyle(<span class="kw">false</span>);
+    Win32Interop.SetLayeredWindowAttributes(_hwnd, <span class="num2">0</span>, <span class="num2">255</span>, Win32Interop.LWA_ALPHA);
+
+    SetTopMost(<span class="kw">true</span>);
+}</code></pre>
+
+  <h2>Schritt für Schritt — und jeweils: warum genau hier?</h2>
+
+  <div class="steps">
+
+    <div class="step">
+      <h3>Im Editor aussteigen</h3>
+      <p>
+        Der Unity-Editor kann Fenster-Transparenz nicht darstellen (Lektion 01), und
+        <code>GetActiveWindow()</code> würde dort das <em>Editor</em>-Fenster liefern. Würde man darauf
+        <code>WS_POPUP</code> setzen, verstümmelt man den Editor selbst — Titelleiste weg, Fenster randlos, im
+        schlimmsten Fall unbenutzbar bis zum Neustart.
+      </p>
+      <p>
+        Der frühe <code>return</code> ist deshalb <strong>kein Komfort, sondern ein Schutzmechanismus</strong>.
+        Er hat außerdem eine angenehme Folge: <code>IsActive</code> bleibt <code>false</code>, und jede
+        andere Methode der Fassade steigt wegen <code>if (!IsActive) return;</code> ebenfalls aus. Der Play-Modus
+        im Editor läuft also fehlerfrei durch, nur eben ohne Overlay-Verhalten.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Handle holen und ehrlich prüfen</h3>
+      <p>
+        <code>GetActiveWindow()</code> liefert das Fenster des aufrufenden Threads. Beim Start des Players ist das
+        das Spielfenster. Kommt <code>IntPtr.Zero</code> zurück, gibt es kein Fenster — dann bricht die Methode ab
+        und <em>protokolliert das</em>. Wichtig: Sie tut nicht so, als sei alles in Ordnung.
+      </p>
+      <p>
+        Alle folgenden Aufrufe hängen an diesem Handle. Ein <code>SetWindowLongPtr</code> auf
+        <code>IntPtr.Zero</code> tut nichts und meldet nichts — man würde ewig suchen.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Rahmen entfernen (<code>SetBorderless</code>)</h3>
+      <p>
+        Muss <strong>vor</strong> dem DWM-Aufruf passieren. Grund: Der Rahmen bestimmt, wo Client-Area und
+        Non-Client-Area liegen. Der nächste Schritt bezieht sich genau darauf — man ändert die Geometrie also
+        zuerst und redet dann über sie, nicht umgekehrt. (Details zu <code>WS_POPUP</code> und
+        <code>SWP_FRAMECHANGED</code>: Lektion 03.)
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Den DWM-Rahmen über das ganze Fenster ziehen</h3>
+<pre><code><span class="kw">var</span> margins = <span class="kw">new</span> Win32Interop.MARGINS { Left = -<span class="num2">1</span>, Right = -<span class="num2">1</span>, Top = -<span class="num2">1</span>, Bottom = -<span class="num2">1</span> };
+Win32Interop.DwmExtendFrameIntoClientArea(_hwnd, <span class="kw">ref</span> margins);</code></pre>
+      <p>
+        Positive Werte bedeuten „zieh den Glas-Rahmen so viele Pixel weit in den Inhalt hinein".
+        <strong><code>-1</code> auf allen vier Seiten ist der dokumentierte Sonderwert für „das ganze Fenster ist
+        Rahmen"</strong> — englisch <em>sheet of glass</em>. Ab jetzt behandelt der DWM den Alpha-Kanal deines
+        Fensterinhalts als echte Durchsichtigkeit.
+      </p>
+      <p>
+        Das ist die Stelle, an der die Player Settings aus Lektion 01 zuschlagen: Läuft die App unter D3D12 oder mit
+        Flip-Model-Swapchain, geht dieser Aufruf ins Leere — ohne Fehler.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Extended Style setzen: Layered + Toolwindow, Click-through zunächst AUS</h3>
+<pre><code>ApplyExStyle(<span class="kw">false</span>);   <span class="cmt">// WS_EX_LAYERED | WS_EX_TOOLWINDOW, ohne WS_EX_TRANSPARENT</span></code></pre>
+      <p>
+        <code>WS_EX_LAYERED</code> ist die Voraussetzung für den nächsten Schritt — ohne dieses Bit lehnt
+        <code>SetLayeredWindowAttributes</code> ab. Der Parameter <code>false</code> ist eine bewusste
+        Startbedingung: <strong>Das Fenster startet klickbar, nicht durchlässig.</strong> Die Hit-Test-Schleife
+        (Lektion 05/06) schaltet ab dem ersten Frame selbst um.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Fenster-Deckkraft auf 255 setzen</h3>
+<pre><code>Win32Interop.SetLayeredWindowAttributes(_hwnd, <span class="num2">0</span>, <span class="num2">255</span>, Win32Interop.LWA_ALPHA);</code></pre>
+      <p>
+        Das sieht auf den ersten Blick widersinnig aus — 255 heißt „voll deckend". Der Punkt ist die Unterscheidung
+        zweier Alpha-Ebenen:
+      </p>
+      <ul>
+        <li><strong>Fenster-Alpha</strong> (dieser Aufruf): eine globale Deckkraft für das <em>gesamte</em> Fenster.
+          255 = „nichts pauschal ausblenden".</li>
+        <li><strong>Per-Pixel-Alpha</strong> (aus Schritt 4 + Kamera-Alpha 0): entscheidet Pixel für Pixel.</li>
+      </ul>
+      <p>
+        Man setzt hier also 255, um zu sagen: <em>„Behandle das Fenster als Layered Window, aber verschleiere es
+        nicht zusätzlich."</em> Die eigentliche Durchsichtigkeit kommt vom DWM. Der zweite Parameter
+        (<code>key = 0</code>) ist der Colorkey und wird ignoriert, weil das Flag <code>LWA_ALPHA</code> lautet und
+        nicht <code>LWA_COLORKEY</code>.
+      </p>
+      <p>
+        <strong>Nebeneffekt, den man später brauchen kann:</strong> Genau diese Zahl ist der Hebel für ein
+        Ein-/Ausblenden des ganzen Pets. Ein Wert von 128 macht die Figur halbtransparent — ohne einen einzigen
+        Shader anzufassen.
+      </p>
+    </div>
+
+  </div>
+
+  <p>
+    Zum Schluss <code>SetTopMost(true)</code> (Lektion 03) — das Fenster ist jetzt randlos, transparent, klickbar
+    und liegt oben.
+  </p>
+
+  <div class="trap">
+    <span class="callout-title">Wenn der Hintergrund trotzdem schwarz bleibt</span>
+    Die Kombination „Layered + ExtendFrame" ist das gängige Rezept, aber die Reihenfolge ist empfindlich, und je nach
+    Windows-Version funktioniert auch die <em>reine</em> DWM-Variante. Der dokumentierte Notfallplan des Spikes:
+    <ol style="margin-top:0.5rem;margin-bottom:0">
+      <li>Zuerst prüfen, ob D3D11 wirklich aktiv ist (in <code>ProjectSettings.asset</code> darf <code>Direct3D12</code>
+        nicht vorkommen, <code>useFlipModelSwapchain</code> muss 0 sein). Das erklärt die meisten Fälle.</li>
+      <li>Erst dann am Code drehen: <code>SetLayeredWindowAttributes</code> testweise ganz weglassen — also nur
+        <code>WS_EX_LAYERED</code> + <code>DwmExtendFrameIntoClientArea</code>. Das ist die zweite gängige Variante.</li>
+    </ol>
+  </div>
+
+  <h2>Die Fassade: warum diese Methode nicht in einem MonoBehaviour steht</h2>
+  <p>
+    <code>OverlayWindow</code> ist eine schlichte C#-Klasse — kein <code>MonoBehaviour</code>, keine Szenen-Referenz.
+    Sie ist die <strong>einzige</strong> Klasse im Projekt, die <code>Win32Interop</code> überhaupt kennt. Ihr
+    öffentliches Gesicht ist absichtlich winzig:
+  </p>
+
+  <table>
+    <tr><th>Mitglied</th><th>Bedeutung</th><th>Genutzt von</th></tr>
+    <tr><td><code>Initialize()</code></td><td>Das komplette Rezept oben</td><td><code>OverlayBootstrap</code></td></tr>
+    <tr><td><code>IsActive</code></td><td>Haben wir ein Handle? (im Editor: nein)</td><td>alle</td></tr>
+    <tr><td><code>SetClickThrough(bool)</code></td><td>Klicks durchlassen ja/nein</td><td><code>HitTestDriver</code></td></tr>
+    <tr><td><code>SetTopMost(bool)</code></td><td>Nach vorn holen</td><td><code>OverlayBootstrap</code> (Timer)</td></tr>
+    <tr><td><code>Position</code> (get/set)</td><td>Fensterecke oben-links in Bildschirmpixeln</td><td><code>WindowDrag</code>, Persistenz</td></tr>
+    <tr><td><code>ClientSize</code></td><td>Fenstergröße in Pixeln</td><td><code>HitTestDriver</code></td></tr>
+    <tr><td><code>TryGetCursorScreen(out …)</code></td><td>Globale Mausposition</td><td><code>HitTestDriver</code>, <code>WindowDrag</code></td></tr>
+  </table>
+
+  <p>
+    Nichts davon riecht nach Windows. Es gibt kein <code>IntPtr</code> in der öffentlichen Signatur, kein
+    <code>hwnd</code>, keine Bitmaske. Genau das ist der Zweck einer Fassade: <strong>Die Spiellogik spricht über
+    Fenster, nicht über Win32.</strong> Was das für einen macOS-Port bedeutet, ist Thema von Lektion 08.
+  </p>
+
+  <div class="ok">
+    <span class="callout-title">Zwei Kleinigkeiten in der Fassade, die man leicht überliest</span>
+    <p style="margin:0.4rem 0 0.4rem">
+      <strong><code>SetClickThrough</code> filtert doppelt:</strong>
+      <code>if (!IsActive || _clickThrough == enabled) return;</code> — die Fassade merkt sich den letzten Zustand
+      und ruft nativ nur bei echter Änderung. Die aufrufende Seite tut dasselbe noch einmal (Lektion 06). Doppelt
+      gemoppelt? Nein: Die Fassade schützt sich selbst, unabhängig davon, wer sie benutzt.
+    </p>
+    <p style="margin:0">
+      <strong><code>ClientSize</code> hat einen Fallback:</strong> Schlägt <code>GetWindowRect</code> fehl oder ist
+      das Fenster inaktiv, liefert die Property <code>new Vector2Int(Screen.width, Screen.height)</code> statt
+      <code>Vector2Int.zero</code>. Der Grund ist praktisch: Der Wert landet in einer <em>Division</em> bzw. einer
+      Koordinatenumrechnung (Lektion 05) — eine 0 dort wäre viel schlimmer als eine plausible Näherung.
+    </p>
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Warum steht <code>SetBorderless()</code> vor <code>DwmExtendFrameIntoClientArea</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> Weil der DWM-Aufruf sich auf die Client-Area bezieht — die Geometrie muss vorher stimmen</label>
+        <label><input type="radio" name="q1"> Weil <code>DwmExtendFrameIntoClientArea</code> den Style zurücksetzt</label>
+        <label><input type="radio" name="q1"> Reine Konvention, die Reihenfolge ist beliebig</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Geometrie zuerst.</strong> Erst festlegen, was Rahmen und was Inhalt ist — dann dem DWM sagen, wie
+        er mit dem Rahmen umgehen soll. Umgekehrt redet man über eine Geometrie, die man gleich danach ändert.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. <code>SetLayeredWindowAttributes(_hwnd, 0, 255, LWA_ALPHA)</code> — warum 255 und nicht 0?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Weil 0 das Fenster komplett unsichtbar machen würde; die Pixel-Transparenz kommt vom DWM, nicht von diesem Wert</label>
+        <label><input type="radio" name="q2"> Weil 255 bei <code>LWA_ALPHA</code> „automatisch" bedeutet</label>
+        <label><input type="radio" name="q2"> Weil der Wert bei gesetztem <code>WS_EX_LAYERED</code> ignoriert wird</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Erste Variante.</strong> Das ist die <em>Fenster</em>-Deckkraft, nicht die Pixel-Transparenz. 0 hieße:
+        alles unsichtbar, auch die Figur. 255 heißt: „pauschal nichts ausblenden — entscheide pro Pixel." Ignoriert
+        wird der Wert keineswegs; genau deshalb ist er ein guter Hebel für ein späteres Ein-/Ausblenden.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Warum ist der <code>Application.isEditor</code>-Ausstieg mehr als eine Bequemlichkeit?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Weil <code>GetActiveWindow()</code> im Editor das Editor-Fenster liefert. Ohne den Ausstieg würde
+        <code>SetBorderless</code> dem Unity-Editor selbst die Titelleiste wegnehmen und ihn topmost machen. Der
+        <code>return</code> lässt <code>IsActive</code> auf <code>false</code>, wodurch alle anderen Methoden der
+        Fassade ebenfalls sauber aussteigen — der Play-Modus läuft dann ohne Overlay-Verhalten, aber ohne Schaden."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li>Die sechs Schritte von <code>Initialize()</code> in ihrer <strong>zwingenden Reihenfolge</strong>: Editor-Ausstieg → Handle → randlos → DWM-Extend → ExStyle → Layered-Alpha → topmost.</li>
+      <li><code>MARGINS(-1,-1,-1,-1)</code> = „das ganze Fenster ist Rahmen" — der <em>Sheet-of-Glass</em>-Trick.</li>
+      <li><strong>Fenster-Alpha (255) ≠ Per-Pixel-Alpha.</strong> Ersteres ist ein globaler Regler und ein guter Hebel für Fade-Effekte.</li>
+      <li>Start-Zustand ist <strong>klickbar</strong> (<code>ApplyExStyle(false)</code>), nicht durchlässig.</li>
+      <li>Der <code>isEditor</code>-Ausstieg schützt den Editor davor, selbst zum Overlay zu werden.</li>
+      <li>Die Fassade <code>OverlayWindow</code> hat <strong>kein <code>IntPtr</code> nach außen</strong> — das macht sie portierbar.</li>
+      <li>Bei schwarzem Hintergrund: erst Grafik-API prüfen, dann testweise <code>SetLayeredWindowAttributes</code> weglassen.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/OverlayWindow.cs</code> (desk-buddy @ <code>a57f9f1</code>) ·
+    Notfallplan aus dem Abschnitt „Risiken" von <code>plans/2026-08-04-overlay-spike.md</code><br>
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea">DwmExtendFrameIntoClientArea</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setlayeredwindowattributes">SetLayeredWindowAttributes</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getactivewindow">GetActiveWindow</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="05-click-through-die-input-falle.html">Click-through und die Input-Falle</a></div>
+
+</div>
+</body>
+</html>

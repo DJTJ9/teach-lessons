@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referenz: Win32-Overlay in Unity — Cheat-Sheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; padding: 2rem 1rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.8rem; color: #f8fafc; margin-bottom: 0.25rem; }
+  .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 2rem; }
+  h2 { font-size: 0.95rem; color: #a5b4fc; margin: 2rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2d2d3f; padding-bottom: 0.35rem; }
+  p { line-height: 1.7; color: #cbd5e1; margin-bottom: 0.8rem; font-size: 0.92rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.86em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto; margin: 0.8rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.79rem; line-height: 1.55; display: block; }
+  .cmt { color: #5b6478; font-style: italic; } .kw { color: #c792ea; } .str { color: #86e1a0; } .num2 { color: #f78c6c; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 0.8rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.45rem 0.7rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.45rem 0.7rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  td code { font-size: 0.95em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .warn { background: #2a1416; border-left: 4px solid #f87171; border-radius: 6px; padding: 0.8rem 1rem; margin: 1rem 0; color: #fecaca; font-size: 0.87rem; line-height: 1.6; }
+  .note { background: #1c1a2e; border-left: 4px solid #818cf8; border-radius: 6px; padding: 0.8rem 1rem; margin: 1rem 0; color: #c7d2fe; font-size: 0.87rem; line-height: 1.6; }
+  .src { font-size: 0.78rem; color: #64748b; margin-top: 2.5rem; line-height: 1.7; border-top: 1px solid #23233a; padding-top: 1rem; }
+  .src a { color: #58a6ff; text-decoration: none; }
+  ol, ul { margin: 0 0 0.8rem 1.2rem; color: #cbd5e1; font-size: 0.9rem; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Win32-Overlay in Unity — Cheat-Sheet</h1>
+  <p class="subtitle">Kompakte Nachschlage-Referenz zum Desk-Buddy-Overlay-Spike · Code-Stand <code>a57f9f1</code>, 2026-08-04</p>
+
+  <h2>1 · Player Settings (zwingend, sonst schwarze Box)</h2>
+  <table>
+    <tr><th>Einstellung</th><th>Wert</th><th>Grund</th></tr>
+    <tr><td>Auto Graphics API for Windows</td><td>AUS</td><td>Unity darf D3D12 nicht selbst wählen</td></tr>
+    <tr><td>Graphics APIs</td><td>nur <code>Direct3D11</code></td><td>D3D12 nutzt ausschließlich Flip-Model</td></tr>
+    <tr><td>Use DXGI Flip Model Swapchain</td><td>AUS</td><td>Flip-Model umgeht das Fenster-Bitmap</td></tr>
+    <tr><td>Render Pipeline</td><td>Built-in</td><td>URP: gemeldete Alpha-/Kantenprobleme</td></tr>
+    <tr><td>Fullscreen Mode</td><td>Windowed</td><td>—</td></tr>
+    <tr><td>Resizable Window</td><td>AUS</td><td>—</td></tr>
+    <tr><td>Default Resolution</td><td>klein (z.&nbsp;B. 256×256)</td><td>Fenster wandert mit; außerhalb ist Click-through gratis</td></tr>
+    <tr><td>Run/Visible In Background</td><td>AN</td><td>Pet lebt weiter ohne Fokus</td></tr>
+    <tr><td>Camera Clear Flags</td><td>Solid Color, RGBA(0,0,0,<strong>0</strong>)</td><td>Alpha 0 ist die Quelle der Transparenz</td></tr>
+    <tr><td>HDR / MSAA / Post-Processing</td><td>AUS</td><td>verfälschen Alpha bzw. Kanten</td></tr>
+    <tr><td>Ziel-Plattform</td><td><code>StandaloneWindows64</code></td><td><code>…LongPtrW</code> nur auf x64</td></tr>
+  </table>
+
+  <p><strong>Verifikation vor jeder Sichtprüfung</strong> in <code>ProjectSettings/ProjectSettings.asset</code>:</p>
+  <pre><code>findstr /C:"Direct3D12" ProjectSettings\ProjectSettings.asset   <span class="cmt">:: KEIN Treffer erwartet</span>
+findstr /C:"m_UseFlipModelSwapchain" ...                        <span class="cmt">:: erwartet: 0</span>
+findstr /C:"resizableWindow" ...                                <span class="cmt">:: erwartet: 0</span></code></pre>
+
+  <h2>2 · Konstanten</h2>
+  <div class="grid">
+    <div>
+      <table>
+        <tr><th>Style (<code>GWL_STYLE = -16</code>)</th><th>Wert</th></tr>
+        <tr><td><code>WS_POPUP</code></td><td>0x80000000</td></tr>
+        <tr><td><code>WS_VISIBLE</code></td><td>0x10000000</td></tr>
+      </table>
+      <table>
+        <tr><th>ExStyle (<code>GWL_EXSTYLE = -20</code>)</th><th>Wert</th></tr>
+        <tr><td><code>WS_EX_LAYERED</code></td><td>0x00080000</td></tr>
+        <tr><td><code>WS_EX_TRANSPARENT</code></td><td>0x00000020</td></tr>
+        <tr><td><code>WS_EX_TOOLWINDOW</code></td><td>0x00000080</td></tr>
+      </table>
+    </div>
+    <div>
+      <table>
+        <tr><th><code>SetWindowPos</code>-Flags</th><th>Wert</th></tr>
+        <tr><td><code>SWP_NOSIZE</code></td><td>0x0001</td></tr>
+        <tr><td><code>SWP_NOMOVE</code></td><td>0x0002</td></tr>
+        <tr><td><code>SWP_NOACTIVATE</code></td><td>0x0010</td></tr>
+        <tr><td><code>SWP_FRAMECHANGED</code></td><td>0x0020</td></tr>
+        <tr><td><code>SWP_SHOWWINDOW</code></td><td>0x0040</td></tr>
+      </table>
+      <table>
+        <tr><th>Sonstige</th><th>Wert</th></tr>
+        <tr><td><code>HWND_TOPMOST</code></td><td>-1</td></tr>
+        <tr><td><code>HWND_NOTOPMOST</code></td><td>-2</td></tr>
+        <tr><td><code>LWA_ALPHA</code></td><td>0x00000002</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2>3 · DllImport-Block zum Kopieren</h2>
+<pre><code>[DllImport(<span class="str">"user32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetActiveWindow();
+[DllImport(<span class="str">"user32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetCursorPos(<span class="kw">out</span> POINT p);
+[DllImport(<span class="str">"user32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetWindowRect(IntPtr h, <span class="kw">out</span> RECT r);
+[DllImport(<span class="str">"user32.dll"</span>, EntryPoint=<span class="str">"SetWindowLongPtrW"</span>)] <span class="kw">static</span> <span class="kw">extern</span> IntPtr SetWindowLongPtr(IntPtr h, <span class="kw">int</span> i, IntPtr v);
+[DllImport(<span class="str">"user32.dll"</span>, EntryPoint=<span class="str">"GetWindowLongPtrW"</span>)] <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetWindowLongPtr(IntPtr h, <span class="kw">int</span> i);
+[DllImport(<span class="str">"user32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> SetWindowPos(IntPtr h, IntPtr after, <span class="kw">int</span> x, <span class="kw">int</span> y, <span class="kw">int</span> cx, <span class="kw">int</span> cy, <span class="kw">uint</span> flags);
+[DllImport(<span class="str">"user32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> SetLayeredWindowAttributes(IntPtr h, <span class="kw">uint</span> key, <span class="kw">byte</span> alpha, <span class="kw">uint</span> flags);
+[DllImport(<span class="str">"dwmapi.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">int</span> DwmExtendFrameIntoClientArea(IntPtr h, <span class="kw">ref</span> MARGINS m);
+[DllImport(<span class="str">"kernel32.dll"</span>)] <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetCurrentProcess();
+[DllImport(<span class="str">"psapi.dll"</span>, SetLastError=<span class="kw">true</span>)] <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetProcessMemoryInfo(IntPtr h, <span class="kw">out</span> PROCESS_MEMORY_COUNTERS c, <span class="kw">uint</span> size);
+
+<span class="cmt">// Structs: POINT{X,Y} · RECT{Left,Top,Right,Bottom} · MARGINS{Left,Right,Top,Bottom}</span>
+<span class="cmt">// alle mit [StructLayout(LayoutKind.Sequential)] — Feldreihenfolge ist Teil des Vertrags!</span></code></pre>
+
+  <h2>4 · Init-Reihenfolge</h2>
+<pre><code><span class="kw">if</span> (Application.isEditor) <span class="kw">return</span>;                 <span class="cmt">// 0. Editor schützen (sonst zerlegst du den Editor)</span>
+hwnd = GetActiveWindow();                          <span class="cmt">// 1. Handle + Null-Prüfung mit Log</span>
+SetWindowLongPtr(hwnd, GWL_STYLE, WS_POPUP|WS_VISIBLE);
+SetWindowPos(hwnd, 0,0,0,0,0, NOMOVE|NOSIZE|NOACTIVATE|FRAMECHANGED);  <span class="cmt">// 2. randlos</span>
+DwmExtendFrameIntoClientArea(hwnd, MARGINS(-1,-1,-1,-1));              <span class="cmt">// 3. Sheet of Glass</span>
+SetWindowLongPtr(hwnd, GWL_EXSTYLE, WS_EX_LAYERED|WS_EX_TOOLWINDOW);   <span class="cmt">// 4. layered, click-through AUS</span>
+SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA);                   <span class="cmt">// 5. Fenster-Alpha voll</span>
+SetWindowPos(hwnd, HWND_TOPMOST, 0,0,0,0, NOMOVE|NOSIZE|NOACTIVATE);   <span class="cmt">// 6. nach oben</span>
+<span class="cmt">// + alle 5 s Schritt 6 wiederholen (Vollbild-Spiele/UAC werfen dich raus)</span></code></pre>
+
+  <h2>5 · Hit-Test pro Frame</h2>
+<pre><code>GetCursorPos(<span class="kw">out</span> p);                    <span class="cmt">// NIE Input.mousePosition — friert unter WS_EX_TRANSPARENT ein</span>
+localX = p.X - windowLeft;
+localY = windowHeight - (p.Y - windowTop);  <span class="cmt">// Win32 Y↓ → Unity Y↑</span>
+world  = camera.ScreenToWorldPoint(<span class="kw">new</span> Vector3(localX, localY, 0));
+overOwn = Physics2D.OverlapPoint(world) != <span class="kw">null</span>;   <span class="cmt">// Punkt-Test, kein Raycast</span>
+
+desired = !(overOwn || dragLock);           <span class="cmt">// DragLock = Veto</span>
+<span class="kw">if</span> (!initialized || desired != last) { last = desired; ApplyExStyle(desired); }  <span class="cmt">// nur bei Kantenwechsel</span></code></pre>
+
+  <h2>6 · Drag</h2>
+<pre><code>OnMouseDown : cursorStart = GetCursorPos(); windowStart = Position; dragLock = <span class="kw">true</span>;
+Update      : <span class="kw">if</span> (!Input.GetMouseButton(0)) { dragLock = <span class="kw">false</span>; Save(Position); <span class="kw">return</span>; }
+              Position = windowStart + (GetCursorPos() - cursorStart);   <span class="cmt">// absolut, nicht inkrementell</span></code></pre>
+  <div class="note">
+    Drag-<em>Ende</em> nie über <code>OnMouseUp</code> — das feuert nur, wenn der Cursor beim Loslassen noch über dem
+    Collider steht. Beim schnellen Ziehen bliebe der DragLock sonst für immer an.
+  </div>
+
+  <h2>7 · Fehlerbild → Ursache</h2>
+  <table>
+    <tr><th>Symptom</th><th>Wahrscheinlichste Ursache</th></tr>
+    <tr><td>Schwarze/graue Box statt Transparenz</td><td>D3D12 aktiv oder Flip-Model an → Settings prüfen. Danach testweise <code>SetLayeredWindowAttributes</code> weglassen (reine DWM-Variante).</td></tr>
+    <tr><td>Click-through schaltet einmal an und nie wieder aus</td><td>Irgendwo doch <code>Input.mousePosition</code> statt <code>GetCursorPos</code>.</td></tr>
+    <tr><td>Figur „reißt ab" beim schnellen Ziehen</td><td><code>DragLock</code> wird nicht gesetzt — Verdrahtung <code>windowDrag.Driver</code> im Bootstrap prüfen.</td></tr>
+    <tr><td>Fenster verschwindet hinter anderen</td><td>Re-Assert-Timer läuft nicht (<code>InvokeRepeating</code> in <code>Awake</code>).</td></tr>
+    <tr><td>Rahmen weg, aber Inhalt verschoben</td><td><code>SWP_FRAMECHANGED</code> fehlt nach dem Style-Wechsel.</td></tr>
+    <tr><td>Hit-Test trifft daneben</td><td>Y-Achse nicht gespiegelt oder <code>GetWindowRect</code>-Ursprung nicht abgezogen. (Bei DPI ≠ 100 %: Skalierungsfaktor fehlt — im Spike ungelöst.)</td></tr>
+    <tr><td>App nicht beendbar</td><td><code>WS_EX_TOOLWINDOW</code> ohne eigenen Beenden-Weg → Rechtsklick/Tray/Hotkey nachrüsten.</td></tr>
+    <tr><td>Speicher-Messwert konstant 0</td><td><code>Process.WorkingSet64</code> unter Mono → <code>psapi!GetProcessMemoryInfo</code>.</td></tr>
+    <tr><td>Editor verliert Titelleiste / verhält sich seltsam</td><td><code>Application.isEditor</code>-Ausstieg fehlt — <code>GetActiveWindow</code> traf das Editor-Fenster.</td></tr>
+  </table>
+
+  <h2>8 · Architektur-Regeln</h2>
+  <ul>
+    <li><strong>Genau eine Datei</strong> mit <code>DllImport</code> — auch für nachträgliche Fixes.</li>
+    <li><strong>Kein <code>IntPtr</code></strong> in der öffentlichen Fassade; Vokabular ist <code>Position</code>, <code>ClientSize</code>, <code>SetClickThrough</code>.</li>
+    <li><strong>Fassade no-oppt im Editor</strong>; <code>IsActive == false</code> lässt alle Aufrufer sauber aussteigen.</li>
+    <li><strong>Native Aufrufe nur bei Zustandswechsel</strong>, nicht pro Frame.</li>
+    <li><strong>Zentrale Verdrahtung</strong> im Bootstrap (Execution Order −100), kein Singleton/<code>FindObjectOfType</code>.</li>
+    <li><strong>Testschnitt:</strong> nur reine Logik testen (Zustandsautomat, Persistenz) — DllImport-Wrapper nicht mocken.</li>
+    <li><strong>Sichtbeweis bleibt manuell:</strong> Fenster dahinter, danebenklicken, draufklicken, schnell ziehen, neu starten, Vollbild-Spiel dazwischen.</li>
+  </ul>
+
+  <div class="warn">
+    <strong>Automatisierte Vollbild-Screenshots auf einem echten Arbeitsrechner: nicht.</strong> Sie erfassen
+    Browser-Tabs, Chats und ggf. Zugangsdaten. Nur gezielt das Zielfenster aufnehmen — oder den Menschen fragen.
+  </div>
+
+  <div class="src">
+    <strong>Referenzcode:</strong> <code>github.com/DJTJ9/desk-buddy</code> @ <code>a57f9f1</code> ·
+    <code>Assets/Scripts/Platform/Win32Interop.cs</code>, <code>Assets/Scripts/Overlay/*</code>, <code>Assets/Editor/SpikeSettings.cs</code><br>
+    <strong>Doku:</strong>
+    <a href="https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles">Extended Window Styles</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos">SetWindowPos</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/nf-dwmapi-dwmextendframeintoclientarea">DwmExtendFrameIntoClientArea</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setlayeredwindowattributes">SetLayeredWindowAttributes</a> ·
+    <a href="https://docs.unity3d.com/ScriptReference/PlayerSettings-useFlipModelSwapchain.html">useFlipModelSwapchain</a><br>
+    <strong>Lektionen:</strong> <a href="../lessons/01-warum-fenster-durchsichtig-wird.html">01</a> ·
+    <a href="../lessons/02-win32-von-null-hwnd-und-dllimport.html">02</a> ·
+    <a href="../lessons/03-randlos-und-immer-oben.html">03</a> ·
+    <a href="../lessons/04-transparenz-rezept-dwm-plus-layered.html">04</a> ·
+    <a href="../lessons/05-click-through-die-input-falle.html">05</a> ·
+    <a href="../lessons/06-zustandsautomat-statt-per-frame-call.html">06</a> ·
+    <a href="../lessons/07-drag-ohne-abreissen.html">07</a> ·
+    <a href="../lessons/08-fassade-persistenz-und-portierung.html">08</a>
+  </div>
+
+</div>
+</body>
+</html>

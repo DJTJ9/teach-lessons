@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 06: Zustandsautomat statt Per-Frame-Call</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; } .kw { color: #c792ea; } .str { color: #86e1a0; } .num2 { color: #f78c6c; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; } .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; } .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; } .src a { color: #58a6ff; text-decoration: none; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; } .nav a { color: #58a6ff; text-decoration: none; }
+  .diagram { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1.2rem; margin: 1.5rem 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78rem; color: #94a3b8; line-height: 1.7; white-space: pre; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 06</div>
+    <h1>Zustandsautomat statt Per-Frame-Call</h1>
+    <p class="subtitle">14 Zeilen <code>ClickThroughState</code> — die einzige Stelle des Spikes, an der echte Logik wohnt (und die einzige, die man testen kann)</p>
+  </div>
+
+  <h2>Das Problem: 30 native Aufrufe pro Sekunde für nichts</h2>
+  <p>
+    Der Hit-Test aus Lektion 05 läuft jeden Frame. Würde man sein Ergebnis direkt weitergeben, hieße das:
+    30 × <code>SetWindowLongPtr</code> pro Sekunde, dauerhaft, den ganzen Arbeitstag. Der Aufruf ist nicht teuer,
+    aber er ist auch nicht gratis — und vor allem ist er <strong>unnötig</strong>: In 99 % der Frames hat sich gar
+    nichts geändert. Der Cursor steht still oder bewegt sich innerhalb derselben Zone.
+  </p>
+  <p>
+    Interessant ist nur der <strong>Kantenwechsel</strong>: der Moment, in dem der Cursor die Silhouette betritt oder
+    verlässt. Genau dafür gibt es einen kleinen Zustandsautomaten.
+  </p>
+
+  <h2>Der ganze Automat</h2>
+
+<pre><code><span class="cmt">/// Reine Entscheidungslogik des Click-through-Toggles — ohne Unity-Abhängigkeit,</span>
+<span class="cmt">/// damit der DragLock-Fall testbar ist.</span>
+<span class="cmt">/// Rückgabe null = kein Zustandswechsel, also kein nativer Call.</span>
+<span class="kw">public</span> <span class="kw">sealed</span> <span class="kw">class</span> ClickThroughState
+{
+    <span class="kw">private</span> <span class="kw">bool</span> _clickThrough;
+    <span class="kw">private</span> <span class="kw">bool</span> _initialized;
+
+    <span class="kw">public</span> <span class="kw">bool</span>? Evaluate(<span class="kw">bool</span> overOwn, <span class="kw">bool</span> dragLock)
+    {
+        <span class="kw">var</span> desired = !(overOwn || dragLock);
+        <span class="kw">if</span> (_initialized &amp;&amp; desired == _clickThrough) <span class="kw">return</span> <span class="kw">null</span>;
+        _initialized = <span class="kw">true</span>;
+        _clickThrough = desired;
+        <span class="kw">return</span> desired;
+    }
+}</code></pre>
+
+  <p>Das ist alles. Drei Entscheidungen stecken darin:</p>
+
+  <h3>1. Der Rückgabetyp ist <code>bool?</code>, nicht <code>bool</code></h3>
+  <p>
+    Drei mögliche Antworten statt zwei: <code>true</code> = „schalte Click-through <em>ein</em>",
+    <code>false</code> = „schalte <em>aus</em>", <code>null</code> = <strong>„tu gar nichts"</strong>. Der
+    Nullable-Typ macht „keine Änderung" zu einem eigenständigen, nicht verwechselbaren Fall. Der Aufrufer wird
+    dadurch zu einer Zeile:
+  </p>
+
+<pre><code><span class="kw">var</span> change = _state.Evaluate(overOwn, DragLock);
+<span class="kw">if</span> (change.HasValue) Window.SetClickThrough(change.Value);</code></pre>
+
+  <div class="insight">
+    <span class="callout-title">Warum das mehr ist als ein Trick</span>
+    Die Alternative wäre gewesen, in <code>HitTestDriver</code> ein <code>_lastOverOwn</code>-Feld zu führen und dort
+    zu vergleichen. Funktioniert auch — aber dann steckt die Entscheidungslogik in einem
+    <code>MonoBehaviour</code>, das eine Kamera, ein Fenster und Physik-Zugriff braucht. Man kann sie nur noch im
+    Build prüfen. So wie hier ist sie eine <strong>reine Klasse ohne eine einzige Unity-Abhängigkeit</strong>:
+    zwei Bools rein, ein <code>bool?</code> raus.
+  </div>
+
+  <h3>2. <code>_initialized</code> erzwingt genau einen Aufruf am Anfang</h3>
+  <p>
+    Beim allerersten <code>Evaluate</code> ist <code>_clickThrough</code> per Default <code>false</code>. Ohne das
+    Flag würde ein erster Aufruf mit <code>desired == false</code> als „keine Änderung" durchgehen — und der native
+    Zustand wäre nie explizit gesetzt worden. Man würde sich auf einen Startwert verlassen, statt ihn zu
+    schreiben. Das Flag stellt sicher: <strong>Der erste Frame setzt immer.</strong>
+  </p>
+
+  <h3>3. Die Wahrheitstabelle passt in eine Zeile</h3>
+
+<pre><code><span class="kw">var</span> desired = !(overOwn || dragLock);</code></pre>
+
+  <table>
+    <tr><th><code>overOwn</code></th><th><code>dragLock</code></th><th><code>desired</code> (= Click-through)</th><th>Bedeutung</th></tr>
+    <tr><td>false</td><td>false</td><td><strong>true</strong></td><td>Cursor daneben, kein Drag → Klicks durchlassen</td></tr>
+    <tr><td>true</td><td>false</td><td>false</td><td>Cursor auf der Figur → Klicks abfangen</td></tr>
+    <tr><td>false</td><td>true</td><td>false</td><td>Drag läuft, Cursor abgerutscht → <em>trotzdem</em> abfangen</td></tr>
+    <tr><td>true</td><td>true</td><td>false</td><td>Drag läuft auf der Figur → abfangen</td></tr>
+  </table>
+
+  <p>
+    Zeile 3 ist der eigentliche Grund für diese Klasse. Warum sie so aussehen muss, ist Lektion 07 —
+    hier zählt: <strong>Der DragLock ist ein Veto, das die Ortsfrage überstimmt.</strong>
+  </p>
+
+  <h2>Warum das die einzige testbare Stelle im Spike ist</h2>
+  <p>
+    Der Spike besteht aus sieben Runtime-Dateien. Sechs davon hängen entweder am Betriebssystem
+    (<code>Win32Interop</code>, <code>OverlayWindow</code>), an einem laufenden Fenster
+    (<code>HitTestDriver</code>, <code>WindowDrag</code>, <code>OverlayBootstrap</code>) oder schreiben Dateien
+    (<code>IdleProbe</code>). Sie lassen sich nicht sinnvoll automatisiert prüfen — Transparenz ist im Editor
+    prinzipiell nicht darstellbar, und einen <code>DllImport</code>-Wrapper zu mocken hieße, Attrappen gegen sich
+    selbst zu testen.
+  </p>
+  <p>
+    Bleiben zwei Stellen mit echter Logik: <code>ClickThroughState</code> und die JSON-Persistenz
+    <code>WindowState</code> (Lektion 08). Genau diese zwei haben Tests — 7 + 4 Stück, alle grün. Der Spike hat den
+    Testschnitt also nicht nach Abdeckungsquote gewählt, sondern nach der Frage:
+    <strong>Wo kann überhaupt ein Denkfehler stecken?</strong>
+  </p>
+
+  <h2>Die sieben Tests als Spezifikation gelesen</h2>
+  <p>
+    Diese Tests sind vor der Implementierung geschrieben worden. Man kann sie deshalb wie eine Anforderungsliste
+    lesen — jeder Test ist ein Satz über gewünschtes Verhalten:
+  </p>
+
+<pre><code>[Test] <span class="kw">public</span> <span class="kw">void</span> FirstEvaluationAlwaysReportsChange()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    Assert.AreEqual(<span class="kw">true</span>, state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">false</span>));
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> RepeatedSameInputReportsNoChange()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    Assert.IsNull(state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>));   <span class="cmt">// ← "kein nativer Call" als Testaussage</span>
+    Assert.IsNull(state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>));
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> EnteringOwnSpriteDisablesClickThrough()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    Assert.AreEqual(<span class="kw">false</span>, state.Evaluate(overOwn: <span class="kw">true</span>, dragLock: <span class="kw">false</span>));
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> LeavingOwnSpriteReEnablesClickThrough()  <span class="cmt">// ← genau der Bug aus Lektion 05</span>
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    state.Evaluate(<span class="kw">true</span>, <span class="kw">false</span>);
+    Assert.AreEqual(<span class="kw">true</span>, state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">false</span>));
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> DragLockKeepsClickThroughOffEvenOutsideSprite()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    state.Evaluate(<span class="kw">true</span>, <span class="kw">false</span>);
+    Assert.IsNull(state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">true</span>));   <span class="cmt">// Cursor raus, aber Drag hält → nichts tun</span>
+    Assert.IsNull(state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">true</span>));
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> ReleasingDragOutsideSpriteReEnablesClickThrough()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    state.Evaluate(<span class="kw">true</span>, <span class="kw">false</span>);
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">true</span>);
+    Assert.AreEqual(<span class="kw">true</span>, state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">false</span>));  <span class="cmt">// Loslassen außerhalb → wieder durchlässig</span>
+}
+
+[Test] <span class="kw">public</span> <span class="kw">void</span> DragLockFromOutsideAlsoDisablesClickThrough()
+{
+    <span class="kw">var</span> state = <span class="kw">new</span> ClickThroughState();
+    state.Evaluate(<span class="kw">false</span>, <span class="kw">false</span>);
+    Assert.AreEqual(<span class="kw">false</span>, state.Evaluate(overOwn: <span class="kw">false</span>, dragLock: <span class="kw">true</span>));
+}</code></pre>
+
+  <div class="ok">
+    <span class="callout-title">Was diese Tests wirklich absichern</span>
+    Nicht „der Code tut, was er tut" — sondern die vier Szenarien, die man im Handtest nur schwer reproduziert:
+    schnelles Ziehen über den Silhouettenrand hinaus, Loslassen außerhalb, Drag-Start neben der Figur, und der
+    allererste Frame. Genau das sind die Momente, in denen ein Desktop-Pet „abreißt" oder klick-tot wird.
+    <strong>Ein Test, den man von Hand nur mit Glück auslöst, ist wertvoller als zehn, die den Normalfall abdecken.</strong>
+  </div>
+
+  <h2>Zwei Typen in einer Datei — Absicht, kein Zufall</h2>
+  <p>
+    <code>HitTestDriver.cs</code> enthält beide Klassen: die reine <code>ClickThroughState</code> und das
+    <code>MonoBehaviour</code> <code>HitTestDriver</code>. Die Aufteilung folgt einer klaren Linie:
+  </p>
+
+  <div class="diagram">HitTestDriver  (MonoBehaviour)     ClickThroughState  (reine Klasse)
+─────────────────────────────     ────────────────────────────────
+Kamera, Physik, Fenster           zwei bool rein, bool? raus
+fragt jeden Frame ab              merkt sich den letzten Zustand
+"WO ist der Cursor?"              "MUSS sich etwas ändern?"
+nur im Build prüfbar              7 EditMode-Tests, ohne Unity</div>
+
+  <p>
+    Für die Test-Assembly ist übrigens eine Kleinigkeit Voraussetzung, die man beim Nachbauen leicht übersieht:
+    Eine Test-<code>asmdef</code> kann <strong>nicht</strong> auf die Standard-Assembly
+    <code>Assembly-CSharp</code> referenzieren. Deshalb hat der Spike eine eigene
+    <code>Assets/Scripts/DeskBuddy.asmdef</code> für den Runtime-Code — sonst gäbe es schlicht nichts, worauf die
+    Tests zeigen könnten.
+  </p>
+
+<pre><code><span class="cmt">// Assets/Tests/EditMode/DeskBuddy.Tests.EditMode.asmdef</span>
+{
+    <span class="str">"name"</span>: <span class="str">"DeskBuddy.Tests.EditMode"</span>,
+    <span class="str">"references"</span>: [<span class="str">"DeskBuddy"</span>, <span class="str">"UnityEngine.TestRunner"</span>, <span class="str">"UnityEditor.TestRunner"</span>],
+    <span class="str">"includePlatforms"</span>: [<span class="str">"Editor"</span>],
+    <span class="str">"overrideReferences"</span>: <span class="kw">true</span>,
+    <span class="str">"precompiledReferences"</span>: [<span class="str">"nunit.framework.dll"</span>],
+    <span class="str">"autoReferenced"</span>: <span class="kw">false</span>,
+    <span class="str">"defineConstraints"</span>: [<span class="str">"UNITY_INCLUDE_TESTS"</span>]
+}</code></pre>
+
+  <div class="trap">
+    <span class="callout-title">Grüne Tests sind hier kein Beweis</span>
+    Alle 11 Tests grün heißt: Die Entscheidungslogik und die Persistenz stimmen. Es heißt <em>nicht</em>, dass das
+    Overlay funktioniert. Ob der Hintergrund wirklich durchsichtig ist, ob Klicks wirklich durchgehen, ob die Figur
+    beim Ziehen hält — das sieht nur ein Mensch vor einem Build. Der Spike hat deshalb einen Neun-Punkte-Durchlauf
+    von Hand als alleiniges Fertig-Kriterium definiert, ausdrücklich nicht die Testsuite.
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Warum gibt <code>Evaluate</code> <code>bool?</code> zurück statt <code>bool</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> Damit „keine Änderung" ein eigener Fall ist und der Aufrufer den nativen Call weglassen kann</label>
+        <label><input type="radio" name="q1"> Weil der Startzustand unbekannt ist und <code>null</code> „unbekannt" bedeutet</label>
+        <label><input type="radio" name="q1"> Weil <code>SetClickThrough</code> einen Nullable-Parameter erwartet</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Erste Variante.</strong> <code>null</code> heißt „nichts zu tun" — daraus wird beim Aufrufer
+        <code>if (change.HasValue)</code>. So passieren native Aufrufe nur bei echten Kantenwechseln statt 30-mal
+        pro Sekunde.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Du löschst das Feld <code>_initialized</code>. Was passiert?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Der Startzustand wird nie explizit gesetzt — man verlässt sich darauf, dass das Fenster zufällig schon richtig steht</label>
+        <label><input type="radio" name="q2"> Nichts, der erste Aufruf liefert ohnehin einen Wert</label>
+        <label><input type="radio" name="q2"> Der DragLock funktioniert nicht mehr</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Erste Variante.</strong> Ohne das Flag gilt der Default <code>_clickThrough == false</code> als
+        „bereits gesetzt". Startet die App mit dem Cursor neben der Figur, wäre <code>desired == true</code> —
+        das würde gemeldet. Startet sie mit dem Cursor <em>auf</em> der Figur, wäre <code>desired == false</code>
+        und die Antwort <code>null</code>: kein Aufruf, obwohl der native Zustand nie geschrieben wurde. Genau das
+        prüft <code>FirstEvaluationAlwaysReportsChange</code>.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Warum ist <code>ClickThroughState</code> eine eigene Klasse und keine drei Felder im <code>HitTestDriver</code>?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Weil sie damit keine Unity-Abhängigkeit hat — kein <code>MonoBehaviour</code>, keine Kamera, keine Physik.
+        Sie ist zwei Bools rein, ein <code>bool?</code> raus und deshalb in EditMode-Tests prüfbar. Im
+        <code>HitTestDriver</code> steckt alles, was nur im Build lebt; in <code>ClickThroughState</code> steckt
+        alles, wo ein Denkfehler möglich ist. Genau an dieser Grenze verläuft die Testbarkeit."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><strong>Kantenwechsel statt Zustand:</strong> nativer Aufruf nur, wenn sich wirklich etwas ändert — sonst 30 Calls/Sekunde für nichts.</li>
+      <li><code>bool?</code> macht <strong>„keine Änderung" zu einem eigenen Fall</strong>; der Aufrufer schrumpft auf zwei Zeilen.</li>
+      <li><code>_initialized</code> erzwingt, dass der erste Frame den nativen Zustand <em>schreibt</em>, statt ihn anzunehmen.</li>
+      <li><code>desired = !(overOwn || dragLock)</code> — <strong>DragLock ist ein Veto</strong> über die Ortsfrage.</li>
+      <li>Der <strong>Testschnitt folgt der Frage „wo kann ein Denkfehler stecken"</strong>, nicht einer Abdeckungsquote: 7 Tests hier, 4 für die Persistenz, sonst keine.</li>
+      <li>Eine Test-<code>asmdef</code> braucht eine eigene Runtime-<code>asmdef</code> — <code>Assembly-CSharp</code> ist nicht referenzierbar.</li>
+      <li><strong>Grüne Tests ≠ funktionierendes Overlay.</strong> Der Sichtbeweis bleibt Handarbeit.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/HitTestDriver.cs</code>, <code>Assets/Tests/EditMode/ClickThroughStateTests.cs</code>,
+    <code>Assets/Tests/EditMode/DeskBuddy.Tests.EditMode.asmdef</code> (desk-buddy @ <code>a57f9f1</code>) ·
+    Testschnitt-Begründung in <code>DECISIONS.md</code> 2026-08-04, Abschnitt (3) ·
+    Testergebnis „11/11 grün" laut Repo-<code>README.md</code><br>
+    <a href="https://docs.unity3d.com/Manual/cus-tests.html">Unity Test Framework — Test-Assemblies</a> ·
+    <a href="https://docs.unity3d.com/Manual/ScriptCompilationAssemblyDefinitionFiles.html">Assembly Definition Files</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="07-drag-ohne-abreissen.html">Ziehen ohne Abreißen</a></div>
+
+</div>
+</body>
+</html>

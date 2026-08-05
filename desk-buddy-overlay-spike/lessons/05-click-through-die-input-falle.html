@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 05: Click-through und die Input-Falle</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; } .kw { color: #c792ea; } .str { color: #86e1a0; } .num2 { color: #f78c6c; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; } .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; } .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; } .src a { color: #58a6ff; text-decoration: none; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; } .nav a { color: #58a6ff; text-decoration: none; }
+  .diagram { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1.2rem; margin: 1.5rem 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78rem; color: #94a3b8; line-height: 1.7; white-space: pre; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 05</div>
+    <h1>Click-through und die Input-Falle</h1>
+    <p class="subtitle">Warum <code>Input.mousePosition</code> hier strukturell nicht funktionieren <em>kann</em> — und wie der Hit-Test stattdessen gebaut ist</p>
+  </div>
+
+  <h2>Das Ziel</h2>
+  <p>
+    Das Fenster ist 256×256 Pixel groß, die Figur füllt davon vielleicht die Hälfte. Für den Nutzer soll gelten:
+  </p>
+  <ul>
+    <li>Klick <strong>auf die Figur</strong> → Unity bekommt den Klick (Farbwechsel, Ziehen, Rechtsklick-Beenden).</li>
+    <li>Klick auf die <strong>durchsichtigen Ecken</strong> des Fensterrechtecks → der Klick landet im Fenster <em>darunter</em>, also im Browser oder Notepad.</li>
+  </ul>
+  <p>
+    Windows kennt dafür ein Bit: <code>WS_EX_TRANSPARENT</code>. Ist es gesetzt, ignoriert das Fenster Mauseingaben
+    komplett — sie werden an das nächste Fenster darunter durchgereicht. Das Bit gilt aber für das
+    <strong>ganze Fenster</strong>, nicht pro Pixel. Also muss man es <em>umschalten</em>, je nachdem, wo der Cursor
+    gerade steht.
+  </p>
+
+  <div class="insight">
+    <span class="callout-title">Der Trick, der die Sache halbiert</span>
+    Das Fenster ist klein und wandert mit der Figur mit (Lektion 07). Alles <em>außerhalb</em> des 256×256-Rechtecks
+    ist damit ohnehin gratis „durchlässig" — dort ist schlicht kein Fenster. Der Toggle regelt nur noch die
+    transparenten Ecken <em>innerhalb</em> des Rechtecks. Ein bildschirmfüllendes Overlay wäre teurer und hätte
+    keinen Vorteil.
+  </div>
+
+  <h2>Die naheliegende Lösung — und warum sie strukturell bricht</h2>
+  <p>Der offensichtliche Unity-Ansatz:</p>
+
+<pre><code><span class="cmt">// SO NICHT — bricht nach genau einem Zustandswechsel</span>
+<span class="kw">var</span> world = _camera.ScreenToWorldPoint(Input.mousePosition);
+<span class="kw">var</span> overOwn = Physics2D.OverlapPoint(world) != <span class="kw">null</span>;
+window.SetClickThrough(!overOwn);</code></pre>
+
+  <p>Das läuft im Editor tadellos. Im Build passiert Folgendes:</p>
+
+  <div class="diagram">Frame 1   Cursor neben der Figur
+          → overOwn = false
+          → SetClickThrough(true)   → WS_EX_TRANSPARENT gesetzt
+
+Frame 2   Fenster empfängt ab jetzt KEINE Maus-Nachrichten mehr.
+          Unitys Input-System bekommt nichts → Input.mousePosition
+          bleibt auf dem letzten bekannten Wert stehen. EINGEFROREN.
+
+Frame 3   overOwn = false (immer noch der alte Wert)
+   …      → Click-through bleibt an. FÜR IMMER.</div>
+
+  <p>
+    <strong>Die Figur ist ab dem ersten Frame außerhalb ihrer selbst nicht mehr anklickbar.</strong> Und das
+    Perfide: Es gibt keinen Fehler, kein Log, keinen Absturz — im Editor tritt der Effekt nicht einmal auf, weil
+    dort die native Schicht abgeschaltet ist (Lektion 04). Man findet es erst im Build, per Hand.
+  </p>
+
+  <div class="trap">
+    <span class="callout-title">Das Muster hinter der Falle</span>
+    Man baut eine Rückkopplung: <em>Der Sensor (Unity-Input) wird von genau der Aktion abgeschaltet, die er
+    auslöst.</em> Ein Sensor, der von seinem eigenen Ergebnis abhängt, ist kein Sensor. Die Lösung ist immer
+    dieselbe — <strong>eine Messquelle nehmen, die unabhängig vom geschalteten Zustand ist</strong>.
+  </div>
+
+  <h2>Die Lösung: global fragen statt lokal empfangen</h2>
+  <p>
+    <code>GetCursorPos</code> fragt nicht das Fenster, sondern das <strong>System</strong>: „Wo ist der Mauszeiger
+    gerade auf dem Bildschirm?" Diese Antwort kommt unabhängig davon, ob irgendein Fenster Maus-Nachrichten
+    bekommt. Sie friert nie ein.
+  </p>
+
+<pre><code><span class="cmt">/// Cursor in Bildschirmkoordinaten (Ursprung oben-links).</span>
+<span class="kw">public</span> <span class="kw">bool</span> TryGetCursorScreen(<span class="kw">out</span> Vector2Int position)
+{
+    position = Vector2Int.zero;
+    <span class="kw">if</span> (!Win32Interop.GetCursorPos(<span class="kw">out</span> <span class="kw">var</span> p)) <span class="kw">return</span> <span class="kw">false</span>;
+    position = <span class="kw">new</span> Vector2Int(p.X, p.Y);
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</code></pre>
+
+  <p>
+    Beachte das <code>Try…</code>-Muster: Der native Aufruf kann fehlschlagen (z. B. auf dem gesperrten Desktop),
+    und dann liefert die Fassade ehrlich <code>false</code> statt einer erfundenen Position. Der Aufrufer steigt in
+    dem Fall einfach aus diesem Frame aus — der Zustand bleibt, wie er war.
+  </p>
+
+  <h2>Die Koordinaten-Umrechnung — der fummelige Teil</h2>
+  <p>
+    Jetzt hat man eine Bildschirmposition, braucht aber eine Weltposition in der Unity-Szene. Dazwischen liegen
+    zwei Unterschiede, die beide gleichzeitig zuschlagen:
+  </p>
+
+  <table>
+    <tr><th></th><th>Win32 (<code>GetCursorPos</code>)</th><th>Unity (<code>ScreenToWorldPoint</code>)</th></tr>
+    <tr><td>Bezugspunkt</td><td>der ganze <strong>Bildschirm</strong></td><td>das <strong>Fenster</strong></td></tr>
+    <tr><td>Y-Achse</td><td>Ursprung <strong>oben</strong>-links, wächst nach unten</td><td>Ursprung <strong>unten</strong>-links, wächst nach oben</td></tr>
+  </table>
+
+  <p>Beides zusammen ergibt genau zwei Zeilen — sie sind das Herz von <code>HitTestDriver.Update()</code>:</p>
+
+<pre><code><span class="kw">var</span> origin = Window.Position;     <span class="cmt">// Fensterecke oben-links, Bildschirmkoordinaten (GetWindowRect)</span>
+<span class="kw">var</span> size   = Window.ClientSize;   <span class="cmt">// Fenstergröße in Pixeln</span>
+
+<span class="cmt">// Win32: Ursprung oben-links. Unity: Ursprung unten-links, fensterrelativ.</span>
+<span class="kw">var</span> localX = cursor.x - origin.x;
+<span class="kw">var</span> localY = size.y - (cursor.y - origin.y);</code></pre>
+
+  <p>
+    <code>localX</code> ist die reine Verschiebung. <code>localY</code> macht beides in einem Ausdruck: erst
+    fensterrelativ (<code>cursor.y - origin.y</code>), dann umgedreht (<code>size.y - …</code>).
+  </p>
+
+  <div class="diagram">Bildschirm (Win32)                 Fenster (Unity)
+┌───────────────────────────┐
+│ (0,0)                     │      origin=(400,300) size=(256,256)
+│      ┌──────────┐         │
+│      │  Fenster │         │      Cursor (500,350) auf dem Bildschirm
+│      │     ●    │         │        localX = 500-400        = 100
+│      └──────────┘         │        localY = 256-(350-300)  = 206
+│                     Y ↓   │                                    Y ↑
+└───────────────────────────┘</div>
+
+  <div class="insight">
+    <span class="callout-title">Warum <code>GetWindowRect</code> überhaupt in der Interop-Datei steht</span>
+    Diese Funktion fehlte in der ursprünglichen Design-Skizze und kam beim Planschreiben dazu — mit genau dieser
+    Begründung: Ohne Fensterursprung und -höhe ist die Umrechnung unmöglich. Sie trägt gleich drei Dinge:
+    <code>Position</code> (get), <code>ClientSize</code> und damit den ganzen Hit-Test.
+    <br><br>
+    Dass <code>ClientSize</code> hier einfach das Fensterrechteck nimmt, ist übrigens nur zulässig, <em>weil</em>
+    das Fenster randlos ist (Lektion 03): Bei <code>WS_POPUP</code> gibt es keine Non-Client-Area, also sind
+    Fenster-Rechteck und Client-Rechteck identisch. Mit Titelleiste bräuchte man <code>GetClientRect</code> +
+    <code>ClientToScreen</code>.
+  </div>
+
+  <h2>Der Punkt-Test: <code>OverlapPoint</code>, nicht <code>Raycast</code></h2>
+
+<pre><code><span class="kw">var</span> world = _camera.ScreenToWorldPoint(<span class="kw">new</span> Vector3(localX, localY, <span class="num2">0f</span>));
+<span class="kw">var</span> overOwn = Physics2D.OverlapPoint(world) != <span class="kw">null</span>;</code></pre>
+
+  <p>
+    <code>Physics2D.OverlapPoint</code> beantwortet direkt die gestellte Frage: „Liegt dieser Punkt in irgendeinem
+    2D-Collider?" Ein <code>Raycast</code> wäre das falsche Werkzeug — ein Strahl braucht eine Richtung, und in
+    einer flachen 2D-Szene müsste man sich eine Z-Richtung ausdenken, die nichts bedeutet.
+  </p>
+  <p>
+    Der Collider ist im Spike ein <code>CircleCollider2D</code> auf dem Platzhalter-Sprite. Das ist die
+    <strong>Definition der Figur-Silhouette</strong>: Was im Collider liegt, gilt als „auf der Figur". Für einen
+    Kreis ist das exakt; für eine spätere Figur nimmt man mehrere Collider oder einen
+    <code>PolygonCollider2D</code>.
+  </p>
+
+  <div class="ok">
+    <span class="callout-title">Die verworfene Alternative: Alpha-Pixel-Hit-Test</span>
+    Man könnte statt eines Colliders den Alpha-Wert des gerenderten Pixels unter dem Cursor prüfen — pixelgenau,
+    auch bei Löchern in der Figur. Der Spike hat das bewusst verworfen: teurer pro Frame, mehr Code, und für einen
+    Kreis (und selbst für ein Pet mit Umriss) reicht ein Collider völlig. <strong>Der Collider hat außerdem einen
+    Vorteil, den man erst später bemerkt:</strong> Man kann die klickbare Fläche <em>absichtlich</em> größer machen
+    als die Figur — angenehmer zu treffen.
+  </div>
+
+  <h2>Der komplette Frame im Zusammenhang</h2>
+
+<pre><code><span class="kw">private</span> <span class="kw">void</span> Update()
+{
+    <span class="kw">if</span> (Window == <span class="kw">null</span> || !Window.IsActive) <span class="kw">return</span>;          <span class="cmt">// im Editor: hier ist Schluss</span>
+    <span class="kw">if</span> (!Window.TryGetCursorScreen(<span class="kw">out</span> <span class="kw">var</span> cursor)) <span class="kw">return</span>;      <span class="cmt">// nativer Fehlschlag → Frame überspringen</span>
+
+    <span class="kw">var</span> origin = Window.Position;
+    <span class="kw">var</span> size   = Window.ClientSize;
+
+    <span class="kw">var</span> localX = cursor.x - origin.x;
+    <span class="kw">var</span> localY = size.y - (cursor.y - origin.y);
+
+    <span class="kw">var</span> world   = _camera.ScreenToWorldPoint(<span class="kw">new</span> Vector3(localX, localY, <span class="num2">0f</span>));
+    <span class="kw">var</span> overOwn = Physics2D.OverlapPoint(world) != <span class="kw">null</span>;
+
+    <span class="kw">var</span> change = _state.Evaluate(overOwn, DragLock);            <span class="cmt">// ← Lektion 06</span>
+    <span class="kw">if</span> (change.HasValue) Window.SetClickThrough(change.Value);
+}</code></pre>
+
+  <p>
+    Auffällig: Die Methode allokiert nichts. Keine <code>new</code>-Objekte, keine Listen, keine Strings — nur
+    Structs auf dem Stack. Bei 30 Frames pro Sekunde über Stunden hinweg ist das der Unterschied zwischen einem
+    ruhigen Managed-Heap und einem Sägezahn, der irgendwann den GC weckt. Für ein Programm, das den ganzen
+    Arbeitstag läuft, ist das keine Mikro-Optimierung, sondern Grundhygiene.
+  </p>
+  <p>
+    Die letzten zwei Zeilen sind der Grund, warum trotz Per-Frame-Messung <em>fast nie</em> ein nativer Aufruf
+    passiert — das ist Lektion 06.
+  </p>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Ein Kollege sagt: „Nimm doch einfach <code>Input.mousePosition</code>, das ist viel weniger Code." Deine Antwort in einem Satz?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Sobald wir <code>WS_EX_TRANSPARENT</code> setzen, bekommt das Fenster keine Maus-Nachrichten mehr und
+        <code>Input.mousePosition</code> friert auf dem letzten Wert ein — Click-through würde genau einmal
+        einschalten und nie wieder aus; im Editor merkst du davon nichts, weil dort die native Schicht aus ist."
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Warum <code>size.y - (cursor.y - origin.y)</code> und nicht <code>cursor.y - origin.y</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Win32 zählt Y von oben, Unity von unten — die Achse muss gespiegelt werden</label>
+        <label><input type="radio" name="q2"> Weil <code>GetCursorPos</code> Y in physischen, Unity in logischen Pixeln liefert</label>
+        <label><input type="radio" name="q2"> Weil die Kamera orthografisch ist</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Achsen-Spiegelung.</strong> <code>cursor.y - origin.y</code> macht die Position fensterrelativ,
+        <code>size.y - …</code> dreht die Richtung um. Zwei Korrekturen in einem Ausdruck. (Physische vs. logische
+        Pixel wären DPI-Scaling — bewusst außerhalb des Spike-Scopes.)
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Wo im Code steht eigentlich die Definition „was gehört zur Figur"?</p>
+      <div class="options">
+        <label><input type="radio" name="q3"> Im <code>Collider2D</code> auf dem Sprite-GameObject</label>
+        <label><input type="radio" name="q3"> Im Alpha-Kanal der Sprite-Textur</label>
+        <label><input type="radio" name="q3"> In der Fenstergröße von 256×256</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Im Collider.</strong> <code>Physics2D.OverlapPoint</code> kennt nur Collider — die Textur ist ihm
+        egal. Deshalb kann man die klickbare Fläche auch bewusst größer oder kleiner als die sichtbare Figur machen.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><code>WS_EX_TRANSPARENT</code> gilt fürs <strong>ganze Fenster</strong> → muss positionsabhängig umgeschaltet werden.</li>
+      <li><strong>Die Input-Falle:</strong> Das Bit schaltet Unitys Maus-Input ab — <code>Input.mousePosition</code> friert ein, Click-through hängt für immer an.</li>
+      <li>Lösung: <strong><code>GetCursorPos</code></strong> fragt das System, nicht das Fenster — unabhängig vom geschalteten Zustand.</li>
+      <li>Zwei Korrekturen nötig: <strong>bildschirm→fensterrelativ</strong> und <strong>Y-Achse spiegeln</strong>.</li>
+      <li><code>GetWindowRect</code> liefert Ursprung und Größe; bei <code>WS_POPUP</code> ist Fenster-Rect == Client-Rect.</li>
+      <li><strong><code>Physics2D.OverlapPoint</code></strong> statt Raycast — Punkt-Frage, Punkt-Werkzeug. Der Collider <em>ist</em> die Silhouette.</li>
+      <li>Der Frame allokiert nichts — Pflicht für etwas, das stundenlang läuft.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/HitTestDriver.cs</code>, <code>OverlayWindow.TryGetCursorScreen/Position/ClientSize</code> (desk-buddy @ <code>a57f9f1</code>) ·
+    Entscheidung „Hit-Test liest die Cursorposition per Win32 <code>GetCursorPos</code>" in <code>DECISIONS.md</code>, 2026-08-04 ·
+    <code>GetWindowRect</code>-Ergänzung dokumentiert in „Abweichungen von der Spec" des Plans<br>
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos">GetCursorPos</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrect">GetWindowRect</a> ·
+    <a href="https://docs.unity3d.com/ScriptReference/Physics2D.OverlapPoint.html">Physics2D.OverlapPoint</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="06-zustandsautomat-statt-per-frame-call.html">Zustandsautomat statt Per-Frame-Call</a></div>
+
+</div>
+</body>
+</html>

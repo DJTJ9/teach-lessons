@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 03: Randlos und immer oben</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; }
+  .kw { color: #c792ea; }
+  .str { color: #86e1a0; }
+  .num2 { color: #f78c6c; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: 0.02em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; }
+  .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .reveal-btn:hover { background: #3d3a9e; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .summary ul { margin-bottom: 0; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; }
+  .src a { color: #58a6ff; text-decoration: none; }
+  .src a:hover { text-decoration: underline; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; }
+  .nav a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 03</div>
+    <h1>Randlos und immer oben</h1>
+    <p class="subtitle"><code>WS_POPUP</code>, <code>SWP_FRAMECHANGED</code>, <code>HWND_TOPMOST</code> — und warum „immer oben" eine Lüge ist, die man alle 5 Sekunden nachschieben muss</p>
+  </div>
+
+  <h2>Teil 1: Den Rahmen loswerden</h2>
+  <p>
+    Ein normales Fenster besteht aus zwei Bereichen: der <strong>Client-Area</strong> (dein Inhalt) und der
+    <strong>Non-Client-Area</strong> (Titelleiste, Rahmen, Minimieren/Maximieren/Schließen). Die Non-Client-Area
+    zeichnet Windows, nicht du. Für ein Desktop-Pet muss sie weg — sonst schwebt der Kreis in einem sichtbaren
+    Kasten.
+  </p>
+  <p>
+    Der Schalter dafür ist der Fenster-<em>Style</em>. Statt einzelne Bits abzuziehen, setzt der Spike den Style
+    komplett neu — er weiß ja, was er will:
+  </p>
+
+<pre><code><span class="kw">public</span> <span class="kw">void</span> SetBorderless()
+{
+    <span class="kw">if</span> (!IsActive) <span class="kw">return</span>;
+    <span class="kw">var</span> style = <span class="kw">new</span> IntPtr(Win32Interop.WS_POPUP | Win32Interop.WS_VISIBLE);
+    Win32Interop.SetWindowLongPtr(_hwnd, Win32Interop.GWL_STYLE, style);
+    Win32Interop.SetWindowPos(_hwnd, IntPtr.Zero, <span class="num2">0</span>, <span class="num2">0</span>, <span class="num2">0</span>, <span class="num2">0</span>,
+        Win32Interop.SWP_NOMOVE | Win32Interop.SWP_NOSIZE |
+        Win32Interop.SWP_NOACTIVATE | Win32Interop.SWP_FRAMECHANGED);
+}</code></pre>
+
+  <p>Zwei Zeilen, zwei Lehren:</p>
+
+  <div class="card">
+    <h3><code>WS_POPUP | WS_VISIBLE</code> — der minimale Fenster-Style</h3>
+    <p style="margin-bottom:0.4rem">
+      <code>WS_POPUP</code> heißt „Fenster ohne alles": keine Titelleiste, kein Rahmen, keine Systemschaltflächen.
+      <code>WS_VISIBLE</code> muss dazu, weil das Fenster ja weiter sichtbar sein soll — der alte Style wird
+      vollständig überschrieben, nicht ergänzt. Alles, was nicht in dieser Zahl steht, ist ab jetzt aus.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><code>SWP_FRAMECHANGED</code> — ohne das passiert nichts Sichtbares</h3>
+    <p style="margin-bottom:0.4rem">
+      Windows berechnet die Fensterrahmen-Geometrie zwischengespeichert. Ein geänderter Style landet zwar sofort
+      in der internen Zahl, aber das Fenster wird erst neu vermessen, wenn man es anstößt. Genau das tut
+      <code>SetWindowPos</code> mit <code>SWP_FRAMECHANGED</code>: „Rahmen neu berechnen." Die drei anderen Flags
+      sagen dabei „aber Position, Größe und Fokus bitte in Ruhe lassen" — der Aufruf dient <em>nur</em> dem
+      Neuberechnen.
+    </p>
+  </div>
+
+  <div class="trap">
+    <span class="callout-title">Typisches Symptom, wenn <code>SWP_FRAMECHANGED</code> fehlt</span>
+    Die Titelleiste ist verschwunden, aber es bleibt ein Rand oder ein toter Streifen — oder der Fensterinhalt sitzt
+    um genau die alte Titelleistenhöhe verschoben. Kein Fehler, nur falsche Geometrie: klassisches Zeichen für einen
+    Style-Wechsel ohne Neuberechnung.
+  </div>
+
+  <h2>Teil 2: Nicht in der Taskleiste auftauchen</h2>
+  <p>
+    Ein Pet gehört nicht in die Taskleiste und nicht in den Alt+Tab-Wechsler. Das erledigt ein Bit im
+    <em>Extended</em> Style: <code>WS_EX_TOOLWINDOW</code>. Der Spike setzt es zusammen mit
+    <code>WS_EX_LAYERED</code> in einer einzigen Methode, die uns in Lektion 04 und 05 noch begegnet:
+  </p>
+
+<pre><code><span class="kw">private</span> <span class="kw">void</span> ApplyExStyle(<span class="kw">bool</span> clickThrough)
+{
+    <span class="kw">long</span> ex = Win32Interop.WS_EX_LAYERED | Win32Interop.WS_EX_TOOLWINDOW;
+    <span class="kw">if</span> (clickThrough) ex |= Win32Interop.WS_EX_TRANSPARENT;
+    Win32Interop.SetWindowLongPtr(_hwnd, Win32Interop.GWL_EXSTYLE, <span class="kw">new</span> IntPtr(ex));
+}</code></pre>
+
+  <p>
+    <code>WS_EX_LAYERED</code> ist die Transparenz-Voraussetzung (Lektion 01/04),
+    <code>WS_EX_TOOLWINDOW</code> die Taskleisten-Frage, <code>WS_EX_TRANSPARENT</code> die Klick-Frage.
+    Drei unabhängige Eigenschaften, eine Zahl.
+  </p>
+
+  <div class="insight">
+    <span class="callout-title">Eine Folge, die im Spike erst im Handtest auffiel</span>
+    Kein Fensterrahmen + kein Taskleisten-Eintrag = <strong>keine Möglichkeit, das Programm zu beenden</strong>.
+    Kein X, kein Rechtsklick auf ein Taskleisten-Symbol, kein Alt+F4-Ziel im Wechsler — nur noch der Task-Manager.
+    Nachgereicht wurde deshalb ein Rechtsklick auf die Figur (Commit <code>7d7a829</code>):
+    <pre style="margin:0.6rem 0 0"><code><span class="kw">private</span> <span class="kw">void</span> OnMouseOver()
+{
+    <span class="kw">if</span> (Input.GetMouseButtonDown(<span class="num2">1</span>))
+    {
+        Application.Quit();
+<span class="cmt">#if UNITY_EDITOR</span>
+        UnityEditor.EditorApplication.isPlaying = <span class="kw">false</span>;
+<span class="cmt">#endif</span>
+    }
+}</code></pre>
+    <strong>Merke für eigene Overlays:</strong> Ein Beenden-Weg gehört von Anfang an dazu — Rechtsklick,
+    Tray-Icon oder Tastenkürzel. Sonst baust du eine App, die man nur abschießen kann.
+  </div>
+
+  <h2>Teil 3: Immer oben — und warum das nicht hält</h2>
+  <p>
+    Die Z-Reihenfolge des Desktops kennt eine Sondergruppe: <strong>Topmost-Fenster</strong> liegen über allen
+    normalen Fenstern, egal wer den Fokus hat. Man erklärt ein Fenster dazu, indem man es bei
+    <code>SetWindowPos</code> hinter das Pseudo-Handle <code>HWND_TOPMOST</code> (numerisch −1) einsortiert:
+  </p>
+
+<pre><code><span class="kw">public</span> <span class="kw">void</span> SetTopMost(<span class="kw">bool</span> enabled)
+{
+    <span class="kw">if</span> (!IsActive || !enabled) <span class="kw">return</span>;
+    Win32Interop.SetWindowPos(_hwnd, Win32Interop.HWND_TOPMOST, <span class="num2">0</span>, <span class="num2">0</span>, <span class="num2">0</span>, <span class="num2">0</span>,
+        Win32Interop.SWP_NOMOVE | Win32Interop.SWP_NOSIZE | Win32Interop.SWP_NOACTIVATE);
+}</code></pre>
+
+  <p>
+    Wieder das bekannte Muster: Die vier Nullen sind Attrappen, <code>NOMOVE</code> und <code>NOSIZE</code> machen
+    sie bedeutungslos. <code>NOACTIVATE</code> verhindert, dass das Pet den Tastaturfokus klaut — sonst würde dir
+    beim Tippen mitten im Satz der Cursor wegspringen.
+  </p>
+
+  <p>
+    Und jetzt der Punkt, den man ohne Praxis nicht kommen sieht: <strong>Topmost ist kein dauerhafter Zustand,
+    auf den man sich verlassen kann.</strong> Es gibt Situationen, in denen Windows die Ordnung neu würfelt und dein
+    Fenster nach hinten fällt:
+  </p>
+  <ul>
+    <li>Ein Spiel geht in den exklusiven Vollbildmodus (und wieder heraus).</li>
+    <li>Ein UAC-Prompt erscheint — der läuft auf einem eigenen, abgeschirmten Desktop.</li>
+    <li>Andere Programme setzen sich ihrerseits topmost und schieben dich in dieser Gruppe nach unten.</li>
+    <li>Bildschirmsperre, Auflösungswechsel, Monitor-Standby.</li>
+  </ul>
+
+  <p>
+    Die Lösung im Spike ist bewusst stumpf: <strong>alle 5 Sekunden nachsetzen</strong>. Der Aufruf ist billig, und
+    dank <code>NOACTIVATE</code> ist er unsichtbar — er stiehlt weder Fokus noch Klicks.
+  </p>
+
+<pre><code><span class="kw">private</span> <span class="kw">const</span> <span class="kw">float</span> TopMostReassertInterval = <span class="num2">5f</span>;
+
+<span class="cmt">// in Awake():</span>
+InvokeRepeating(<span class="kw">nameof</span>(ReassertTopMost), TopMostReassertInterval, TopMostReassertInterval);
+
+<span class="cmt">/// Exklusiv-Vollbild-Spiele und UAC-Prompts stoßen jedes Fenster aus der Topmost-Ordnung.</span>
+<span class="kw">private</span> <span class="kw">void</span> ReassertTopMost()
+{
+    _window.SetTopMost(<span class="kw">true</span>);
+}</code></pre>
+
+  <div class="ok">
+    <span class="callout-title">Warum ein Timer und kein Event?</span>
+    Es gibt keine zuverlässige Benachrichtigung „du wurdest aus der Topmost-Ordnung geworfen". Man könnte
+    Fenster-Hooks installieren oder Nachrichten abfangen — deutlich mehr Code, mehr native Fläche, mehr Bruchgefahr.
+    Ein <code>SetWindowPos</code> alle 5 Sekunden kostet im Rauschen nichts. <strong>Für einen Spike ist die
+    robuste, dumme Lösung die richtige</strong>, und sie hat im Beweis-Durchlauf (Punkt 8: Vollbild-Spiel starten
+    und beenden → Overlay wieder oben) gehalten.
+  </div>
+
+  <p>
+    Beachte auch die Signatur: <code>SetTopMost(bool enabled)</code> steigt bei <code>!enabled</code> einfach aus.
+    Der Spike braucht „nicht mehr topmost" nirgends — der Parameter hält die Fassade symmetrisch, ohne Code für
+    einen Fall zu schreiben, den es nicht gibt. Willst du das später (z. B. „Pet in den Hintergrund während einer
+    Präsentation"), ist die Erweiterung ein Dreizeiler mit <code>HWND_NOTOPMOST</code> (numerisch −2).
+  </p>
+
+  <h2>Wie die drei Eigenschaften zusammenspielen</h2>
+
+  <table>
+    <tr><th>Eigenschaft</th><th>Bit / Handle</th><th>Wo gesetzt</th><th>Sichtbare Folge</th></tr>
+    <tr><td>Kein Rahmen</td><td><code>WS_POPUP</code> (Style)</td><td><code>SetBorderless()</code></td><td>Nur noch Inhalt, keine Titelleiste</td></tr>
+    <tr><td>Nicht in Taskleiste</td><td><code>WS_EX_TOOLWINDOW</code> (ExStyle)</td><td><code>ApplyExStyle()</code></td><td>Kein Eintrag, kein Alt+Tab → Beenden-Weg nötig</td></tr>
+    <tr><td>Immer oben</td><td><code>HWND_TOPMOST</code> (Z-Order)</td><td><code>SetTopMost()</code> + 5-s-Timer</td><td>Bleibt über anderen Fenstern, auch ohne Fokus</td></tr>
+  </table>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Du setzt <code>WS_POPUP</code>, aber das Fenster sieht unverändert aus. Woran liegt es am ehesten?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> <code>SWP_FRAMECHANGED</code> fehlt — der Rahmen wurde nie neu berechnet</label>
+        <label><input type="radio" name="q1"> <code>WS_POPUP</code> gehört in den Extended Style, nicht in den Style</label>
+        <label><input type="radio" name="q1"> Es fehlt ein Aufruf von <code>UpdateWindow</code></label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Fehlendes <code>SWP_FRAMECHANGED</code>.</strong> Der Style ist gesetzt, aber die
+        Rahmengeometrie ist zwischengespeichert. <code>WS_POPUP</code> ist korrekt ein <em>Style</em>
+        (<code>GWL_STYLE</code>, Index −16), kein Extended Style.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Warum steht in <code>SetTopMost</code> unbedingt <code>SWP_NOACTIVATE</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Sonst würde das Pet alle 5 Sekunden den Tastaturfokus an sich reißen</label>
+        <label><input type="radio" name="q2"> Sonst wird das Fenster bei jedem Aufruf neu gezeichnet und flackert</label>
+        <label><input type="radio" name="q2"> Sonst ignoriert Windows das <code>HWND_TOPMOST</code></label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Fokus.</strong> Der Timer feuert dauerhaft im Hintergrund — ohne <code>NOACTIVATE</code> würde dir
+        beim Tippen alle fünf Sekunden der Eingabefokus wegspringen. Das ist der Unterschied zwischen einem
+        Begleiter und einem Schädling.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Was ist die praktische Konsequenz von <code>WS_EX_TOOLWINDOW</code> in Kombination mit <code>WS_POPUP</code> — und wie hat der Spike sie gelöst?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Kein Schließen-Knopf und kein Taskleisten-Eintrag heißt: Es gibt keinen normalen Weg, die App zu beenden —
+        nur den Task-Manager. Der Spike hat deshalb Rechtsklick auf die Figur als Beenden-Geste nachgerüstet
+        (<code>ClickFeedback.OnMouseOver</code> + <code>Application.Quit()</code>). Bei jedem eigenen Overlay gehört
+        so ein Ausgang von Anfang an in die Planung."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><strong>Client- vs. Non-Client-Area</strong>: Der Rahmen gehört Windows — <code>WS_POPUP | WS_VISIBLE</code> entfernt ihn komplett.</li>
+      <li><strong><code>SWP_FRAMECHANGED</code></strong> ist Pflicht nach jedem Style-Wechsel, sonst bleibt die alte Geometrie stehen.</li>
+      <li><strong><code>WS_EX_TOOLWINDOW</code></strong> nimmt das Fenster aus Taskleiste und Alt+Tab — und damit jeden normalen Beenden-Weg. Ausgang selbst bauen.</li>
+      <li><strong><code>HWND_TOPMOST</code></strong> ist kein stabiler Zustand: Vollbild-Spiele, UAC, Sperrbildschirm werfen dich raus → alle 5 s stumpf nachsetzen.</li>
+      <li><strong><code>SWP_NOACTIVATE</code></strong> ist bei allem, was periodisch läuft, nicht optional.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/OverlayWindow.cs</code> (<code>SetBorderless</code>, <code>SetTopMost</code>, <code>ApplyExStyle</code>),
+    <code>Assets/Scripts/Overlay/OverlayBootstrap.cs</code> (Re-Assert-Timer),
+    <code>Assets/Scripts/Overlay/ClickFeedback.cs</code> (Rechtsklick-Quit, Commit <code>7d7a829</code>) · desk-buddy @ <code>a57f9f1</code><br>
+    Beweis-Durchlauf Punkt 8 („Nach Vollbild-Spiel wieder topmost: ✅") in <code>README.md</code> des Repos<br>
+    <a href="https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles">Window Styles</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles">Extended Window Styles</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos">SetWindowPos</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="04-transparenz-rezept-dwm-plus-layered.html">Das Transparenz-Rezept: DWM + Layered</a></div>
+
+</div>
+</body>
+</html>

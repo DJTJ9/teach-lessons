@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 07: Ziehen ohne Abreißen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; } .kw { color: #c792ea; } .str { color: #86e1a0; } .num2 { color: #f78c6c; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; } .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; } .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; } .src a { color: #58a6ff; text-decoration: none; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; } .nav a { color: #58a6ff; text-decoration: none; }
+  .diagram { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1.2rem; margin: 1.5rem 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78rem; color: #94a3b8; line-height: 1.7; white-space: pre; overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 07</div>
+    <h1>Ziehen ohne Abreißen</h1>
+    <p class="subtitle">Der Drag-Lock — warum die naive Umsetzung genau dann versagt, wenn der Nutzer schnell zieht</p>
+  </div>
+
+  <h2>Der Bug, den fast jedes Desktop-Pet einmal hatte</h2>
+  <p>
+    Du drückst auf die Figur und ziehst schnell nach rechts. Das Fenster folgt — aber die Maus ist schneller als der
+    Frame. Für einen Moment steht der Cursor <em>neben</em> der Figur, weil das Fenster noch nicht nachgezogen ist.
+    Der Hit-Test aus Lektion 05 misst brav: „Cursor nicht über der Silhouette." Click-through geht an. Das Fenster
+    bekommt keine Maus-Events mehr. Das Drag stirbt mitten in der Bewegung — die Figur <strong>reißt ab</strong> und
+    bleibt liegen, während die Maus weiterzieht.
+  </p>
+
+  <div class="diagram">Frame n     Cursor auf Figur      → Click-through AUS   → alles gut
+Frame n+1   Maus rast weiter, Fenster hinkt hinterher
+            Cursor liegt neben der Figur
+            → Hit-Test: "nicht drüber" → Click-through AN
+            → keine Maus-Events mehr → Drag bricht ab
+Frame n+2   Figur steht still, Cursor ist weg. ABGERISSEN.</div>
+
+  <p>
+    Das Fatale: Der Fehler tritt nur bei schneller Bewegung auf. Langsam ziehen funktioniert perfekt — die Sorte
+    Bug, die man im Test nicht findet und die den Nutzer täglich trifft.
+  </p>
+
+  <h2>Die Lösung: ein Veto, das während des Ziehens gilt</h2>
+  <p>
+    Statt den Hit-Test zu beschleunigen (aussichtslos — das Fenster kann prinzipiell nicht schneller sein als der
+    Cursor), friert der Spike die Entscheidung ein: <strong>Solange die Maustaste gedrückt ist, bleibt
+    Click-through AUS, egal wo der Cursor steht.</strong> Das ist der DragLock.
+  </p>
+  <p>
+    Er ist ein einfaches <code>bool</code>-Property auf dem <code>HitTestDriver</code> — und der zweite Parameter im
+    Zustandsautomaten aus Lektion 06:
+  </p>
+
+<pre><code><span class="kw">var</span> desired = !(overOwn || dragLock);   <span class="cmt">// dragLock überstimmt die Ortsfrage</span></code></pre>
+
+  <p>
+    Ein Oder-Veto: „Cursor auf der Figur <em>oder</em> Drag läuft" → Klicks abfangen. Beim Loslassen fällt der Lock
+    weg, der normale Hit-Test übernimmt sofort wieder.
+  </p>
+
+  <h2>Wer setzt den Lock? <code>WindowDrag</code></h2>
+
+<pre><code>[RequireComponent(<span class="kw">typeof</span>(Collider2D))]
+<span class="kw">public</span> <span class="kw">sealed</span> <span class="kw">class</span> WindowDrag : MonoBehaviour
+{
+    <span class="kw">public</span> OverlayWindow Window { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> HitTestDriver Driver { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">private</span> <span class="kw">bool</span> _dragging;
+    <span class="kw">private</span> Vector2Int _cursorStart;
+    <span class="kw">private</span> Vector2Int _windowStart;
+
+    <span class="kw">private</span> <span class="kw">void</span> OnMouseDown()
+    {
+        <span class="kw">if</span> (Window == <span class="kw">null</span> || !Window.IsActive) <span class="kw">return</span>;
+        <span class="kw">if</span> (!Window.TryGetCursorScreen(<span class="kw">out</span> _cursorStart)) <span class="kw">return</span>;
+
+        _windowStart = Window.Position;      <span class="cmt">// Startpunkte MERKEN, nicht Deltas addieren</span>
+        _dragging = <span class="kw">true</span>;
+        <span class="kw">if</span> (Driver != <span class="kw">null</span>) Driver.DragLock = <span class="kw">true</span>;   <span class="cmt">// ← das Veto einschalten</span>
+    }
+
+    <span class="kw">private</span> <span class="kw">void</span> Update()
+    {
+        <span class="kw">if</span> (!_dragging) <span class="kw">return</span>;
+
+        <span class="kw">if</span> (!Input.GetMouseButton(<span class="num2">0</span>))            <span class="cmt">// losgelassen?</span>
+        {
+            _dragging = <span class="kw">false</span>;
+            <span class="kw">if</span> (Driver != <span class="kw">null</span>) Driver.DragLock = <span class="kw">false</span>;
+            WindowState.Save(WindowState.DefaultDirectory, Window.Position);
+            <span class="kw">return</span>;
+        }
+
+        <span class="kw">if</span> (!Window.TryGetCursorScreen(<span class="kw">out</span> <span class="kw">var</span> cursor)) <span class="kw">return</span>;
+        Window.Position = <span class="kw">new</span> Vector2Int(
+            _windowStart.x + (cursor.x - _cursorStart.x),
+            _windowStart.y + (cursor.y - _cursorStart.y));
+    }
+}</code></pre>
+
+  <h3>Warum absolute Startpunkte statt Frame-Deltas?</h3>
+  <p>
+    Die naive Variante wäre, pro Frame die Mausbewegung seit dem letzten Frame auf die Fensterposition zu addieren.
+    Das driftet: Jeder Rundungsfehler, jeder verpasste Frame, jeder Aufruf, der wegen
+    <code>TryGetCursorScreen == false</code> aussteigt, geht dauerhaft verloren.
+  </p>
+  <p>
+    Der Spike merkt sich stattdessen beim Drücken <strong>zwei Ankerpunkte</strong> — wo der Cursor war
+    (<code>_cursorStart</code>) und wo das Fenster war (<code>_windowStart</code>) — und rechnet in jedem Frame die
+    <em>Gesamtverschiebung</em> neu aus. Ein ausgelassener Frame ist damit folgenlos: Der nächste stellt die
+    korrekte Position wieder her. <strong>Absolut rechnen statt inkrementell — das gilt für jedes Drag,
+    jeden Slider, jede Kamerabewegung.</strong>
+  </p>
+
+  <div class="ok">
+    <span class="callout-title">Hier ist Unity-Input ausnahmsweise erlaubt</span>
+    <code>OnMouseDown</code> und <code>Input.GetMouseButton(0)</code> sind Unity-APIs — genau das, was Lektion 05
+    verboten hat. Der Unterschied ist die Voraussetzung: <strong>Ein Drag beginnt immer auf der Figur.</strong> Dort
+    ist Click-through per Definition AUS, das Fenster bekommt also Maus-Events. Und sobald der Lock steht, bleibt es
+    dabei — der Zustand, der die Unity-Events abwürgen würde, kann während des Drags gar nicht eintreten.
+    <br><br>
+    Die <em>Position</em> holt sich der Code trotzdem per <code>TryGetCursorScreen</code>: Sie muss in
+    Bildschirmkoordinaten vorliegen, damit sie sich mit <code>Window.Position</code> verrechnen lässt. Und sie darf
+    nicht an der Fenstergröße hängen — der Cursor verlässt das Fenster beim schnellen Ziehen ja regelmäßig.
+  </div>
+
+  <h3>Warum <code>OnMouseDown</code>, aber kein <code>OnMouseUp</code>?</h3>
+  <p>
+    Das Loslassen wird in <code>Update</code> per <code>Input.GetMouseButton(0)</code> abgefragt statt über
+    <code>OnMouseUp</code>. Der Grund ist derselbe wie beim Abreißen: <code>OnMouseUp</code> feuert nur, wenn der
+    Cursor beim Loslassen <em>noch über dem Collider</em> steht. Lässt der Nutzer 300 Pixel daneben los — was beim
+    schnellen Ziehen ständig passiert — käme das Event nie. Der DragLock bliebe für immer an, und die Figur wäre
+    dauerhaft klick-blockierend.
+  </p>
+
+  <div class="trap">
+    <span class="callout-title">Merke: collider-gebundene Events sind für Drag-<em>Enden</em> ungeeignet</span>
+    <code>OnMouseDown</code> ist collider-gebunden und deshalb für den <em>Start</em> perfekt (dort ist der Cursor
+    ja garantiert drüber). Für das <em>Ende</em> braucht man eine Quelle, die unabhängig von der Cursorposition ist.
+    Dieselbe Logik gilt für <code>OnMouseUpAsButton</code> in <code>ClickFeedback</code> — das ist Absicht: Der
+    Farbwechsel <em>soll</em> nur zählen, wenn man auf der Figur loslässt.
+  </div>
+
+  <h2>Das Zusammenspiel der drei Komponenten</h2>
+
+  <div class="diagram">Maustaste gedrückt (auf der Figur)
+   │
+   ├─ WindowDrag.OnMouseDown()
+   │     _cursorStart, _windowStart merken
+   │     Driver.DragLock = true ──────────────┐
+   │                                          │
+   ▼                                          ▼
+Jeder Frame:                        HitTestDriver.Update()
+   WindowDrag.Update()                  overOwn = OverlapPoint(...)
+     Window.Position = Start + Delta     Evaluate(overOwn, dragLock: TRUE)
+                                           → desired immer false
+                                           → nach dem ersten Mal: null
+                                           → KEIN nativer Call mehr
+Maustaste los
+   ├─ DragLock = false
+   ├─ WindowState.Save(...)   ← Position sofort persistieren
+   └─ nächster Frame: Hit-Test entscheidet wieder normal</div>
+
+  <p>
+    Schön daran: Während des gesamten Drags passiert <strong>kein einziger nativer Style-Aufruf</strong>. Der
+    Zustandsautomat liefert nach dem ersten <code>false</code> nur noch <code>null</code>. Die einzigen nativen
+    Aufrufe im Drag sind <code>GetCursorPos</code> und <code>SetWindowPos</code> — genau die zwei, die man braucht.
+  </p>
+
+  <h2>Die verworfene Alternative: natives Fenster-Drag</h2>
+  <p>
+    Windows kann Fenster-Ziehen selbst. Man schickt dem Fenster beim Mausdruck die Nachricht
+    <code>WM_NCLBUTTONDOWN</code> mit <code>HTCAPTION</code> — „behandle das, als hätte der Nutzer die Titelleiste
+    gepackt". Windows übernimmt dann die komplette Zieh-Schleife: butterweich, kein Nachhinken, null eigener Code.
+  </p>
+  <p>
+    Der Spike hat das bewusst verworfen. Der Preis wäre gewesen: <strong>Während des Drags läuft eine
+    Windows-eigene Modal-Schleife</strong> — deine Anwendung ist in dieser Zeit weitgehend außen vor. Keine
+    Animation („Figur zappelt beim Hochheben"), kein Einrasten an Bildschirmkanten, keine Reaktion aufs Ziel. Für
+    ein Desktop-Pet, dessen ganzer Sinn Reaktion ist, ist Kontrolle wichtiger als perfekte Weichheit.
+  </p>
+
+  <table>
+    <tr><th></th><th>Drag-Lock (gewählt)</th><th><code>WM_NCLBUTTONDOWN</code> (verworfen)</th></tr>
+    <tr><td>Bewegung</td><td>folgt pro Frame, minimal hinterher</td><td>butterweich, systemgleich</td></tr>
+    <tr><td>Kontrolle während des Drags</td><td>voll (Animation, Snapping, Abbruch)</td><td>keine</td></tr>
+    <tr><td>Code</td><td>~30 Zeilen + ein Bool</td><td>eine Nachricht</td></tr>
+    <tr><td>Abreiß-Bug</td><td>durch Lock verhindert</td><td>tritt gar nicht auf</td></tr>
+  </table>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Was passiert ohne DragLock, wenn man schnell zieht?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> Der Cursor verlässt kurz die Silhouette, Click-through geht an, das Fenster verliert die Maus-Events — die Figur bleibt liegen</label>
+        <label><input type="radio" name="q1"> Das Fenster ruckelt, fängt sich aber wieder</label>
+        <label><input type="radio" name="q1"> Nichts, <code>OnMouseDown</code> hält den Drag ohnehin am Leben</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Abreißen.</strong> Und es fängt sich nicht von selbst: Nach dem Umschalten kommen keine Maus-Events
+        mehr an, das Drag ist tot. <code>OnMouseDown</code> hat den Drag zwar gestartet, aber
+        <code>Input.GetMouseButton(0)</code> würde ohne Events auch nicht mehr aktualisiert.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Warum <code>_windowStart + (cursor - _cursorStart)</code> statt „Position += Frame-Delta"?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Weil absolute Rechnung nicht driftet — ausgelassene Frames korrigieren sich von selbst</label>
+        <label><input type="radio" name="q2"> Weil <code>Window.Position</code> nur geschrieben, nie gelesen werden kann</label>
+        <label><input type="radio" name="q2"> Weil <code>Vector2Int</code> keine Addition unterstützt</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Kein Drift.</strong> Jeder Frame rechnet die Gesamtverschiebung seit dem Drücken neu aus. Ein
+        übersprungener Frame (z. B. <code>TryGetCursorScreen</code> liefert <code>false</code>) hat null
+        Langzeitwirkung. <code>Window.Position</code> hat sehr wohl einen Getter — er wird für
+        <code>_windowStart</code> und fürs Speichern gebraucht.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Warum wird das Drag-Ende in <code>Update</code> geprüft und nicht in <code>OnMouseUp</code>?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Weil <code>OnMouseUp</code> collider-gebunden ist: Es feuert nur, wenn der Cursor beim Loslassen noch über
+        der Figur steht. Beim schnellen Ziehen ist er das oft nicht — dann käme das Event nie, der DragLock bliebe
+        hängen und das Pet würde dauerhaft alle Klicks abfangen. <code>Input.GetMouseButton(0)</code> in
+        <code>Update</code> ist positionsunabhängig."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><strong>Der Abreiß-Bug:</strong> Beim schnellen Ziehen hinkt das Fenster nach, der Cursor verlässt die Silhouette, Click-through schaltet mitten im Drag um.</li>
+      <li><strong>DragLock</strong> ist ein Veto in <code>Evaluate(overOwn, dragLock)</code> — während des Ziehens gilt die Ortsfrage nicht.</li>
+      <li><strong>Absolut rechnen</strong> (Start-Anker + Gesamtdelta) statt Frame-Deltas addieren — driftfrei.</li>
+      <li><code>OnMouseDown</code> ist für den <strong>Start</strong> richtig (Cursor garantiert drüber), fürs <strong>Ende</strong> braucht es <code>Input.GetMouseButton</code> in <code>Update</code>.</li>
+      <li>Während des Drags passiert <strong>kein nativer Style-Aufruf</strong> — der Automat liefert nur noch <code>null</code>.</li>
+      <li><strong>Verworfen:</strong> natives Drag per <code>WM_NCLBUTTONDOWN</code>/<code>HTCAPTION</code> — weicher, aber ohne jede Kontrolle während der Bewegung.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/WindowDrag.cs</code>, <code>HitTestDriver.DragLock</code> (desk-buddy @ <code>a57f9f1</code>) ·
+    Entscheidung „Drag-Konflikt: Drag-Lock gewählt" in <code>specs/2026-08-04-overlay-spike-design.md</code> ·
+    Beweis-Durchlauf Punkt 5 („Ziehen ohne Abreißen: ✅") im Repo-<code>README.md</code><br>
+    <a href="https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnMouseDown.html">MonoBehaviour.OnMouseDown</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-nclbuttondown">WM_NCLBUTTONDOWN</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="08-fassade-persistenz-und-portierung.html">Fassade, Persistenz und Portierung</a></div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 02: Win32 von Null — HWND, DllImport, Bitmasken</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; font-weight: 700; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; }
+  .kw { color: #c792ea; }
+  .str { color: #86e1a0; }
+  .num2 { color: #f78c6c; }
+  .card { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: 0.02em; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; }
+  .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; }
+  .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .reveal-btn:hover { background: #3d3a9e; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .summary ul { margin-bottom: 0; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; }
+  .src a { color: #58a6ff; text-decoration: none; }
+  .src a:hover { text-decoration: underline; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; }
+  .nav a { color: #58a6ff; text-decoration: none; }
+  .bits { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.8rem; color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 02</div>
+    <h1>Win32 von Null: HWND, DllImport, Bitmasken</h1>
+    <p class="subtitle"><code>Win32Interop.cs</code> Zeile für Zeile — die einzige Datei im Projekt, die das Betriebssystem direkt anfasst</p>
+  </div>
+
+  <h2>Die Ausgangslage</h2>
+  <p>
+    Unity kann alles, was <em>im</em> Fenster passiert. Was das Fenster <em>selbst</em> ist — Rahmen, Position,
+    Z-Reihenfolge, ob Klicks ankommen — weiß nur Windows. Für diese Fragen gibt es keine Unity-API. Man muss mit
+    dem Betriebssystem reden, und zwar über die <strong>Win32-API</strong>: eine Sammlung von C-Funktionen in
+    System-DLLs, die es seit den 90ern gibt und die sich seither nicht geändert hat.
+  </p>
+  <p>
+    Diese Lektion baut die dafür nötigen vier Konzepte von Null auf — <strong>Handle, P/Invoke, Struct-Layout,
+    Bitmaske</strong> — und liest damit die komplette Interop-Datei des Spikes.
+  </p>
+
+  <h2>Konzept 1: Das Handle (HWND)</h2>
+  <p>
+    Windows gibt dir keine Objekte, sondern <strong>Handles</strong>: undurchsichtige Zahlen, die intern auf eine
+    Systemressource zeigen. Ein <code>HWND</code> ist ein Fenster-Handle. Du kannst damit nichts anfangen außer:
+    es an andere Win32-Funktionen weiterzureichen. Auf C#-Seite ist das ein <code>IntPtr</code> — ein Zeiger-großer
+    Integer (auf x64: 64 Bit).
+  </p>
+
+<pre><code><span class="kw">private</span> IntPtr _hwnd = IntPtr.Zero;   <span class="cmt">// Zero == "kein Fenster", die übliche Null-Prüfung</span>
+<span class="kw">public</span> <span class="kw">bool</span> IsActive => _hwnd != IntPtr.Zero;</code></pre>
+
+  <p>
+    Woher bekommt man das eigene Handle? Der Spike nimmt <code>GetActiveWindow()</code> — sie liefert das Fenster,
+    das dem aufrufenden Thread gerade gehört. Beim Start eines Unity-Players ist das genau das Spielfenster.
+  </p>
+
+  <div class="insight">
+    <span class="callout-title">Warum nicht <code>FindWindow("UnityWndClass", productName)</code>?</span>
+    Das ist die andere gängige Variante — sie sucht ein Fenster nach Klassenname und Titel. Sie funktioniert auch,
+    hat aber zwei Schwächen: Sie kann bei mehreren Instanzen oder gleichnamigen Fenstern das falsche treffen, und
+    sie hängt am Produktnamen. <code>GetActiveWindow</code> braucht keine Namen — der Preis ist, dass sie nur
+    stimmt, solange man sie <em>früh</em> aufruft, während das eigene Fenster aktiv ist. Genau deshalb läuft die
+    Initialisierung im Spike in <code>Awake()</code> mit Script Execution Order −100 (Lektion 08).
+  </div>
+
+  <h2>Konzept 2: P/Invoke — C#-Funktionen, die in einer DLL leben</h2>
+  <p>
+    <strong>P/Invoke</strong> (Platform Invoke) ist der .NET-Mechanismus, um eine native C-Funktion aufzurufen.
+    Du deklarierst eine Methode <em>ohne Rumpf</em>, markierst sie <code>extern</code> und sagst per Attribut,
+    in welcher DLL sie steckt. Die Laufzeit sucht das Symbol beim ersten Aufruf und übersetzt die Argumente
+    (das nennt man <em>Marshalling</em>).
+  </p>
+
+<pre><code>[DllImport(<span class="str">"user32.dll"</span>)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetActiveWindow();</code></pre>
+
+  <p>Drei Details, die man beim Lesen sofort erkennen sollte:</p>
+
+  <table>
+    <tr><th>Schreibweise</th><th>Bedeutung</th></tr>
+    <tr>
+      <td><code>[DllImport("user32.dll")]</code></td>
+      <td>Fensterverwaltung. <code>dwmapi.dll</code> = Composition, <code>kernel32.dll</code> = Prozesse/System, <code>psapi.dll</code> = Prozess-Statistiken.</td>
+    </tr>
+    <tr>
+      <td><code>EntryPoint = "SetWindowLongPtrW"</code></td>
+      <td>Der echte Symbolname in der DLL weicht vom C#-Namen ab. Das <code>W</code> steht für die Unicode-Variante (es gibt fast immer ein <code>…A</code> für ANSI und ein <code>…W</code> für Wide/UTF-16 — nimm immer <code>W</code>).</td>
+    </tr>
+    <tr>
+      <td><code>[return: MarshalAs(UnmanagedType.Bool)]</code></td>
+      <td>Win32 gibt <code>BOOL</code> zurück — das ist ein <strong>4-Byte-Int</strong>, nicht das 1-Byte-<code>bool</code> von C#. Ohne diese Angabe liest .NET unter Umständen das falsche Byte. Sicherheitsgurt, kostet nichts.</td>
+    </tr>
+  </table>
+
+  <h2>Konzept 3: Structs mit festem Speicherlayout</h2>
+  <p>
+    Manche Funktionen schreiben ihr Ergebnis nicht in den Rückgabewert, sondern in eine Struktur, deren Adresse
+    du übergibst. Damit das klappt, muss das C#-Struct <strong>byteweise</strong> dem C-Struct entsprechen. Der
+    C#-Compiler darf Felder normalerweise umsortieren — <code>[StructLayout(LayoutKind.Sequential)]</code>
+    verbietet ihm das.
+  </p>
+
+<pre><code>[StructLayout(LayoutKind.Sequential)]
+<span class="kw">internal</span> <span class="kw">struct</span> POINT { <span class="kw">public</span> <span class="kw">int</span> X; <span class="kw">public</span> <span class="kw">int</span> Y; }
+
+[StructLayout(LayoutKind.Sequential)]
+<span class="kw">internal</span> <span class="kw">struct</span> RECT { <span class="kw">public</span> <span class="kw">int</span> Left; <span class="kw">public</span> <span class="kw">int</span> Top; <span class="kw">public</span> <span class="kw">int</span> Right; <span class="kw">public</span> <span class="kw">int</span> Bottom; }
+
+[StructLayout(LayoutKind.Sequential)]
+<span class="kw">internal</span> <span class="kw">struct</span> MARGINS { <span class="kw">public</span> <span class="kw">int</span> Left; <span class="kw">public</span> <span class="kw">int</span> Right; <span class="kw">public</span> <span class="kw">int</span> Top; <span class="kw">public</span> <span class="kw">int</span> Bottom; }</code></pre>
+
+  <div class="trap">
+    <span class="callout-title">Die Reihenfolge ist Teil des Vertrags</span>
+    <code>MARGINS</code> ist <em>Left, Right, Top, Bottom</em> — nicht die gewohnte Uhrzeigersinn-Reihenfolge, und
+    auch nicht dieselbe wie bei <code>RECT</code> (<em>Left, Top, Right, Bottom</em>). Wer hier zwei Felder
+    vertauscht, bekommt keinen Compilerfehler und keine Exception, sondern falsche Zahlen. Immer gegen die
+    Microsoft-Doku abgleichen, nie aus dem Gedächtnis tippen.
+  </div>
+
+  <p>
+    Beim Aufruf markiert man solche Parameter mit <code>out</code> (Funktion füllt sie) oder <code>ref</code>
+    (Funktion liest <em>und</em> schreibt):
+  </p>
+
+<pre><code>[DllImport(<span class="str">"user32.dll"</span>)]
+[<span class="kw">return</span>: MarshalAs(UnmanagedType.Bool)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetCursorPos(<span class="kw">out</span> POINT point);
+
+[DllImport(<span class="str">"user32.dll"</span>)]
+[<span class="kw">return</span>: MarshalAs(UnmanagedType.Bool)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetWindowRect(IntPtr hWnd, <span class="kw">out</span> RECT rect);
+
+[DllImport(<span class="str">"dwmapi.dll"</span>)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">int</span> DwmExtendFrameIntoClientArea(IntPtr hWnd, <span class="kw">ref</span> MARGINS margins);</code></pre>
+
+  <h2>Konzept 4: Bitmasken — wie Windows Eigenschaften speichert</h2>
+  <p>
+    Ein Fenster hat dutzende Ja/Nein-Eigenschaften: sichtbar, Rahmen, Titelleiste, Minimierbar, Layered, Klick-
+    durchlässig … Windows packt sie nicht in Felder, sondern in <strong>zwei Zahlen</strong>: den <em>Style</em>
+    und den <em>Extended Style</em>. Jedes Bit dieser Zahlen ist eine Eigenschaft.
+  </p>
+
+<pre><code><span class="cmt">// Style (GWL_STYLE)</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">long</span> WS_POPUP   = <span class="num2">0x80000000L</span>;  <span class="cmt">// Fenster ohne Rahmen/Titelleiste</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">long</span> WS_VISIBLE = <span class="num2">0x10000000L</span>;  <span class="cmt">// sichtbar</span>
+
+<span class="cmt">// Extended Style (GWL_EXSTYLE)</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">long</span> WS_EX_LAYERED     = <span class="num2">0x00080000L</span>; <span class="cmt">// über Zwischenschicht komponiert → Alpha erlaubt</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">long</span> WS_EX_TRANSPARENT = <span class="num2">0x00000020L</span>; <span class="cmt">// Mausklicks gehen durch (Lektion 05)</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">long</span> WS_EX_TOOLWINDOW  = <span class="num2">0x00000080L</span>; <span class="cmt">// kein Taskleisten-Eintrag, nicht im Alt+Tab</span></code></pre>
+
+  <p>
+    Kombiniert wird mit <code>|</code> (bitweises Oder = „beide Eigenschaften an"), geprüft mit <code>&amp;</code>.
+    Im Spike sieht das so aus — eine Zeile, die den Unterschied zwischen „klickbar" und „durchlässig" macht:
+  </p>
+
+<pre><code><span class="kw">long</span> ex = WS_EX_LAYERED | WS_EX_TOOLWINDOW;
+<span class="kw">if</span> (clickThrough) ex |= WS_EX_TRANSPARENT;</code></pre>
+
+  <p class="bits">
+    0x00080000 | 0x00000080 = 0x00080080 &nbsp;→&nbsp; mit Transparent: 0x000800A0
+  </p>
+
+  <div class="insight">
+    <span class="callout-title">Warum <code>long</code> und nicht <code>int</code>?</span>
+    <code>WS_POPUP</code> ist <code>0x80000000</code> — das oberste Bit eines 32-Bit-Werts. Als <code>int</code>
+    wäre das negativ, und beim Verrechnen mit anderen Konstanten holt man sich Vorzeichen-Ärger. Deshalb
+    <code>long</code> für die Konstanten und erst am Ende die Umwandlung nach <code>IntPtr</code>.
+  </div>
+
+  <h3>Die Setter: SetWindowLongPtr und SetWindowPos</h3>
+
+<pre><code><span class="kw">internal</span> <span class="kw">const</span> <span class="kw">int</span> GWL_STYLE   = -<span class="num2">16</span>;  <span class="cmt">// "welche der Zahlen?" → Style</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">int</span> GWL_EXSTYLE = -<span class="num2">20</span>;  <span class="cmt">// → Extended Style</span>
+
+[DllImport(<span class="str">"user32.dll"</span>, EntryPoint = <span class="str">"SetWindowLongPtrW"</span>)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> IntPtr SetWindowLongPtr(IntPtr hWnd, <span class="kw">int</span> index, IntPtr value);
+
+[DllImport(<span class="str">"user32.dll"</span>, EntryPoint = <span class="str">"GetWindowLongPtrW"</span>)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetWindowLongPtr(IntPtr hWnd, <span class="kw">int</span> index);</code></pre>
+
+  <p>
+    Die negativen Indizes sind kein Tippfehler — Win32 adressiert die Fenster-Eigenschaften über negative Offsets.
+    Merken muss man nur diese zwei.
+    <em>Hinweis:</em> Die <code>…Ptr</code>-Varianten existieren als echte Exporte nur in 64-Bit-Windows; deshalb baut
+    der Spike ausschließlich <code>StandaloneWindows64</code> und spart sich einen 32-Bit-Fallback.
+  </p>
+
+  <p>
+    <code>SetWindowPos</code> ist der Allzweck-Fensterbefehl: Position, Größe und Z-Reihenfolge in einem Aufruf.
+    Weil man selten alles gleichzeitig will, gibt es Flags, die einzelne Parameter für ungültig erklären:
+  </p>
+
+<pre><code><span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> SWP_NOSIZE      = <span class="num2">0x0001</span>; <span class="cmt">// cx/cy ignorieren</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> SWP_NOMOVE      = <span class="num2">0x0002</span>; <span class="cmt">// x/y ignorieren</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> SWP_NOACTIVATE  = <span class="num2">0x0010</span>; <span class="cmt">// Fenster NICHT in den Fokus holen ← wichtig fürs Pet</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> SWP_FRAMECHANGED= <span class="num2">0x0020</span>; <span class="cmt">// "Stil hat sich geändert, Rahmen neu berechnen"</span>
+<span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> SWP_SHOWWINDOW  = <span class="num2">0x0040</span>;
+
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">readonly</span> IntPtr HWND_TOPMOST = <span class="kw">new</span> IntPtr(-<span class="num2">1</span>); <span class="cmt">// Pseudo-Handle: "ganz nach oben"</span>
+
+[DllImport(<span class="str">"user32.dll"</span>)]
+[<span class="kw">return</span>: MarshalAs(UnmanagedType.Bool)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+    <span class="kw">int</span> x, <span class="kw">int</span> y, <span class="kw">int</span> cx, <span class="kw">int</span> cy, <span class="kw">uint</span> flags);</code></pre>
+
+  <div class="ok">
+    <span class="callout-title">Das Muster, das du überall wiedersehen wirst</span>
+    „Verschiebe das Fenster, ändere aber nicht die Größe und stiehl nicht den Fokus" heißt:
+    <code>SetWindowPos(hwnd, IntPtr.Zero, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE)</code>.
+    Die beiden Nullen für Breite/Höhe sind Attrappen — <code>SWP_NOSIZE</code> macht sie bedeutungslos.
+  </div>
+
+  <h3>Die restlichen zwei: SetLayeredWindowAttributes und DwmExtendFrameIntoClientArea</h3>
+
+<pre><code><span class="kw">internal</span> <span class="kw">const</span> <span class="kw">uint</span> LWA_ALPHA = <span class="num2">0x00000002</span>;  <span class="cmt">// "der alpha-Parameter gilt" (statt Colorkey)</span>
+
+[DllImport(<span class="str">"user32.dll"</span>)]
+[<span class="kw">return</span>: MarshalAs(UnmanagedType.Bool)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> SetLayeredWindowAttributes(IntPtr hWnd, <span class="kw">uint</span> key, <span class="kw">byte</span> alpha, <span class="kw">uint</span> flags);</code></pre>
+
+  <p>
+    Diese beiden sind die eigentlichen Transparenz-Aufrufe — ihre Reihenfolge und ihr Zusammenspiel sind
+    Lektion 04. Hier reicht: Sie stehen in derselben Datei wie alles andere Native.
+  </p>
+
+  <h2>Der Nachzügler: psapi und ein stiller Mono-Bug</h2>
+  <p>
+    Der Spike loggt alle 10 Sekunden Speicherverbrauch mit, um nach 30 Minuten Leerlauf ein Speicherleck
+    ausschließen zu können. Der naheliegende C#-Weg dafür ist
+    <code>Process.GetCurrentProcess().WorkingSet64</code>. Im gebauten Player mit dem <strong>Mono</strong>-Backend
+    liefert der aber durchgängig <code>0</code> — keine Exception, kein Log, nur eine plausibel aussehende falsche
+    Zahl. Aufgefallen ist das erst beim Blick in die CSV-Rohdaten.
+  </p>
+  <p>
+    Der Fix holt den Wert direkt beim Betriebssystem — und zwar bewusst in <em>dieser</em> Datei, um die Regel
+    „nur eine Datei enthält <code>DllImport</code>" nicht aufzuweichen:
+  </p>
+
+<pre><code>[StructLayout(LayoutKind.Sequential)]
+<span class="kw">internal</span> <span class="kw">struct</span> PROCESS_MEMORY_COUNTERS
+{
+    <span class="kw">public</span> <span class="kw">uint</span> cb;                          <span class="cmt">// Größe der Struktur — Versions-Handshake</span>
+    <span class="kw">public</span> <span class="kw">uint</span> PageFaultCount;
+    <span class="kw">public</span> UIntPtr PeakWorkingSetSize;
+    <span class="kw">public</span> UIntPtr WorkingSetSize;             <span class="cmt">// ← der gesuchte Wert</span>
+    <span class="kw">public</span> UIntPtr QuotaPeakPagedPoolUsage;
+    <span class="kw">public</span> UIntPtr QuotaPagedPoolUsage;
+    <span class="kw">public</span> UIntPtr QuotaPeakNonPagedPoolUsage;
+    <span class="kw">public</span> UIntPtr QuotaNonPagedPoolUsage;
+    <span class="kw">public</span> UIntPtr PagefileUsage;
+    <span class="kw">public</span> UIntPtr PeakPagefileUsage;
+}
+
+[DllImport(<span class="str">"kernel32.dll"</span>)]
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">extern</span> IntPtr GetCurrentProcess();
+
+[DllImport(<span class="str">"psapi.dll"</span>, SetLastError = <span class="kw">true</span>)]
+<span class="kw">private</span> <span class="kw">static</span> <span class="kw">extern</span> <span class="kw">bool</span> GetProcessMemoryInfo(IntPtr hProcess, <span class="kw">out</span> PROCESS_MEMORY_COUNTERS counters, <span class="kw">uint</span> size);
+
+<span class="cmt">/// Bypasses System.Diagnostics.Process — under Mono on Windows, Process.WorkingSet64 silently returns 0.</span>
+<span class="kw">internal</span> <span class="kw">static</span> <span class="kw">ulong</span> GetWorkingSetBytes()
+{
+    <span class="kw">var</span> counters = <span class="kw">new</span> PROCESS_MEMORY_COUNTERS();
+    counters.cb = (<span class="kw">uint</span>)Marshal.SizeOf(<span class="kw">typeof</span>(PROCESS_MEMORY_COUNTERS));
+    <span class="kw">if</span> (!GetProcessMemoryInfo(GetCurrentProcess(), <span class="kw">out</span> counters, counters.cb)) <span class="kw">return</span> <span class="num2">0</span>;
+    <span class="kw">return</span> (<span class="kw">ulong</span>)counters.WorkingSetSize;
+}</code></pre>
+
+  <p>
+    Drei Dinge, die man hier lernt und überall wiederverwenden kann:
+    <strong>(1)</strong> Das <code>cb</code>-Feld ist ein Versions-Handshake — viele Win32-Structs beginnen damit,
+    und man füllt es <em>immer</em> per <code>Marshal.SizeOf</code>, nie mit einer getippten Zahl.
+    <strong>(2)</strong> <code>UIntPtr</code> statt <code>ulong</code>, weil <code>SIZE_T</code> zeigergroß ist —
+    auf x86 4, auf x64 8 Byte.
+    <strong>(3)</strong> <code>SetLastError = true</code> sorgt dafür, dass man den Windows-Fehlercode
+    nachträglich per <code>Marshal.GetLastWin32Error()</code> abfragen könnte.
+  </p>
+
+  <div class="trap">
+    <span class="callout-title">Die eigentliche Lehre ist nicht der Fix</span>
+    Ein Messwert, der <em>immer</em> 0 ist, sieht in einer CSV genauso „ordentlich" aus wie ein echter Messwert.
+    Der Spike hätte Punkt „kein Speicherwachstum" grün abhaken können, ohne je etwas gemessen zu haben.
+    <strong>Wenn eine Diagnose keinen Fehler wirft, ist sie damit noch nicht richtig.</strong> Rohdaten einmal
+    selbst anschauen — nicht nur „lief durch" prüfen.
+  </div>
+
+  <h2>Die Architektur-Regel dahinter</h2>
+  <p>
+    Alles oben steht in <strong>genau einer Datei</strong>: <code>Assets/Scripts/Platform/Win32Interop.cs</code>,
+    <code>internal static class</code>. Kein anderer Ort im Projekt darf <code>DllImport</code> enthalten. Der Grund
+    ist nicht Ordnungsliebe:
+  </p>
+  <ul>
+    <li><strong>Portierbarkeit:</strong> Ein macOS- oder Linux-Port ersetzt genau diese eine Datei. Alles darüber bleibt unverändert.</li>
+    <li><strong>Testbarkeit:</strong> Was P/Invoke berührt, ist nur im Build prüfbar. Je kleiner diese Fläche, desto mehr Logik lässt sich normal testen (Lektion 06).</li>
+    <li><strong>Fehlersuche:</strong> Kommt eine falsche Zahl aus dem System, gibt es genau einen Ort zum Nachschauen.</li>
+  </ul>
+  <p>
+    Der Spike hat diese Regel unter Druck gehalten: Als der Working-Set-Fix nötig wurde, wanderte er in die
+    Interop-Datei — <em>nicht</em> in die Diagnose-Klasse, wo er thematisch hingehört hätte.
+  </p>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Warum steht <code>[return: MarshalAs(UnmanagedType.Bool)]</code> über den <code>bool</code>-Funktionen?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> Weil Win32 <code>BOOL</code> als 4-Byte-Int zurückgibt, C#-<code>bool</code> aber 1 Byte ist</label>
+        <label><input type="radio" name="q1"> Weil die Funktion sonst immer <code>false</code> liefert</label>
+        <label><input type="radio" name="q1"> Weil der Compiler es für <code>extern</code>-Methoden verlangt</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Größenunterschied.</strong> Win32-<code>BOOL</code> ist ein 32-Bit-Int. Das Attribut sagt dem
+        Marshaller explizit, wie er das umrechnen soll. Pflicht ist es nicht (der Default für <code>bool</code> ist
+        in der Praxis derselbe) — aber es macht die Absicht sichtbar und schützt vor Überraschungen.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Du willst ein Fenster nach vorn holen, ohne es zu verschieben, ohne die Größe zu ändern und ohne ihm den Tastaturfokus zu geben. Welche Flags?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> <code>SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE</code>, hWndInsertAfter = <code>HWND_TOPMOST</code></label>
+        <label><input type="radio" name="q2"> <code>SWP_SHOWWINDOW | SWP_FRAMECHANGED</code></label>
+        <label><input type="radio" name="q2"> Nur <code>SWP_NOACTIVATE</code>, der Rest ergibt sich</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Erste Variante</strong> — exakt die Zeile aus <code>OverlayWindow.SetTopMost</code>. Ohne
+        <code>NOMOVE</code>/<code>NOSIZE</code> würden die übergebenen Nullen als „Position 0,0 und Größe 0×0"
+        gelten. Ohne <code>NOACTIVATE</code> springt der Fokus weg — bei einem alle 5 Sekunden feuernden Timer
+        (Lektion 03) wäre das unbenutzbar.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Ein Kollege will <code>GetWorkingSetBytes()</code> nach <code>IdleProbe.cs</code> verschieben, „weil es dort thematisch hingehört". Was antwortest du?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „Thematisch stimmt das, aber dann enthält eine zweite Datei <code>DllImport</code> — und die Regel
+        ‚genau eine Plattform-Datei' ist genau das, was einen späteren macOS-Port zu einem Ein-Datei-Austausch
+        macht. Der Aufruf <code>Win32Interop.GetWorkingSetBytes()</code> steht ja in <code>IdleProbe</code>; nur
+        das <code>DllImport</code> bleibt gekapselt."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><strong>HWND</strong> = undurchsichtiges Fenster-Handle, in C# ein <code>IntPtr</code>; <code>IntPtr.Zero</code> ist die Null-Prüfung.</li>
+      <li><strong>P/Invoke</strong>: <code>[DllImport]</code> + <code>extern</code>, <code>EntryPoint</code> für <code>…W</code>-Namen, <code>MarshalAs</code> für Typgrößen.</li>
+      <li><strong><code>StructLayout(Sequential)</code></strong> erzwingt die Feldreihenfolge — Reihenfolge ist Teil des Vertrags (<code>MARGINS</code> ≠ <code>RECT</code>).</li>
+      <li><strong>Bitmasken:</strong> Style und Extended Style sind je eine Zahl; kombiniert mit <code>|</code>. <code>GWL_STYLE = -16</code>, <code>GWL_EXSTYLE = -20</code>.</li>
+      <li><code>SetWindowPos</code> ist Position + Größe + Z-Order in einem — <code>SWP_NO…</code>-Flags schalten aus, was du nicht meinst.</li>
+      <li><strong>Mono-Falle:</strong> <code>Process.WorkingSet64</code> liefert im Windows-Build still <code>0</code>; echter Wert über <code>psapi!GetProcessMemoryInfo</code>.</li>
+      <li><strong>Eine Datei, alle <code>DllImport</code>s</strong> — die Regel, die einen Port zu einem Datei-Austausch macht.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Platform/Win32Interop.cs</code> (desk-buddy @ <code>a57f9f1</code>, psapi-Fix in Commit <code>299a7dd</code>) ·
+    <code>LEARNINGS.md</code> 2026-08-04 „<code>Process.WorkingSet64</code> liefert unter Mono unbemerkt 0"<br>
+    <a href="https://learn.microsoft.com/en-us/dotnet/framework/interop/marshalling-data-with-platform-invoke">P/Invoke Marshalling (Microsoft Learn)</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlongptrw">SetWindowLongPtrW</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos">SetWindowPos</a> ·
+    <a href="https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessmemoryinfo">GetProcessMemoryInfo</a>
+  </div>
+
+  <div class="nav">Nächste Lektion → <a href="03-randlos-und-immer-oben.html">Randlos und immer oben</a></div>
+
+</div>
+</body>
+</html>

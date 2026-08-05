@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 08: Fassade, Persistenz und Portierung</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f14; color: #e2e8f0; padding: 2rem 1rem; }
+  .container { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 2rem; color: #f8fafc; margin-bottom: 0.25rem; line-height: 1.2; }
+  .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1rem; color: #cbd5e1; margin: 2.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  h3 { font-size: 1.05rem; color: #f8fafc; margin: 1.5rem 0 0.5rem; }
+  p { line-height: 1.75; color: #cbd5e1; margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.25rem; color: #cbd5e1; line-height: 1.75; }
+  li { margin-bottom: 0.4rem; }
+  code { background: #13131f; padding: 0.1em 0.4em; border-radius: 3px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; color: #f472b6; }
+  pre { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1rem 1.15rem; overflow-x: auto; margin: 1rem 0; }
+  pre code { background: none; color: #d7dce8; padding: 0; font-size: 0.83rem; line-height: 1.6; display: block; }
+  .cmt { color: #5b6478; font-style: italic; } .kw { color: #c792ea; } .str { color: #86e1a0; } .num2 { color: #f78c6c; }
+  .insight { background: #1c1a2e; border: 1px solid #312e81; border-left: 4px solid #818cf8; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #c7d2fe; font-size: 0.93rem; line-height: 1.7; }
+  .trap { background: #2a1416; border: 1px solid #7f1d1d; border-left: 4px solid #f87171; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #fecaca; font-size: 0.93rem; line-height: 1.7; }
+  .ok { background: #0d2018; border: 1px solid #14532d; border-left: 4px solid #34d399; border-radius: 8px; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #bbf7d0; font-size: 0.93rem; line-height: 1.7; }
+  .callout-title { display: block; font-weight: 700; margin-bottom: 0.35rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; margin: 1rem 0; }
+  th { background: #13131f; color: #94a3b8; text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid #2d2d3f; }
+  td { padding: 0.55rem 0.9rem; border-bottom: 1px solid #1e1e2e; color: #cbd5e1; vertical-align: top; }
+  .quiz { background: #1e1e2e; border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; }
+  .question { margin-bottom: 1.6rem; } .question > p { color: #e2e8f0; font-weight: 600; margin-bottom: 0.7rem; }
+  .options label { display: block; padding: 0.45rem 0.7rem; border-radius: 6px; cursor: pointer; color: #94a3b8; font-size: 0.9rem; }
+  .options label:hover { background: #13131f; color: #e2e8f0; } .options input { margin-right: 0.5rem; }
+  .reveal-btn { background: #312e81; color: #a5b4fc; border: none; border-radius: 6px; padding: 0.45rem 1.1rem; cursor: pointer; font-size: 0.85rem; margin-top: 0.6rem; }
+  .answer { display: none; background: #13131f; border-radius: 6px; padding: 0.8rem 1rem; margin-top: 0.7rem; color: #6ee7b7; font-size: 0.9rem; line-height: 1.65; }
+  .answer.show { display: block; }
+  .summary { background: linear-gradient(180deg,#1a1a2b,#15151f); border: 1px solid #2d2d3f; border-radius: 12px; padding: 1.5rem; margin-top: 2.5rem; }
+  .src { font-size: 0.82rem; color: #64748b; margin-top: 2rem; line-height: 1.7; } .src a { color: #58a6ff; text-decoration: none; }
+  .kicker { color: #475569; font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.08em; }
+  .nav { margin-top: 2.5rem; font-size: 0.9rem; color: #64748b; } .nav a { color: #58a6ff; text-decoration: none; }
+  .diagram { background: #0b0b12; border: 1px solid #23233a; border-radius: 10px; padding: 1.2rem; margin: 1.5rem 0; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78rem; color: #94a3b8; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .check { list-style: none; margin-left: 0; }
+  .check li { padding-left: 1.6rem; position: relative; }
+  .check li::before { content: "☐"; position: absolute; left: 0; color: #818cf8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div style="margin-bottom:2rem">
+    <div class="kicker">DESK-BUDDY OVERLAY-SPIKE · LEKTION 08</div>
+    <h1>Fassade, Persistenz und Portierung</h1>
+    <p class="subtitle">Wie die Teile verdrahtet sind — und was du davon in dein nächstes Overlay-Projekt mitnimmst</p>
+  </div>
+
+  <h2>Teil 1: Die Schichten und wer wen kennt</h2>
+
+  <div class="diagram">┌──────────────────────────────────────────────────────────┐
+│ Spiellogik / Szene                                       │
+│   ClickFeedback   (Farbwechsel, Rechtsklick-Beenden)     │
+│   IdleProbe       (CSV-Diagnose)                         │
+├──────────────────────────────────────────────────────────┤
+│ Unity-Komponenten                                        │
+│   OverlayBootstrap  ← Init-Reihenfolge, Verdrahtung      │
+│   HitTestDriver     ← misst, entscheidet (Lektion 05/06) │
+│   WindowDrag        ← zieht, setzt DragLock (Lektion 07) │
+│   WindowState       ← JSON-Persistenz                    │
+├──────────────────────────────────────────────────────────┤
+│ Fassade                                                  │
+│   OverlayWindow  ← EINZIGE Klasse, die Win32Interop kennt│
+├──────────────────────────────────────────────────────────┤
+│ Plattform                                                │
+│   Win32Interop   ← EINZIGE Datei mit DllImport           │
+└──────────────────────────────────────────────────────────┘
+                 Ein macOS-Port ersetzt genau die unterste Schicht.</div>
+
+  <p>
+    Die Pfeile zeigen nur nach unten. <code>Win32Interop</code> ist <code>internal</code> und wird ausschließlich von
+    <code>OverlayWindow</code> benutzt; die Fassade wiederum hat keine einzige <code>IntPtr</code> in ihrer
+    öffentlichen Signatur (Lektion 04). Deshalb kennt oberhalb der Fassade <em>nichts</em> mehr das Betriebssystem.
+  </p>
+
+  <h2>Teil 2: Persistenz — 40 Zeilen, die man überall wiederverwendet</h2>
+  <p>
+    Das Pet soll dort wieder auftauchen, wo man es hingestellt hat. Der Spike speichert dafür genau zwei Zahlen:
+  </p>
+
+<pre><code><span class="cmt">/// JSON-Persistenz der Fensterposition. Verzeichnis wird injiziert, damit testbar.</span>
+<span class="kw">public</span> <span class="kw">static</span> <span class="kw">class</span> WindowState
+{
+    <span class="kw">private</span> <span class="kw">const</span> <span class="kw">string</span> FileName = <span class="str">"window.json"</span>;
+
+    [Serializable]
+    <span class="kw">private</span> <span class="kw">struct</span> Payload { <span class="kw">public</span> <span class="kw">int</span> x; <span class="kw">public</span> <span class="kw">int</span> y; }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">string</span> DefaultDirectory => Application.persistentDataPath;
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> Save(<span class="kw">string</span> directory, Vector2Int position)
+    {
+        Directory.CreateDirectory(directory);
+        <span class="kw">var</span> json = JsonUtility.ToJson(<span class="kw">new</span> Payload { x = position.x, y = position.y });
+        File.WriteAllText(Path.Combine(directory, FileName), json);
+    }
+
+    <span class="kw">public</span> <span class="kw">static</span> <span class="kw">bool</span> TryLoad(<span class="kw">string</span> directory, <span class="kw">out</span> Vector2Int position)
+    {
+        position = Vector2Int.zero;
+        <span class="kw">var</span> path = Path.Combine(directory, FileName);
+        <span class="kw">if</span> (!File.Exists(path)) <span class="kw">return</span> <span class="kw">false</span>;
+
+        <span class="kw">try</span>
+        {
+            <span class="kw">var</span> payload = JsonUtility.FromJson&lt;Payload&gt;(File.ReadAllText(path));
+            position = <span class="kw">new</span> Vector2Int(payload.x, payload.y);
+            <span class="kw">return</span> <span class="kw">true</span>;
+        }
+        <span class="kw">catch</span> (Exception e)
+        {
+            Debug.LogWarning($<span class="str">"[WindowState] unreadable {path}: {e.Message}"</span>);
+            <span class="kw">return</span> <span class="kw">false</span>;
+        }
+    }
+}</code></pre>
+
+  <p>Drei Designentscheidungen, die kleiner aussehen, als sie sind:</p>
+
+  <table>
+    <tr><th>Entscheidung</th><th>Warum</th></tr>
+    <tr>
+      <td><strong>Verzeichnis als Parameter</strong>, Default nur als Property</td>
+      <td>Macht die Klasse testbar: Die Tests schreiben in ein temporäres Verzeichnis. Hätte man <code>Application.persistentDataPath</code> fest eingebaut, ginge kein EditMode-Test — und der Standardpfad wäre trotzdem nur eine Property entfernt.</td>
+    </tr>
+    <tr>
+      <td><code>TryLoad</code> statt <code>Load</code></td>
+      <td>„Keine Datei da" ist beim ersten Start der <em>Normalfall</em>, kein Fehler. Der Aufrufer bekommt ein <code>bool</code> und entscheidet selbst — keine Exception für ein erwartetes Ereignis.</td>
+    </tr>
+    <tr>
+      <td><code>catch</code> um das Parsen, mit <code>LogWarning</code></td>
+      <td>Eine korrupte Datei (abgestürzter Schreibvorgang, manuell editiert) darf den Start nicht verhindern. Das Pet landet dann an der Standardposition — und die Warnung steht im Log, statt still verschluckt zu werden.</td>
+    </tr>
+  </table>
+
+  <div class="insight">
+    <span class="callout-title">Die vier Tests, die dazu gehören</span>
+    <code>SaveThenLoadRoundTripsPosition</code> · <code>LoadWithoutFileReturnsFalse</code> ·
+    <code>LoadWithCorruptFileReturnsFalse</code> (schreibt <code>"{not json"</code> in die Datei) ·
+    <code>SaveOverwritesPreviousPosition</code>.
+    <br><br>
+    Beachte, was <em>nicht</em> getestet wird: dass <code>JsonUtility</code> funktioniert. Getestet werden nur die
+    eigenen Entscheidungen — Roundtrip, fehlende Datei, kaputte Datei, Überschreiben. Das ist derselbe Schnitt wie in
+    Lektion 06: <strong>Teste, wo dein Denkfehler stecken kann, nicht die Bibliothek.</strong>
+  </div>
+
+  <h3>Wann wird gespeichert?</h3>
+  <p>An zwei Stellen — bewusst redundant:</p>
+  <ul>
+    <li><strong>Beim Loslassen des Drags</strong> (<code>WindowDrag.Update</code>): sofort, damit ein Absturz die Position nicht kostet.</li>
+    <li><strong>Beim Beenden</strong> (<code>OverlayBootstrap.OnApplicationQuit</code>): fängt Positionsänderungen ab, die nicht aus einem Drag stammen.</li>
+  </ul>
+
+  <h2>Teil 3: <code>OverlayBootstrap</code> — die Reihenfolge ist das Feature</h2>
+
+<pre><code><span class="kw">public</span> <span class="kw">sealed</span> <span class="kw">class</span> OverlayBootstrap : MonoBehaviour
+{
+    [SerializeField] <span class="kw">private</span> Camera overlayCamera;
+    [SerializeField] <span class="kw">private</span> HitTestDriver hitTest;
+    [SerializeField] <span class="kw">private</span> WindowDrag windowDrag;
+
+    <span class="kw">private</span> <span class="kw">const</span> <span class="kw">float</span> TopMostReassertInterval = <span class="num2">5f</span>;
+    <span class="kw">private</span> <span class="kw">readonly</span> OverlayWindow _window = <span class="kw">new</span> OverlayWindow();
+
+    <span class="kw">private</span> <span class="kw">void</span> Awake()
+    {
+        <span class="cmt">// 1. Laufverhalten: Messenger, nicht Spiel</span>
+        Application.targetFrameRate = <span class="num2">30</span>;
+        QualitySettings.vSyncCount  = <span class="num2">0</span>;
+
+        <span class="cmt">// 2. Kamera auf Alpha 0 (Lektion 01)</span>
+        <span class="kw">if</span> (overlayCamera == <span class="kw">null</span>) overlayCamera = Camera.main;
+        overlayCamera.clearFlags      = CameraClearFlags.SolidColor;
+        overlayCamera.backgroundColor = <span class="kw">new</span> Color(<span class="num2">0f</span>, <span class="num2">0f</span>, <span class="num2">0f</span>, <span class="num2">0f</span>);
+        overlayCamera.allowHDR  = <span class="kw">false</span>;
+        overlayCamera.allowMSAA = <span class="kw">false</span>;
+
+        <span class="cmt">// 3. Fenster nativ aufsetzen (Lektion 04)</span>
+        _window.Initialize();
+
+        <span class="cmt">// 4. Erst JETZT die Abhängigen verdrahten — sie bekommen ein fertiges Fenster</span>
+        <span class="kw">if</span> (hitTest != <span class="kw">null</span>) hitTest.Window = _window;
+        <span class="kw">if</span> (windowDrag != <span class="kw">null</span>)
+        {
+            windowDrag.Window = _window;
+            windowDrag.Driver = hitTest;
+        }
+
+        <span class="cmt">// 5. Gespeicherte Position anwenden</span>
+        <span class="kw">if</span> (WindowState.TryLoad(WindowState.DefaultDirectory, <span class="kw">out</span> <span class="kw">var</span> saved))
+            _window.Position = saved;
+
+        <span class="cmt">// 6. Topmost dauerhaft halten (Lektion 03)</span>
+        InvokeRepeating(<span class="kw">nameof</span>(ReassertTopMost), TopMostReassertInterval, TopMostReassertInterval);
+    }
+
+    <span class="kw">private</span> <span class="kw">void</span> ReassertTopMost() => _window.SetTopMost(<span class="kw">true</span>);
+
+    <span class="kw">private</span> <span class="kw">void</span> OnApplicationQuit()
+    {
+        <span class="kw">if</span> (_window.IsActive) WindowState.Save(WindowState.DefaultDirectory, _window.Position);
+    }
+}</code></pre>
+
+  <p>
+    Zwei Mechanismen sichern die Reihenfolge ab, die man sonst nur hofft:
+  </p>
+
+  <div class="ok">
+    <span class="callout-title">Script Execution Order −100</span>
+    Unity ruft <code>Awake()</code> aller Komponenten in <strong>undefinierter</strong> Reihenfolge auf. Würde
+    <code>HitTestDriver.Update()</code> laufen, bevor <code>_window.Initialize()</code> durch ist, gäbe es
+    Null-Referenzen oder — schlimmer — einen Frame mit falschem Zustand. Der Spike setzt die Ausführungsordnung
+    deshalb hart auf −100 (also deutlich vor allen anderen), und zwar im Szenen-Generator:
+    <pre style="margin:0.6rem 0 0"><code>MonoImporter.SetExecutionOrder(MonoScript.FromMonoBehaviour(bootstrap), -<span class="num2">100</span>);</code></pre>
+  </div>
+
+  <p>
+    Der zweite Mechanismus ist die <strong>zentrale Verdrahtung</strong>: <code>HitTestDriver</code> und
+    <code>WindowDrag</code> holen sich das Fenster nicht selbst (kein Singleton, kein
+    <code>FindObjectOfType</code>), sondern bekommen es zugewiesen. Genau eine Klasse kennt die Reihenfolge, alle
+    anderen sind passiv. Das ist der Grund, warum die beiden Komponenten in ihren Methoden mit
+    <code>if (Window == null || !Window.IsActive) return;</code> beginnen — sie sind darauf ausgelegt, ohne Fenster
+    einfach nichts zu tun (Editor-Fall).
+  </p>
+
+  <h2>Teil 4: Der Portierungsschnitt</h2>
+  <p>
+    Die Frage, für die die ganze Architektur gebaut ist: <strong>Was müsstest du anfassen, um dasselbe unter macOS
+    laufen zu lassen?</strong>
+  </p>
+
+  <table>
+    <tr><th>Datei</th><th>Beim Port</th></tr>
+    <tr><td><code>Win32Interop.cs</code></td><td><strong>Ersetzen</strong> — macOS-Äquivalent über Cocoa/Objective-C-Bridge</td></tr>
+    <tr><td><code>OverlayWindow.cs</code></td><td>Innenleben austauschen, <strong>öffentliche Signatur bleibt</strong> (oder Interface + zwei Implementierungen)</td></tr>
+    <tr><td><code>HitTestDriver.cs</code></td><td>unverändert</td></tr>
+    <tr><td><code>WindowDrag.cs</code></td><td>unverändert</td></tr>
+    <tr><td><code>WindowState.cs</code></td><td>unverändert (<code>persistentDataPath</code> ist plattformneutral)</td></tr>
+    <tr><td><code>OverlayBootstrap.cs</code></td><td>unverändert</td></tr>
+    <tr><td>Player Settings</td><td>komplett neu — die D3D11/Flip-Model-Frage ist rein Windows</td></tr>
+  </table>
+
+  <p>
+    Zwei von sieben Dateien. Das ist kein Zufall, sondern das Ergebnis von zwei Regeln, die von Anfang an galten:
+    <em>nur eine Datei mit <code>DllImport</code></em> und <em>kein <code>IntPtr</code> in der öffentlichen
+    Fassade</em>.
+  </p>
+
+  <div class="trap">
+    <span class="callout-title">Was der Spike bewusst NICHT gelöst hat</span>
+    Bevor du das in ein Produkt überführst, sind das die offenen Punkte — alle bewusst außerhalb des Spike-Scopes:
+    <ul style="margin:0.5rem 0 0 1.2rem">
+      <li><strong>DPI-Scaling:</strong> Bei Skalierung ≠ 100 % können Win32-Pixel und Unity-Pixel auseinanderlaufen — die Koordinatenrechnung aus Lektion 05 braucht dann einen Faktor.</li>
+      <li><strong>Multi-Monitor:</strong> Negative Bildschirmkoordinaten (Monitor links vom Hauptmonitor) funktionieren prinzipiell, aber eine gespeicherte Position auf einem abgezogenen Monitor macht das Pet unsichtbar. Es gibt keine Plausibilitätsprüfung beim Laden.</li>
+      <li><strong>Autostart, Tray-Icon, Installer</strong> — nicht angefasst.</li>
+      <li><strong>Der 30-Minuten-Dauertest</strong> steht mit dem gefixten Working-Set-Tracking noch aus; der erste Lauf hatte eine ~16-minütige Lücke (vermutlich Display-Standby) und die Working-Set-Spalte war wegen des Mono-Bugs komplett 0. <code>managed_bytes</code> zeigte ein normales Sägezahnmuster, die FPS lagen bei ~30 — <em>Hinweis</em> gegen ein Leck, kein Beweis.</li>
+    </ul>
+  </div>
+
+  <h2>Teil 5: Deine Checkliste für das nächste Overlay-Projekt</h2>
+  <p>
+    Wenn du diese Technik neu aufsetzt — in Unity oder woanders —, ist das die Reihenfolge, in der du am wenigsten
+    Zeit verlierst:
+  </p>
+
+  <ol>
+    <li><strong>Umgebung zuerst, und verifizieren.</strong> D3D11 erzwingen, Flip-Model aus, Windowed, klein, nicht resizable. Danach in der Settings-Datei <em>nachsehen</em>, dass es wirklich drinsteht. Erst dann Code schreiben.</li>
+    <li><strong>Eine Plattform-Datei anlegen</strong> und die Regel „nur hier <code>DllImport</code>" von Anfang an durchhalten — auch wenn später ein Fix thematisch woanders hingehört.</li>
+    <li><strong>Fassade mit Fenster-Vokabular</strong> (<code>Position</code>, <code>ClientSize</code>, <code>SetClickThrough</code>) — kein <code>IntPtr</code> nach außen, im Editor no-op.</li>
+    <li><strong>Cursorposition global holen</strong>, nie über den Engine-Input, sobald Click-through im Spiel ist.</li>
+    <li><strong>Zustandsautomat</strong> für alles, was einen nativen Aufruf auslöst — <code>bool?</code>-Muster, Aufruf nur bei Kantenwechsel.</li>
+    <li><strong>DragLock von Anfang an</strong>. Der Abreiß-Bug kommt sonst garantiert, und zwar erst beim Nutzer.</li>
+    <li><strong>Beenden-Weg einbauen</strong>, bevor du <code>WS_EX_TOOLWINDOW</code> setzt.</li>
+    <li><strong>Diagnose mitlaufen lassen</strong> — und die Rohdaten einmal wirklich ansehen, statt nur „lief ohne Fehler" zu prüfen.</li>
+    <li><strong>Sichtbeweis von Hand</strong>: Notepad dahinter, danebenklicken, draufklicken, schnell ziehen, neu starten, Vollbild-Spiel dazwischen. Grüne Tests ersetzen das nicht.</li>
+  </ol>
+
+  <div class="insight">
+    <span class="callout-title">Und ein Punkt, der nichts mit Code zu tun hat</span>
+    Beim Beweis-Durchlauf sollte automatisiert ein Vollbild-Screenshot als Nachweis entstehen. Auf dem echten
+    Arbeitsrechner hat der prompt Browser-Tabs, eine private Chat-Konversation und ein Notepad-Fenster mit
+    Klartext-Zugangsdaten mit erfasst; das Aufräumen danach hat zusätzlich ein ungespeichertes Dokument hart
+    geschlossen. Abgebrochen, nichts committet, im README offen dokumentiert.
+    <br><br>
+    <strong>Beweisbilder auf einem Live-Desktop gehören dem Menschen.</strong> Entweder gezielt nur das Zielfenster
+    aufnehmen — oder den Screenshot selbst machen.
+  </div>
+
+  <h2>Quiz</h2>
+  <div class="quiz">
+
+    <div class="question">
+      <p>1. Warum nimmt <code>WindowState.Save</code> das Verzeichnis als Parameter, obwohl es immer <code>Application.persistentDataPath</code> ist?</p>
+      <div class="options">
+        <label><input type="radio" name="q1"> Damit die Tests in ein temporäres Verzeichnis schreiben können — sonst wäre die Klasse nicht testbar</label>
+        <label><input type="radio" name="q1"> Weil <code>persistentDataPath</code> in <code>static</code>-Kontext nicht verfügbar ist</label>
+        <label><input type="radio" name="q1"> Um mehrere Pets mit eigenen Positionen zu unterstützen</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Testbarkeit.</strong> Der Kommentar im Code sagt es wörtlich: „Verzeichnis wird injiziert, damit
+        testbar." <code>DefaultDirectory</code> steht als Property daneben, der Produktivpfad ist also trotzdem nur
+        ein Wort entfernt. Mehrere Pets wären ein netter Nebeneffekt, aber nicht die Absicht.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>2. Was passiert ohne Script Execution Order −100 auf <code>OverlayBootstrap</code>?</p>
+      <div class="options">
+        <label><input type="radio" name="q2"> Die <code>Awake</code>-Reihenfolge ist undefiniert — andere Komponenten können vor der Fenster-Initialisierung laufen</label>
+        <label><input type="radio" name="q2"> Nichts, <code>Awake</code> läuft immer vor allen <code>Update</code>-Methoden</label>
+        <label><input type="radio" name="q2"> Die Kamera wird nicht gefunden</label>
+      </div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Antwort</button>
+      <div class="answer">
+        <strong>Undefinierte Reihenfolge.</strong> Zwar laufen alle <code>Awake</code> vor allen <code>Update</code>,
+        aber die Reihenfolge <em>innerhalb</em> der <code>Awake</code>-Phase ist nicht garantiert. Da
+        <code>OverlayBootstrap.Awake</code> die anderen Komponenten verdrahtet, muss es zuverlässig zuerst laufen —
+        sonst hängt es vom Zufall ab, ob im ersten Frame ein halb initialisierter Zustand sichtbar wird.
+      </div>
+    </div>
+
+    <div class="question">
+      <p>3. Du sollst dieselbe Technik für ein transparentes Notiz-Widget benutzen. Welche Dateien kopierst du unverändert, welche schreibst du neu?</p>
+      <div class="options"><label>(frei formulieren, dann aufdecken)</label></div>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Musterantwort</button>
+      <div class="answer">
+        „<code>Win32Interop</code>, <code>OverlayWindow</code>, <code>HitTestDriver</code> (inkl.
+        <code>ClickThroughState</code>), <code>WindowDrag</code> und <code>WindowState</code> übernehme ich
+        unverändert — das ist die komplette Overlay-Schicht. Neu schreibe ich nur die Szene, den Collider, der die
+        klickbare Silhouette definiert, und den Bootstrap, weil dort projektspezifische Verdrahtung steht. Die Player
+        Settings setze ich per Editor-Script identisch und verifiziere sie in der Settings-Datei, bevor ich
+        überhaupt anfange."
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary">
+    <h2 style="margin-top:0">Was du jetzt weißt</h2>
+    <ul>
+      <li><strong>Vier Schichten</strong>, Abhängigkeiten nur nach unten: Spiellogik → Unity-Komponenten → Fassade → Plattform.</li>
+      <li><strong>Persistenz:</strong> <code>TryLoad</code> statt Exception, Verzeichnis injiziert (testbar), <code>catch</code> mit Warnung statt Startabbruch. Gespeichert wird beim Loslassen <em>und</em> beim Beenden.</li>
+      <li><strong><code>OverlayBootstrap</code> besitzt die Reihenfolge</strong>: Framerate → Kamera-Alpha → <code>Initialize()</code> → Verdrahtung → gespeicherte Position → Topmost-Timer. Abgesichert per Execution Order −100.</li>
+      <li>Komponenten holen sich nichts selbst — <strong>zentrale Verdrahtung statt Singleton/Find</strong>, und jede beginnt mit einem <code>IsActive</code>-Ausstieg.</li>
+      <li><strong>Portierung = 2 von 7 Dateien</strong>, weil <code>DllImport</code> und <code>IntPtr</code> nie nach oben durchgesickert sind.</li>
+      <li><strong>Offen geblieben:</strong> DPI, Multi-Monitor, Autostart, sauberer 30-Minuten-Dauerlauf mit gefixtem Working-Set.</li>
+      <li><strong>Neun-Punkte-Checkliste</strong> für dein nächstes Overlay — Umgebung zuerst und verifizieren, DragLock von Anfang an, Beenden-Weg vor <code>WS_EX_TOOLWINDOW</code>.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <strong>Quellen &amp; Code-Stellen:</strong><br>
+    Code: <code>Assets/Scripts/Overlay/WindowState.cs</code>, <code>OverlayBootstrap.cs</code>,
+    <code>Assets/Editor/SpikeSceneBuilder.cs</code>, <code>Assets/Tests/EditMode/WindowStateTests.cs</code> (desk-buddy @ <code>a57f9f1</code>) ·
+    Offene Punkte + Punkt-7-Einschränkung im Repo-<code>README.md</code> ·
+    Screenshot-Vorfall in <code>LEARNINGS.md</code> 2026-08-04<br>
+    <a href="https://docs.unity3d.com/ScriptReference/MonoImporter.SetExecutionOrder.html">MonoImporter.SetExecutionOrder</a> ·
+    <a href="https://docs.unity3d.com/ScriptReference/Application-persistentDataPath.html">Application.persistentDataPath</a> ·
+    <a href="https://docs.unity3d.com/ScriptReference/JsonUtility.html">JsonUtility</a>
+  </div>
+
+  <div class="nav">Cheat-Sheet → <a href="../reference/win32-overlay-cheatsheet.html">Win32-Overlay-Referenz</a></div>
+
+</div>
+</body>
+</html>
