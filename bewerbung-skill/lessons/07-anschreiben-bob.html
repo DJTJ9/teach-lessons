@@ -42,6 +42,7 @@
   .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
   .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
   .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .hist { font-size:13px; color:var(--muted); border-left:2px solid var(--border); padding-left:12px; }
   .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
   .nav a { color:var(--accent2); text-decoration:none; }
 </style>
@@ -79,17 +80,20 @@
 <table>
   <tr><th>Tool</th><th>Laut eigener Beschreibung</th><th>Für Bewerbung brauchbar?</th></tr>
   <tr><td><code>get_my_profile</code></td><td>Kriterien, No-Gos, Preferences, Feedback-Beispiele, <code>favorites</code></td><td>teilweise — <code>favorites</code> enthält nur <b>Titel</b>, keine URL</td></tr>
-  <tr><td><code>get_my_votes</code></td><td>👍/👎-Votes „mit vollem Job-Kontext"</td><td><b>ja</b> — der einzige Weg zu einem gemerkten Job samt Kontext</td></tr>
-  <tr><td><code>pull_pending_jobs</code></td><td>„bereits gescorte Jobs, die nach Learn-Insights ein <b>LLM-Rescore</b> brauchen"</td><td><b>nein</b> — das ist die Rescore-Warteschlange, keine Bewerbungsliste</td></tr>
+  <tr><td><code>get_my_votes</code></td><td>👍/👎-Votes „mit vollem Job-Kontext"</td><td><b>ja</b> — das vom Skill vorgesehene Tool für Weg A</td></tr>
+  <tr><td><code>pull_pending_jobs</code></td><td>„bereits gescorte Jobs, die nach Learn-Insights ein <b>LLM-Rescore</b> brauchen"</td><td><b>nein</b> — Rescore-Warteschlange; im Skill explizit ausgeschlossen</td></tr>
   <tr><td><code>update_my_criteria</code>, <code>apply_member_insights</code></td><td>schreiben Learnings zurück</td><td>nein (Gebiet von <code>/bob-learn</code>)</td></tr>
   <tr><td><code>scan_aggregators</code>, <code>push_jobs</code>, <code>push_batch</code></td><td>Scanner-Seite</td><td>nein (Gebiet von <code>/bob-scan</code>)</td></tr>
 </table>
 
 <div class="warn">
-  <b>Abweichung in deinem eigenen Skill — merken oder fixen:</b><br>
-  <code>SKILL.md</code> Schritt 1 sagt: „Bob-MCP <code>pull_pending_jobs</code> (Favoriten/hoher Score zuerst)". Die Tool-Beschreibung von <code>pull_pending_jobs</code> sagt aber: Jobs, die ein <b>Rescore</b> brauchen — eine Queue für <code>/bob-rescore</code>, keine Auswahl an Jobs, auf die du dich bewerben willst. Wer sich darauf verlässt, bekommt im schlimmsten Fall eine leere Liste (wenn nichts zum Rescoren ansteht) und denkt, Bob hätte keine Jobs.<br><br>
-  <b>Was tatsächlich funktioniert:</b> <code>get_my_votes</code> (deine 👍-Jobs mit Kontext) — oder du greifst den Job dort ab, wo du ihn ohnehin siehst (Telegram/Web) und gehst den Paste-Weg aus Lektion 8. Der Paste-Weg ist nicht der zweite Klasse — er ist der robusteste.
+  <b>Die Verwechslung, die der Skill ausdrücklich ausschließt:</b><br>
+  <code>SKILL.md</code> Schritt 1 nennt <code>get_my_votes</code> und schreibt dazu: „NICHT <code>pull_pending_jobs</code> — das ist die LLM-Rescore-Queue, keine Bewerbungsliste."<br><br>
+  Der Grund: <code>pull_pending_jobs</code> liefert Jobs, die nach neuen Learn-Insights <b>neu bewertet</b> werden müssen — Futter für <code>/bob-rescore</code>. Steht nichts zum Rescoren an, kommt eine <b>leere Liste</b> zurück. Wer den Namen für „offene Jobs" hält, schließt daraus, Bob hätte nichts gefunden — und irrt.<br><br>
+  <b>Zweiter Weg, ohne MCP:</b> Job dort abgreifen, wo du ihn ohnehin siehst (Telegram/Web), und den Paste-Weg aus Lektion 8 gehen. Der ist nicht zweite Klasse — er ist der robusteste.
 </div>
+
+<p class="hist">Historie: Bis 08/2026 stand in Schritt 1 <code>pull_pending_jobs</code> „(Favoriten/hoher Score zuerst)". Der Skill ist seit Commit <code>efc1af2</code> korrigiert — falls du irgendwo noch die alte Formulierung siehst, ist sie überholt.</p>
 
 <h2>Auswahl per AskUserQuestion</h2>
 <p>Der Skill schreibt vor: Auswahl <b>über einen Dialog</b>, nicht per Automatik. Claude zeigt dir eine Handvoll Kandidaten (Titel · Firma · Score/Vote), du wählst einen.</p>
@@ -123,7 +127,7 @@ Datum:   2026-08-16           <span class="comment">← Fundtag, nicht Bewerbung
   <ol>
     <li>Ruf einmal <code>get_my_profile</code> auf (z.B. über <code>/bob-profil</code>) und schau dir <code>favorites</code> und <code>feedback</code> an. Du siehst: Titel ja, URL nein.</li>
     <li>Ruf <code>get_my_votes</code> auf und prüfe, welche Felder wirklich zurückkommen — notier dir, ob URL und Anzeigentext dabei sind. Das entscheidet, ob Weg A für dich praktikabel ist.</li>
-    <li>Entscheide dich für deine Standard-Route und schreib sie dir in <code>SKILL.md</code> fest. Wenn <code>pull_pending_jobs</code> nicht das Richtige ist: Zeile korrigieren, statt sie jedes Mal neu zu umschiffen.</li>
+    <li>Wenn URL oder Anzeigentext fehlen: Weg A taugt für dich nur zum Aussuchen, den Text holst du dann trotzdem per Copy-Paste. Halt fest, welche Route deine Standard-Route ist — und wenn sie von <code>SKILL.md</code> abweicht, korrigier die Zeile dort, statt sie jedes Mal neu zu umschiffen.</li>
   </ol>
 </div>
 
@@ -153,8 +157,8 @@ Datum:   2026-08-16           <span class="comment">← Fundtag, nicht Bewerbung
   <h2>Gelernt</h2>
   <ul>
     <li>Weg A holt den Job aus Bob; alles ab <code>job.md</code> ist identisch mit Weg B.</li>
-    <li><code>pull_pending_jobs</code> = Rescore-Queue, <b>nicht</b> Bewerbungsliste — der Skill-Text ist an dieser Stelle ungenau.</li>
-    <li><code>get_my_votes</code> liefert 👍-Jobs mit Kontext; <code>get_my_profile.favorites</code> nur Titel.</li>
+    <li><code>get_my_votes</code> liefert 👍-Jobs mit Kontext und ist das vom Skill vorgesehene Tool; <code>get_my_profile.favorites</code> nur Titel.</li>
+    <li><code>pull_pending_jobs</code> = Rescore-Queue, <b>nicht</b> Bewerbungsliste — leere Antwort heißt „nichts zu rescoren", nicht „keine Jobs".</li>
     <li>Job-Auswahl bleibt eine Dialog-Entscheidung, keine Score-Automatik.</li>
     <li><code>job.md</code> friert Titel, Firma, URL, Datum und Anzeigentext im Git ein — Anzeigen verschwinden.</li>
   </ul>
