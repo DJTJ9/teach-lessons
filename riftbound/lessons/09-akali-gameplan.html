@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 09 — Akali-Gameplan</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>🗺️ Lektion 09 — Akali-Gameplan</h1>
+
+<p class="mission">Ziel: Du weißt für jede Spielphase (Early/Mid/Late), was dein Deck erreichen will, kennst deine Mulligan-Prioritäten und den Signature-Finish — und vermeidest die vier typischen Akali-Fehler beim ersten Event.</p>
+
+<h2>0. Die Grundidee: "Hit and Run", off-tempo</h2>
+
+<p>riftbound.gg bringt Akalis Design auf den Punkt: Sie ist gebaut, <strong>Showdowns so oder so zu gewinnen</strong> — entweder removed sie die gegnerische Unit und scored, oder der Gegner verbrennt Support-Karten, nur damit deine Unit am Ende per Legend-Ability zur Base zurückgeht. Wiederholt sich das, kippt der Ressourcen-Count unaufhaltsam zu deinen Gunsten.</p>
+
+<p>Wichtig für dein Tempo-Gefühl aus anderen CCGs: Akali spielt <strong>"off-tempo"</strong> — erst Board-Setup, dann Scoren und den Gegner aus Comeback-Wegen aussperren. Wie Irelia braucht sie ein paar Züge Anlauf. Wer sie wie ein Aggro-Deck pilotiert, verliert die Engine, bevor sie läuft.</p>
+<cite>Quellen: https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>1. Early Game (Züge 1–2): Entwickeln, nicht hetzen</h2>
+<ul>
+  <li>Going first: starken 2-Drop suchen — <strong>Scuttle Crab</strong> (Cantrip + später Handreveal) oder <strong>Mournful Witness</strong> (wird nach dem ersten Combat zur 4-Might-Unit; riftbound.gg: "Anker des Early Game").</li>
+  <li>Ohne Unit-Start: <strong>Gear legen</strong> — Mask of Foresight (skaliert den Solo-Playstyle) oder Zhonya's Hourglass (schützt später das Key-Piece; als [Hidden] verdeckt ablegbar).</li>
+  <li>Zug 2 ideal: <strong>Stellacorn Herder</strong> oder <strong>Jhin, Murderous Artist</strong>. Sonst ist der Chosen Champion völlig okay — <strong>Akali, Deadly Weapon für 3 ohne Power-Cost ist der verlässlichste Champion-Play</strong>.</li>
+  <li><strong>Lonely Poro</strong> als Früh-Blocker, der sich ersetzt ("[Deathknell] If I died alone, draw 1" — solo-kompatibel).</li>
+</ul>
+
+<h3>Mulligan-Prioritäten</h3>
+<table>
+  <tr><th>Priorität</th><th>Suchen</th></tr>
+  <tr><td>1</td><td>2-Drop (Scuttle Crab / Mournful Witness)</td></tr>
+  <tr><td>2</td><td>4-Cost-Value-Unit (Stellacorn Herder / Jhin)</td></tr>
+  <tr><td>3</td><td>Schutz-Gear (Zhonya's Hourglass / Mask of Foresight)</td></tr>
+</table>
+<div class="warning">Transparenz: Keine gefundene Quelle enthält eine dedizierte Mulligan-Sektion — diese Prioritäten sind aus dem Riftlab-Early-Game-Guide <strong>abgeleitet</strong>, nicht wörtlich zitiert. Zur Erinnerung (Regelbasis): Starthand 4 Karten, Mulligan = bis zu 2 beiseitelegen, nachziehen, zurückmischen.</div>
+<cite>Quellen: https://www.youtube.com/watch?v=_izcg8Zhc8E · https://riftbound.gg/akali-rogue-assassin-guide/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/ (Mulligan-Regel)</cite>
+
+<h2>2. Mid Game: Die Engine fahren</h2>
+<ul>
+  <li><strong>Empower zünden</strong> (3 Energie + 1 Power), sobald der Loop ansteht — der Ready-Rider ist der halbe Wert der Legend.</li>
+  <li><strong>Standard-Line:</strong> Stellacorn ins Battlefield (draw 1) → Showdown → Legend-Ability zurück zur Base (draw 1), der Gegner bekommt dabei keine Action → empowered kommt er ready an → nochmal (draw 1).</li>
+  <li><strong>Jhin-Line:</strong> 3 Moves = +3 Energie/+3 Power für Entwicklung, Accelerate-Kosten, Hidden-Karten.</li>
+  <li><strong>Twilight-Reveler-Line:</strong> rein moven → beim Angriff andere Unit ready machen → Reveler per Legend nach Hause retten ("Accelerate für alle").</li>
+  <li>Verteidigt wird mit Calm-Spells (Discipline, En Garde, Defy) + Mask-Triggern — nicht mit der Legend-Ability (die geht nur im eigenen Zug).</li>
+</ul>
+<cite>Quellen: https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>3. Late Game: Auf 8 Punkte drücken</h2>
+<ul>
+  <li>Ein gut entwickeltes Board + Trick-Hand (Discipline/En Garde/Shuriken Flip) überrennt Battlefields.</li>
+  <li><strong>Perfect Execution</strong> (Ready + Assault 3, Flow) für Doppel-Angriffe oder als "Ready + Rückzug"-Utility.</li>
+  <li><strong>Deadly-Weapon-Removal-Line</strong> (mit Void Gate): Move-in 2, Move-out 2, empowered 3+3, plus Shuriken Flip → bis zu 9 Schaden ohne Combat.</li>
+</ul>
+
+<h3>Der Signature-Finish</h3>
+<div class="card">
+<p><strong>Bei 6 Punkten zu Zugbeginn reichen 1 Unit + Shuriken Flip:</strong></p>
+<pre>1. Unit movt in Battlefield 1 → Conquer → 7. Punkt
+2. Shuriken Flip: "Deal 2 to up to one enemy unit …,
+   then move a friendly unit" → dieselbe Unit ins Battlefield 2
+   → Conquer → 8. Punkt</pre>
+<p>Regel-Clou (Final-Point-Regel): Der 8. Punkt per Conquer gewinnt nur sofort, wenn du in diesem Zug <em>beide</em> Battlefields erobert hast — genau das tut diese Line. Riftlab: "Bei 6 Punkten + 1 Unit + Shuriken Flip kannst du mit genau diesen zwei Karten gewinnen." Und dank <strong>Flow [3][A]</strong> ist der Flip sogar aus dem Trash wiederholbar.</p>
+</div>
+<cite>Quellen: https://www.youtube.com/watch?v=_izcg8Zhc8E · https://riftdecks.com/cards/details-shuriken-flip · https://runesandrift.com/riftbound-rules/ (Final-Point-Regel)</cite>
+
+<h2>4. Häufige Fehler</h2>
+
+<table>
+  <tr><th>Fehler</th><th>Warum es weh tut</th></tr>
+  <tr><td><strong>Empower vergessen / zu spät</strong></td><td>Der Ready-Rider ist der halbe Wert der Legend-Ability. 3+[A] früh investieren, sobald der Loop ansteht.</td></tr>
+  <tr><td><strong>Shuriken Flip als reines Removal verbrennen</strong></td><td>"Up to one" erlaubt auch den reinen Move — die Karte ist primär Reichweite/Finisher. Wer sie früh auf einen 2-Drop wirft, hat später keinen Signature-Finish.</td></tr>
+  <tr><td><strong>Key-Piece ungeschützt lassen</strong></td><td>Ohne Zhonya's / Twilight Shroud / Defy stirbt die einzige Engine — und das Deck fällt auseinander (besonders in den Mind-/Chaos-Matchups).</td></tr>
+  <tr><td><strong>Zu früh scoren wollen</strong></td><td>Die Quellen betonen mehrfach das "off-tempo"-Setup: erst Engine, dann Punkte. Aggro-Instinkte aus HS/Snap hier bewusst abtrainieren.</td></tr>
+</table>
+<div class="warning">Transparenz: Keine Quelle führt explizit eine "Common Mistakes"-Liste — diese vier Punkte sind direkt aus den Guide-Aussagen (riftbound.gg, Riftlab) <strong>abgeleitet</strong>.</div>
+<cite>Quellen: https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+
+<p><strong>1. Du hast 6 Punkte, eine ready Unit in der Base und Shuriken Flip auf der Hand. Beide Battlefields sind leer. Wie gewinnst du in diesem Zug?</strong></p>
+<div class="answer">Unit in Battlefield 1 (Conquer, 7. Punkt), dann Shuriken Flip movt sie in Battlefield 2 (Conquer, 8. Punkt) — beide Battlefields in einem Zug erobert = sofortiger Sieg.<div class="reveal">✅ Richtig — der Signature-Finish. Die Final-Point-Regel verlangt für den Sofort-Sieg per Conquer genau das: beide Battlefields im selben Zug. Ein einzelner Conquer auf 8 würde stattdessen nur eine Karte ziehen.</div></div>
+<div class="answer">Unit in Battlefield 1 moven und mit Shuriken Flip die gegnerische Legend um 2 Punkte reduzieren.<div class="reveal wrong">❌ Falsch — Shuriken Flip macht Schaden an einer Unit an einem Battlefield und bewegt dann eine eigene Unit. Punkte "wegnehmen" gibt es in Riftbound nicht.</div></div>
+
+<p><strong>2. Wann solltest du die 3 Energie + 1 Power für Akalis Empower bezahlen?</strong></p>
+<div class="answer">So spät wie möglich — erst wenn das Spiel auf der Kippe steht.<div class="reveal wrong">❌ Falsch — "Empower zu spät" ist einer der teuersten ableitbaren Fehler: Jede Runde ohne Ready-Rider ist ein verlorener Extra-Move (= verlorene Draws/Ressourcen).</div></div>
+<div class="answer">Früh — sobald der Move-Loop ansteht, denn der Ready-Rider verdoppelt ab dann jede Aktivierung.<div class="reveal">✅ Richtig — der Empower ist eine Investition, die jede folgende Runde Zinsen zahlt. Die Quellen betonen: Der Ready-Rider ist der halbe Wert der Legend-Ability.</div></div>
+
+<p><strong>3. Dein Gegner spielt viel Targeted-Removal. Welche Schutz-Schichten hat dein Deck für das Key-Piece?</strong></p>
+<div class="answer">Zhonya's Hourglass (Todes-Ersatz + Recall), Twilight Shroud (untargetable + wiederholbar via Flow), Defy (Counter bis Kosten 4) — plus Akali, Silent, die außerhalb von Combat gar nicht erst targetbar ist.<div class="reveal">✅ Richtig — genau diese Redundanz hält die Engine am Leben. Ungeschützte Key-Pieces sind Fehler Nr. 3 — besonders gegen Mind/Chaos.</div></div>
+<div class="answer">Die Legend-Ability — sie holt die Unit als Reaction jederzeit in Sicherheit.<div class="reveal wrong">❌ Falsch — die Ability ist eine Action, nur im eigenen Zug und nur aus Showdowns. Gegen Removal im gegnerischen Zug schützt sie nicht.</div></div>
+
+<p><strong>4. Du bist Hearthstone-Aggro-Spieler. Was musst du dir bei Akali abtrainieren?</strong></p>
+<div class="answer">Den Drang, ab Zug 1 zu scoren — Akali spielt "off-tempo": erst Board/Engine-Setup, dann Punkte + Comeback-Wege zusperren.<div class="reveal">✅ Richtig — riftbound.gg vergleicht sie mit Irelia: Sie braucht ein paar Züge Anlauf. Wer die Engine für frühe Punkte opfert, hat im Mid Game nichts mehr.</div></div>
+<div class="answer">Nichts — Akali ist ein Aggro-Deck und belohnt maximalen Frühdruck.<div class="reveal wrong">❌ Falsch — sie ist aggressiver als Irelia, aber ein Setup-Deck. "Zu früh scoren wollen" ist einer der vier typischen Fehler.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li><strong>Identität:</strong> Hit and Run, off-tempo — Showdowns "so oder so" gewinnen, Ressourcen-Count kippen lassen; braucht Anlauf wie Irelia.</li>
+  <li><strong>Early:</strong> 2-Drop (Scuttle/Witness) → 4-Cost-Engine (Stellacorn/Jhin) → Schutz-Gear; Deadly Weapon als verlässlichster Champion-Play. Mulligan-Prios: abgeleitet, nicht offiziell.</li>
+  <li><strong>Mid:</strong> Empower früh, dann den Loop fahren (Stellacorn-Draws / Jhin-Ressourcen / Reveler-Readies); Defensive über Calm-Spells, nicht über die Legend.</li>
+  <li><strong>Late:</strong> Board + Tricks überrennen Battlefields; Perfect Execution für Doppel-Angriffe; Deadly Weapon + Void Gate als Combat-freies Removal.</li>
+  <li><strong>Signature-Finish:</strong> Bei 6 Punkten gewinnen 1 Unit + Shuriken Flip via Doppel-Conquer (Final-Point-Regel erfüllt).</li>
+  <li><strong>Vier Fehler:</strong> Empower zu spät, Flip als Removal verbrannt, Key-Piece ungeschützt, zu früh gescort.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

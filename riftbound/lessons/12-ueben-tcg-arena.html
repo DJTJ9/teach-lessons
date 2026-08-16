@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 12 — Üben: TCG-Arena.fr + Alternativen</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>💻 Lektion 12 — Üben online: TCG-Arena.fr + Alternativen</h1>
+
+<p class="mission"><strong>Ziel:</strong> Du kannst noch heute Abend dein erstes Online-Match auf TCG-Arena.fr starten, kennst die Alternativen (Tabletop Simulator, Pixelborn, Webcam) — und hast einen Übungsplan, mit dem du in 1–2 Wochen fit für dein erstes Hamburg-Event bist.</p>
+
+<h2>Warum überhaupt online üben?</h2>
+<p>Es gibt <strong>keinen offiziellen Digital-Client</strong> (Stand August 2026). Riot hat im "State of the Game" (Februar 2026) einen Digital-Client als "delicate topic" bezeichnet — nicht ausgeschlossen, aber "nicht in naher Zukunft"; die 2026–2027-Roadmap nennt nur Papier-Sets. Anders als bei Hearthstone oder LoR übst du Riftbound also über Community-Simulatoren — und die aktivste inoffizielle Plattform ist <strong>TCG Arena</strong>.</p>
+<cite>https://playriftbound.com/en-us/news/announcements/state-of-the-game-feb-2026/ · https://themagicrain.com/2026/08/riftbound-reveals-2026-2027-roadmap-teases-major-gameplay-changes-and-new-sets/</cite>
+
+<h2>Was ist TCG Arena?</h2>
+<p><a href="https://tcg-arena.fr/">tcg-arena.fr</a> ist ein kostenloser, browserbasierter <strong>Peer-to-Peer-TCG-Simulator</strong> aus Frankreich (UI englisch, Chrome/Firefox, Desktop/Landscape). Kein Download, <strong>kein Account nötig</strong>, bis zu 4 Spieler pro Tisch. Die Plattform ist nicht um ein bestimmtes Spiel gebaut — sie lädt community-gepflegte "Game Files", und Riftbound ist eines der aktiv gepflegten Spiele. Finanzierung über Ko-Fi; EU- und Amerika-Server verfügbar.</p>
+<table>
+  <tr><th>Gibt es</th><th>Gibt es NICHT</th></tr>
+  <tr><td>Deckbuilder mit aktuellen Kartendaten + Suchfiltern</td><td>Rules Enforcement (dazu gleich mehr)</td></tr>
+  <tr><td>Deck-Import per Textcode (z. B. aus riftmana.com / riftbound.zone)</td><td>Matchmaking / Ranking / Turniersystem</td></tr>
+  <tr><td>Multiplayer via Game-ID, Pings, Karten-Links</td><td>Dokumentierter Solo-/KI-Modus</td></tr>
+  <tr><td>Optionale Teil-Automatisierung von Kernaktionen (Ressourcen zahlen, Karten in die richtige Zone)</td><td>Automatische Karteneffekte</td></tr>
+</table>
+<cite>https://tcg-arena.fr/ · https://riftbound.zone/en/guide/how-to-use-tcg-arena-for-riftbound-tcg/ · https://riftmana.com/how-to-play-riftbound-online-league-of-legends-tcg/</cite>
+
+<h2>Match-Setup Schritt für Schritt</h2>
+<ol>
+  <li><strong>tcg-arena.fr öffnen</strong> (kein Login) und oben <strong>Riftbound</strong> als Spiel wählen.</li>
+  <li><strong>Deck bereitstellen:</strong> <code>Decks → New Deck</code> (im Deckbuilder bauen) ODER <code>Decks → Import</code> (Textcode einfügen, z. B. eine Meta-Liste von riftmana.com). Struktur: <strong>1 Legend + 1 Chosen Champion + 40 Main-Deck + 12 Runes</strong>.</li>
+  <li><strong>Spiel starten:</strong> <code>Play → New Game</code> → die angezeigte <strong>Game-ID</strong> mit dem Gegner teilen.</li>
+  <li><strong>Gegner:</strong> <code>Join Game</code> → Code einfügen. Kommunikation läuft typischerweise über Voice (Discord).</li>
+</ol>
+<div class="tip">Deine Akali-Liste einmal als Textcode speichern — dann ist der Import vor jeder Session eine Sache von Sekunden, und du testest exakt das Deck, das du in Hamburg spielen wirst.</div>
+<cite>https://riftbound.zone/en/guide/how-to-use-tcg-arena-for-riftbound-tcg/</cite>
+
+<h2>Kein Rules Enforcement — Bug oder Feature?</h2>
+<div class="warning"><strong>TCG Arena setzt die Regeln NICHT automatisch durch.</strong> Zitat riftbound.zone: "TCG Arena does not enforce the rules automatically. You and your opponent manage move legality — exactly like in a physical game." Die App implementiert bewusst keine Karteneffekte; nur Kernaktionen (Kosten zahlen, Zonen) können teil-automatisiert werden.</div>
+<p>Für dich als Hearthstone-/LoR-Veteran ist das die größte Umstellung: Dort hat der Client jede Interaktion für dich gelöst. Hier musst du Chain-Reihenfolge (LIFO), Showdown-Fenster, Combat-Damage-Zuweisung und jeden Karteneffekt <em>selbst</em> korrekt ausführen — genau wie später am Tisch in Hamburg. Das ist fürs Lernen ein <strong>Vorteil</strong>: Wer auf TCG Arena sauber spielt, hat die Regeln wirklich verstanden und wird am physischen Tisch nicht von Papier-Logistik überrascht. Rules-Unsicherheiten klärst du parallel mit den Core Rules (Lektion Regeln) statt mit "der Client wird's schon wissen".</p>
+<cite>https://riftbound.zone/en/guide/how-to-use-tcg-arena-for-riftbound-tcg/ · https://tcg-arena.fr/</cite>
+
+<h2>Alternativen im Überblick</h2>
+<table>
+  <tr><th>Option</th><th>Was es ist</th><th>Wofür geeignet</th></tr>
+  <tr>
+    <td><strong>Tabletop Simulator</strong> (Steam, ~20 €)</td>
+    <td>Workshop-Mod <strong>"Riftbound" von Willow</strong> — aktuelle Version abonnieren, nicht "Legacy"; es existiert auch "Riftbound — Advanced Table". 3D-Tisch, keine Rules Enforcement.</td>
+    <td><strong>Solo-Goldfishing</strong> (alleine Curve/Mulligan üben); Mitspieler über den Riftbound Community Discord.</td>
+  </tr>
+  <tr>
+    <td><strong>Pixelborn</strong></td>
+    <td>Ehemaliger Lorcana-Simulator; Entwickler "Pavel" baut einen Riftbound-Client. Windows-Download via Google Drive/Discord, Account nötig, Kartenbilder manuell per archive.org-Link nachladen. Distribution/Status wechselhaft.</td>
+    <td>Nur wenn du Bastelaufwand nicht scheust — aktuelle Links immer über den Discord.</td>
+  </tr>
+  <tr>
+    <td><strong>Webcam-Play</strong></td>
+    <td>Physische Decks per Top-Down-Webcam über Discord (à la SpellTable bei MTG).</td>
+    <td>Maximale Nähe zum echten Tisch-Erlebnis — inklusive Mischen und Kartenhandling.</td>
+  </tr>
+</table>
+<cite>https://riftmana.com/how-to-play-riftbound-online-league-of-legends-tcg/ · https://steamcommunity.com/sharedfiles/filedetails/?id=3583236563 · https://riftbound.gg/riftbound-online-playing-using-webcam-tabletop-simulator-and-pixelborn/</cite>
+
+<h2>Dein Übungsplan für 1–2 Wochen</h2>
+<table>
+  <tr><th>Phase</th><th>Was</th><th>Ziel</th></tr>
+  <tr>
+    <td><strong>Tage 1–3: Goldfishing-Drills</strong></td>
+    <td>Solo (TTS-Mod oder TCG Arena ohne Gegner): Akali-Deck 5–10× "gegen niemanden" ausspielen — Mulligan-Entscheidungen, Runen-Channeling, Curve bis Zug 4–5.</td>
+    <td>Deck-Mechanik automatisieren: Was mache ich in Zug 1–3 fast immer?</td>
+  </tr>
+  <tr>
+    <td><strong>Tage 3–10: Manuelle Matches</strong></td>
+    <td>TCG Arena gegen echte Gegner (Mitspieler über Discord-Community); jede Regelfrage sofort nachschlagen statt raten.</td>
+    <td>Showdowns, Chain/LIFO und Karteneffekte fehlerfrei selbst ausführen — Turnier-Simulation im Kopf.</td>
+  </tr>
+  <tr>
+    <td><strong>Ab Woche 2: Store</strong></td>
+    <td>Erste Nexus Night in Hamburg (Lektion 13) — physisches Spielen mit echtem Deck, Mischen, Token.</td>
+    <td>Online-Routine auf den Tisch übertragen; Locals als Lernumgebung nutzen.</td>
+  </tr>
+</table>
+<div class="tip">Spiel online bewusst auch <em>gegen</em> die Tier-1-Decks aus Lektion 11 (Kennen, Master Yi, Irelia) — importierte Meta-Listen gibt es auf riftmana.com. So kennst du die Matchups, bevor sie dir am Store-Tisch begegnen.</div>
+
+<div class="quiz">
+<h3>✅ Quiz</h3>
+<p><strong>1. Dein Gegner auf TCG Arena spielt einen Spell mit Targeting-Effekt. Wer sorgt dafür, dass der Effekt regelkonform ausgeführt wird?</strong></p>
+<div class="answer">Die Plattform — Karteneffekte sind automatisiert
+  <div class="reveal wrong">❌ Falsch — TCG Arena implementiert bewusst keine Karteneffekte. Nur Kernaktionen (Kosten zahlen, Zonen) können teil-automatisiert sein.</div>
+</div>
+<div class="answer">Beide Spieler gemeinsam — wie am physischen Tisch
+  <div class="reveal">✅ Richtig — "You and your opponent manage move legality — exactly like in a physical game" (riftbound.zone). Genau das macht die Plattform zum perfekten Turnier-Training.</div>
+</div>
+
+<p><strong>2. Was ist die korrekte Deck-Struktur beim Import in TCG Arena?</strong></p>
+<div class="answer">1 Legend + 60 Main-Deck + 10 Runes
+  <div class="reveal wrong">❌ Falsch — das wäre eher eine MTG-Größenordnung. Riftbound-Constructed ist kompakter.</div>
+</div>
+<div class="answer">1 Legend + 1 Chosen Champion + 40 Main-Deck + 12 Runes
+  <div class="reveal">✅ Richtig — genau diese Struktur erwartet der Deckbuilder/Import (und sie entspricht dem Constructed-Format).</div>
+</div>
+
+<p><strong>3. Du willst um 23 Uhr noch alleine deine Akali-Curve drillen — niemand ist online. Beste Option?</strong></p>
+<div class="answer">Offizieller Riot-Client im Practice-Mode
+  <div class="reveal wrong">❌ Falsch — es gibt keinen offiziellen Digital-Client (Riot, Feb 2026: "nicht in naher Zukunft").</div>
+</div>
+<div class="answer">Tabletop Simulator mit dem "Riftbound"-Mod von Willow — Solo-Goldfishing
+  <div class="reveal">✅ Richtig — der TTS-Mod eignet sich gut für Solo-Goldfishing. Aktuelle Mod-Version abonnieren, nicht "Legacy".</div>
+</div>
+<div class="answer">Pixelborn-Ranked-Queue
+  <div class="reveal wrong">❌ Falsch — Pixelborn ist ein Bastel-Client in wechselhaftem Status (Download via Discord/Google Drive) und kein dokumentierter Solo-Trainer.</div>
+</div>
+
+<p><strong>4. Braucht man für TCG Arena einen Account oder einen Download?</strong></p>
+<div class="answer">Ja, Client-Download plus Account
+  <div class="reveal wrong">❌ Falsch — das beschreibt eher Pixelborn (Windows-Download, Account nötig).</div>
+</div>
+<div class="answer">Nein — Browser öffnen, Spiel wählen, losspielen; Match-Verbindung per Game-ID
+  <div class="reveal">✅ Richtig — kostenlos, browserbasiert (Chrome/Firefox, Desktop), kein Account. Play → New Game → Game-ID teilen.</div>
+</div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li><strong>Kein offizieller Digital-Client</strong> (Riot, Feb 2026) — geübt wird über Community-Simulatoren.</li>
+  <li><strong>TCG Arena</strong> (tcg-arena.fr): kostenlos, Browser, kein Account, P2P via Game-ID; Deckbuilder + Deck-Import (1 Legend + 1 Champion + 40 + 12 Runes).</li>
+  <li><strong>Kein Rules Enforcement:</strong> Karteneffekte und Legalität verwaltest du selbst — anstrengender als Hearthstone/LoR, aber ideales Training für den physischen Turniertisch.</li>
+  <li><strong>Alternativen:</strong> Tabletop Simulator (Mod "Riftbound" von Willow — Solo-Goldfishing), Pixelborn (Bastel-Client via Discord), Webcam-Play über Discord.</li>
+  <li><strong>Übungsplan:</strong> Tage 1–3 Goldfishing-Drills → Tage 3–10 manuelle Online-Matches (auch gegen Tier-1-Listen) → ab Woche 2 Nexus Night im Store.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

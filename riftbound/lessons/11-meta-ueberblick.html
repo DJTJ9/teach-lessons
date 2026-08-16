@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 11 — Meta-Überblick</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>🗺️ Lektion 11 — Meta-Überblick</h1>
+
+<p class="mission"><strong>Ziel:</strong> Du kennst die Top-Archetypen des Vendetta-Formats (Stand: Mitte August 2026), erkennst sie am Tisch an ihren Schlüsselkarten — und weißt vor deinem ersten Event in Hamburg, was dir mit deiner Akali gegenübersitzen wird.</p>
+
+<h2>Das Format: Vendetta (Stand Mitte August 2026)</h2>
+<p>Aktuelles Set ist <strong>Vendetta</strong> (Set 4, Release 31.07.2026) — das Meta ist also erst 2–3 Wochen alt. Wichtig zur Einordnung: Vendetta gilt als <strong>schwacher Set-Impact</strong>. Im Schnitt stecken nur ~5 Vendetta-Karten in einem Top-Deck, und nur 4 von 9 neuen Legends (Kennen, Nasus, Mel, Ambessa) haben überhaupt Top-8-Platzierungen in großen Turnieren erreicht. Das Meta ist im Kern also ein weiterentwickeltes Unleashed-Meta. Nächstes Set: <strong>Radiance</strong> (23.10.2026).</p>
+<div class="warning"><strong>Verfallsdatum beachten:</strong> Der erste Vendetta-Regional-Qualifier (Barcelona, 21.–23.08.2026) stand zum Stand dieser Lektion noch aus — danach können sich Tierlists deutlich verschieben. Vor deinem Event kurz die Quellen unten checken.</div>
+<cite>https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/ · https://en.wikipedia.org/wiki/Riftbound · https://playriftbound.com/en-us/news/organizedplay/all-eyes-on-barcelona</cite>
+
+<h2>Tier 1 — die Decks, die du erwarten musst</h2>
+<p>Datengrundlage: riftbound.gg-Tierlist (14.08.2026, 16 Turniere mit 64+ Spielern) plus riftdecks.com-Metashare-Statistik (16.08.2026).</p>
+
+<table>
+  <tr><th>Legend</th><th>Metashare / Winrate (riftdecks)</th><th>Kurzprofil</th></tr>
+  <tr><td><strong>Kennen</strong></td><td>9 % / 58 % WR</td><td>Höchste Share UND höchste Winrate — das Deck des Formats</td></tr>
+  <tr><td><strong>Master Yi</strong> (OGS)</td><td>8 % / 57 %</td><td>Meiste Top-8s (21), 2 Siege</td></tr>
+  <tr><td><strong>Irelia</strong></td><td>7 % / 54 %</td><td>Konsistenter Tempo-Midrange</td></tr>
+  <tr><td><strong>Kai'Sa</strong></td><td>6 % / 47 %</td><td>Unverändertes Unleashed-Deck</td></tr>
+  <tr><td><strong>Ezreal</strong></td><td>2 % / 54 %</td><td>Value-Deck, wenig gespielt, konvertiert gut</td></tr>
+</table>
+
+<div class="card">
+<h3>Kennen, Heart of the Tempest — "Miracle/Tempo Kennen"</h3>
+<p><strong>Gameplan:</strong> Der beste Build ist das Tempo-Deck um <em>Rhasa the Sunderer</em> (OGN-195) — hat sich gegen die Baited-Hook-/Ruination-Varianten durchgesetzt. Sehr komplexer Pilot: Card Counting und "Deck Looping" gehören zum Pflichtprogramm — vergleichbar mit Miracle-Decks aus anderen CCGs.</p>
+<p><strong>Am Tisch erkennst du es an:</strong> Kennen-Legend, <em>Rhasa the Sunderer</em> und Staple <em>Nocturne – Horrifying</em>; riftmana listet es als Chaos/Order.</p>
+</div>
+
+<div class="card">
+<h3>Master Yi, Wuju Bladesman</h3>
+<p><strong>Gameplan:</strong> Superzuverlässiges Early Game — Board früh übernehmen und die Legend-Ability hebeln, gleiches Muster wie schon in Unleashed. Neu aus Vendetta: <em>Jayce – Hammer in Hand</em> (VEN-088) als Mid-Game-Anker und <em>Rampage</em> (VEN-083) als Removal.</p>
+<p><strong>Am Tisch:</strong> Yi-Legend (die starke OGS-Version aus Proving Grounds) und früher, konstanter Board-Druck ab Zug 1. Gegenmittel laut riftstorm.gg: einen "clean reset" für die großen Threats aufheben.</p>
+</div>
+
+<div class="card">
+<h3>Irelia, Blade Dancer</h3>
+<p><strong>Gameplan:</strong> Calm/Chaos-Tempo-/Value-Midrange, extrem konsistent — die Liste ist seit Unleashed kaum verändert. <em>Stellacorn Herder</em> (SFD-048) bleibt die wichtigste 4-Kosten-Unit; Vendetta-Karten (<em>Akali – Silent</em>, <em>Twilight Shroud</em>) nur situativ.</p>
+<p><strong>Am Tisch:</strong> Calm/Chaos-Runen + <em>Stellacorn Herder</em>. Für dich besonders relevant: Irelia ist die direkte, konsistentere Konkurrenz zu deiner Akali (beide teilen Karten wie den Herder).</p>
+</div>
+
+<div class="card">
+<h3>Kai'Sa, Daughter of the Void</h3>
+<p><strong>Gameplan:</strong> Spielt praktisch das identische Unleashed-Deck — <em>null</em> Vendetta-Main-Deck-Karten — und performt trotzdem (2 Siege, 7 Top-8s). Der riftbound.gg-Autor bleibt für Regional-Niveau skeptisch; die 47 % WR bei riftdecks stützen das.</p>
+<p><strong>Am Tisch:</strong> Kai'Sa-Legend mit der bekannten Unleashed-Liste — wer die alte Liste kennt, kennt auch diese.</p>
+</div>
+
+<div class="card">
+<h3>Ezreal, Prodigal Explorer</h3>
+<p><strong>Gameplan:</strong> Mind/Chaos-Value-Deck. Beste Liste ist die aus Hartford (Ende Unleashed), fast unverändert — einziger Neuzugang: <em>Heisho – Shell of the World</em> (VEN-158). Grindet Kartenvorteil und gewinnt lange Spiele.</p>
+<p><strong>Am Tisch:</strong> Mind/Chaos-Runen, langsame value-orientierte Züge, Heisho als Vendetta-Signal.</p>
+</div>
+<cite>https://riftbound.gg/tier-list/ · https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/ · https://riftdecks.com/legends · https://riftmana.com/meta-tier-list/ · https://riftbound.gg/best-vendetta-decks-week-2-meta-update-best-performing-legends-early-in-vendetta/ · https://riftstorm.gg/blog/riftbound-counters-top-5-meta-legends</cite>
+
+<h2>Die zweite Reihe (Tier 2)</h2>
+
+<div class="card">
+<h3>Nasus, Curator of the Sands</h3>
+<p><strong>Gameplan:</strong> Die Überraschung des Sets — ausbalancierter Calm/Mind-Build, der mit schnellen Gegnern mitgehen kann und im Late Game mit großen Threats dominiert.</p>
+<p><strong>Am Tisch:</strong> Neue Vendetta-Legend, Calm/Mind, geduldiger Spielstil, der auf dicke Late-Game-Bodies hinausläuft.</p>
+</div>
+
+<div class="card">
+<h3>Rengar / Rek'Sai / Draven — die "Fast-Paced"-Fraktion</h3>
+<p><strong>Gameplan:</strong> Aggressive Fury-Decks, die schnell punkten und Value-Decks (Ezreal, Lux) unter Druck setzen, bevor die ins Spiel kommen. <strong>Rengar gewann mit 12-0-2 das bisher größte Vendetta-Turnier</strong> (Riftbound Showdown Ottawa, 594 Spieler; Pilot: Prismaticism, einer der weltbesten Spieler). Rek'Sai kommt bei riftdecks auf starke 57 % WR.</p>
+<p><strong>Am Tisch:</strong> Fury-Runen und sofortiger Battlefield-Druck ab den ersten Zügen — wer dich in Zug 1–2 schon auf beiden Battlefields attackiert, sitzt sehr wahrscheinlich vor einem dieser Decks.</p>
+</div>
+
+<div class="card">
+<h3>Diana, Scorn of the Moon</h3>
+<p><strong>Gameplan:</strong> Extrem pilotabhängiges High-Skill-Deck: 3 Turniersiege bei nur 1 Top-8 — wer sie gut spielt, gewinnt ganze Events (u. a. den 2000+-Spieler-RQ Vancouver). Ende Unleashed galt sie als "beste Legend im Spiel".</p>
+<p><strong>Am Tisch:</strong> Diana-Legend — und meistens ein erfahrener Pilot dahinter. Nicht an der Metashare (4 %) unterschätzen.</p>
+</div>
+<cite>https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/ · https://riftdecks.com/legends · https://playriftbound.com/en-us/news/organizedplay/vancouvers-top-decks</cite>
+
+<h2>Und deine Akali?</h2>
+<p>Ehrliche Standortbestimmung (Stand Mitte August 2026): riftbound.gg führt Akali in <strong>Tier 5</strong>, riftmana immerhin in <strong>Tier B</strong> ("Fury Calm Akali"). Die riftdecks-Daten: 4 % Metashare (beliebte Figur!), aber nur <strong>39 % Winrate</strong> und 0.44x Top-Conversion — viel gespielt, konvertiert schlecht. Noch kein Turniersieg im Westen. Heißt für dein erstes Event: Du spielst den Underdog — rechne damit, dass Irelia-Piloten dein Deck als "die inkonsistentere Irelia" einschätzen. Details zum Akali-Gameplan hast du in deiner Deck-Lektion.</p>
+<cite>https://riftbound.gg/tier-list/ · https://riftmana.com/meta-tier-list/ · https://riftdecks.com/legends · https://riftbound.gg/akali-rogue-assassin-guide/</cite>
+
+<h2>Organized Play 2026 — wo das alles hinführt</h2>
+<table>
+  <tr><th>Ebene</th><th>Event</th><th>Für dich</th></tr>
+  <tr><td>Lokal, wöchentlich</td><td><strong>Nexus Nights</strong></td><td>Dein Einstieg (Lektion 13)</td></tr>
+  <tr><td>Lokal, pro Set</td><td><strong>Summoner Skirmish</strong> (Store-Championship)</td><td>Erster "echter" Turnier-Test; vergibt RQ-Byes</td></tr>
+  <tr><td>Kompetitiv</td><td><strong>Showdown Series</strong> (Third-Party, z. B. Ottawa 594 Spieler) &amp; <strong>Regional Qualifiers</strong> (3–4 pro Set, Top 64 → RC)</td><td>Nächster EU-RQ: Barcelona 21.–23.08.</td></tr>
+  <tr><td>Top-Level</td><td><strong>Regional Championships</strong> → <strong>Worlds</strong></td><td><strong>EU-RC: Stuttgart, 6.–8.11.2026</strong> (Messe Stuttgart, $50.000 Preispool) — das wichtigste EU-Event findet in Deutschland statt. Worlds: Top 8 jeder RC qualifiziert; Ort/Datum noch offen.</td></tr>
+</table>
+<div class="tip">Ab 2027 wird umgebaut: Nexus Cup (monatlich), Challenge Series ersetzt den Skirmish, RCs werden "Continentals". Merken, aber für dich jetzt noch nicht relevant.</div>
+<cite>https://playriftbound.com/en-us/news/organizedplay/august-2026-state-of-play/ · https://playriftbound.com/en-us/news/organizedplay/2026-regional-championship-info/</cite>
+
+<h2>Verlässliche Meta-Quellen</h2>
+<table>
+  <tr><th>Quelle</th><th>Was sie liefert</th></tr>
+  <tr><td><a href="https://riftbound.gg/tier-list/">riftbound.gg</a></td><td>Wöchentliche Meta-Reports + Tierlist von "Den" (frz. Coach/Caster mit LoR/HS-Background) — beste Prosa-Analyse</td></tr>
+  <tr><td><a href="https://riftdecks.com/legends">riftdecks.com</a></td><td>Turnierdaten-DB: Metashare, Winrate, Top-Conversion — die harten Zahlen</td></tr>
+  <tr><td><a href="https://riftmana.com/meta-tier-list/">riftmana.com</a></td><td>Tierlist + Decklisten mit importierbaren Deck-Codes</td></tr>
+  <tr><td><a href="https://riftmeta.net/">LotharHS / riftmeta.net</a></td><td>Ex-Pro (HS/TFT) mit eigener Tierlist + Power/Complexity-Matrix; YouTube: <a href="https://www.youtube.com/@LotharHSRiftbound">@LotharHSRiftbound</a></td></tr>
+  <tr><td><a href="https://playriftbound.com/">playriftbound.com</a></td><td>Offizielle OP-News + "Top Decks"-Artikel nach jedem RQ</td></tr>
+</table>
+<div class="tip"><strong>Workflow vor dem Event:</strong> riftdecks für die Zahlen, riftbound.gg-Weekly für das "Warum", riftmana für konkrete Listen zum Nachbauen/Testen.</div>
+
+<div class="quiz">
+<h3>✅ Quiz</h3>
+<p><strong>1. Du sitzt am Tisch: Der Gegner spielt Zug 1 sofort aggressiv Units auf beide Battlefields, seine Runen sind Fury. Was ist die wahrscheinlichste Deck-Familie?</strong></p>
+<div class="answer">Ezreal Value
+  <div class="reveal wrong">❌ Falsch — Ezreal ist ein Mind/Chaos-Value-Deck, das lange Spiele grindet. Früher Fury-Druck ist das Gegenteil seines Plans.</div>
+</div>
+<div class="answer">Rengar / Rek'Sai / Draven (Fast-Paced Fury)
+  <div class="reveal">✅ Richtig — die aggressive Fury-Fraktion will schnell punkten, bevor Value-Decks ins Spiel kommen. Rengar gewann so das 594-Spieler-Showdown in Ottawa (12-0-2, Pilot Prismaticism).</div>
+</div>
+<div class="answer">Nasus Calm/Mind
+  <div class="reveal wrong">❌ Falsch — Nasus spielt geduldig auf Late-Game-Threats, nicht auf frühen Rush; und seine Runen wären Calm/Mind, nicht Fury.</div>
+</div>
+
+<p><strong>2. Welches Deck hat im Vendetta-Meta gleichzeitig die höchste Metashare UND die höchste Winrate — und um welche Schlüsselkarte ist der beste Build gebaut?</strong></p>
+<div class="answer">Master Yi, um Jayce – Hammer in Hand
+  <div class="reveal wrong">❌ Falsch — Yi hat zwar die meisten Top-8s, aber Kennen führt bei Share (9 %) und WR (58 %). Jayce ist Yis Vendetta-Neuzugang, nicht das Zentrum des Kennen-Decks.</div>
+</div>
+<div class="answer">Kennen, um Rhasa the Sunderer
+  <div class="reveal">✅ Richtig — "Miracle/Tempo Kennen" um Rhasa the Sunderer (OGN-195): 9 % Share, 58 % WR. Achtung: sehr komplexer Pilot (Card Counting, Deck Looping).</div>
+</div>
+<div class="answer">Irelia, um Stellacorn Herder
+  <div class="reveal wrong">❌ Falsch — Irelia ist Tier 1 und der Herder ihre wichtigste 4-Kosten-Unit, aber sie liegt bei 7 % Share / 54 % WR, hinter Kennen.</div>
+</div>
+
+<p><strong>3. Warum gilt Vendetta trotz neuem Set als "schwacher Set-Impact"?</strong></p>
+<div class="answer">Weil die neuen Karten zu teuer sind
+  <div class="reveal wrong">❌ Falsch — über Preise sagt der Meta-Report nichts. Es geht um Spielbarkeit im Turnier.</div>
+</div>
+<div class="answer">Weil Top-Decks im Schnitt nur ~5 Vendetta-Karten spielen und nur 4 von 9 neuen Legends Top-8s erreicht haben
+  <div class="reveal">✅ Richtig — Kai'Sa performt sogar mit null Vendetta-Main-Deck-Karten. Das Meta ist im Kern ein weiterentwickeltes Unleashed-Meta (Quelle: Week-3-Report, riftbound.gg).</div>
+</div>
+
+<p><strong>4. Welches große Riftbound-Event 2026 findet in Deutschland statt?</strong></p>
+<div class="answer">Der erste Vendetta-Regional-Qualifier
+  <div class="reveal wrong">❌ Falsch — der findet in Barcelona statt (21.–23.08.2026).</div>
+</div>
+<div class="answer">Die europäische Regional Championship in Stuttgart, 6.–8.11.2026
+  <div class="reveal">✅ Richtig — Messe Stuttgart, $50.000 Preispool, $10.000 für Platz 1; Top 8 qualifiziert sich für die ersten Riftbound Worlds.</div>
+</div>
+<div class="answer">Riftbound Worlds
+  <div class="reveal wrong">❌ Falsch — Worlds ist zwar als erste Weltmeisterschaft bestätigt, Ort und Datum sind aber noch nicht angekündigt.</div>
+</div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li><strong>Format Vendetta</strong> (seit 31.07.2026): junges Meta, schwacher Set-Impact — im Kern weiterentwickeltes Unleashed; Tierlists können nach dem RQ Barcelona kippen.</li>
+  <li><strong>Tier 1:</strong> Kennen (9 %/58 %, Tempo um <em>Rhasa the Sunderer</em>), Master Yi (Early-Game-Board, meiste Top-8s), Irelia (Calm/Chaos-Midrange mit <em>Stellacorn Herder</em>), Kai'Sa (unverändertes Unleashed-Deck), Ezreal (Mind/Chaos-Value).</li>
+  <li><strong>Zweite Reihe:</strong> Nasus (Calm/Mind-Lategame), Rengar/Rek'Sai/Draven (Fury-Aggro; Rengar gewann Ottawa mit 594 Spielern), Diana (High-Skill, 3 Siege).</li>
+  <li><strong>Akali:</strong> Fan-Favorit, aber 39 % WR und Tier 5/B — du spielst den Underdog gegen die konsistentere Irelia-Konkurrenz.</li>
+  <li><strong>OP-Pfad 2026:</strong> Nexus Nights → Summoner Skirmish → Regional Qualifiers → Regional Championship <strong>Stuttgart (6.–8.11.)</strong> → Worlds.</li>
+  <li><strong>Quellen-Trio:</strong> riftdecks.com (Zahlen), riftbound.gg (Analyse), riftmana.com (Listen); dazu LotharHS/riftmeta.net.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

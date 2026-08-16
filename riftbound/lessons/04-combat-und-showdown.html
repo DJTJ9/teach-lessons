@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 04 — Combat &amp; Showdown-Chain</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+<h1>⚔️ Lektion 04 — Combat &amp; Showdown-Chain</h1>
+<p class="mission">Ziel: Du kannst einen kompletten Combat Showdown inklusive Chain-Abarbeitung und Schadenszuweisung regelfest durchspielen — die Phase, in der in Hamburg die meisten Spiele (und die meisten Judge-Calls) entschieden werden.</p>
+
+<h2>Schritt 1: Angriff = Bewegung</h2>
+<p>Es gibt keinen separaten „Attack-Step" wie in HS oder LoR. Ein Angriff ist schlicht: Eine <strong>ready Unit (oder Gruppe)</strong> in der Main Phase auf ein Battlefield <strong>bewegen</strong> (Bewegung erschöpft die Unit). Zwei Fälle:</p>
+<ul>
+  <li><strong>Unbesetztes Battlefield → „Open Showdown":</strong> sofortige Übernahme ohne Kampf; Conquer-Punkt, falls zutreffend.</li>
+  <li><strong>Gegnerisch besetztes Battlefield → Combat Showdown:</strong> jetzt wird's interaktiv.</li>
+</ul>
+
+<h2>Schritt 2: Das Showdown-Fenster und die Chain</h2>
+<p>Der Zug geht in einen <strong>Closed State</strong>. Beide Spieler dürfen jetzt abwechselnd <strong>Action</strong>-Karten/Fähigkeiten und <strong>Reaction</strong>-Karten spielen (Buffs, Removal, Tricks), bis beide nacheinander passen. Alle Effekte bilden eine <strong>Chain</strong>, die <strong>LIFO</strong> (Last In, First Out) abgearbeitet wird.</p>
+<p>Timing-Regeln außerhalb und innerhalb der Chain:</p>
+<ul>
+  <li>Existiert eine Chain (Closed State), sind nur Karten/Fähigkeiten mit <strong>REACTION</strong> spielbar — auch im gegnerischen Zug.</li>
+  <li><strong>ACTION</strong>-Karten sind zusätzlich während Showdowns in jedermanns Zug spielbar (aber nicht als Interrupt auf die Chain).</li>
+  <li>Chain löst LIFO auf; <strong>ungültig gewordene Ziele werden bei Resolution ignoriert</strong>; teilweise ausführbare Anweisungen werden so weit wie möglich ausgeführt. <strong>Kartentext schlägt Regelbuch.</strong></li>
+  <li>Kartenspielen läuft in 5 Schritten: Ziele deklarieren → Kosten berechnen → bezahlen → Legalität prüfen → resolven.</li>
+</ul>
+
+<div class="card">
+<p><strong>Analogie-Anker:</strong> Die Chain funktioniert wie die <strong>Yu-Gi-Oh-Chain</strong>: Effekte stapeln sich, der zuletzt gelegte löst zuerst auf (LIFO), und es wird gebaut, bis beide passen. Für MTG-Spieler: ja, das ist im Kern der Stack — aber mit zwei wichtigen Unterschieden: (1) Du kannst <em>nicht jederzeit</em> mit „Instants" reagieren — Interrupt-Timing haben nur <strong>Reaction</strong>-Karten; <strong>Action</strong>-Karten sind eher „Showdown-Sorceries", die im offenen Showdown-Fenster beider Spieler legal sind, nicht als Antwort auf die Chain. (2) Es gibt keine „Priority" im MTG-Sinn über den ganzen Zug — außerhalb von Showdowns/Chains spielt der aktive Spieler weitgehend ungestört.</p>
+</div>
+
+<h2>Schritt 3: Combat Damage Step</h2>
+<p>Wenn beide gepasst haben und die Chain aufgelöst ist, kommt der Schaden — und der funktioniert anders als in allem, was du bisher gespielt hast:</p>
+<ol>
+  <li>Beide Seiten <strong>summieren ihr gesamtes Might</strong> (Might = Angriff und Leben in einem Wert).</li>
+  <li>Schaden wird <strong>gleichzeitig</strong> zugewiesen — niemand schlägt zuerst.</li>
+  <li><strong>Zuweisungsregel:</strong> Einer Unit muss <strong>tödlicher Schaden vollständig</strong> zugewiesen werden, bevor eine weitere Unit Schaden erhält — kein freies Verteilen, kein „Anpingen". <strong>Tank</strong>-Units müssen zuerst tödlich zugewiesen bekommen.</li>
+  <li>Dann wird aller Schaden <strong>gleichzeitig verrechnet</strong>.</li>
+</ol>
+
+<h2>Schritt 4: Ergebnis</h2>
+<ul>
+  <li>Bei <strong>Gleichstand der Gesamt-Might sterben alle Units beider Seiten</strong> — Mutual Destruction ist hier Standard, kein Sonderfall.</li>
+  <li>Vernichten die Angreifer alle Verteidiger, <strong>conquern</strong> sie das Battlefield (Punkt).</li>
+  <li>Überlebende <strong>heilen danach vollständig</strong>; <strong>Deathknell</strong>-Effekte („Wenn ich sterbe: …") lösen aus.</li>
+  <li>Unabhängig davon heilen in der Ending Phase jedes Zuges ohnehin alle Units vollständig.</li>
+</ul>
+<cite>Quellen: https://riftbound.zone/en/guide/combat-and-showdown-in-riftbound/ · https://riftwatcher.com/rules/step-2-the-combat-damage-step/ · https://riftboundguide.com/2026/03/29/how-damage-works-in-riftbound/ · https://learnriftbound.gg/how-to-play/combat · https://runesandrift.com/riftbound-rules/ · https://www.riftboundfaq.com/general-rules/showdowns</cite>
+
+<h2>Die häufigsten Regel-Fallen</h2>
+<div class="warning"><strong>Falle 1 — „Ich pinge erst mal alle kleinen Units an":</strong> Geht nicht. Die Zuweisungsregel zwingt dich, einer Unit erst <em>vollständig tödlichen</em> Schaden zuzuweisen, bevor die nächste etwas abbekommt. Chip-Damage über mehrere Units verteilen wie in MTG (ohne Trample-Zwang) existiert nicht.</div>
+<div class="warning"><strong>Falle 2 — „Mein dicker Blocker überlebt schon":</strong> Might zählt beidseitig <em>summiert</em> und der Schaden ist simultan. Bei Gesamt-Might-Gleichstand stirbt <em>alles auf beiden Seiten</em> — auch dein 8-Might-Bomber gegen vier 2-Might-Tokens.</div>
+<div class="warning"><strong>Falle 3 — „Chip-Damage bleibt liegen":</strong> Nein. Überlebende heilen nach dem Showdown vollständig, und in der Ending Phase heilen ohnehin alle Units komplett. Es gibt kein „zwei Züge lang runterprügeln" wie in Hearthstone — jeder Showdown muss für sich lethal rechnen.</div>
+<div class="warning"><strong>Falle 4 — Action ≠ Reaction:</strong> Im Closed State (Chain existiert) sind <em>nur</em> REACTION-Karten spielbar. Deine ACTION-Tricks musst du im offenen Showdown-Fenster spielen — wer eine Action als „Counter" auf die gegnerische Chain legen will, bekommt den Judge-Call gegen sich.</div>
+<div class="warning"><strong>Falle 5 — Tank ignorieren:</strong> Steht ein Tank auf der Gegenseite, <em>muss</em> er zuerst tödlich zugewiesen werden. Dein Removal-Plan „ich töte im Kampf nur den Support dahinter" ist illegal, solange der Tank lebt.</div>
+<div class="warning"><strong>Falle 6 — Fizzle-Regeln falsch spielen:</strong> Wird das Ziel eines Chain-Effekts ungültig, wird es bei der Resolution schlicht ignoriert und teilweise ausführbare Anweisungen werden so weit wie möglich ausgeführt — der Effekt „verpufft" also nicht zwingend komplett wie manche YGO-Effekte.</div>
+
+<div class="tip"><strong>Praxis-Heuristik für Hamburg:</strong> Rechne vor jedem Angriff drei Zahlen: (1) Summe deiner Might, (2) Summe der gegnerischen Might, (3) wie viel Reaction-Mana der Gegner offen hat. Wenn (1) = (2), fragst du dich: Ist Full-Trade für mich gut — z. B. weil der Conquer trotzdem durchgeht, wenn alle Verteidiger sterben? Denn genau so ist es: Sterben beide Seiten komplett, haben die Angreifer alle Verteidiger vernichtet.</div>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>1. Du greifst mit 3+3 Might an, der Gegner verteidigt mit einer 6-Might-Unit. Was passiert im Damage Step (keine Tricks)?</strong></p>
+<div class="answer">Nur meine Units sterben, seine 6er überlebt mit Restschaden.<div class="reveal wrong">❌ Falsch — der Schaden ist simultan und summiert: 6 gegen 6. Bei Gleichstand der Gesamt-Might sterben <strong>alle Units beider Seiten</strong>.</div></div>
+<div class="answer">Alle drei Units sterben; da alle Verteidiger tot sind, conquere ich das Battlefield.<div class="reveal">✅ Richtig — 6 vs. 6 = Mutual Destruction. Und weil die Angreifer alle Verteidiger vernichtet haben, gibt es den Conquer (Punkt), obwohl die Angreifer selbst auch gestorben sind.</div></div>
+
+<p><strong>2. Der Gegner verteidigt mit einem 2-Might-Tank und einer 4-Might-Unit. Du hast 5 Gesamt-Might. Wie musst du zuweisen?</strong></p>
+<div class="answer">4 auf die 4-Might-Unit (der größere Threat), 1 auf den Tank.<div class="reveal wrong">❌ Doppelt illegal: Der <strong>Tank</strong> muss zuerst tödlich zugewiesen bekommen, und tödlicher Schaden muss <strong>vollständig</strong> zugewiesen sein, bevor die nächste Unit etwas erhält.</div></div>
+<div class="answer">2 auf den Tank (tödlich, zuerst), dann die restlichen 3 auf die 4-Might-Unit — die überlebt und heilt danach voll.<div class="reveal">✅ Richtig — Tank zuerst voll-tödlich (2), Rest (3) auf die nächste Unit; 3 &lt; 4, also überlebt sie, und nach dem Showdown heilt sie vollständig. Dein „Fast-Kill" ist wertlos.</div></div>
+
+<p><strong>3. Während der Auflösung einer Chain will dein Gegner eine ACTION-Karte spielen. Legal?</strong></p>
+<div class="answer">Ja — Actions sind während Showdowns in jedermanns Zug spielbar.<div class="reveal wrong">❌ Falsch — das gilt nur im offenen Showdown-Fenster. Existiert eine Chain (Closed State), sind <strong>nur REACTION</strong>-Karten/-Fähigkeiten spielbar.</div></div>
+<div class="answer">Nein — im Closed State sind nur Reactions legal.<div class="reveal">✅ Richtig — Reaction ist das einzige Interrupt-Timing. Action-Karten sind „Showdown-spielbar", aber keine Antwort auf die Chain.</div></div>
+
+<p><strong>4. In welcher Reihenfolge löst die Chain auf, und was passiert mit einem Effekt, dessen Ziel inzwischen tot ist?</strong></p>
+<div class="answer">FIFO (zuerst gelegter Effekt zuerst); Effekte mit totem Ziel lösen normal auf.<div class="reveal wrong">❌ Falsch — die Chain ist <strong>LIFO</strong>: der zuletzt gelegte Effekt löst zuerst auf (wie die Yu-Gi-Oh-Chain / der MTG-Stack).</div></div>
+<div class="answer">LIFO (zuletzt gelegter Effekt zuerst); ungültige Ziele werden bei der Resolution ignoriert, der Rest wird so weit wie möglich ausgeführt.<div class="reveal">✅ Richtig — Last In, First Out; ungültig gewordene Ziele werden ignoriert, teilweise ausführbare Anweisungen werden bestmöglich ausgeführt. Und im Zweifel gilt: Kartentext schlägt Regelbuch.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Angriff = <strong>Bewegung</strong> einer ready Unit aufs Battlefield (erschöpft sie); unbesetzt = Open Showdown (sofortige Übernahme), besetzt = Combat Showdown.</li>
+  <li>Showdown-Fenster = <strong>Closed State</strong>: beide Spieler spielen abwechselnd Actions/Reactions bis beide passen; Effekte bilden eine <strong>LIFO-Chain</strong> (wie YGO-Chain; anders als MTG kein freies Instant-Timing — Interrupts nur per <strong>Reaction</strong>).</li>
+  <li>Damage Step: Might beidseitig <strong>summieren</strong>, Schaden <strong>simultan</strong>; Zuweisung immer <strong>voll-tödlich pro Unit</strong>, Tanks zuerst; Gleichstand = alle sterben; Verteidiger ausgelöscht = <strong>Conquer</strong>.</li>
+  <li>Kein Chip-Damage: Überlebende heilen nach dem Showdown und in jeder Ending Phase <strong>vollständig</strong> — jeder Kampf muss für sich lethal rechnen.</li>
+  <li>Chain-Details: 5 Schritte beim Kartenspielen, ungültige Ziele werden ignoriert, Kartentext &gt; Regelbuch.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

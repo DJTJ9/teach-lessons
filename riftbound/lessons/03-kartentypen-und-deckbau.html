@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 03 — Kartentypen &amp; Deckbau</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+<h1>🃏 Lektion 03 — Kartentypen &amp; Deckbau</h1>
+<p class="mission">Ziel: Du kennst alle 7 Kartentypen, kannst jede Karte auf einen Blick lesen und baust ein turnier-legales Constructed-Deck (inkl. Sideboard) — die Grundlage, um dein Akali-Deck für Hamburg regelkonform zu registrieren.</p>
+
+<h2>Die 7 Kartentypen</h2>
+<table>
+  <tr><th>Typ</th><th>Rolle</th><th>Kern-Fakten</th></tr>
+  <tr><td><strong>Legend</strong> (Champion Legend)</td><td>Deck-Identität</td><td>Große Karte in der Legend Zone; definiert Domains (bis zu 2) und Champion-Tag; <strong>verlässt das Spiel nie</strong>; oft mit Fähigkeiten (z. B. XP-Fähigkeiten seit Unleashed). Vergleichbar mit einem Commander in MTG oder dem Helden in HS — aber regelbildend für den ganzen Deckbau.</td></tr>
+  <tr><td><strong>Champion Unit</strong> / Chosen Champion</td><td>Dein Ass</td><td>Normale Unit-Karte des zur Legend passenden Champions; startet in der <strong>Champion Zone</strong> und wird von dort wie eine Unit gespielt. Champions im Deck müssen Tags mit der Legend teilen.</td></tr>
+  <tr><td><strong>Unit</strong></td><td>Kreaturen</td><td>Haben <strong>Might</strong> (oben rechts) = Angriff <em>und</em> Lebenspunkte in einem Wert; bewegen sich zwischen Base und Battlefields.</td></tr>
+  <tr><td><strong>Spell</strong></td><td>Einmaleffekte</td><td>Gehen nach der Auflösung in den <strong>Trash</strong> (Ablagestapel); Timing-Varianten <strong>Action</strong>/<strong>Reaction</strong> (→ Lektion 04/05).</td></tr>
+  <tr><td><strong>Gear</strong></td><td>Permanents</td><td>Ausrüstung/Permanents, bleiben auf dem Board.</td></tr>
+  <tr><td><strong>Battlefield</strong></td><td>Orte</td><td>Die umkämpften Orts-Karten: 3 im Constructed-Deck, im 1v1 steuert jeder Spieler 1 pro Partie bei.</td></tr>
+  <tr><td><strong>Rune</strong></td><td>Ressourcen</td><td>Basic Runes je Domain im separaten 12er-Rune-Deck (→ Lektion 02).</td></tr>
+</table>
+<p>Dazu kommen <strong>Tokens</strong>, die nur von Effekten erzeugt werden (kein Decktyp): u. a. Buff (+1 Might), Gold (seit Spiritforged: erschöpfen + killen = 1 Power), Sprite (Temporary), Reflection, Brush, Baron Pit, Bird, XP-Tracker.</p>
+<cite>Quellen: https://riftboundguide.com/cards/ · https://cardgamer.com/guides/riftbound-card-anatomy/ · https://riftbound.gg/unleashed/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/</cite>
+
+<h2>Eine Karte lesen (Anatomie)</h2>
+<ul>
+  <li><strong>Energy Cost:</strong> Zahl — farblos, mit beliebigen Runen (erschöpfen) bezahlbar.</li>
+  <li><strong>Power Cost:</strong> farbige Pips daneben — Anzahl + Domain der zu recycelnden Runen.</li>
+  <li><strong>Might:</strong> oben rechts (nur Units) — Schaden UND Zähigkeit in einem Wert. Es gibt kein getrenntes Attack/Health wie in HS/LoR.</li>
+  <li><strong>Banner unter dem Artwork:</strong> Kartentyp + Supertypes/<strong>Tags</strong> (z. B. „Champion Unit — Darius, Noxus, Trifarian"). Tags tun allein nichts, werden aber von Effekten referenziert — wie Stämme/Tribes in anderen TCGs.</li>
+  <li><strong>Rarity-Gem</strong> + Rahmenfarbe (siehe unten), <strong>Set-Code + Sammlernummer</strong> (z. B. OGN 123/298) unten.</li>
+</ul>
+<cite>Quellen: https://riftboundsymbols.com/riftbound-card-anatomy/ · https://cardgamer.com/guides/riftbound-card-anatomy/</cite>
+
+<h2>Constructed-Deckbau: die Checkliste</h2>
+<table>
+  <tr><th>Komponente</th><th>Regel</th></tr>
+  <tr><td>Main Deck</td><td><strong>Mindestens 40 Karten</strong> (Turnierpraxis: exakt 40) — nur Units/Spells/Gear, die zur Domain-Identität der Legend passen</td></tr>
+  <tr><td>Legend</td><td><strong>Genau 1</strong></td></tr>
+  <tr><td>Chosen Champion</td><td><strong>1</strong> — Champion-Tag muss zur Legend passen</td></tr>
+  <tr><td>Runen</td><td><strong>Genau 12</strong></td></tr>
+  <tr><td>Battlefields</td><td><strong>3</strong></td></tr>
+  <tr><td>Kopien-Limit</td><td><strong>Max. 3 Kopien</strong> pro Karte</td></tr>
+  <tr><td>Signature Cards</td><td>Auf Champion-Tag limitiert: <strong>max. 3 gesamt</strong> pro passendem Champion-Tag</td></tr>
+  <tr><td>Sideboard (Bo3)</td><td><strong>8 Karten</strong> — zwischen den Spielen tauschbar, auch Champion-Wechsel (gleicher Tag); <strong>nicht</strong> tauschbar: Legend, Runen, Battlefields</td></tr>
+</table>
+
+<div class="tip"><strong>Für Hamburg (Bo3-Constructed):</strong> Deckliste wird komplett registriert — 40er-Main, Legend, Champion, 3 Battlefields, 12 Runen, 8er-Sideboard. Der Sideboard-Champion-Swap (gleicher Tag) ist dein Match-up-Werkzeug: gleiche Legend, anderes Gameplan-Profil in Spiel 2/3.</div>
+<div class="warning"><strong>Sprachregel auf Turnieren:</strong> Karten jeder Sprache sind legal, aber <strong>alle Karten eines Decks müssen dieselbe Sprache haben</strong>; „SAMPLE"-Karten sind illegal. Wenn du deutsch/englisch mischst, ist das Deck nicht legal.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://runesandrift.com/riftbound-organized-play/ · https://playriftbound.com/en-us/news/organizedplay/riftbound-organized-play/ · https://en.wikipedia.org/wiki/Riftbound</cite>
+
+<h2>Rarity-System &amp; Sammler-Varianten (Kurzüberblick)</h2>
+<table>
+  <tr><th>Rarity</th><th>Gem-Form</th><th>Rahmen</th><th>Besonderheit</th></tr>
+  <tr><td>Common</td><td>Rund</td><td>Bronze</td><td>—</td></tr>
+  <tr><td>Uncommon</td><td>Dreieck</td><td>Silber</td><td>—</td></tr>
+  <tr><td>Rare</td><td>Quadrat</td><td>Gold</td><td>immer foil</td></tr>
+  <tr><td>Epic</td><td>Pentagon</td><td>Gold</td><td>immer foil</td></tr>
+  <tr><td>Ultimate</td><td colspan="2">neu ab Unleashed</td><td>extrem selten, für Einzelkarten reserviert (erste: overnumbered Baron Nashor); erscheint nicht in jedem Set</td></tr>
+</table>
+<p>Wichtig: <strong>Rarity ≠ Finish</strong> — Rarity beschreibt die Häufigkeit (Gem/Rahmen), Foil ist nur die Veredelung. Die Sammler-Varianten in Kürze:</p>
+<ul>
+  <li><strong>Alt-Art:</strong> hexagonaler Gem; in Origins je eine Alt-Version der 12 Haupt-Champion-Units (anderer LoL-Skin, Premium-Foil); dazu Special Alt Arts.</li>
+  <li><strong>Overnumbered:</strong> Sammlernummer <em>über</em> der Setgröße (z. B. &gt;298 bei OGN); exklusive Artworks von Riot-Künstlern.</li>
+  <li><strong>Signature Cards (Sammler-Variante):</strong> ~1 von 10 Overnumbered trägt die Foil-Signatur des Künstlers (Asterisk in der Nummer; Pull-Rate grob ~1/360 Packs). Nicht verwechseln mit den <em>Signature Cards</em> im Deckbau-Sinn (Champion-Tag-limitierte Karten, max. 3)!</li>
+</ul>
+<cite>Quellen: https://playriftbound.com/en-us/news/announcements/collectability-in-riftbound-origins/ · https://riftboundsymbols.com/riftbound-rarity-symbols/ · https://riftboundplayer.com/riftbound-rarities-alt-arts-overnumbered-pull-rates/ · https://tcgodds.com/riftbound/rarity-guide/ · https://riftbound.gg/unleashed/</cite>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>1. Was ist der Unterschied zwischen Legend und Chosen Champion?</strong></p>
+<div class="answer">Legend = Karte in der Legend Zone, die das Spiel nie verlässt und die Deck-Identität (Domains, Champion-Tag) definiert; Chosen Champion = normale Unit-Karte, die aus der Champion Zone gespielt wird.<div class="reveal">✅ Richtig — die Legend ist regelbildend und unzerstörbar präsent, der Chosen Champion ist eine spielbare Unit mit garantiertem Zugriff (startet in der Champion Zone statt im Deck).</div></div>
+<div class="answer">Beides sind Bezeichnungen für dieselbe Karte.<div class="reveal wrong">❌ Falsch — es sind zwei verschiedene Karten in zwei verschiedenen Zonen: Legend (Legend Zone, bleibt immer) und Chosen Champion (Champion Zone, wird wie eine Unit gespielt).</div></div>
+
+<p><strong>2. Welche Deckliste ist turnier-legal?</strong></p>
+<div class="answer">45 Main-Deck-Karten, 1 Legend, 1 Champion, 12 Runen, 3 Battlefields, max. 3 Kopien pro Karte.<div class="reveal">✅ Richtig — das Main Deck braucht <em>mindestens</em> 40 Karten; 45 ist legal (Turnierpraxis ist trotzdem exakt 40 für maximale Konsistenz).</div></div>
+<div class="answer">40 Main-Deck-Karten, 1 Legend, 1 Champion, 10 Runen, 3 Battlefields.<div class="reveal wrong">❌ Falsch — das Rune Deck muss <strong>genau 12</strong> Runen haben, nicht 10.</div></div>
+<div class="answer">40 Main-Deck-Karten mit 4 Kopien der besten Karte, 1 Legend, 1 Champion, 12 Runen, 3 Battlefields.<div class="reveal wrong">❌ Falsch — max. <strong>3 Kopien</strong> pro Karte.</div></div>
+
+<p><strong>3. Was darfst du zwischen Spiel 1 und 2 eines Bo3 per Sideboard NICHT tauschen?</strong></p>
+<div class="answer">Main-Deck-Karten.<div class="reveal wrong">❌ Falsch — genau dafür ist das 8-Karten-Sideboard da.</div></div>
+<div class="answer">Legend, Runen und Battlefields.<div class="reveal">✅ Richtig — die bleiben das ganze Match fix. Tauschbar sind Main-Deck-Karten und sogar der Chosen Champion (solange der Champion-Tag zur Legend passt).</div></div>
+
+<p><strong>4. Eine Karte hat einen quadratischen Gold-Gem. Was weißt du über sie?</strong></p>
+<div class="answer">Sie ist eine Rare und immer foil.<div class="reveal">✅ Richtig — Quadrat = Rare, Gold-Rahmen, immer foil. (Pentagon wäre Epic, Hexagon Alt-Art.)</div></div>
+<div class="answer">Sie ist eine Epic.<div class="reveal wrong">❌ Falsch — Epic hat den Pentagon-Gem. Quadrat = Rare.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>7 Kartentypen: <strong>Legend</strong> (Deck-Identität, verlässt nie das Spiel), <strong>Champion Unit/Chosen Champion</strong> (startet in der Champion Zone), <strong>Unit</strong> (ein Might-Wert = Angriff+Leben), <strong>Spell</strong> (in den Trash), <strong>Gear</strong>, <strong>Battlefield</strong>, <strong>Rune</strong> — plus effekterzeugte Tokens.</li>
+  <li>Karte lesen: Energy Cost (Zahl) + Power-Pips, Might oben rechts, Typ+Tags im Banner, Rarity-Gem + Set-Code/Nummer unten.</li>
+  <li>Constructed: <strong>40+ Main / 1 Legend / 1 Champion / 12 Runen / 3 Battlefields</strong>, max. 3 Kopien, Signature Cards max. 3 pro Champion-Tag.</li>
+  <li><strong>8-Karten-Sideboard</strong> im Bo3 — Champion-Swap erlaubt, Legend/Runen/Battlefields fix; ein Deck = eine Sprache.</li>
+  <li>Rarities: Common (rund/Bronze) → Uncommon (Dreieck/Silber) → Rare (Quadrat, foil) → Epic (Pentagon, foil) → Ultimate; Alt-Art (Hexagon), Overnumbered (&gt; Setgröße), Künstler-Signature (~1/360 Packs); Rarity ≠ Foil.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 02 — Runen-System</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+<h1>💎 Lektion 02 — Runen-System</h1>
+<p class="mission">Ziel: Du kannst Energy- und Power-Kosten fehlerfrei bezahlen und verstehst, warum Recyceln deine Runen „verbraucht" — damit du in Hamburg deine Akali-Züge sauber durchsequenzt, statt dich zu ver-manen.</p>
+
+<h2>Das Rune Deck: dein zweites Deck</h2>
+<p>Neben dem Main Deck hast du ein separates <strong>Rune Deck mit genau 12 Runen</strong>. In jeder <strong>Channel Phase</strong> channelst du <strong>2 Runen</strong> vom Rune Deck ins Spiel (sie kommen ready). Runen bleiben liegen und werden in jeder Awaken Phase wieder ready — du baust also wie bei MTG-Ländern ein wachsendes Ressourcen-Board auf, aber ohne Land-Screw: die Runen kommen garantiert, 2 pro Zug.</p>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundsymbols.com/riftbound-card-anatomy/</cite>
+
+<h2>Zwei Ressourcenarten: Energy vs. Power</h2>
+<p>Jede Karte kann zwei Kostenanteile haben: einen generischen <strong>Energy Cost</strong> (Zahl) und einen farbigen <strong>Power Cost</strong> (Domain-Pips, z. B. „1 Mind"). Beide werden aus denselben 12 Runen bezahlt — aber auf fundamental unterschiedliche Weise:</p>
+<table>
+  <tr><th></th><th>Energy (farblos)</th><th>Power (farbig)</th></tr>
+  <tr><td><strong>Wie erzeugt</strong></td><td>1 Rune <strong>erschöpfen</strong> (tappen)</td><td>1 Rune der passenden Domain <strong>recyceln</strong> = unter das Rune Deck legen</td></tr>
+  <tr><td><strong>Ertrag</strong></td><td>1 Energy</td><td>1 Power dieser Farbe</td></tr>
+  <tr><td><strong>Rune danach</strong></td><td>Bleibt im Spiel, ist nächsten Zug wieder ready</td><td><strong>Verlässt das Spiel</strong> — dein Runen-Board schrumpft um 1</td></tr>
+  <tr><td><strong>Bezahlt</strong></td><td>Den generischen Energy Cost</td><td>Den Power Cost (z. B. „1 Mind")</td></tr>
+</table>
+
+<div class="warning"><strong>Der Runenpool ist nicht hortbar:</strong> Er leert sich am Ende der Draw Phase und am Zugende. Es gibt kein „Mana floaten" über Züge hinweg — was du erzeugst, musst du im selben Fenster ausgeben.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundsymbols.com/riftbound-card-anatomy/</cite>
+
+<h2>Die 6 Domains</h2>
+<p>Es gibt 6 Domains (Farben), paarweise als Gegensätze angelegt:</p>
+<table>
+  <tr><th>Domain</th><th>Gegensatz</th></tr>
+  <tr><td><strong>Fury</strong></td><td>Calm</td></tr>
+  <tr><td><strong>Calm</strong></td><td>Fury</td></tr>
+  <tr><td><strong>Mind</strong></td><td>Body</td></tr>
+  <tr><td><strong>Body</strong></td><td>Mind</td></tr>
+  <tr><td><strong>Chaos</strong></td><td>Order</td></tr>
+  <tr><td><strong>Order</strong></td><td>Chaos</td></tr>
+</table>
+<p>Deine <strong>Legend</strong> definiert die Domain-Identität deines Decks (bis zu 2 Domains); alle Karten im Deck müssen dazu passen. Power-Kosten kannst du nur mit Runen der geforderten Domain bezahlen.</p>
+<cite>Quellen: https://riftboundsymbols.com/riftbound-domain-symbols/ · https://riftbound.wiki.fextralife.com/Domains · https://runesandrift.com/riftbound-rules/</cite>
+
+<h2>Ressourcen-Mathe &amp; Sequencing</h2>
+<p>Hier trennt sich der Grinder vom Casual. Drei Rechenregeln, die du verinnerlichen musst:</p>
+<div class="card">
+<p><strong>1. Recyceln ist ein Tempo-Kredit.</strong> Jede recycelte Rune reduziert dein verfügbares Runen-Board dieses und der nächsten Züge um 1 — die Rune wandert unter das Rune Deck und muss erst wieder gechannelt werden. Da du pro Zug 2 channelst, gleicht ein Recycle-Zug sich zwar teils aus, aber wer pro Zug mehr Power ausgibt als er nachchannelt, schrumpft sein Board netto. Power-lastige Züge sind also „teurer", als die Kostenzahl aussieht.</p>
+<p><strong>2. Maximal-Output eines Zuges:</strong> Mit N ready Runen im Spiel kannst du bis zu N Ressourcen erzeugen — jede Rune entweder erschöpfen (1 Energy) oder recyceln (1 Power, falls Domain passt). Eine Karte mit Kosten „3 Energy + 1 Fury" braucht dir also insgesamt 4 Runen, davon mindestens eine Fury-Rune, die du opferst.</p>
+<p><strong>3. Sequencing:</strong> Weil der Pool nach der Draw Phase und am Zugende verfällt, erzeuge Ressourcen erst, wenn du sie ausgibst — und plane vor dem ersten Play den ganzen Zug durch: Welche Runen erschöpfe ich, welche recycle ich, und bleibt genug ready für Reactions im gegnerischen Showdown? Wer blind seine einzige Fury-Rune für Energy tappt und dann den Fury-Power-Cost nicht mehr bezahlen kann, hat sich selbst gecountert.</p>
+</div>
+
+<div class="tip"><strong>Analogie für LoR-Spieler:</strong> LoR-Mana wächst automatisch (+1/Runde) und bis zu 3 ungenutzte Mana fließen als Spell Mana in die nächste Runde. Riftbound-Runen wachsen auch automatisch (+2/Zug), aber <em>nichts</em> wird gespart — und anders als in LoR ist die farbige Komponente (Power) destruktiv: Du bezahlst sie mit der Substanz deines Runen-Boards. Denk an Power wie an ein „Opfer-Mana": jede farbige Anforderung frisst eine Rune. Deshalb ist Kurve-Spielen hier nicht nur Kartenfrage, sondern auch Runen-Erhaltungsfrage.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundsymbols.com/riftbound-card-anatomy/</cite>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>1. Wie bezahlst du eine Karte mit Kosten „2 Energy + 1 Mind"?</strong></p>
+<div class="answer">3 beliebige Runen erschöpfen.<div class="reveal wrong">❌ Falsch — Erschöpfen erzeugt nur Energy. Für den Mind-Power-Cost musst du eine Mind-Rune <strong>recyceln</strong> (unter das Rune Deck legen).</div></div>
+<div class="answer">2 beliebige Runen erschöpfen + 1 Mind-Rune recyceln.<div class="reveal">✅ Richtig — Energy per Erschöpfen (beliebige Runen), Power per Recyceln einer Rune der passenden Domain. Insgesamt kostet dich die Karte 3 Runen, davon verlässt eine das Spiel.</div></div>
+<div class="answer">2 Runen erschöpfen + 1 beliebige Rune recyceln.<div class="reveal wrong">❌ Falsch — die recycelte Rune muss die geforderte Domain haben (hier: Mind).</div></div>
+
+<p><strong>2. Was passiert mit ungenutzter Energy im Runenpool am Zugende?</strong></p>
+<div class="answer">Sie bleibt für den nächsten Zug erhalten (wie LoR-Spell-Mana).<div class="reveal wrong">❌ Falsch — genau das ist der Unterschied zu LoR: Der Runenpool leert sich am Ende der Draw Phase und am Zugende. Nichts wird gespart.</div></div>
+<div class="answer">Sie verfällt ersatzlos.<div class="reveal">✅ Richtig — der Pool ist nicht hortbar. Erzeuge Ressourcen deshalb erst in dem Moment, in dem du sie ausgibst.</div></div>
+
+<p><strong>3. Du hast 5 Runen im Spiel, davon 1 Fury. Du tappst die Fury-Rune früh im Zug für Energy. Später willst du einen Spell mit „1 Fury"-Power-Cost spielen. Geht das?</strong></p>
+<div class="answer">Ja, ich kann die erschöpfte Fury-Rune trotzdem recyceln.<div class="reveal wrong">❌ Das ist in den Research-Quellen nicht als legal dokumentiert — und selbst wenn Edge-Cases existieren: Als Faustregel gilt, dass du dein Sequencing so planst, dass Domain-Runen für Power-Kosten <em>ready</em> reserviert bleiben. Verlass dich nie darauf, eine bereits getappte Farb-Rune noch als Power nutzen zu können.</div></div>
+<div class="answer">Das ist genau der Sequencing-Fehler, den ich vermeiden muss: Farb-Runen zuletzt für Energy verwenden.<div class="reveal">✅ Richtig gedacht — plane vor dem ersten Play den ganzen Zug: Power-Anforderungen zuerst identifizieren, die passenden Domain-Runen dafür reservieren und generische Energy mit den übrigen Runen bezahlen.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li><strong>Rune Deck = genau 12 Runen</strong>, separat gemischt; 2 pro Channel Phase, garantiertes Wachstum, kein Screw.</li>
+  <li><strong>Energy</strong> = Rune erschöpfen (bleibt im Spiel); <strong>Power</strong> = Rune der passenden Domain recyceln (verlässt das Spiel unter das Rune Deck).</li>
+  <li>6 Domains: <strong>Fury↔Calm, Mind↔Body, Chaos↔Order</strong>; die Legend legt bis zu 2 davon als Deck-Identität fest.</li>
+  <li>Runenpool <strong>verfällt</strong> nach Draw Phase und am Zugende — kein Ansparen wie LoR-Spell-Mana.</li>
+  <li>Sequencing: Power-Kosten sind Substanzkosten — Domain-Runen reservieren, ganzen Zug vorplanen, Reactions-Runen für den Gegnerzug einkalkulieren.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

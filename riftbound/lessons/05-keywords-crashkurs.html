@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 05 — Keywords-Crashkurs</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+<h1>📖 Lektion 05 — Keywords-Crashkurs</h1>
+<p class="mission">Ziel: Du kennst jedes relevante Keyword des aktuellen Kartenpools (Origins bis Vendetta) auf Zuruf — inklusive der Akali-relevanten Vendetta-Mechaniken Flow und Empower — und liest in Hamburg keinen Kartentext zweimal.</p>
+
+<h2>Ein Konzept: Keywords als Timing- und Combat-Sprache</h2>
+<p>Riftbound-Keywords zerfallen in drei Gruppen: <strong>Timing-Keywords</strong> (Action, Reaction, Hidden, Ambush — <em>wann</em> darf ich das spielen?), <strong>Combat-Modifikatoren</strong> (Assault, Shield, Tank, Deflect — <em>was</em> ändert sich im Showdown?) und <strong>Value-Engines</strong> (Legion, Vision, Deathknell, XP/Level, Flow — <em>woher</em> kommt Karten-/Board-Vorteil?). Wer die Gruppe erkennt, weiß sofort, worauf er achten muss.</p>
+
+<h2>Origins (OGN) — das Grundvokabular</h2>
+<table>
+  <tr><th>Keyword</th><th>Definition</th><th>Merkhilfe</th></tr>
+  <tr><td><strong>Accelerate</strong></td><td>Beim Spielen optional Zusatzkosten zahlen; die Unit kommt dann <strong>ready</strong> ins Spiel.</td><td>„Kaufbares Charge/Haste" — sofort bewegungs-/angriffsbereit</td></tr>
+  <tr><td><strong>Action</strong></td><td>Während Showdowns in jedem Zug spielbar.</td><td>Showdown-Sorcery, kein Interrupt</td></tr>
+  <tr><td><strong>Reaction</strong></td><td>Im Closed State / auf die Chain spielbar (Interrupt-Timing), auch im gegnerischen Zug.</td><td>Das „Instant"-Timing des Spiels</td></tr>
+  <tr><td><strong>Assault X</strong></td><td>+X Might, solange die Unit Angreifer ist.</td><td>Offensiv-Bonus</td></tr>
+  <tr><td><strong>Shield X</strong></td><td>+X Might, solange die Unit Verteidiger ist.</td><td>Defensiv-Bonus</td></tr>
+  <tr><td><strong>Tank</strong></td><td>Muss im Kampf zuerst tödlichen Schaden zugewiesen bekommen.</td><td>Taunt für die Zuweisungsregel</td></tr>
+  <tr><td><strong>Deflect X</strong></td><td>Gegnerische Spells/Fähigkeiten, die diese Unit wählen, kosten X zusätzliche Power.</td><td>„Ward light" — Steuer statt Verbot</td></tr>
+  <tr><td><strong>Deathknell</strong></td><td>„Wenn ich sterbe: [Effekt]."</td><td>Deathrattle / Last Breath</td></tr>
+  <tr><td><strong>Ganking</strong></td><td>Unit darf bei ihrem Move von Battlefield zu Battlefield ziehen (statt nur Base→Battlefield).</td><td>Roaming zwischen Lanes</td></tr>
+  <tr><td><strong>Hidden</strong></td><td>Karte kann verdeckt an ein Battlefield gelegt und später (für 0 Energy, als Reaction) gespielt werden.</td><td>Facedown-Trap mit Reaction-Timing</td></tr>
+  <tr><td><strong>Legion</strong></td><td>Effekt, falls in diesem Zug bereits eine andere Main-Deck-Karte gespielt wurde.</td><td>Combo-/Sequencing-Trigger</td></tr>
+  <tr><td><strong>Vision</strong></td><td>Beim Spielen: oberste Karte des Main Decks ansehen, optional recyceln.</td><td>Mini-Scry</td></tr>
+  <tr><td><strong>Temporary</strong></td><td>Permanent stirbt zu Beginn der Beginning Phase des Besitzers — <em>vor</em> dem Scoring.</td><td>Token hält keinen Hold-Punkt!</td></tr>
+  <tr><td><strong>Mighty</strong></td><td>Beschreibung für Units mit Might ≥ 5 (wird von Effekten referenziert).</td><td>Kein Effekt, nur eine Eigenschaft</td></tr>
+</table>
+
+<div class="warning"><strong>Temporary-Falle:</strong> Weil Temporary-Tokens vor dem Hold-Scoring sterben, kann ein Battlefield, das nur von einem Temporary-Token „gehalten" wird, dir keinen Hold-Punkt bringen. Nicht drauf bauen.</div>
+<div class="warning"><strong>Backline (in Unleashed-Keyword-Listen genannt):</strong> Kampf-Positions-Keyword — die genauen Details sind in den Research-Quellen <em>nicht verifiziert</em>. Vor dem Event im offiziellen Rules Hub nachschlagen, falls es dir auf einer Karte begegnet.</div>
+
+<h2>Unleashed (UNL) — die XP-Mechanik</h2>
+<table>
+  <tr><th>Keyword</th><th>Definition</th></tr>
+  <tr><td><strong>XP</strong></td><td>Ressource; jede XP = +1 Level.</td></tr>
+  <tr><td><strong>Level X</strong></td><td>Karte erhält ab X XP Bonusfähigkeiten/Kostensenkungen.</td></tr>
+  <tr><td><strong>Hunt X</strong></td><td>„Wenn ich conquere oder holde: X XP."</td></tr>
+  <tr><td><strong>Ambush</strong></td><td>Unit als Reaction an ein Battlefield spielen, an dem man schon Units hat.</td></tr>
+  <tr><td><strong>Predict</strong></td><td><em>Definition in den Research-Quellen unverifiziert</em> — beim Antreffen Kartentext lesen / Rules Hub prüfen.</td></tr>
+</table>
+<div class="tip"><strong>Einordnung:</strong> XP/Level ist die Skalierungs-Engine des Spiels — Hunt belohnt genau das, was ohnehin gewinnt (Conquer/Hold), Legends haben seit Unleashed teils XP-Fähigkeiten. Ambush ist Timing-technisch bemerkenswert: eine <em>Unit</em> mit Reaction-Timing, also boardbauende Interaktion mitten im gegnerischen Showdown.</div>
+
+<h2>Vendetta (VEN) — der aktuelle Set-Pool (Akali!)</h2>
+<table>
+  <tr><th>Keyword</th><th>Definition</th></tr>
+  <tr><td><strong>Flow</strong></td><td>Karten aus dem Trash (Ablage) spielbar; danach werden sie ganz aus dem Spiel entfernt.</td></tr>
+  <tr><td><strong>Empower(ed)</strong></td><td>Aktivierte Fähigkeit mit Kosten; die Unit wird dadurch „empowered".</td></tr>
+  <tr><td><strong>Burn</strong></td><td><em>Genaue Definition in den Research-Quellen unverifiziert</em> — Kartentext gilt; vor dem Event im Rules Hub verifizieren.</td></tr>
+</table>
+<p><strong>Spiritforged (SFD)</strong> brachte kein großes neues Schlagwort-Keyword, sondern die 2v2-Regeln und den <strong>Gold-Token</strong> (erschöpfen + killen = 1 Power).</p>
+<div class="tip"><strong>Für dein Akali-Deck:</strong> Flow macht deinen Trash zur zweiten Hand (Graveyard-Value wie Shadow-Isles-/Phyrexia-Decks), aber mit eingebautem Exile — jede Flow-Karte gibt es nur einmal „extra". Zähle deinen Trash mit wie eine Ressource.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-keywords/ · https://mobalytics.gg/riftbound/guides/keywords · https://riftbound.gg/unleashed/ · https://games.gg/news/riftbound-vendetta-booster-set-first-impressions/ · https://playriftbound.com/en-us/news/rules-and-releases/riftbound-core-rules-unleashed-patch-notes/ · https://en.wikipedia.org/wiki/Riftbound</cite>
+
+<div class="warning"><strong>Unverifiziert-Liste auf einen Blick:</strong> <strong>Predict</strong> (UNL), <strong>Backline</strong> (UNL-Listen) und <strong>Burn</strong> (VEN) sind in den Quellen ohne belastbare Definition. Offizielle Referenz: der Rules Hub unter https://playriftbound.com/en-us/rules-hub/ — Core Rules werden zu jedem Set-Release aktualisiert.</div>
+<cite>Quelle: https://playriftbound.com/en-us/rules-hub/ · https://playriftbound.com/en-us/news/rules-and-releases/gameplay-guide-core-rules/</cite>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>1. Worin unterscheiden sich Action und Reaction?</strong></p>
+<div class="answer">Action = nur im eigenen Zug; Reaction = nur im gegnerischen Zug.<div class="reveal wrong">❌ Falsch — beide können in beiden Zügen relevant sein. Der Unterschied ist das <em>Chain</em>-Timing.</div></div>
+<div class="answer">Action = während Showdowns in jedermanns Zug spielbar; Reaction = zusätzlich im Closed State auf die Chain (Interrupt).<div class="reveal">✅ Richtig — Reaction ist das einzige echte Interrupt-Timing. Sobald eine Chain existiert, sind nur noch Reactions legal.</div></div>
+
+<p><strong>2. Eine Unit mit Assault 2 und 3 Might verteidigt ihr Battlefield. Mit wie viel Might kämpft sie?</strong></p>
+<div class="answer">5 — Assault gilt immer im Kampf.<div class="reveal wrong">❌ Falsch — Assault X gibt +X Might nur als <strong>Angreifer</strong>. Als Verteidiger wäre Shield X das relevante Keyword.</div></div>
+<div class="answer">3 — Assault greift nur als Angreifer.<div class="reveal">✅ Richtig — Assault = Angreifer-Bonus, Shield = Verteidiger-Bonus. Beim Angriff hätte sie 5 Might.</div></div>
+
+<p><strong>3. Du spielst mit Flow eine Karte aus deinem Trash. Wo landet sie danach?</strong></p>
+<div class="answer">Zurück im Trash — ich kann sie später wieder spielen.<div class="reveal wrong">❌ Falsch — Flow-Karten werden nach dem Spielen aus dem Trash <strong>ganz aus dem Spiel entfernt</strong>. Einmal Recycling, kein Loop.</div></div>
+<div class="answer">Ganz aus dem Spiel entfernt.<div class="reveal">✅ Richtig — Flow ist Einweg-Graveyard-Value mit eingebautem Exile. Plane jede Flow-Karte als genau einen Extra-Einsatz.</div></div>
+
+<p><strong>4. Was macht Hunt 2 auf einer Unleashed-Unit?</strong></p>
+<div class="answer">Wenn die Unit conquert oder holdet, bekommt sie 2 XP (und damit 2 Level Richtung ihrer Level-Boni).<div class="reveal">✅ Richtig — Hunt X = „Wenn ich conquere oder holde: X XP", und jede XP = +1 Level. Die Mechanik belohnt genau das punktende Gameplay.</div></div>
+<div class="answer">Die Unit macht +2 Schaden gegen erschöpfte Units.<div class="reveal wrong">❌ Falsch — das wäre ein erfundener Effekt. Hunt X gibt X XP beim Conquer oder Hold.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Keywords in 3 Gruppen denken: <strong>Timing</strong> (Action/Reaction/Hidden/Ambush), <strong>Combat</strong> (Assault/Shield/Tank/Deflect), <strong>Value</strong> (Legion/Vision/Deathknell/XP-Paket/Flow).</li>
+  <li>Origins-Vokabular: Accelerate (ready ins Spiel gegen Aufpreis), Assault/Shield (Rollen-Boni), Tank (Zuweisungs-Taunt), Deflect (Ziel-Steuer), Deathknell (Deathrattle), Ganking (Battlefield→Battlefield), Hidden (Facedown-Reaction für 0 Energy), Legion, Vision, Temporary (stirbt <em>vor</em> dem Scoring), Mighty (Might ≥ 5).</li>
+  <li>Unleashed: <strong>XP/Level</strong> (Skalierung), <strong>Hunt X</strong> (XP für Conquer/Hold), <strong>Ambush</strong> (Unit mit Reaction-Timing).</li>
+  <li>Vendetta: <strong>Flow</strong> (aus dem Trash spielen, danach exiled), <strong>Empower</strong> (aktivierte Fähigkeit mit Kosten).</li>
+  <li>Unverifiziert und vor dem Event zu prüfen: <strong>Predict</strong>, <strong>Backline</strong>, <strong>Burn</strong> — offizielle Quelle: playriftbound.com Rules Hub.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

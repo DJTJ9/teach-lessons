@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 10 — Akali vs. Meta</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>⚔️ Lektion 10 — Akali vs. Meta</h1>
+
+<p class="mission">Ziel: Du gehst mit realistischer Erwartung nach Hamburg — du weißt, wo Akali im Vendetta-Meta ehrlich steht (unterdurchschnittlich), gegen welche Decks du favorisiert bist und wo du um jeden Prozentpunkt kämpfen musst.</p>
+
+<h2>1. Die ehrliche Einordnung (Stand: Mitte August 2026)</h2>
+
+<p>Drei Quellen, drei Perspektiven — aber ein konsistentes Bild:</p>
+
+<table>
+  <tr><th>Quelle</th><th>Einstufung</th><th>Detail</th></tr>
+  <tr><td>riftbound.gg (Tierlist, 14.08.2026)</td><td><strong>Tier 5</strong></td><td>Kommentar sinngemäß: "Best-of cards are worth good money" — kompetitiv faktisch irrelevant; fehlt in der Week-3-Tierlist (16 Turniere mit 64+ Spielern) komplett — kein Top-8</td></tr>
+  <tr><td>riftmana.com (Vendetta-Tierlist)</td><td><strong>Tier B</strong></td><td>als "Fury Calm Akali"; optimistischste Quelle</td></tr>
+  <tr><td>riftdecks.com (Metashare-Daten)</td><td>4 % Metashare (141 Decks)</td><td><strong>39 % Winrate, 0.44x Top-25%-Conversion</strong>, 14 Top 8s — viel gespielt (Fan-Favorit), konvertiert schlecht</td></tr>
+</table>
+
+<p>Dazu riftbound.gg wörtlich: "Akali had a few competitive sparks, but so far has failed to look like a dominant legend. <strong>She has yet to win a tournament.</strong>" Lichtblicke: 3rd Platz MANASCREW Nexus Night (Brad00f, 31.07.), und in China (langsameres Meta) ein Sieg bei einem 36-Spieler-Turnier plus vereinzelte Top Cuts <em>[Eventname/Datum unverifiziert]</em>.</p>
+
+<div class="warning">Zum Vergleich die Spitze (riftdecks): Kennen 58 % WR / 1.43x Conversion, Master Yi 57 % / 1.38x, Irelia 54 % / 1.16x. Akalis 39 % / 0.44x sind der schlechteste Wert unter den meistgespielten Legends. Das Meta ist allerdings erst 2–3 Wochen alt; der erste Vendetta-RQ (Barcelona, 21.–23.08.) kann die Tierlists noch verschieben.</div>
+<cite>Quellen: https://riftbound.gg/tier-list/ · https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/ · https://riftmana.com/meta-tier-list/ · https://riftdecks.com/legends · https://riftbound.gg/akali-rogue-assassin-guide/</cite>
+
+<h2>2. Matchups gegen Tier 1</h2>
+
+<p>Die Tier-1-Legends der Vendetta-Week-3-Tierlist: <strong>Master Yi, Kennen, Ezreal, Irelia, Kai'Sa</strong>. Explizite Matchup-Prozente Akali vs. X gibt es in keiner Quelle — die folgende Einschätzung kombiniert die dokumentierten Deck-Profile mit Akalis belegten Stärken/Schwächen (Riftlab, riftbound.gg):</p>
+
+<table>
+  <tr><th>Gegner</th><th>Profil (Quelle: Week-3-Report)</th><th>Einschätzung für Akali</th></tr>
+  <tr><td><strong>Master Yi</strong> (2 Siege/21 Top-8)</td><td>Superzuverlässiges Early Game, übernimmt das Board früh</td><td>Schwierig: Akali braucht Setup-Züge, die Yi nicht hergibt. Board-Midrange-Duell — Akali gilt zwar generell als gut vs. Midrange, aber Yi ist die konsistenteste Version davon.</td></tr>
+  <tr><td><strong>Kennen</strong> (58 % WR, höchste Metashare)</td><td>"Miracle/Tempo"-Deck um Rhasa the Sunderer, sehr komplexer Pilot</td><td>Schwierig: höchste WR im Feld; Akalis 39 % kommen auch daher, dass sie im direkten Vergleich mit solchen Decks schlecht konvertiert.</td></tr>
+  <tr><td><strong>Ezreal</strong> (Mind/Chaos-Value)</td><td>Value-/Control-lastig</td><td>Schlecht: kombiniert genau die zwei Domains (Mind + Chaos), gegen die Akalis Engine laut Riftlab am meisten leidet (Disruption + Value-Trades).</td></tr>
+  <tr><td><strong>Irelia</strong> (Calm/Chaos-Tempo-Midrange)</td><td>Spielt selbst Stellacorn Herder; konsistenter als Akali</td><td>Ungünstig: riftbound.gg sagt explizit, der direkte Vergleich mit Top-Tier-Irelia schadet Akali — gleiche Spielidee, bessere Ausführung.</td></tr>
+  <tr><td><strong>Kai'Sa</strong> (Unleashed-Liste unverändert)</td><td>Aggressives Conquer-Deck</td><td>Spielbar: gegen Aggro-Profile ist Akali laut Riftlab gut aufgestellt ("should walk over most aggro decks") — die beste Ansage unter den Tier-1-Matchups.</td></tr>
+</table>
+
+<h2>3. Zweite Reihe: Rengar und Rek'Sai</h2>
+<ul>
+  <li><strong>Rengar</strong> (Tier 2, gewann mit Prismaticism 12-0-2 das größte Vendetta-Turnier, Showdown Ottawa mit 594 Spielern): aggressives "Fast-Paced"-Fury-Deck. Nach der Aggro-Logik für Akali eher angenehm — aber Rengar ist die am besten performende Version des Archetyps (1.56x Conversion), Respekt einplanen.</li>
+  <li><strong>Rek'Sai</strong> (Tier 2): Riftlab nennt sie <strong>explizit als gutes Matchup</strong> — Decks, die Units an Battlefields parken, "struggle to push back in", sobald Akali die Battlefields übernimmt.</li>
+</ul>
+<cite>Quellen: https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>4. Stärken- und Schwächen-Profil</h2>
+
+<table>
+  <tr><th>Stark gegen</th><th>Schwach gegen</th></tr>
+  <tr>
+    <td>
+      <ul>
+        <li><strong>Aggro</strong> generell ("should walk over most aggro decks" — Riftlab)</li>
+        <li><strong>Battlefield-Parker</strong> (Rek'Sai): wer wenig Might an Battlefields hält, kommt gegen den Move-Loop nicht zurück</li>
+        <li>Midrange allgemein — Akali gilt als bestes Conquer-Deck: Fury-Offense + Calm-Defense + Legend-Ability als Rettungsanker, wenn ein Conquer schiefgeht</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li><strong>Chaos-Disruption</strong>: braucht Setup; "Rebuke"/"Star Cross" sehr frustrierend; Zhonya's rettet, aber Redevelopment kostet Tempo</li>
+        <li><strong>Mind</strong>: Debuffs, große Units, expendable Sprites für Value-Trades; <strong>Thousand-Tailed Watcher</strong> "oft verheerend" — die eine Solo-Unit wird überwältigt, Back Off verzögert nur</li>
+        <li><strong>Control</strong> generell: gut vs. Midrange, schlecht vs. Control</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+<cite>Quellen: https://www.youtube.com/watch?v=_izcg8Zhc8E · https://riftbound.gg/akali-rogue-assassin-guide/</cite>
+
+<h2>5. Was heißt das für dein erstes Event? (Locals ≠ RQ-Meta)</h2>
+
+<ul>
+  <li><strong>Die Tierlist misst 64+-Spieler-Turniere.</strong> Ein lokaler Nexus Night / Locals-Abend in Hamburg ist ein anderes Feld: mehr Precons, mehr Homebrews, weniger getunte Kennen-/Yi-Piloten. Brad00fs 3rd Platz kam genau aus so einem Umfeld (MANASCREW Friday Evening Nexus Night).</li>
+  <li><strong>Akalis 39 % WR sind kein Todesurteil für Locals</strong> — die schlechte Conversion zeigt sich vor allem in großen Feldern (0.44x Top-25%). Gegen Aggro- und Midrange-lastige Casual-Metas spielt sie ihre belegten Stärken aus.</li>
+  <li><strong>Skill-Vorsprung schlägt Tier-Nachteil:</strong> Das China-Ergebnis (Turniersieg im langsameren Meta) zeigt: In Feldern, die Akali Setup-Zeit geben, gewinnt sie. Wer den Loop (Lektion 07) und den Signature-Finish (Lektion 09) sauber pilotiert, ist auf Locals-Niveau kompetitiv.</li>
+  <li><strong>Erwartungsmanagement:</strong> Wenn am Nachbartisch getunte Kennen-, Ezreal- oder Irelia-Listen sitzen, sind das deine schlechten Pairings — das ist eingepreist. Du spielst Akali als Fan-Favorit-Deck mit echtem Skill-Ausdruck, nicht als Tier-1-Abkürzung.</li>
+</ul>
+
+<div class="tip">Sideboard-Konsequenz aus den Schwächen: Die zitierten Turnierlisten packen genau dafür Tech ein — Against the Odds, Not So Fast, Thermo Beam, Brittle Steel (Lektion 08). Plane deine 8 Sideboard-Slots gegen Mind/Chaos/Control, nicht gegen Aggro — Aggro schlägst du main-deck.</div>
+
+<cite>Quellen: https://riftdecks.com/riftbound-metagame/deck-akali-223791 · https://riftbound.gg/akali-rogue-assassin-guide/ · https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/</cite>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+
+<p><strong>1. Wie steht Akali datenseitig im Vendetta-Meta da (Stand Mitte Aug 2026)?</strong></p>
+<div class="answer">Solide Mitte: ~50 % Winrate bei kleiner Spielerbasis.<div class="reveal wrong">❌ Falsch — die Spielerbasis ist mit 4 % Metashare (141 Decks) sogar beachtlich, aber die Ergebnisse sind klar unterdurchschnittlich.</div></div>
+<div class="answer">Viel gespielt (4 % Metashare), aber 39 % Winrate und 0.44x Top-25%-Conversion — Tier 5 (riftbound.gg) bzw. Tier B (riftmana), noch kein Turniersieg im Westen.<div class="reveal">✅ Richtig — Fan-Favorit mit schwacher Conversion. Die Rohdaten stützen die pessimistische Einstufung; riftmana ist die optimistischste Quelle.</div></div>
+
+<p><strong>2. Gegen welchen Tier-2-Gegner nennt Riftlab Akali explizit favorisiert?</strong></p>
+<div class="answer">Rengar — als Fury-Deck zu langsam für Akali.<div class="reveal wrong">❌ Falsch — Rengar ist zwar aggro-artig (tendenziell ok für Akali), aber die explizite Nennung gilt einem anderen Deck. Rengar gewann außerdem gerade Ottawa mit 594 Spielern — Vorsicht.</div></div>
+<div class="answer">Rek'Sai — Battlefield-Parker "struggle to push back in", sobald Akali die Battlefields übernimmt.<div class="reveal">✅ Richtig — Decks, die Units an Battlefields parken und dort wenig Might halten, verlieren gegen den Move-Loop die Kontrolle und kommen nicht zurück.</div></div>
+
+<p><strong>3. Warum ist Ezreal ein besonders unangenehmes Tier-1-Matchup?</strong></p>
+<div class="answer">Weil sein Deck Mind + Chaos kombiniert — genau die zwei Domains, gegen die Akalis Setup-Engine laut Quellen am meisten leidet.<div class="reveal">✅ Richtig — Chaos-Disruption (Rebuke/Star Cross) bestraft das Setup, Mind (Debuffs, Sprites, Thousand-Tailed Watcher) überwältigt die Solo-Unit. Generell: gut vs. Midrange, schlecht vs. Control.</div></div>
+<div class="answer">Weil Ezreal schneller scored als jedes andere Deck.<div class="reveal wrong">❌ Falsch — Ezreal ist ein Value-Deck, kein Racing-Deck. Reine Geschwindigkeit (Aggro) ist eher Akalis GUTES Matchup-Profil.</div></div>
+
+<p><strong>4. Sollten die Meta-Zahlen dich von Akali für das Hamburg-Event abbringen?</strong></p>
+<div class="answer">Ja — Tier 5 heißt: Deck wechseln oder verlieren.<div class="reveal wrong">❌ Falsch — die Tierlist misst 64+-Spieler-Turniere. Locals sind ein anderes Feld, und Akalis Stärken (Aggro, Midrange, Battlefield-Parker) treffen dort häufiger auf.</div></div>
+<div class="answer">Nein — Locals ≠ RQ-Meta: weniger getunte Tier-1-Listen, Akalis gute Matchups sind dort häufiger, und Brad00fs 3rd Platz kam genau aus so einem Nexus-Night-Umfeld. Aber: Erwartung realistisch halten und das Sideboard gegen Mind/Chaos bauen.<div class="reveal">✅ Richtig — Skill-Ausdruck + passendes Feld machen Akali auf Locals-Niveau kompetitiv, auch wenn sie im Großturnier-Meta unterdurchschnittlich ist. Stand: Mitte August 2026, vor dem ersten Vendetta-RQ (Barcelona).</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li><strong>Ehrliche Lage (Mitte Aug 2026):</strong> Tier 5 (riftbound.gg) bzw. Tier B (riftmana); 4 % Metashare, aber 39 % WR und 0.44x Conversion — kein Turniersieg im Westen, kein Top-8 in 64+-Turnieren.</li>
+  <li><strong>Tier 1 (Master Yi, Kennen, Ezreal, Irelia, Kai'Sa):</strong> überwiegend ungünstig — Ezreal (Mind/Chaos) am schlimmsten, Irelia als "bessere Version derselben Idee", Kai'Sa als spielbarstes Pairing.</li>
+  <li><strong>Belegte Stärken:</strong> Aggro, Battlefield-Parker (explizit Rek'Sai), Midrange — bestes Conquer-Deck mit Rettungsanker-Legend.</li>
+  <li><strong>Belegte Schwächen:</strong> Chaos-Disruption (Rebuke/Star Cross), Mind (Thousand-Tailed Watcher), Control generell.</li>
+  <li><strong>Locals ≠ RQ-Meta:</strong> Fürs erste Event in Hamburg ist Akali eine legitime Wahl — Sideboard gegen Mind/Chaos/Control planen, Aggro schlägst du main-deck.</li>
+  <li>Vorbehalt: Meta erst 2–3 Wochen alt; nach dem RQ Barcelona (21.–23.08.) neu bewerten.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

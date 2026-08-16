@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 06 — Akali-Karten im Detail</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>🥷 Lektion 06 — Akali-Karten im Detail</h1>
+
+<p class="mission">Ziel: Du kennst alle drei Akali-Karten auswendig — Kosten, Stats, exakten Kartentext und was jede Ability praktisch macht — damit du beim Event in Hamburg keine Regelfrage zu deinem eigenen Deck offen hast.</p>
+
+<p>Es existieren Stand Mitte August 2026 <strong>genau drei Akali-Karten</strong>, alle aus dem Set <strong>Vendetta (VEN)</strong>, erschienen 31.07.2026: eine Legend und zwei Champion-Units. Kein Akali-Print in Origins, Spiritforged oder Unleashed. Akali ist das Poster-Legend von Vendetta und die <strong>erste (und einzige) Calm+Fury-Legend im Spiel</strong> — das prägt alles, was das Deck kann.</p>
+<cite>Quellen: https://articles.starcitygames.com/riftbound/every-card-revealed-so-far-from-riftbound-vendetta/ · https://tcgwatchtower.com/riftbound/sets/vendetta/cards</cite>
+
+<h2>1. Akali, Rogue Assassin — die Legend (VEN-139)</h2>
+
+<div class="card">
+  <p><strong>Akali, Rogue Assassin</strong> · Legend · Domains: <strong>Fury + Calm</strong> · Vendetta VEN-139/166, Rare</p>
+  <p><em>Kartentext (wörtlich):</em></p>
+  <pre>[Empower] [3][A]
+[Action][&gt;] [T]: If it's your turn, move a friendly unit
+in a showdown to base and if I'm [Empowered], ready it.</pre>
+</div>
+
+<p>Was das praktisch heißt:</p>
+<ul>
+  <li><strong>Empower-Kosten: 3 Energie + 1 Power</strong> (beliebige Domain). Einmal bezahlt, ist die Legend "Empowered" — der Ready-Rider ihrer Ability schaltet sich frei.</li>
+  <li><strong>Die Ability selbst:</strong> Action-Timing, tappt die Legend, nur in deinem eigenen Zug: Bewege eine eigene Unit <em>aus einem Showdown</em> zurück zur Base. Ist Akali Empowered, kommt die Unit dabei <strong>wieder ready</strong> an — sie kann im selben Zug erneut angreifen oder moven.</li>
+  <li>Das ist Akalis "Hit and Run"-Identität als Regeltext: angreifen, punkten oder Value ziehen, und vor der Bestrafung verschwinden. Denk League of Legends: rein, Combo, Shroud, raus.</li>
+</ul>
+
+<div class="warning">Die Ability funktioniert nur, wenn die Unit <strong>in einem Showdown</strong> steht, und nur <strong>in deinem Zug</strong>. Sie ist kein Blitzcrank-Hook und kein Panik-Knopf im gegnerischen Zug. Und: Die Legend tappt dafür — einmal pro Zugzyklus (bis zur nächsten Awaken Phase).</div>
+
+<div class="tip">CCG-Analogie: Der Empower ist wie ein einmaliges "Level-Up" à la LoR-Champions — 3+[A] sind viel, aber der Ready-Rider verdoppelt danach den Wert jeder Aktivierung. Mehr dazu in Lektion 07 (Move-Trigger-Engine).</div>
+<cite>Quelle: https://riftdecks.com/cards/details-akali-rogue-assassin</cite>
+
+<h2>2. Akali, Deadly Weapon — Champion-Unit (VEN-021)</h2>
+
+<div class="card">
+  <p><strong>Akali, Deadly Weapon</strong> · Unit — Champion · Ionia, Akali · Domain: <strong>Fury</strong> · <strong>3 Energie (kein Power-Cost)</strong> · <strong>3 Might</strong> · Vendetta VEN-021/166, Epic</p>
+  <p><em>Kartentext (wörtlich):</em></p>
+  <pre>[Empower] [2][C] ([2][C]: Empower me. Use only if not Empowered.)
+When I move, you may deal 1 to a unit at a battlefield
+I moved to or from. If I'm [Empowered], deal 2 instead.
+[Empowered][&gt;] I have +1 [S].</pre>
+</div>
+
+<p>Praktisch:</p>
+<ul>
+  <li><strong>3 Energie ohne Power-Cost</strong> macht sie zum verlässlichsten Champion-Play im Deck — du musst keine Rune recyceln.</li>
+  <li><strong>Ping bei jedem Move:</strong> 1 Schaden an eine Unit am Battlefield, zu dem oder von dem sie zieht. Rein <em>und</em> raus sind zwei separate Trigger. Empowered (2 Energie + 1 Calm-Power) wird der Ping zu 2 und sie steigt auf <strong>4 Might</strong>.</li>
+  <li>Mit dem Legend-Loop (Move-in → Ability → Move-out) removed sie kleine Blocker, ohne je Combat zu riskieren — die berühmte Line mit Void Gate und Shuriken Flip rechnet Lektion 07/09 durch.</li>
+</ul>
+<cite>Quelle: https://riftdecks.com/cards/details-akali-deadly-weapon</cite>
+
+<h2>3. Akali, Silent — Champion-Unit (VEN-038)</h2>
+
+<div class="card">
+  <p><strong>Akali, Silent</strong> · Unit — Champion · Domain: <strong>Calm</strong> · <strong>4 Energie + 1 Calm-Power</strong> · <strong>4 Might</strong> · Vendetta VEN-038/166, Rare</p>
+  <p><em>Kartentext (wörtlich):</em></p>
+  <pre>I can't be chosen by enemy spells and abilities
+unless I'm in combat.
+When I move to a battlefield, give me +2 [S] this turn.</pre>
+</div>
+
+<p>Praktisch:</p>
+<ul>
+  <li><strong>Quasi-Hexproof außerhalb von Combat:</strong> Gegnerisches Targeted-Removal trifft sie nur, wenn sie gerade kämpft. Das spielt perfekt um Removal herum — der Hauptgrund, warum sie in Turnierlisten der Standard-<strong>Chosen Champion</strong> ist.</li>
+  <li><strong>+2 Might beim Move zum Battlefield:</strong> Sie greift als temporäre <strong>6-Might</strong>-Unit an; nach dem Conquer holt die Legend-Ability sie sicher nach Hause.</li>
+  <li>Sie ist so gut, dass sie sogar domänenübergreifend als Staple in Irelia- und Lillia-Decks auftaucht.</li>
+</ul>
+<cite>Quellen: https://riftdecks.com/cards/details-akali-silent · https://riftbound.gg/riftbound-meta-tier-list-best-decks-for-vendetta-week-3-report/</cite>
+
+<h2>4. Welche Champion-Unit als Chosen Champion?</h2>
+<table>
+  <tr><th></th><th>Akali, Silent</th><th>Akali, Deadly Weapon</th></tr>
+  <tr><td><strong>Wer spielt sie</strong></td><td>Überwiegende Mehrheit der Turnierlisten (Brad00f, David Shi, 白色枫叶)</td><td>Riftlab-Empfehlung für Einsteiger; sonst meist im Sideboard (1x)</td></tr>
+  <tr><td><strong>Stärke</strong></td><td>Removal-resistent, 6-Might-Angriffe</td><td>Billig (3, kein Power), Ping-Removal ohne Combat</td></tr>
+  <tr><td><strong>Kosten</strong></td><td>4 + 1 Calm-Power</td><td>3 Energie</td></tr>
+</table>
+<cite>Quellen: https://riftdecks.com/riftbound-metagame/deck-akali-223791 · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>5. Varianten, Rarities &amp; Preise (Stand: Mitte August 2026)</h2>
+
+<p>Spielerisch sind alle Akali-Karten spottbillig. Der Sammlerwert steckt in den Showcase-/Overnumbered-Versionen:</p>
+
+<table>
+  <tr><th>Karte</th><th>Variante</th><th>Preis (Cardmarket EUR, ab / Trend)</th></tr>
+  <tr><td>Akali, Rogue Assassin</td><td>V.1 Rare (VEN-139)</td><td>ab €0,02 (TCGPlayer ~$0.17)</td></tr>
+  <tr><td>Akali, Rogue Assassin</td><td>V.2 Showcase = <strong>Overnumbered VEN-189/166</strong></td><td><strong>ab €330 / Trend €371,75</strong> (TCGIndex $431; TCG Watchtower ~$284)</td></tr>
+  <tr><td>Akali, Rogue Assassin</td><td>V.3 <strong>Signed Showcase</strong> (Overnumbered mit Artist-Signatur)</td><td><strong>ab €1.800–2.000 / Trend €2.109,93</strong> (TCGIndex $3.000) — Top-Chase des Sets</td></tr>
+  <tr><td>Akali, Silent</td><td>V.1 Rare (VEN-038)</td><td>ab €0,04 / Trend €0,19</td></tr>
+  <tr><td>Akali, Silent</td><td>V.2 Showcase (VEN-038a)</td><td>ab €10,00 / Trend €13,06</td></tr>
+  <tr><td>Akali, Deadly Weapon</td><td>V.1 Epic (VEN-021)</td><td>ab €1,12 / Trend €1,70 (30d-Schnitt €4,15)</td></tr>
+  <tr><td>Akali, Deadly Weapon</td><td>V.2 Showcase / Alt Art (VEN-021a)</td><td>ab €9,00</td></tr>
+</table>
+
+<p>Einordnung: Vendetta hat 9 Legend-Overnumbers (jeweils mit Signed-Version) plus 22 "Rival"-Connecting-Art-Karten. Akalis Overnumbered VEN-189 gehört zusammen mit Kennens "Heart of the Tempest" (~$306) zu den teuersten Karten des Sets.</p>
+
+<div class="warning"><strong>[Unverifiziert]</strong>: Eine zusätzliche "SP"-Rarity wurde für Vendetta in einem Instagram-Reel erwähnt — ob es eine SP-Akali gibt, ist nicht bestätigt. Nicht einpreisen.</div>
+
+<cite>Quellen: https://www.cardmarket.com/en/Riftbound/Cards/Akali-Rogue-Assassin/Versions · https://www.cardmarket.com/en/Riftbound/Cards/Akali-Silent/Versions · https://www.cardmarket.com/en/Riftbound/Cards/Akali-Deadly-Weapon/Versions · https://www.cardmarket.com/en/Riftbound/Products/Singles/Vendetta/Akali-Rogue-Assassin-V3-Signed-Showcase · https://riftbound.gg/vendetta-overnumbered-cards/ · https://tcgwatchtower.com/riftbound/sets/vendetta/cards</cite>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+
+<p><strong>1. Deine Akali-Legend ist NICHT Empowered. Du aktivierst ihre Ability auf deinen Stellacorn Herder im Showdown. Was passiert?</strong></p>
+<div class="answer">Der Stellacorn geht ready zur Base zurück.<div class="reveal wrong">❌ Falsch — der Ready-Rider ("ready it") gilt nur, wenn Akali Empowered ist. Ohne Empower kommt die Unit exhausted zu Hause an.</div></div>
+<div class="answer">Der Stellacorn geht zur Base zurück, bleibt aber exhausted.<div class="reveal">✅ Richtig — der Move zur Base passiert immer, das Ready nur bei [Empowered]. Deshalb sind die 3+[A] für Empower so wichtig: Sie verdoppeln den Wert jeder Aktivierung.</div></div>
+
+<p><strong>2. Warum ist Akali, Silent in Turnierlisten der Standard-Chosen-Champion — und nicht Deadly Weapon?</strong></p>
+<div class="answer">Weil sie billiger ist.<div class="reveal wrong">❌ Falsch — Deadly Weapon ist billiger (3 Energie ohne Power-Cost vs. 4+1 Calm). Silent gewinnt aus einem anderen Grund.</div></div>
+<div class="answer">Weil sie außerhalb von Combat nicht getargetet werden kann und beim Move als 6-Might-Unit angreift.<div class="reveal">✅ Richtig — Quasi-Hexproof spielt um Removal herum, und "When I move to a battlefield, +2 [S]" macht sie zum 6-Might-Angreifer, den die Legend danach sicher heimholt. Riftlab empfiehlt Deadly Weapon nur als Einsteiger-Option.</div></div>
+
+<p><strong>3. Akali, Deadly Weapon (Empowered) bewegt sich von der Base in ein Battlefield und später per Legend-Ability wieder heraus. Wie viel Ping-Damage kann sie in diesem Zug maximal verteilen?</strong></p>
+<div class="answer">2 — ein Trigger pro Zug.<div class="reveal wrong">❌ Falsch — "When I move" triggert bei JEDEM Move, rein wie raus.</div></div>
+<div class="answer">4 — je 2 beim Move rein und beim Move raus.<div class="reveal">✅ Richtig — zwei Moves = zwei Trigger, Empowered je 2 Schaden. Mit Void Gate (+1 Bonus Damage) und Shuriken Flip skaliert das noch weiter — Lektion 07.</div></div>
+
+<p><strong>4. Was ist an Akali, Rogue Assassin einzigartig im gesamten Spiel (Stand Mitte Aug 2026)?</strong></p>
+<div class="answer">Sie ist die einzige Legend mit einer Empower-Fähigkeit.<div class="reveal wrong">❌ Falsch — Empower ist eine allgemeine Vendetta-Mechanik (auch z. B. auf Deadly Weapon und Mournful Witness).</div></div>
+<div class="answer">Sie ist die einzige Legend mit der Domain-Kombination Fury + Calm.<div class="reveal">✅ Richtig — dadurch kombiniert das Deck als einziges Fury-Offense mit Calm-Tools wie Defy (Counterspell) und Discipline. Das ist Akalis strukturelles Alleinstellungsmerkmal.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Es gibt genau 3 Akali-Karten, alle aus Vendetta (31.07.2026): Legend VEN-139 + Champion-Units VEN-021 und VEN-038.</li>
+  <li><strong>Legend:</strong> Empower 3+[A]; Action+Tap im eigenen Zug: eigene Unit aus einem Showdown zur Base — Empowered kommt sie <em>ready</em> zurück.</li>
+  <li><strong>Deadly Weapon:</strong> 3 Energie / 3 Might, Ping 1 (Empowered 2 und 4 Might) bei jedem Move — rein und raus sind zwei Trigger.</li>
+  <li><strong>Silent:</strong> 4+C / 4 Might, untargetable außerhalb von Combat, +2 Might beim Move → 6-Might-Angreifer; Standard-Chosen-Champion.</li>
+  <li>Akali ist die einzige Calm+Fury-Legend — Counterspells im Aggro-Farbpaar.</li>
+  <li>Playset-Kosten minimal (alle 3 Karten zusammen unter ~€5); Sammler-Chase: Overnumbered VEN-189 (~€330+) und Signed Showcase (~€1.800–2.100). Stand: Mitte August 2026.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

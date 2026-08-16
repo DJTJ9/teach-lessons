@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 01 — Spielziel &amp; Zugstruktur</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+<h1>🏆 Lektion 01 — Spielziel &amp; Zugstruktur</h1>
+<p class="mission">Ziel: Du kennst die Win-Condition (8 Punkte) und alle sechs Zugphasen so sicher, dass du beim Event in Hamburg in 1–2 Wochen keinen einzigen Hold-Punkt verschenkst und dein Akali-Tempo sauber planst.</p>
+
+<h2>Worum es geht: Punkte, nicht Lebenspunkte</h2>
+<p>Der wichtigste mentale Shift für dich als Hearthstone/LoR-Spieler: Riftbound hat <strong>kein Lebenstotal</strong>, das du auf 0 prügelst. Du gewinnst über <strong>Punkte</strong>, die du durch Kontrolle von <strong>Battlefields</strong> erzielst — eher King-of-the-Hill als Face-Damage-Race.</p>
+<ul>
+  <li><strong>1v1: 8 Punkte</strong> zum Sieg.</li>
+  <li><strong>2v2: 11 Punkte</strong> (Team-Format, offiziell seit dem Set Spiritforged).</li>
+  <li>Free-for-all-Zielwert: in den Quellen nicht bestätigt.</li>
+</ul>
+
+<h3>Die Battlefields</h3>
+<p>Im Constructed gehören <strong>3 Battlefields</strong> zu deinem Deck. Im 1v1 steuert jeder Spieler <strong>1 Battlefield</strong> bei (zufällig aus seinen dreien gewählt) — es sind also <strong>2 Battlefields im Spiel</strong>, um die permanent gekämpft wird. Deine Units bewegen sich zwischen deiner Base und diesen Battlefields.</p>
+
+<h3>Die vier Punktequellen</h3>
+<table>
+  <tr><th>Quelle</th><th>Wann</th><th>Wie viel</th></tr>
+  <tr><td><strong>Conquer</strong></td><td>Du übernimmst (neu) die Kontrolle über ein Battlefield</td><td>1 Punkt — pro Battlefield und Zug nur einmal</td></tr>
+  <tr><td><strong>Hold</strong></td><td>Beginn deines Zuges (Beginning Phase): jedes Battlefield, das du weiterhin mit Units kontrollierst</td><td>1 Punkt pro gehaltenem Battlefield</td></tr>
+  <tr><td><strong>Burn Out</strong></td><td>Der Gegner müsste aus leerem Deck ziehen</td><td>1 Punkt</td></tr>
+  <tr><td><strong>Karteneffekte</strong></td><td>Wenn der Kartentext es sagt</td><td>variabel</td></tr>
+</table>
+
+<div class="tip"><strong>Conquer vs. Hold strategisch:</strong> Conquer ist Tempo (Punkt sofort, aber du musst aktiv erobern), Hold ist Inevitability (passives Einkommen, aber der Gegner hat einen ganzen Zug Zeit, dich runterzuschlagen). Gute Spieler rechnen ständig: „Wenn ich beide Battlefields halte, bekomme ich nächsten Zug 2 Punkte — was muss der Gegner dafür ausgeben, das zu verhindern?" Das ist das Riftbound-Äquivalent zur LoR-Frage „Wer hat nächste Runde den Attack Token und was macht er damit?"</div>
+
+<div class="warning"><strong>Final-Point-Regel (echte Turnier-Falle):</strong> Wer den <strong>8. Punkt per Conquer</strong> erreicht, gewinnt nur dann sofort, wenn er in diesem Zug <em>beide</em> Battlefields erobert hat — sonst zieht er stattdessen eine Karte (kein Punkt!). Hold-Punkte und Karteneffekte gewinnen bei 8 dagegen sofort. Plane deine Lethal-Züge also über Hold oder Doppel-Conquer, nicht über einen einzelnen Conquer bei 7 Punkten.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/ · https://www.eneba.com/hub/collectibles/how-to-play-riftbound/</cite>
+
+<h2>Die Zugstruktur: „ABCD" + Hauptteil</h2>
+<p>Jeder Zug läuft in fester Reihenfolge ab. Die Community merkt sich die ersten vier Phasen als <strong>„ABCD"</strong> — Awaken, Beginning, Channel, Draw — danach kommen Main und Ending:</p>
+<table>
+  <tr><th>#</th><th>Phase</th><th>Was passiert</th></tr>
+  <tr><td>1</td><td><strong>Awaken Phase</strong></td><td>Alle erschöpften Karten (Units, Legend, Runen) werden ready.</td></tr>
+  <tr><td>2</td><td><strong>Beginning Phase</strong></td><td><strong>Scoring:</strong> 1 Punkt pro kontrolliertem Battlefield (Hold). Temporary-Tokens sterben hier <em>vor</em> dem Scoring.</td></tr>
+  <tr><td>3</td><td><strong>Channel Phase</strong></td><td>2 Runen vom Rune Deck ins Spiel channeln (kommen ready).</td></tr>
+  <tr><td>4</td><td><strong>Draw Phase</strong></td><td>1 Karte ziehen.</td></tr>
+  <tr><td>5</td><td><strong>Main/Action Phase</strong></td><td>Beliebige Reihenfolge: Karten spielen (Units, Spells, Gear), Fähigkeiten aktivieren, ready Units bewegen (Bewegung erschöpft die Unit), Angriffe/Showdowns auslösen.</td></tr>
+  <tr><td>6</td><td><strong>Ending Phase</strong></td><td>End-of-turn-Effekte, alle Units heilen vollständig, ungenutzte Ressourcen (Runenpool) verfallen.</td></tr>
+</table>
+<p>Hinweis: Manche Guides fassen Beginning und Channel leicht unterschiedlich zusammen — inhaltlich ist die Reihenfolge überall identisch.</p>
+<cite>Quellen: https://riftbound.gg/riftbound-beginners-guide-basic-rules-how-to-play/ · https://runesandrift.com/riftbound-turn-order/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/</cite>
+
+<h3>Analogie-Anker für CCG-Veteranen</h3>
+<div class="card">
+  <p><strong>Vs. Legends of Runeterra:</strong> LoR hat alternierende Aktionen innerhalb einer Runde und den Attack Token. Riftbound hat klassische „mein Zug / dein Zug"-Struktur — aber der Gegner ist trotzdem nicht passiv: über <strong>Reaction</strong>- und <strong>Action</strong>-Timing (Lektion 04) mischt er in deinen Showdowns mit. Denk an LoR-Interaktivität, aber verpackt in eine MTG/HS-artige Zugfolge.</p>
+  <p><strong>Vs. Hearthstone-Tempo:</strong> In HS ist Tempo-Vorsprung Board-Vorsprung, der in Face-Damage konvertiert. Hier konvertiert Board-Vorsprung in <em>Battlefield-Kontrolle</em>, und die konvertiert jede eigene Beginning Phase in Hold-Punkte. Wer wie in HS nur „effizient traded", aber die Battlefields ignoriert, verliert gegen jemanden, der einfach Punkte farmt.</p>
+</div>
+
+<h2>Spielstart &amp; Erster-Zug-Regeln</h2>
+<ul>
+  <li>Beide Spieler legen <strong>Legend + Chosen Champion</strong> offen aus; Main Deck und Rune Deck werden getrennt gemischt.</li>
+  <li>Starthand: <strong>4 Karten</strong>. Mulligan: bis zu 2 Karten beiseitelegen, nachziehen, zurückmischen.</li>
+  <li>Startspieler wird zufällig bestimmt.</li>
+  <li><strong>Ausgleich für den zweiten Spieler:</strong> Er channelt in seiner <em>ersten</em> Channel Phase <strong>3 statt 2 Runen</strong> — das Riftbound-Pendant zum Coin/zur zusätzlichen Karte in anderen TCGs, nur als Ressourcen-Vorsprung.</li>
+</ul>
+<cite>Quellen: https://riftboundguide.com/2026/05/09/how-to-play-riftbound/ · https://www.eneba.com/hub/collectibles/how-to-play-riftbound/</cite>
+
+<div class="quiz">
+<h3>Quiz</h3>
+<p><strong>1. Du stehst bei 7 Punkten und conquerst in deinem Zug genau ein Battlefield. Was passiert?</strong></p>
+<div class="answer">Ich gewinne sofort.<div class="reveal wrong">❌ Falsch — die Final-Point-Regel: Der 8. Punkt per Conquer gewinnt nur sofort, wenn du in diesem Zug <em>beide</em> Battlefields erobert hast. Bei nur einem Conquer ziehst du stattdessen eine Karte.</div></div>
+<div class="answer">Ich ziehe stattdessen eine Karte, der Punkt zählt nicht.<div class="reveal">✅ Richtig — ein einzelner Conquer als 8. Punkt wird durch einen Kartenzug ersetzt. Nur Doppel-Conquer im selben Zug, Hold-Punkte oder Karteneffekte bringen den sofortigen Sieg bei 8.</div></div>
+<div class="answer">Der Punkt zählt, aber der Gegner hat noch einen Konterzug.<div class="reveal wrong">❌ Falsch — es gibt keinen „letzten Konterzug". Der Conquer-Punkt wird in dieser Situation schlicht durch einen Kartenzug ersetzt.</div></div>
+
+<p><strong>2. In welcher Phase bekommst du Hold-Punkte, und was stirbt direkt davor?</strong></p>
+<div class="answer">In der Ending Phase; davor verfallen die Runen.<div class="reveal wrong">❌ Falsch — Hold-Scoring passiert in der <strong>Beginning Phase</strong> deines Zuges. In der Ending Phase heilen Units und der Runenpool verfällt.</div></div>
+<div class="answer">In der Beginning Phase; Temporary-Tokens sterben davor.<div class="reveal">✅ Richtig — Scoring in der Beginning Phase, und Temporary-Tokens (z. B. Sprites) sterben <em>vor</em> dem Scoring. Ein Battlefield, das nur von einem Temporary-Token gehalten wird, bringt dir also keinen Hold-Punkt.</div></div>
+
+<p><strong>3. Wie wird der Nachteil des zweiten Spielers ausgeglichen?</strong></p>
+<div class="answer">Er zieht eine Extra-Karte (wie der Coin in Hearthstone).<div class="reveal wrong">❌ Falsch — kein Coin, keine Extra-Karte: Der zweite Spieler channelt in seiner ersten Channel Phase <strong>3 statt 2 Runen</strong>.</div></div>
+<div class="answer">Er channelt in seiner ersten Channel Phase 3 statt 2 Runen.<div class="reveal">✅ Richtig — ein einmaliger Ressourcen-Vorsprung von einer Rune, analog zum Coin, aber auf der Mana- statt der Kartenseite.</div></div>
+
+<p><strong>4. Wie viele Battlefields liegen in einer 1v1-Partie im Spiel, und woher kommen sie?</strong></p>
+<div class="answer">3 — alle aus dem Deck des Startspielers.<div class="reveal wrong">❌ Falsch — jeder Spieler hat zwar 3 Battlefields im Deck, steuert aber nur eines bei.</div></div>
+<div class="answer">2 — jeder Spieler steuert 1 bei, zufällig aus seinen 3 im Deck gewählt.<div class="reveal">✅ Richtig — 3 Battlefields gehören zum Constructed-Deck, pro 1v1-Partie kommt von jedem Spieler 1 zufällig gewähltes ins Spiel.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Sieg über <strong>Punkte</strong> (1v1: 8, 2v2: 11), nicht über Lebenspunkte — Battlefields sind die Punktemaschine.</li>
+  <li>Punktequellen: <strong>Conquer</strong> (1 Punkt bei Übernahme, 1×/Battlefield/Zug), <strong>Hold</strong> (1 Punkt pro gehaltenem Battlefield in deiner Beginning Phase), <strong>Burn Out</strong>, Karteneffekte.</li>
+  <li><strong>Final-Point-Regel:</strong> Einzelner Conquer als 8. Punkt = Kartenzug statt Sieg; Doppel-Conquer, Hold und Effekte gewinnen sofort.</li>
+  <li>Zugfolge: <strong>Awaken → Beginning (Scoring) → Channel (2 Runen) → Draw (1 Karte) → Main → Ending</strong> (Heilung + Ressourcen verfallen).</li>
+  <li>Setup: Legend + Chosen Champion offen, 4 Karten Starthand, Mulligan bis 2; der <strong>zweite Spieler channelt anfangs 3 Runen</strong>.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

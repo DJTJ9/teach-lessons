@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound Referenz — Regel- &amp; Keyword-Cheatsheet</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+    /* Cheatsheet: kompakter für Handy + Druck */
+    td, th { padding: .4rem .6rem; font-size: .92em; }
+    ol.steps { padding-left: 1.3rem; }
+    ol.steps li { margin-bottom: .4rem; }
+    @media print {
+      body { padding: .5rem; background: #fff; }
+      .tip, .warning { break-inside: avoid; }
+      table { break-inside: avoid; font-size: .85em; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚡ Regel- &amp; Keyword-Cheatsheet (fürs Event)</h1>
+<p class="mission">Nachschlagen in 10 Sekunden: Zugablauf, Ressourcen, Combat, Chain, alle Keywords, Deckbau-Zahlen, Punkteziele. Stand: Mitte August 2026 (Core Rules ~1.4, Sets OGN–VEN).</p>
+
+<h2>1. Zugablauf ("ABCD" + Hauptteil)</h2>
+<table>
+  <tr><th>#</th><th>Phase</th><th>Was passiert</th></tr>
+  <tr><td>1</td><td><strong>Awaken</strong></td><td>Alle erschöpften Karten (Units, Legend, Runen) werden ready.</td></tr>
+  <tr><td>2</td><td><strong>Beginning</strong></td><td>Scoring: 1 Punkt pro kontrolliertem Battlefield (<strong>Hold</strong>). Temporary-Tokens sterben davor.</td></tr>
+  <tr><td>3</td><td><strong>Channel</strong></td><td>2 Runen vom Rune Deck ins Spiel channeln (ready).</td></tr>
+  <tr><td>4</td><td><strong>Draw</strong></td><td>1 Karte ziehen. (Danach leert sich der Runenpool.)</td></tr>
+  <tr><td>5</td><td><strong>Main/Action</strong></td><td>Beliebige Reihenfolge: Karten spielen (Units, Spells, Gear), Fähigkeiten aktivieren, ready Units bewegen (Bewegung erschöpft), Angriffe/Showdowns.</td></tr>
+  <tr><td>6</td><td><strong>Ending</strong></td><td>End-of-turn-Effekte, alle Units heilen vollständig, ungenutzte Ressourcen verfallen.</td></tr>
+</table>
+<div class="tip">Setup-Merker: Starthand <strong>4</strong>, Mulligan bis zu 2 Karten. Der <strong>zweite Spieler channelt in seiner ersten Channel Phase 3 statt 2 Runen</strong>.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-turn-order/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/ · https://riftbound.gg/riftbound-beginners-guide-basic-rules-how-to-play/</cite>
+
+<h2>2. Ressourcen-Kurzreferenz</h2>
+<table>
+  <tr><th>Ressource</th><th>Woher</th><th>Bezahlt</th></tr>
+  <tr><td><strong>Energy</strong> (farblos)</td><td>1 Rune <strong>erschöpfen</strong> = 1 Energy</td><td>Generischen Energy-Cost (Zahl)</td></tr>
+  <tr><td><strong>Power</strong> (farbig)</td><td>1 Rune der passenden Domain <strong>recyceln</strong> (unter das Rune Deck) = 1 Power dieser Farbe</td><td>Power-Cost (farbige Pips, z. B. "1 Mind")</td></tr>
+</table>
+<div class="warning">Runenpool ist <strong>nicht hortbar</strong>: leert sich am Ende der Draw Phase und am Zugende.</div>
+<p><strong>Domains (6, paarweise Gegensätze):</strong> Fury↔Calm · Mind↔Body · Chaos↔Order. Die Legend definiert bis zu 2 Domains — alle Deck-Karten müssen dazu passen.</p>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundsymbols.com/riftbound-domain-symbols/ · https://riftboundsymbols.com/riftbound-card-anatomy/</cite>
+
+<h2>3. Combat / Showdown-Ablauf</h2>
+<ol class="steps">
+  <li><strong>Angriff = Bewegung:</strong> Ready Unit (oder Gruppe) in der Main Phase auf ein Battlefield bewegen. <em>Unbesetzt</em> → <strong>Open Showdown</strong>: sofortige Übernahme ohne Kampf (ggf. Conquer-Punkt). <em>Gegnerisch besetzt</em> → <strong>Combat Showdown</strong>.</li>
+  <li><strong>Showdown-Fenster:</strong> Zug geht in den <strong>Closed State</strong>; beide Spieler spielen abwechselnd <strong>Action</strong>- und <strong>Reaction</strong>-Karten/Fähigkeiten, bis beide nacheinander passen. Effekte bilden eine <strong>Chain</strong> (LIFO).</li>
+  <li><strong>Combat Damage Step:</strong> Beide Seiten summieren ihr <strong>Might</strong>. Schaden wird <strong>gleichzeitig</strong> zugewiesen — niemand schlägt zuerst. Zuweisung: einer Unit muss <strong>tödlicher Schaden vollständig</strong> zugewiesen werden, bevor die nächste dran ist (kein Verteilen); <strong>Tank</strong>-Units zuerst.</li>
+  <li><strong>Ergebnis:</strong> Gleichstand der Gesamt-Might → alle Units beider Seiten sterben. Verteidiger alle tot → Angreifer <strong>conquern</strong> (Punkt). Überlebende heilen vollständig; <strong>Deathknell</strong> löst aus.</li>
+</ol>
+<cite>Quellen: https://riftbound.zone/en/guide/combat-and-showdown-in-riftbound/ · https://riftwatcher.com/rules/step-2-the-combat-damage-step/ · https://riftboundguide.com/2026/03/29/how-damage-works-in-riftbound/</cite>
+
+<h2>4. Chain &amp; Timing — Merkregeln</h2>
+<table>
+  <tr><th>Regel</th><th>Kurzform</th></tr>
+  <tr><td>Closed State</td><td>Sobald eine Chain existiert: nur noch <strong>Reaction</strong> spielbar (auch im gegnerischen Zug).</td></tr>
+  <tr><td>Action-Timing</td><td><strong>Action</strong> ist zusätzlich während Showdowns in jedermanns Zug spielbar.</td></tr>
+  <tr><td>Auflösung</td><td>Chain resolvt <strong>LIFO</strong> — Last In, First Out.</td></tr>
+  <tr><td>Ungültige Ziele</td><td>Werden bei Resolution ignoriert; teilweise ausführbare Anweisungen so weit wie möglich ausführen.</td></tr>
+  <tr><td>Vorrang</td><td><strong>Kartentext schlägt Regelbuch.</strong></td></tr>
+  <tr><td>Karte spielen (5 Schritte)</td><td>Ziele deklarieren → Kosten berechnen → bezahlen → Legalität prüfen → resolven.</td></tr>
+</table>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://www.riftboundfaq.com/general-rules/showdowns</cite>
+
+<h2>5. Keywords A–Z</h2>
+<table>
+  <tr><th>Keyword</th><th>Set</th><th>1-Zeiler</th></tr>
+  <tr><td><strong>Accelerate</strong></td><td>OGN</td><td>Optional Zusatzkosten zahlen → Unit kommt <strong>ready</strong> ins Spiel.</td></tr>
+  <tr><td><strong>Action</strong></td><td>OGN</td><td>Während Showdowns in jedem Zug spielbar.</td></tr>
+  <tr><td><strong>Ambush</strong></td><td>UNL</td><td>Unit als Reaction an ein Battlefield spielen, an dem man schon Units hat.</td></tr>
+  <tr><td><strong>Assault X</strong></td><td>OGN</td><td>+X Might, solange die Unit Angreifer ist.</td></tr>
+  <tr><td><strong>Backline</strong></td><td>OGN/UNL</td><td>Kampf-Positions-Keyword — <em>Details unverifiziert</em>.</td></tr>
+  <tr><td><strong>Burn</strong></td><td>VEN</td><td><em>Genaue Definition unverifiziert</em> — im Zweifel Kartentext/Judge fragen.</td></tr>
+  <tr><td><strong>Deathknell</strong></td><td>OGN</td><td>"Wenn ich sterbe: [Effekt]".</td></tr>
+  <tr><td><strong>Deflect X</strong></td><td>OGN</td><td>Gegnerische Spells/Fähigkeiten, die diese Unit wählen, kosten X zusätzliche Power.</td></tr>
+  <tr><td><strong>Empower(ed)</strong></td><td>VEN</td><td>Aktivierte Fähigkeit mit Kosten; die Unit wird "empowered".</td></tr>
+  <tr><td><strong>Flow</strong></td><td>VEN</td><td>Karte aus dem Trash spielbar; danach ganz aus dem Spiel entfernt.</td></tr>
+  <tr><td><strong>Ganking</strong></td><td>OGN</td><td>Unit darf beim Move von Battlefield zu Battlefield ziehen (statt nur Base→Battlefield).</td></tr>
+  <tr><td><strong>Hidden</strong></td><td>OGN</td><td>Verdeckt an ein Battlefield legen; später für 0 Energy als Reaction spielen.</td></tr>
+  <tr><td><strong>Hunt X</strong></td><td>UNL</td><td>"Wenn ich conquere oder holde: X XP".</td></tr>
+  <tr><td><strong>Legion</strong></td><td>OGN</td><td>Effekt, falls in diesem Zug schon eine andere Main-Deck-Karte gespielt wurde.</td></tr>
+  <tr><td><strong>Level X</strong></td><td>UNL</td><td>Karte erhält ab X XP Bonusfähigkeiten/Kostensenkungen.</td></tr>
+  <tr><td><strong>Mighty</strong></td><td>OGN</td><td>Beschreibung für Units mit Might ≥ 5 (wird von Effekten referenziert).</td></tr>
+  <tr><td><strong>Predict</strong></td><td>UNL</td><td><em>Definition unverifiziert</em>.</td></tr>
+  <tr><td><strong>Reaction</strong></td><td>OGN</td><td>Im Closed State / auf die Chain spielbar (Interrupt-Timing).</td></tr>
+  <tr><td><strong>Shield X</strong></td><td>OGN</td><td>+X Might, solange die Unit Verteidiger ist.</td></tr>
+  <tr><td><strong>Tank</strong></td><td>OGN</td><td>Muss im Kampf zuerst tödlichen Schaden zugewiesen bekommen.</td></tr>
+  <tr><td><strong>Temporary</strong></td><td>OGN</td><td>Permanent stirbt zu Beginn der Beginning Phase des Besitzers (vor dem Scoring).</td></tr>
+  <tr><td><strong>Vision</strong></td><td>OGN</td><td>Beim Spielen: oberste Karte des Main Decks ansehen, optional recyceln.</td></tr>
+  <tr><td><strong>XP</strong></td><td>UNL</td><td>Ressource; jede XP = +1 Level.</td></tr>
+</table>
+<cite>Quellen: https://runesandrift.com/riftbound-keywords/ · https://mobalytics.gg/riftbound/guides/keywords · https://riftbound.gg/unleashed/ · https://playriftbound.com/en-us/news/rules-and-releases/riftbound-core-rules-unleashed-patch-notes/</cite>
+
+<h2>6. Deckbau-Zahlen (Constructed)</h2>
+<table>
+  <tr><th>Baustein</th><th>Zahl</th><th>Merker</th></tr>
+  <tr><td>Main Deck</td><td><strong>40+</strong></td><td>Turnierpraxis: exakt 40; nur Units/Spells/Gear passend zur Domain-Identität der Legend (bis zu 2 Domains).</td></tr>
+  <tr><td>Legend</td><td><strong>1</strong></td><td>Definiert Domains + Champion-Tag.</td></tr>
+  <tr><td>Chosen Champion</td><td><strong>1</strong></td><td>Champion-Tag muss zur Legend passen.</td></tr>
+  <tr><td>Runen</td><td><strong>genau 12</strong></td><td>Separates Rune Deck.</td></tr>
+  <tr><td>Battlefields</td><td><strong>3</strong></td><td>Im 1v1 steuert jeder 1 davon (zufällig gewählt) zum Spiel bei.</td></tr>
+  <tr><td>Kopien-Limit</td><td><strong>max. 3</strong></td><td>Pro Karte; <strong>Signature Cards: max. 3 gesamt</strong> pro passendem Champion-Tag.</td></tr>
+  <tr><td>Sideboard (Bo3)</td><td><strong>8</strong></td><td>Zwischen Spielen tauschbar, auch Champion-Wechsel (gleicher Tag). <strong>Nicht</strong> tauschbar: Legend, Runen, Battlefields.</td></tr>
+</table>
+<div class="warning">Turnier: Karten jeder Sprache legal, aber <strong>alle Karten eines Decks in derselben Sprache</strong>; "SAMPLE"-Karten illegal. Deckliste beim Summoner Skirmish erforderlich.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://playriftbound.com/en-us/news/organizedplay/riftbound-organized-play/ · https://runesandrift.com/riftbound-organized-play/</cite>
+
+<h2>7. Punkteziele &amp; Punktequellen</h2>
+<table>
+  <tr><th>Modus</th><th>Ziel</th></tr>
+  <tr><td>1v1</td><td><strong>8 Punkte</strong></td></tr>
+  <tr><td>2v2</td><td><strong>11 Punkte</strong></td></tr>
+  <tr><td>Free-for-all</td><td><em>Zielwert unverifiziert</em></td></tr>
+</table>
+<table>
+  <tr><th>Punktequelle</th><th>Wann</th></tr>
+  <tr><td><strong>Conquer</strong></td><td>1 Punkt beim (Neu-)Erobern eines Battlefields — pro Battlefield und Zug einmal.</td></tr>
+  <tr><td><strong>Hold</strong></td><td>1 Punkt zu Beginn des eigenen Zuges pro weiterhin kontrolliertem Battlefield.</td></tr>
+  <tr><td><strong>Burn Out</strong></td><td>1 Punkt, wenn der Gegner aus leerem Deck ziehen müsste.</td></tr>
+  <tr><td><strong>Karteneffekte</strong></td><td>Nach Kartentext.</td></tr>
+</table>
+<div class="warning"><strong>Final-Point-Regel:</strong> Der 8. Punkt per Conquer gewinnt nur sofort, wenn du in diesem Zug <strong>beide</strong> Battlefields erobert hast — sonst ziehst du stattdessen eine Karte. Hold-Punkte und Karteneffekte gewinnen bei 8 sofort.</div>
+<cite>Quellen: https://runesandrift.com/riftbound-rules/ · https://riftboundguide.com/2026/05/09/how-to-play-riftbound/</cite>
+
+<div class="summary">
+  <h2>Offizielle Regelquellen</h2>
+  <ul>
+    <li>Rules Hub: <a href="https://playriftbound.com/en-us/rules-hub/">playriftbound.com/en-us/rules-hub/</a></li>
+    <li>Core Rules interaktiv: <a href="https://riftbound.gg/rules/core-rules/">riftbound.gg/rules/core-rules/</a> · <a href="https://riftwatcher.com/rules/">riftwatcher.com/rules/</a></li>
+    <li>Bei Unklarheit am Event: Kartentext schlägt Regelbuch — sonst Judge rufen.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 08 — Akali-Decklisten</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>📋 Lektion 08 — Akali-Decklisten</h1>
+
+<p class="mission">Ziel: Du kennst die zwei etablierten Akali-Builds (West-Value vs. CN-Tempo), das unverhandelbare Core-Package und kannst entscheiden, ob du für Hamburg die Budget- (~€110–160) oder die Full-Version (~€240–300) baust.</p>
+
+<p>Einen Fancy-Archetyp-Namen gibt es nicht — die Szene sagt schlicht "Akali (Calm/Fury)" bzw. "Akali Move/Tempo-Midrange". riftdecks.com listet 141 Akali-Constructed-Turnierdecks (alle Archetyp "Calm Fury"). Daraus haben sich <strong>zwei Builds</strong> herauskristallisiert.</p>
+<cite>Quelle: https://riftdecks.com/legends/constructed/akali-rogue-assassin</cite>
+
+<h2>1. Das Core-Package (in fast jeder Liste)</h2>
+
+<table>
+  <tr><th>Karte</th><th>Rolle</th></tr>
+  <tr><td><strong>Shuriken Flip</strong> (VEN-140, 1+C, Epic)</td><td>Signature-Spell: "Deal 2 to up to one enemy unit at a battlefield, then move a friendly unit. [Flow] [3][A]" — Removal + Move-Trigger + Finisher-Reichweite in einer Karte, via Flow aus dem Trash wiederholbar</td></tr>
+  <tr><td><strong>Twilight Shroud</strong> (VEN-031, 1)</td><td>"+1 [S], can't be chosen this turn. [Flow] [2]" — Schutz der Schlüssel-Unit, wiederverwendbar</td></tr>
+  <tr><td><strong>Mask of Foresight</strong> (OGN-060, Gear, 2)</td><td>Solo-Attacker-Belohnung: +1 [S] pro Alleingang; stackt, triggert im Move-Loop mehrfach</td></tr>
+  <tr><td><strong>Zhonya's Hourglass</strong> (OGN-077, Gear, 2, Hidden)</td><td>"The next time a friendly unit would die, kill this instead. Recall that unit exhausted." — rettet die Engine</td></tr>
+  <tr><td><strong>Defy</strong> (OGN-045, 1+C)</td><td>Counterspell (Spells bis Kosten 4/[A]) — Akalis Alleinstellungsmerkmal als einzige Calm+Fury-Legend</td></tr>
+  <tr><td><strong>Discipline</strong> (OGN-058, 2)</td><td>Reaction: +2 [S] + draw 1 — Combat-Trick, der sich ersetzt</td></tr>
+  <tr><td><strong>En Garde</strong> (OGN-046, 1)</td><td>+1 [S], +1 mehr wenn allein — Akali greift fast immer solo an → meist +2 für 1</td></tr>
+  <tr><td><strong>Mournful Witness</strong> (VEN-028, 2, 2 Might)</td><td>"When a combat that I was in ends, empower me. [Empowered] +2 [S]" — bester 2-Drop, wird zur 4-Might-Unit</td></tr>
+  <tr><td><strong>Perfect Execution</strong> (VEN-012, 3+C)</td><td>"Ready a unit + [Assault 3]. [Flow] [3][C]" — Doppel-Angriff-Finisher</td></tr>
+</table>
+<cite>Quellen: https://riftdecks.com/cards/details-shuriken-flip (und weitere Kartenseiten) · https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>2. Build A — West-Value ("Kai'Sa-Build")</h2>
+
+<p>Draw- und Ressourcen-Maximierung: <strong>Kai'Sa, Survivor</strong> ("When I conquer, draw 1", Accelerate), <strong>Irelia, Fervent</strong> ("When you choose or ready me, +1 [S]" — liebt die Legend-Ready-Ability), <strong>Stellacorn Herder</strong>, <strong>Mournful Witness</strong>, <strong>Twilight Reveler</strong>, <strong>Lonely Poro</strong>.</p>
+
+<div class="card">
+<p><strong>Referenzliste: Brad00f — 3rd, MANASCREW Friday Evening Nexus Night, 31.07.2026</strong> (beste dokumentierte West-Platzierung; Deckwert lt. riftdecks $400.97 TCGPlayer)</p>
+<pre>Legend: Akali, Rogue Assassin · Chosen Champion: Akali, Silent
+Units (16): 2 Inferna, 3 Lonely Poro, 3 Mournful Witness,
+  3 Kai'Sa Survivor, 3 Stellacorn Herder, 2 Irelia Fervent
+Gear (4): 2 Mask of Foresight, 2 Zhonya's Hourglass
+Spells (19): 2 Charm, 2 Cleave, 3 Defy, 3 En Garde,
+  3 Shuriken Flip, 2 Twilight Shroud, 3 Discipline, 1 Back Off
+Battlefields: Back-Alley Bar, Targon's Peak, Zaun Warrens
+Runes: 6 Calm / 6 Fury
+Sideboard (10): 2 Against the Odds, 2 Not So Fast,
+  1 Akali Deadly Weapon, 2 Thermo Beam, 2 Brynhir Thundersong,
+  1 Ferrous Forerunner</pre>
+<p>Win-Condition: Value-Midrange — Showdowns via Legend-Ability + Calm-Support gewinnen, Karten-/Ressourcenvorteil aufbauen, dann auf 8 Punkte drücken.</p>
+</div>
+<cite>Quelle: https://riftdecks.com/riftbound-metagame/deck-akali-223791</cite>
+
+<h2>3. Build B — CN-Tempo/Gear ("Jhin-Build")</h2>
+
+<p>Ressourcen statt Karten: <strong>Jhin, Murderous Artist</strong> (Energie/Power pro Move), <strong>Scuttle Crab</strong> (Cantrip + Handinfo), mehr Gear (<strong>Zhonya's</strong>, Long Sword, Blighted Battleaxe, Pendulum Blade, Guardian Angel), <strong>Falling Star</strong> als Premium-Removal. Passt zum langsameren CN-Meta.</p>
+
+<div class="card">
+<p><strong>Referenzliste 1: David Shi — 32nd, "Sideways Showdown: CN vs World", 25.07.2026</strong> (Deckwert $151.40)</p>
+<pre>Legend: Akali, Rogue Assassin · Chosen Champion: Akali, Silent
+Units: 3 Lonely Poro, 3 Scuttle Crab, 3 Jhin Murderous Artist,
+  3 Stellacorn Herder, 1 Ferrous Forerunner
+Gear: 2 Guardian Angel, 1 Zhonya's Hourglass, 2 Pendulum Blade,
+  3 Blighted Battleaxe
+Spells: 1 Blood Rush, 1 Charm, 3 Defy, 1 En Garde, 2 Shuriken Flip,
+  1 Twilight Shroud, 1 Brittle Steel, 3 Discipline,
+  2 Emperor's Divide, 2 Falling Star, 1 Perfect Execution
+Battlefields: Back-Alley Bar, Seat of Power, Targon's Peak
+Runes: 5 Calm / 7 Fury
+Sideboard: 1 Blood Rush, 2 Charm, 1 Emperor's Divide, 1 Long Sword,
+  2 Adaptatron, 1 Akali Silent, 1 Helm of Suppression, 1 Vilemaw</pre>
+</div>
+
+<div class="card">
+<p><strong>Referenzliste 2: 白色枫叶 ("akl") — 20th, S4 Guangzhou City Challenge (128 Spieler), 09.08.2026</strong> (Deckwert $174.52)</p>
+<pre>Legend: Akali, Rogue Assassin · Chosen Champion: Akali, Silent
+Units: 2 Lonely Poro, 3 Scuttle Crab, 3 Jhin Murderous Artist,
+  3 Stellacorn Herder, 1 Blitzcrank Impassive
+Gear: 2 Long Sword, 3 Mask of Foresight, 3 Zhonya's Hourglass
+Spells: 1 Charm, 3 Defy, 2 En Garde, 3 Shuriken Flip,
+  1 Twilight Shroud, 3 Discipline, 2 Falling Star, 1 Not So Fast,
+  1 Back Off, 1 Perfect Execution, 1 Tricksy Tentacles
+Battlefields: Back-Alley Bar, Sunken Temple, Threshold of the Gray
+Runes: 6 Calm / 6 Fury
+Sideboard: 1 Crumbling Sands, 2 Decree of Rage, 2 Against the Odds,
+  2 Brittle Steel, 1 Akali Deadly Weapon, 1 Blighted Battleaxe,
+  1 Thermo Beam</pre>
+</div>
+<cite>Quellen: https://riftdecks.com/riftbound-metagame/deck-akali-222468 · https://riftdecks.com/riftbound-metagame/deck-akl-227557</cite>
+
+<div class="tip">Dritte Referenz für den Einstieg: Riftlabs "How to Play AKALI"-Liste (25.07.2026, $328.02) spielt als einzige <strong>Akali, Deadly Weapon</strong> als Chosen Champion und mischt beide Builds (Kai'Sa + Jhin + Scuttle + Twilight Reveler). Battlefields dort: Targon's Peak, <strong>Void Gate</strong> (OGN-296), <strong>Star Spring</strong> (UNL-215). Liste: https://piltoverarchive.com/decks/view/9faa2a55-0576-4948-b2a4-d2a8a1e3023f</div>
+
+<h2>4. Battlefields — Flex mit klarer Logik</h2>
+<table>
+  <tr><th>Battlefield</th><th>Warum</th></tr>
+  <tr><td><strong>Back-Alley Bar</strong></td><td>"When a unit moves from here, +1 [S] this turn" — triggert exakt auf den Move-out-Loop; in fast allen Listen gesetzt</td></tr>
+  <tr><td><strong>Star Spring</strong> (UNL-215)</td><td>Gratis-Rückzug beim ersten Non-Token-Unit-Play = Extra-Move-Trigger/Schutz</td></tr>
+  <tr><td><strong>Void Gate</strong> (OGN-296)</td><td>+1 Bonus Damage auf Spells/Abilities → Deadly-Weapon-Pings werden 2/2 bzw. 3/3</td></tr>
+  <tr><td><strong>Targon's Peak</strong></td><td>Runen-Ramp, Standard-Value — Vorsicht: hilft auch dem Gegner</td></tr>
+</table>
+
+<p><strong>Flex-Slots</strong> (aus den Listen ablesbar): Charm, Cleave, Back Off, Falling Star, Emperor's Divide, Not So Fast, Inferna, Blitzcrank, Ferrous Forerunner, Gear-Auswahl (Long Sword vs. Pendulum Blade vs. Battleaxe) sowie das dritte Battlefield — hier unterscheiden sich die Listen am stärksten.</p>
+
+<h2>5. Budget vs. Full Build (EUR, Cardmarket-Niveau, Stand: Mitte August 2026)</h2>
+
+<p>Die Akali-eigenen Karten kosten fast nichts (Legend €0,02–0,20; Silent €0,04–0,20; Deadly Weapon €1,12–1,70). Teuer sind die Cross-Set-Staples:</p>
+
+<table>
+  <tr><th>Kostentreiber</th><th>Cardmarket EUR</th><th>Im Deck</th></tr>
+  <tr><td>Kai'Sa, Survivor (OGN, Epic)</td><td>~€41–43 (30d-Schnitt)</td><td>x3 ≈ €125</td></tr>
+  <tr><td>Shuriken Flip (VEN, Epic)</td><td>Trend €16,51 / ab €14</td><td>x3 ≈ €50</td></tr>
+  <tr><td>Irelia, Fervent (SFD, Epic)</td><td>ab €9,50 / Trend €16,47</td><td>x1–2 ≈ €10–33</td></tr>
+  <tr><td>Zhonya's Hourglass (OGN, Rare)</td><td>~€11,69</td><td>x2–3 ≈ €23–35</td></tr>
+  <tr><td>Defy (OGN, Common!)</td><td>Trend €1,70</td><td>x3 ≈ €5</td></tr>
+  <tr><td>Rest (Commons/Uncommons, Runes, Battlefields)</td><td>—</td><td>≈ €15–30</td></tr>
+</table>
+
+<ul>
+  <li><strong>Budget-/CN-Style-Build</strong> (ohne Kai'Sa/Irelia, dafür Jhin/Scuttle/Gear): <strong>≈ €110–160</strong> (riftdecks-USD-Pendants: $117–197)</li>
+  <li><strong>Voller Value-Build</strong> (3x Kai'Sa, 2x Irelia, 3x Shuriken Flip, 2x Zhonya's): <strong>≈ €240–300</strong> (riftdecks-USD: $328–437 — US-Preise liegen über Cardmarket)</li>
+</ul>
+
+<div class="tip">Kai'Sa, Survivor ist mit −11,6 %/30d im Abwärtstrend (TCGIndex) — der teuerste Slot wird gerade billiger. Wenn du auf den Full Build sparst: zuletzt kaufen.</div>
+
+<div class="warning">Für Hamburg pragmatisch: Der CN-Build ist die validierte Budget-Route — beide zitierten Turnierlisten (David Shi $151, akl $174) kommen ohne Kai'Sa/Irelia aus. Der Sprung zum Full-Value-Build kauft dir vor allem 3x Kai'Sa (~€125), nicht einen anderen Gameplan.</div>
+
+<cite>Quellen: https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/KaiSa-Survivor-V1-Epic · https://www.cardmarket.com/en/Riftbound/Products/Singles/Vendetta/Shuriken-Flip · https://www.cardmarket.com/en/Riftbound/Cards/Irelia-Fervent · https://www.cardmarket.com/en/Riftbound/Cards/Defy · https://www.cardmarket.com/en/Riftbound/Products/Singles/Origins/Zhonyas-Hourglass · riftdecks.com-Deckseiten</cite>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+
+<p><strong>1. Was unterscheidet den West-Value-Build strukturell vom CN-Tempo-Build?</strong></p>
+<div class="answer">Der West-Build spielt Kai'Sa/Irelia als Draw-/Value-Motoren, der CN-Build ersetzt sie durch Jhin/Scuttle Crab + mehr Gear (Ressourcen statt Karten).<div class="reveal">✅ Richtig — Kern-Package und Gameplan sind identisch; der Unterschied ist die Value-Quelle: Karten ziehen (Kai'Sa "When I conquer, draw 1") vs. Ressourcen generieren (Jhin "When I move, Add 1 Energie+Power") plus Gear-Pumps.</div></div>
+<div class="answer">Der CN-Build spielt eine andere Legend-Variante von Akali.<div class="reveal wrong">❌ Falsch — es gibt nur eine Akali-Legend (VEN-139). Beide Builds spielen dieselbe Legend und fast immer Akali, Silent als Chosen Champion.</div></div>
+
+<p><strong>2. Welche Karte ist der teuerste Einzelposten des Full-Value-Builds?</strong></p>
+<div class="answer">Shuriken Flip — die Signature-Spell des Decks.<div class="reveal wrong">❌ Falsch — Shuriken Flip liegt bei ~€50 fürs Playset. Es gibt einen deutlich teureren Slot.</div></div>
+<div class="answer">Kai'Sa, Survivor — ~€41–43/Stück, x3 ≈ €125.<div class="reveal">✅ Richtig — rund die Hälfte des Full-Build-Preises steckt im Kai'Sa-Playset. Deshalb ist "CN-Build ohne Kai'Sa" die validierte Budget-Route (~€110–160). Stand: Mitte August 2026, Trend fallend (−11,6 %/30d).</div></div>
+
+<p><strong>3. Welches Battlefield steht in fast jeder Akali-Liste und warum?</strong></p>
+<div class="answer">Back-Alley Bar — "When a unit moves from here, +1 [S]" triggert exakt auf den Move-out der Legend-Ability.<div class="reveal">✅ Richtig — es belohnt genau das, was das Deck ohnehin jede Runde tut. Die anderen zwei Battlefield-Slots sind Flex (Star Spring, Void Gate, Targon's Peak, Zaun Warrens, Seat of Power …).</div></div>
+<div class="answer">Void Gate — der Bonus-Damage gewinnt jedes Matchup.<div class="reveal wrong">❌ Falsch — Void Gate ist eine starke Flex-Option für die Deadly-Weapon-Line (Riftlab), aber gesetzt ist Back-Alley Bar.</div></div>
+
+<p><strong>4. Wie gut war das beste dokumentierte West-Ergebnis eines Akali-Decks (Stand Mitte Aug 2026)?</strong></p>
+<div class="answer">Turniersieg beim MANASCREW Nexus Night.<div class="reveal wrong">❌ Falsch — Akali hat noch KEIN Turnier im Westen gewonnen (riftbound.gg: "She has yet to win a tournament").</div></div>
+<div class="answer">3. Platz — Brad00f, MANASCREW Friday Evening Nexus Night, 31.07.2026.<div class="reveal">✅ Richtig — das ist die beste dokumentierte West-Platzierung. Realistische Erwartungshaltung fürs eigene Event: solide Platzierungen ja, Dominanz nein (mehr in Lektion 10).</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Zwei Builds, ein Gameplan: <strong>West-Value</strong> (Kai'Sa Survivor, Irelia Fervent, Stellacorn) vs. <strong>CN-Tempo/Gear</strong> (Jhin, Scuttle Crab, Zhonya's/Gear-Paket).</li>
+  <li>Core-Package auswendig: Shuriken Flip, Twilight Shroud, Mask of Foresight, Zhonya's Hourglass, Defy, Discipline, En Garde, Mournful Witness, Perfect Execution.</li>
+  <li>Referenzlisten: Brad00f 3rd MANASCREW (Value), David Shi 32nd Sideways Showdown + akl 20th Guangzhou (Tempo), Riftlab-Einsteigerliste (Deadly Weapon als Champion).</li>
+  <li>Battlefields: Back-Alley Bar gesetzt; Star Spring / Void Gate / Targon's Peak als begründete Flex-Picks.</li>
+  <li>Preise (Stand Mitte Aug 2026): Budget-Build ≈ €110–160, Full-Value ≈ €240–300; Kostentreiber Kai'Sa (~€125/Playset), Shuriken Flip (~€50), Zhonya's, Irelia.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 07 — Die Move-Trigger-Engine</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>⚙️ Lektion 07 — Die Move-Trigger-Engine</h1>
+
+<p class="mission">Ziel: Du kannst den Kern-Loop des Akali-Decks — Move-Trigger-Unit rein, Legend-Ability raus, bei Empower nochmal — fehlerfrei ansagen und die Value-Rechnung (Draws, Energie, Power) im Kopf durchführen.</p>
+
+<p>Das Akali-Deck ist keine Ansammlung guter Karten, sondern <strong>eine Maschine mit einem Zahnrad</strong>: Units, deren Ability auf "When I move" (oder verwandte Trigger) anspringt, kombiniert mit der Legend-Ability, die den Move-Vorgang <em>verdoppelt bis verdreifacht</em>. Wer diesen Loop versteht, versteht das ganze Deck.</p>
+
+<h2>1. Die Bausteine</h2>
+
+<table>
+  <tr><th>Karte</th><th>Trigger (wörtlich)</th><th>Was du dafür bekommst</th></tr>
+  <tr><td><strong>Stellacorn Herder</strong> (SFD-048, Calm, 4 Energie, 3 Might)</td><td>"When I move, draw 1."</td><td>1 Karte pro Move — der wichtigste Value-Motor</td></tr>
+  <tr><td><strong>Jhin, Murderous Artist</strong> (Calm, 4+C, 4 Might, Deflect, Ganking)</td><td>"When I move, [Add] [1][A]."</td><td>1 Energie + 1 Power pro Move — der Ressourcen-Motor</td></tr>
+  <tr><td><strong>Scuttle Crab</strong> (2, 0 Might)</td><td>"When you play me, draw 1." + Deathknell: Handreveal des Gegners, 1 XP</td><td>Cantrip-Body — kein Move-Trigger, aber der billige Kleber der CN-Listen</td></tr>
+  <tr><td><strong>Akali, Rogue Assassin</strong> (Legend)</td><td>Action, Tap: Unit aus Showdown zur Base; Empowered → ready</td><td>Der Verstärker: jeder Angriff wird zu 2+ Moves</td></tr>
+</table>
+
+<div class="warning">Präzision zählt: <strong>Scuttle Crab hat keinen Move-Trigger</strong> — er zieht beim <em>Spielen</em>. Er gehört trotzdem zur Engine-Familie (billiger Value-Body, den man gefahrlos vorschicken oder per Legend retten kann), aber rechne ihn nicht in die Move-Loops ein.</div>
+<cite>Quellen: https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E · riftdecks.com-Kartenseiten (details-akali-rogue-assassin)</cite>
+
+<h2>2. Der Basis-Loop, Schritt für Schritt</h2>
+
+<p>Ausgangslage: Stellacorn Herder ready in deiner Base, Akali-Legend ready, es ist deine Main Phase.</p>
+
+<ol>
+  <li><strong>Move:</strong> Stellacorn bewegt sich von der Base in ein Battlefield (Bewegung erschöpft ihn). Move-Trigger: <strong>draw 1</strong>. Steht dort ein Gegner → Combat Showdown beginnt; ist es leer → Open Showdown.</li>
+  <li><strong>Showdown-Fenster:</strong> Der Zug ist im Closed State, Action-Karten und Abilities sind spielbar. Jetzt kommt der Trick:</li>
+  <li><strong>Legend-Ability (Action, Tap):</strong> Bewege den Stellacorn aus dem Showdown zurück zur Base. Move-Trigger: <strong>draw 1</strong>. Der Gegner bekommt seine Combat-Bestrafung nie — deine Unit ist einfach weg.</li>
+  <li><strong>Empowered-Bonus:</strong> Hat Akali vorher ihren Empower (3 Energie + 1 Power) bezahlt, kommt der Stellacorn <strong>ready</strong> an — er kann im selben Zug <em>noch einmal</em> in ein Battlefield moven: <strong>draw 1</strong> (Trigger Nr. 3).</li>
+</ol>
+
+<p><strong>Bilanz des Basis-Loops:</strong> 2 Gratis-Draws pro Zug (3 mit Empower und erneutem Move) — jede Awaken Phase macht Legend und Unit wieder ready, der Loop läuft jeden Zug erneut. riftbound.gg und Riftlab nennen Stellacorn + Akali-Legend "einen der stärksten Combos im Spiel".</p>
+
+<div class="tip">Warum das mehr ist als Karten ziehen: Der Gegner steht vor einem Dilemma, das riftbound.gg so beschreibt — entweder er verliert den Showdown (du scorest), oder er verbrennt Support-Karten, nur damit deine Unit am Ende ohnehin zur Base zurückgeht. Wiederholt sich das, kippt der Ressourcen-Count unaufhaltsam zu deinen Gunsten.</div>
+<cite>Quellen: https://riftbound.gg/akali-rogue-assassin-guide/ · https://www.youtube.com/watch?v=_izcg8Zhc8E</cite>
+
+<h2>3. Beispielzüge durchgerechnet</h2>
+
+<h3>Beispielzug A — Stellacorn-Value (Mid Game, Legend Empowered)</h3>
+<pre>Start: Stellacorn ready in Base, Legend ready + Empowered.
+
+1. Stellacorn Base → Battlefield 1 (leer):  draw 1, Open Showdown, Conquer → 1 Punkt
+2. Legend-Ability im Showdown:              Stellacorn → Base, draw 1, kommt READY an
+3. Stellacorn Base → Battlefield 1:         draw 1 (steht wieder als Verteidiger da)
+
+Ergebnis: 1 Punkt + 3 Karten gezogen, 0 zusätzliche Karten ausgegeben.</pre>
+
+<h3>Beispielzug B — Jhin-Ressourcen (CN-Build)</h3>
+<p>Gleiche Struktur mit Jhin, Murderous Artist statt Stellacorn: Laut Riftlab sind mit Empowered-Legend <strong>3 Moves pro Zug = 3 Energie + 3 Power extra</strong>. Das finanziert Accelerate-Kosten, Hidden-Karten (z. B. Zhonya's Hourglass) und die Entwicklung weiterer Units — und dank <strong>Ganking</strong> darf Jhin sogar von Battlefield zu Battlefield ziehen statt nur über die Base.</p>
+
+<h3>Beispielzug C — Deadly-Weapon-Removal ohne Combat</h3>
+<pre>Akali, Deadly Weapon (Empowered, 4 Might) + Battlefield Void Gate
+("Spells and abilities affecting units here each deal 1 Bonus Damage"):
+
+1. Move in Void Gate:        Ping 2 + 1 Bonus = 3 Schaden
+2. Legend-Ability, Move out: Ping 2 + 1 Bonus = 3 Schaden
+3. Shuriken Flip:            2 + 1 Bonus     = 3 Schaden
+
+Summe: bis zu 9 Schaden auf eine Unit — ohne einen einzigen Combat (Riftlab-Line).</pre>
+
+<h3>Bonus-Synergien am Rand des Loops</h3>
+<ul>
+  <li><strong>Back-Alley Bar</strong> ("When a unit moves from here, give it +1 [S] this turn") triggert exakt auf den Move-out-Teil des Loops — deshalb in fast allen Listen.</li>
+  <li><strong>Star Spring</strong> (UNL-215) schenkt einen zusätzlichen Gratis-Rückzug ("move another unit … to its base") = ein Extra-Move-Trigger bzw. Schutz.</li>
+  <li><strong>Mask of Foresight</strong> ("When a friendly unit attacks or defends alone, +1 [S]") wird durch den Move-in/Move-out-Loop mehrfach pro Zug getriggert; mehrere Masks stacken (Riftlab: "easy 6–8 Might on attack").</li>
+  <li><strong>Twilight Reveler</strong> (VEN-020): rein moven → "When I attack, ready another friendly unit" → per Legend nach Hause retten — Pseudo-Accelerate für dein ganzes Board.</li>
+</ul>
+<cite>Quellen: https://www.youtube.com/watch?v=_izcg8Zhc8E · https://riftbound.gg/akali-rogue-assassin-guide/ · riftdecks.com-Kartenseiten (details-shuriken-flip u. a.)</cite>
+
+<h2>4. Timing-Feinheiten (die im Turnier entscheiden)</h2>
+<ul>
+  <li>Die Legend-Ability ist <strong>[Action]</strong> — im Showdown spielbar, aber nur <strong>in deinem Zug</strong>. Ein Showdown, den der Gegner in seinem Zug startet, lässt sich damit nicht beantworten.</li>
+  <li>Die Legend <strong>tappt</strong> für die Ability: ein Loop pro Zugzyklus. Plane, WELCHE Unit du rausholst, bevor du angreifst.</li>
+  <li>Der Empower (3+[A]) ist eine Investition, die sich über den Ready-Rider jede Runde erneut auszahlt — Quellen zählen "Empower zu spät" zu den teuersten ableitbaren Fehlern (Details in Lektion 09).</li>
+</ul>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+
+<p><strong>1. Stellacorn Herder movt ins Battlefield, du holst ihn mit der Empowered-Legend zurück und movst ihn erneut rein. Wie viele Karten hast du gezogen?</strong></p>
+<div class="answer">2 — der Rückzug per Ability zählt nicht als Move.<div class="reveal wrong">❌ Falsch — die Legend-Ability sagt wörtlich "move a friendly unit … to base". Es IST ein Move und triggert "When I move, draw 1".</div></div>
+<div class="answer">3 — rein (1), per Ability raus (1), wieder rein (1).<div class="reveal">✅ Richtig — jeder der drei Moves triggert den Draw. Genau deshalb ist Stellacorn + Akali-Legend laut riftbound.gg/Riftlab einer der stärksten Combos im Spiel.</div></div>
+
+<p><strong>2. Der Gegner greift in SEINEM Zug dein Battlefield an, dein Stellacorn steckt im Showdown. Kannst du ihn mit der Legend-Ability retten?</strong></p>
+<div class="answer">Ja — die Ability ist eine Action und Actions sind in Showdowns in jedermanns Zug spielbar.<div class="reveal wrong">❌ Falsch — das Action-Timing würde es erlauben, aber der Kartentext schränkt selbst ein: "If it's your turn". Im gegnerischen Zug verpufft die Aktivierung.</div></div>
+<div class="answer">Nein — der Kartentext verlangt "If it's your turn".<div class="reveal">✅ Richtig — die Ability funktioniert nur im eigenen Zug. Für die Defensive brauchst du Calm-Tools (Discipline, En Garde, Defy) oder Zhonya's Hourglass.</div></div>
+
+<p><strong>3. Welche Ressourcen bringt Jhin, Murderous Artist mit Empowered-Legend laut Riftlab pro Zug ein, wenn du 3 Moves fährst?</strong></p>
+<div class="answer">3 Karten.<div class="reveal wrong">❌ Falsch — Karten zieht Stellacorn. Jhins Trigger ist "When I move, [Add] [1][A]".</div></div>
+<div class="answer">3 Energie + 3 Power.<div class="reveal">✅ Richtig — 1 Energie + 1 Power pro Move. Das finanziert Accelerate-Kosten, Hidden-Karten und weitere Entwicklung — der Motor des CN-Tempo-Builds.</div></div>
+
+<p><strong>4. Warum gehört Scuttle Crab NICHT in die Move-Rechnung?</strong></p>
+<div class="answer">Weil er nur 0 Might hat und nie angreift.<div class="reveal wrong">❌ Falsch — 0 Might ist egal für Trigger-Fragen; er kann durchaus bewegt werden. Der Grund liegt im Triggertext.</div></div>
+<div class="answer">Weil sein Draw an "When you play me" hängt, nicht an "When I move".<div class="reveal">✅ Richtig — Scuttle Crab ist ein Cantrip-Body (plus Deathknell: Handreveal + 1 XP), kein Move-Trigger. Er ist Kleber der CN-Listen, aber Loop-Value liefern Stellacorn und Jhin.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Die Engine: Move-Trigger-Unit ins Battlefield → Showdown → Legend-Ability (Action, Tap, nur eigener Zug) zurück zur Base → bei Empowered kommt sie <em>ready</em> und movt nochmal.</li>
+  <li>Jeder Teilschritt ist ein echter "Move" und triggert "When I move"-Effekte — Stellacorn: bis zu 3 Draws/Zug; Jhin: bis zu 3 Energie + 3 Power/Zug.</li>
+  <li>Scuttle Crab zieht beim Spielen (kein Move-Trigger) — Engine-Familie, aber andere Rechnung.</li>
+  <li>Removal-Line ohne Combat: Deadly Weapon (Empowered) + Void Gate + Shuriken Flip = bis zu 9 Schaden.</li>
+  <li>Back-Alley Bar, Star Spring, Mask of Foresight und Twilight Reveler verstärken den Loop zusätzlich.</li>
+  <li>Grenzen kennen: nur eigener Zug, Legend tappt (1 Loop/Zugzyklus), Empower früh bezahlen.</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

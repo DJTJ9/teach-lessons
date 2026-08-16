@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riftbound 14 — Collection-Tracking einrichten</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+    h1 { color: #b8860b; border-bottom: 3px solid #b8860b; padding-bottom: .5rem; }
+    h2 { color: #2c3e50; margin-top: 2rem; }
+    h3 { color: #2c3e50; }
+    .mission { background: #fdf6e3; border-left: 4px solid #b8860b; padding: .8rem 1rem; border-radius: 0 6px 6px 0; font-style: italic; }
+    code { background: #f0f0f0; padding: .15rem .4rem; border-radius: 4px; font-size: .9em; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem; border-radius: 8px; overflow-x: auto; font-size: .9em; line-height: 1.5; }
+    .quiz { background: #fff8e1; border: 2px solid #f39c12; border-radius: 8px; padding: 1.2rem; margin: 2rem 0; }
+    .quiz h3 { color: #f39c12; margin-top: 0; }
+    .answer { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: .8rem 1rem; margin-top: .5rem; cursor: pointer; }
+    .answer:hover { background: #f9f9f9; }
+    .reveal { display: none; margin-top: .5rem; padding: .8rem 1rem; background: #eafaf1; border-radius: 6px; border-left: 4px solid #27ae60; }
+    .reveal.wrong { background: #fdecea; border-color: #e74c3c; }
+    .summary { background: #f0f4ff; border-radius: 8px; padding: 1.2rem; margin-top: 2rem; }
+    .summary h2 { margin-top: 0; }
+    .tip { background: #eafaf1; border-left: 4px solid #27ae60; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .warning { background: #fff8e1; border-left: 4px solid #f39c12; padding: .8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+    .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #b8860b; color: #fff; padding: .6rem 1rem; text-align: left; }
+    td { padding: .6rem 1rem; border-bottom: 1px solid #ddd; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8f8f8; }
+    cite { font-size: .85em; color: #666; display: block; margin-top: .3rem; }
+    a { color: #b8860b; }
+  </style>
+</head>
+<body>
+
+<h1>📦 Lektion 14 — Collection-Tracking einrichten</h1>
+
+<p class="mission">Ziel: Du richtest heute ein Tracking-System ein, das dir vor jedem Kauf exakt zeigt, welche Karten dir für dein Akali-Deck noch fehlen — damit du vor deinem ersten Event in Hamburg keine einzige Karte doppelt und keine unnötig kaufst.</p>
+
+<h2>Warum Tracking? Das Überkauf-Problem</h2>
+<p>Du kennst das aus jedem physischen TCG (bei Hearthstone/LoR/Snap nimmt dir der Client das ab): Ohne System kaufst du Karten, die du längst besitzt — vor allem, wenn der Bestand über mehrere Precons verstreut ist. Bei dir liegen spielbare Karten aktuell in mindestens fünf Produkten: <strong>Vex-, Rumble- und Vi-Champion-Deck, Zed-vs-Shen-Showdown, Unleashed Pre-Rift Kit</strong> plus erste Singles (u.&nbsp;a. Akali). Genau diese Streuung ist die klassische Überkauf-Falle: Staples wie Runen, Battlefields und Cross-Set-Commons stecken oft schon in den Precons.</p>
+<p>Das Konzept dieser Lektion: <strong>ein einziges führendes System</strong> (Single Source of Truth), gegen das jede Kaufentscheidung geprüft wird.</p>
+
+<h3>Die Playset-Logik: 3, nicht 4</h3>
+<p>Riftbound-Constructed erlaubt maximal <strong>3 Kopien pro Karte</strong> (40-Karten-Maindeck + 1 Legend + 3 Battlefields + 12 Runen; der Chosen Champion zählt ins 3er-Limit, dazu max. 3 Signature-Karten mit dem Champion-Tag der eigenen Legend). Ein „Playset" ist also 3 — nicht 4 wie bei MTG. Alles über 3 Kopien einer Karte ist für den Deckbau totes Kapital. Dein Tracker muss dir deshalb pro Karte anzeigen: <em>besessen / 3</em>.</p>
+<cite>Quellen: https://www.danireon.com/en-us/blogs/news/riftbound-deck-building-rules · https://mobalytics.gg/riftbound/guides/deckbuilding-fundamentals · https://riftbound.gg/riftbound-formats-constructed-limited-details/</cite>
+
+<h2>Tool-Vergleich (Stand: Mitte August 2026)</h2>
+<table>
+  <tr><th>Tool</th><th>Plattform</th><th>Stärken</th><th>Für dich relevant weil…</th></tr>
+  <tr>
+    <td><strong>Piltover Archive</strong><br>piltoverarchive.com</td>
+    <td>Web</td>
+    <td>Umfangreichste Gesamtplattform: Collection-Dashboard mit Bindern (privat/geteilt), Kartenzahl + Marktwert pro Binder, Set-Completion-Tracking, Statistiken; dazu Karten-DB, Deckbuilder, Proxies, Turnierdaten. Kostenloser Account („Sign Up Free"), werbefinanziert.</td>
+    <td>De-facto-Community-Standard; ein Ort für Collection <em>und</em> Deckbau <em>und</em> Meta.</td>
+  </tr>
+  <tr>
+    <td><strong>riftbound.gg Collection</strong></td>
+    <td>Web</td>
+    <td>Collection-Tracker mit Wert und Zählung pro Domain/Rarity — „you know exactly what you need to get" = direkte Lücken-Anzeige; mehrere Binder pro Account; <strong>Deck-Abgleich:</strong> Deck-Browser nach „Collection" sortierbar → zeigt Decks, die du komplett aus deinem Bestand bauen kannst.</td>
+    <td>Der direkteste Workflow für genau dein Ziel: Lücken zur Akali-Zielliste sehen.</td>
+  </tr>
+  <tr>
+    <td><strong>RiftMana Companion</strong></td>
+    <td>Android/iOS</td>
+    <td>Karten browsen, Decks bauen, Collection unterwegs tracken, Offline-Support; zeigt Preise von TCGplayer <strong>und Cardmarket</strong>.</td>
+    <td>Cardmarket-Preise mobil = Preis-/Besitz-Check im Laden (Kofuku, Mulligan, KTCards) vor Spontankäufen.</td>
+  </tr>
+  <tr>
+    <td>RIFT.TCG</td>
+    <td>iOS/Android</td>
+    <td>Collection Manager &amp; Price Tracker.</td>
+    <td>Alternative Mobile-App.</td>
+  </tr>
+  <tr>
+    <td>Riftbound Companion / Rift TCG Scanner</td>
+    <td>iOS bzw. iOS/Android</td>
+    <td>Binder-Suche, Filter; Karten-Scanner (Beta) bzw. reine Scanner-App zum schnellen Einpflegen.</td>
+    <td>Optional zum Beschleunigen der Ersterfassung.</td>
+  </tr>
+</table>
+<cite>Quellen: https://piltoverarchive.com/collection · https://www.rift.tools/tools/piltover-archive · https://riftbound.gg/collection/ · https://riftbound.gg/riftbound-gg-deckbuiler-and-collection-tracker-getting-started/ · https://riftbound.gg/binder-feature-now-available-for-collections/ · https://play.google.com/store/apps/details?id=com.riftmana.app · https://rifttcg.app/ · https://apps.apple.com/us/app/riftbound-companion/id6740396103 · https://apps.apple.com/app/id6754607981</cite>
+
+<div class="warning"><strong>⚠️ Dragon-Shield-App: kein Riftbound-Support.</strong> Falls du die Dragon-Shield-Scanner von MTG oder Pokémon kennst: Für Riftbound gibt es sie <strong>nicht</strong> — die Dragon-Shield-Apps existieren nur für MTG und Pokémon. Nicht danach suchen, nicht darauf warten.
+<cite>Quellen: https://play.google.com/store/apps/details?id=pt.tscg.mtgmanager · https://play.google.com/store/apps/details?id=pt.tscg.pokemanager</cite></div>
+
+<h2>Empfehlung für dein Setup</h2>
+<div class="card">
+<p><strong>Führendes System: riftbound.gg ODER Piltover Archive — aber nur eines von beiden.</strong> Zwei Tracker parallel zu pflegen führt garantiert zu Abweichungen, und dann traust du keinem mehr.</p>
+<ul>
+  <li><strong>riftbound.gg</strong>, wenn dein Hauptziel der Lücken-/Deck-Abgleich ist (Collection ↔ Deck-Browser) — das ist dein Fall: Du willst wissen, was dir zur Akali-Liste fehlt.</li>
+  <li><strong>Piltover Archive</strong>, wenn du die umfangreichste Plattform willst (Set-Completion, Marktwerte pro Binder, Turnierdaten) — in der Community der De-facto-Standard.</li>
+  <li>Dazu <strong>RiftMana mobil</strong> als Zweitgerät-Check: im Laden Cardmarket-Preis und „Hab ich die schon?" nachschlagen.</li>
+</ul>
+</div>
+<cite>Quellen: https://riftbound.gg/collection/ · https://piltoverarchive.com/ · Community-Diskussion Piltover vs riftbound.gg: https://www.facebook.com/groups/604213538783585/posts/857820330089570/</cite>
+
+<h2>Schritt-für-Schritt-Einrichtungsplan</h2>
+<ol>
+  <li><strong>Account anlegen</strong> beim gewählten führenden System (riftbound.gg bzw. Piltover Archive — beide kostenlos).</li>
+  <li><strong>Binder-Struktur festlegen:</strong> ein Haupt-Binder „Collection" reicht zum Start; beide Tools unterstützen mehrere Binder, wenn du später z.&nbsp;B. Trade-Ware trennen willst.</li>
+  <li><strong>Precons als Kartenlisten erfassen:</strong> Deine fünf Produkte (Vex-, Rumble-, Vi-Deck, Zed-vs-Shen-Showdown, Unleashed Pre-Rift Kit) haben feste Inhalte — such die Decklisten in der Karten-DB des Tools und trag jede enthaltene Karte mit Stückzahl ein. Das ist der größte Brocken, aber einmalig.</li>
+  <li><strong>Singles erfassen:</strong> deine Akali-Singles und alles Weitere einzeln eintragen (optional per Scanner-App beschleunigen).</li>
+  <li><strong>Akali-Zielliste als Deck anlegen:</strong> die Ziel-Deckliste (aus deiner Deckbau-Lektion / den Turnierlisten auf riftdecks) im Deckbuilder des Tools nachbauen. Ab jetzt zeigt der Deck-Abgleich automatisch: <em>diese X Karten fehlen dir noch</em>.</li>
+  <li><strong>Kauf-Regel etablieren:</strong> Vor <u>jedem</u> Kauf (Cardmarket-Warenkorb, TrinketMage, Laden) die Lücken-Anzeige checken. Nur kaufen, was fehlt — und nie über 3 Kopien pro Karte hinaus.</li>
+  <li><strong>Pflege-Routine:</strong> Neuzugänge (Käufe, Nexus-Night-Promos, Trades) noch am selben Tag eintragen — mobil via RiftMana oder abends am Rechner. Ein Tracker, der eine Woche hinterherhinkt, ist wertlos.</li>
+</ol>
+
+<div class="tip"><strong>💡 Profi-Tipp:</strong> Der Deck-Browser von riftbound.gg lässt sich nach „Collection" sortieren — so siehst du nebenbei, welche kompletten Decks (auch abseits von Akali) du mit deinem Precon-Bestand schon jetzt bauen kannst. Gut für Casual-Runden bei der Nexus Night, ohne einen Cent auszugeben.</div>
+
+<div class="quiz">
+<h3>🧠 Quiz</h3>
+<p><strong>1. Wie viele Kopien einer Karte sind in Riftbound-Constructed maximal erlaubt — und was heißt das für dein Sammelziel?</strong></p>
+<div class="answer">4 Kopien, wie bei MTG.<div class="reveal wrong">❌ Falsch — Riftbound erlaubt nur 3 Kopien pro Karte. Wer aus MTG-Gewohnheit 4er-Playsets kauft, hat pro Staple eine tote Karte im Ordner.</div></div>
+<div class="answer">3 Kopien — ein Playset ist 3, alles darüber ist fürs Constructed wertlos.<div class="reveal">✅ Richtig — 40-Karten-Maindeck, max. 3x pro Karte (Chosen Champion zählt mit rein). Dein Tracker sollte pro Karte „besessen / 3" anzeigen.</div></div>
+
+<p><strong>2. Du stehst bei Kofuku am Regal und willst spontan Singles mitnehmen. Was ist der korrekte Workflow?</strong></p>
+<div class="answer">Kaufen, wenn der Preis gut aussieht — eintragen kann ich später.<div class="reveal wrong">❌ Falsch — genau so entstehen Überkäufe: Ohne Besitz-Check kaufst du Karten, die längst in einem deiner fünf Precons stecken.</div></div>
+<div class="answer">RiftMana (oder das führende Web-Tool) öffnen, Besitz und Cardmarket-Preis checken, nur echte Lücken bis max. 3 Kopien kaufen.<div class="reveal">✅ Richtig — RiftMana zeigt Cardmarket-Preise mobil; die Lücken-Anzeige des führenden Systems entscheidet, ob die Karte überhaupt fehlt.</div></div>
+
+<p><strong>3. Du willst wissen, welche kompletten Decks du aus deinem Bestand bereits bauen kannst. Welches Tool löst das direkt?</strong></p>
+<div class="answer">Die Dragon-Shield-App mit Riftbound-Modus.<div class="reveal wrong">❌ Falsch — Dragon Shield hat keinerlei Riftbound-Support; die Scanner existieren nur für MTG und Pokémon.</div></div>
+<div class="answer">riftbound.gg — Deck-Browser nach „Collection" sortieren.<div class="reveal">✅ Richtig — riftbound.gg gleicht den Deck-Browser gegen deine Collection ab und zeigt baubare Decks; das ist der direkteste Lücken-/Deck-Abgleich-Workflow.</div></div>
+
+<p><strong>4. Warum solltest du NICHT Piltover Archive und riftbound.gg parallel als Collection-Tracker pflegen?</strong></p>
+<div class="answer">Weil die Tools sich gegenseitig sperren.<div class="reveal wrong">❌ Falsch — technisch geht beides parallel. Das Problem ist ein anderes.</div></div>
+<div class="answer">Weil zwei Systeme zwangsläufig auseinanderlaufen und dann keines mehr als verlässliche Kauf-Referenz taugt.<div class="reveal">✅ Richtig — Single Source of Truth: ein führendes System, das immer aktuell ist, plus RiftMana nur als mobiler Lese-/Preis-Check.</div></div>
+</div>
+
+<div class="summary">
+<h2>Was du gelernt hast</h2>
+<ul>
+  <li>Überkäufe entstehen durch verstreuten Bestand (deine 5 Precons + Singles) — die Lösung ist <strong>ein</strong> führendes Tracking-System als Single Source of Truth.</li>
+  <li>Playset = <strong>3 Kopien</strong> (nicht 4) — Sammelziel und Kauflimit pro Karte entsprechend.</li>
+  <li>Tool-Landschaft: <strong>Piltover Archive</strong> = umfangreichste Plattform (Binder, Set-Completion, Marktwerte), <strong>riftbound.gg</strong> = bester Lücken-/Deck-Abgleich (zeigt baubare Decks), <strong>RiftMana</strong> = mobil mit Cardmarket-Preisen, <strong>Dragon Shield</strong> = kein Riftbound-Support.</li>
+  <li>Setup: Account → Binder → Precons als Kartenlisten erfassen → Singles → Akali-Zielliste als Deck anlegen → vor jedem Kauf Lücken-Anzeige checken → Neuzugänge sofort eintragen.</li>
+  <li>Deck-Abgleich gegen die Akali-Zielliste macht jede Kaufentscheidung zu einer simplen Frage: „Steht die Karte auf der Fehlt-Liste — ja oder nein?"</li>
+</ul>
+</div>
+
+<script>
+document.querySelectorAll('.answer').forEach(a => {
+  a.addEventListener('click', () => {
+    const r = a.querySelector('.reveal');
+    if (r) r.style.display = r.style.display === 'block' ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>
