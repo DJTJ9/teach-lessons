@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 6: /bewerbung portfolio</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>/bewerbung portfolio</h1>
+<div class="subtitle">Lektion 6 von 10 · Drei bis vier Showcases kuratieren — und warum <code>projekte:</code> synchron bleiben muss</div>
+
+<h2>Zwei Dateien, zwei Zwecke</h2>
+<table>
+  <tr><th></th><th><code>profil/portfolio.md</code></th><th><code>projekte:</code> in <code>master.md</code></th></tr>
+  <tr><td>Wird gerendert?</td><td><b>nein</b> — reines Markdown</td><td>ja, in den CV</td></tr>
+  <tr><td>Felder</td><td>Outcome · Tech · Link · <b>Story</b></td><td>titel · outcome · tech · link</td></tr>
+  <tr><td>Leser</td><td>Claude, beim Schreiben des Anschreibens</td><td>der Recruiter</td></tr>
+  <tr><td>Länge</td><td>ausführlich, 2 Sätze Story erlaubt</td><td>eine Outcome-Zeile, DE+EN</td></tr>
+</table>
+
+<div class="why">
+  <b>Warum die Story <em>nicht</em> in den CV wandert:</b><br>
+  Im CV hast du pro Projekt eine Zeile — mehr passt physisch nicht auf die eine Seite (Lektion 5). Die längere Erzählung („warum belegt dieses Projekt meinen Quereinstieg?") braucht aber jemand: das Anschreiben. <code>portfolio.md</code> ist der Vorrat, aus dem Lektion 7/8 schöpfen. Der CV zeigt das Ergebnis, das Anschreiben erzählt den Weg.
+</div>
+
+<h2>Der Aufbau eines Showcase-Eintrags</h2>
+<pre>## 1. Bob der Job-Bot
+- **Outcome:** <span class="comment">was kann es, was ist der Effekt? — messbar, nicht „habe gebaut"</span>
+- **Tech:** Python · Telegram · SQLite · MCP
+- **Link:** <span class="comment">Repo oder Live-Demo. Ohne Link zählt der Eintrag halb.</span>
+- **Story (für Anschreiben):** <span class="comment">2 Sätze, warum das den Quereinstieg belegt</span></pre>
+
+<p>Die Nummerierung ist nicht Dekoration: <strong>Reihenfolge = Stärke</strong>. Eintrag 1 ist dein bestes Argument. Diese Reihenfolge überträgst du 1:1 nach <code>projekte:</code> — das Template rendert die Liste in genau der YAML-Reihenfolge, ohne zu sortieren.</p>
+
+<h2>Der Sync-Schritt</h2>
+<pre><span class="comment"># portfolio.md</span>
+## 1. Bob der Job-Bot
+- **Outcome:** Scannt StepStone/Indeed und filtert nach gelernten Kriterien.
+- **Tech:** Python · Telegram · SQLite · MCP
+- **Link:** https://github.com/…
+
+<span class="comment"># master.md — dieselbe Sache, komprimiert und zweisprachig</span>
+projekte:
+  - titel: Bob der Job-Bot
+    outcome: {de: "Scannt Jobbörsen und filtert nach gelernten Kriterien.",
+              en: "Scans job boards and filters by learned criteria."}
+    tech: "Python · Telegram · SQLite"
+    link: "https://github.com/…"</pre>
+
+<div class="warn">
+  <b>Es gibt keine Automatik.</b> Nichts im Code liest <code>portfolio.md</code> — der Sync passiert durch dich bzw. durch Claude im <code>portfolio</code>-Lauf. Wenn du nur <code>portfolio.md</code> pflegst und <code>projekte:</code> vergisst, ändert sich dein CV nicht. Danach immer neu rendern:
+  <pre>python3 scripts/render.py cv --lang de && python3 scripts/render.py cv --lang en</pre>
+</div>
+
+<h2>Kuratieren heißt streichen</h2>
+<p>Die Vorgabe ist <strong>3–4 Einträge</strong>, nicht „alles, was ich je gebaut habe".</p>
+<ul>
+  <li><b>Platzgrund:</b> Jeder Eintrag frisst im CV ~3 Zeilen der einzigen Seite. Sechs Projekte drängen deine Erfahrung raus (und du merkst es wegen <code>overflow:hidden</code> nicht sofort).</li>
+  <li><b>Signalgrund:</b> Vier starke Projekte lesen sich stärker als vier starke plus drei halbfertige. Der schwächste sichtbare Eintrag setzt die Erwartung.</li>
+</ul>
+
+<h3>Ein guter Outcome vs. ein schlechter</h3>
+<table>
+  <tr><th>schwach</th><th>stark</th></tr>
+  <tr><td>„Telegram-Bot in Python geschrieben"</td><td>„Scannt täglich 4 Jobbörsen und stellt vorgefilterte Treffer im Chat zu"</td></tr>
+  <tr><td>„Unity-Prototyp mit Movement"</td><td>„Third-Person-Prototyp mit eigenem State-Machine-Controller, spielbar im Browser (Link)"</td></tr>
+</table>
+<p>Muster: <em>Was tut es für wen</em> — nicht <em>welche Technologie habe ich angefasst</em>. Die Technologie steht ohnehin in der <code>tech</code>-Zeile.</p>
+
+<div class="why">
+  <b>Der Skill-Grundsatz dahinter:</b> „Quereinstieg als Progression, nicht als Entschuldigung." Ein Portfolio-Eintrag mit hartem Outcome und Link ist der einzige Beleg, der ohne Berufserfahrung trägt. Er ersetzt den Satz „ich lerne schnell" durch etwas, das man anklicken kann.
+</div>
+
+<div class="task">
+  <b>Do it:</b>
+  <ol>
+    <li><code>/bewerbung portfolio</code> starten. Die drei TODO-Slots füllen: Bob, ein Unity-Projekt, ein drittes.</li>
+    <li>Für jeden Eintrag den Link zuerst festlegen. Kein Link ⇒ Eintrag streichen oder erst den Link herstellen (Repo public machen, WebGL-Build hochladen).</li>
+    <li>Reihenfolge bewusst wählen: Welcher Eintrag überzeugt einen Games-Studio-Recruiter am schnellsten? Der ist Nummer 1.</li>
+    <li><code>projekte:</code> in <code>master.md</code> angleichen (DE+EN), beide CVs neu rendern, PDF auf Beschnitt prüfen.</li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Du ergänzt einen vierten Showcase in <code>portfolio.md</code> und renderst den CV neu. Was steht im PDF?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Vier Projekte — <code>portfolio.md</code> wird mitgelesen</li>
+    <li onclick="this.className='correct'">Weiterhin drei — der CV liest nur <code>projekte:</code> aus <code>master.md</code>, der Sync ist Handarbeit</li>
+    <li onclick="this.className='wrong'">Ein Render-Fehler wegen Inkonsistenz</li>
+  </ul>
+  <div class="quiz-q">2. Wofür ist das Feld <b>Story</b> da?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Als Rohmaterial fürs Anschreiben — im CV ist kein Platz dafür</li>
+    <li onclick="this.className='wrong'">Es wird als Tooltip ins PDF eingebettet</li>
+    <li onclick="this.className='wrong'">Es ersetzt das Feld <code>outcome</code> in der englischen Fassung</li>
+  </ul>
+  <div class="quiz-q">3. Warum 3–4 Einträge statt aller Projekte?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">YAML erlaubt maximal vier Listenelemente</li>
+    <li onclick="this.className='correct'">Platz (eine Seite, harter Beschnitt) plus Signal — der schwächste sichtbare Eintrag setzt die Erwartung</li>
+    <li onclick="this.className='wrong'">Chrome rendert ab fünf Einträgen fehlerhaft</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li><code>portfolio.md</code> wird nie gerendert — es ist der Erzähl-Vorrat fürs Anschreiben; <code>projekte:</code> ist die CV-Fassung.</li>
+    <li>Der Sync zwischen beiden ist <b>manuell</b>; danach beide CVs neu rendern.</li>
+    <li>Reihenfolge = Stärke, und das Template sortiert nicht.</li>
+    <li>3–4 Einträge, jeder mit Outcome <b>und</b> Link; Outcome beschreibt Wirkung, nicht Technologie.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="07-anschreiben-bob.html">Lektion 7 — Anschreiben aus Bob</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 7: Anschreiben aus Bob</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .step { display:flex; gap:14px; margin:12px 0; align-items:flex-start; }
+  .step-num { background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .step-body { flex:1; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>Anschreiben aus Bob</h1>
+<div class="subtitle">Lektion 7 von 10 · <code>/bewerbung anschreiben</code>, Weg A: Job kommt aus der Bob-DB</div>
+
+<h2>Der Ablauf in fünf Schritten</h2>
+
+<div class="step"><div class="step-num">1</div><div class="step-body">
+  <h3>Job-Quelle wählen</h3>
+  <p>Bob-MCP befragen, Treffer per <code>AskUserQuestion</code> auswählen. Alternative: Anzeigentext einfügen (Lektion 8).</p>
+</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body">
+  <h3>Ordner + <code>job.md</code></h3>
+  <p><code>bewerbungen/YYYY-MM-&lt;firma-kebab&gt;/job.md</code> mit Titel, Firma, Quelle/URL, Datum, Anzeigentext.</p>
+</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body">
+  <h3>Entwurf <code>anschreiben-de.md</code></h3>
+  <p>Anforderungen der Anzeige × <code>master.md</code> × Storys aus <code>portfolio.md</code>.</p>
+</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-body">
+  <h3>Du editierst, dann Render</h3>
+  <p>Anschreiben-PDF <b>und</b> CV-PDF in denselben Ordner.</p>
+</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-body">
+  <h3>Commit — PDFs inklusive</h3>
+</div></div>
+
+<p>Schritte 2–5 sind in Lektion 9 im Detail. Hier geht es nur um Schritt 1: <b>woher der Job kommt</b>.</p>
+
+<h2>Was die Bob-MCP-Tools wirklich liefern</h2>
+<table>
+  <tr><th>Tool</th><th>Laut eigener Beschreibung</th><th>Für Bewerbung brauchbar?</th></tr>
+  <tr><td><code>get_my_profile</code></td><td>Kriterien, No-Gos, Preferences, Feedback-Beispiele, <code>favorites</code></td><td>teilweise — <code>favorites</code> enthält nur <b>Titel</b>, keine URL</td></tr>
+  <tr><td><code>get_my_votes</code></td><td>👍/👎-Votes „mit vollem Job-Kontext"</td><td><b>ja</b> — der einzige Weg zu einem gemerkten Job samt Kontext</td></tr>
+  <tr><td><code>pull_pending_jobs</code></td><td>„bereits gescorte Jobs, die nach Learn-Insights ein <b>LLM-Rescore</b> brauchen"</td><td><b>nein</b> — das ist die Rescore-Warteschlange, keine Bewerbungsliste</td></tr>
+  <tr><td><code>update_my_criteria</code>, <code>apply_member_insights</code></td><td>schreiben Learnings zurück</td><td>nein (Gebiet von <code>/bob-learn</code>)</td></tr>
+  <tr><td><code>scan_aggregators</code>, <code>push_jobs</code>, <code>push_batch</code></td><td>Scanner-Seite</td><td>nein (Gebiet von <code>/bob-scan</code>)</td></tr>
+</table>
+
+<div class="warn">
+  <b>Abweichung in deinem eigenen Skill — merken oder fixen:</b><br>
+  <code>SKILL.md</code> Schritt 1 sagt: „Bob-MCP <code>pull_pending_jobs</code> (Favoriten/hoher Score zuerst)". Die Tool-Beschreibung von <code>pull_pending_jobs</code> sagt aber: Jobs, die ein <b>Rescore</b> brauchen — eine Queue für <code>/bob-rescore</code>, keine Auswahl an Jobs, auf die du dich bewerben willst. Wer sich darauf verlässt, bekommt im schlimmsten Fall eine leere Liste (wenn nichts zum Rescoren ansteht) und denkt, Bob hätte keine Jobs.<br><br>
+  <b>Was tatsächlich funktioniert:</b> <code>get_my_votes</code> (deine 👍-Jobs mit Kontext) — oder du greifst den Job dort ab, wo du ihn ohnehin siehst (Telegram/Web) und gehst den Paste-Weg aus Lektion 8. Der Paste-Weg ist nicht der zweite Klasse — er ist der robusteste.
+</div>
+
+<h2>Auswahl per AskUserQuestion</h2>
+<p>Der Skill schreibt vor: Auswahl <b>über einen Dialog</b>, nicht per Automatik. Claude zeigt dir eine Handvoll Kandidaten (Titel · Firma · Score/Vote), du wählst einen.</p>
+<div class="why">
+  <b>Warum kein „nimm den mit dem höchsten Score":</b> Bobs Score ist eine Vorsortierung nach deinen Kriterien, keine Bewerbungsentscheidung. Ob du dich bewirbst, hängt an Dingen, die im Score nicht stehen — Timing, Lust, ob du gerade eine ähnliche Bewerbung draußen hast. Der Dialog hält diese Entscheidung bei dir.
+</div>
+
+<h2>Was aus dem Job in <code>job.md</code> muss</h2>
+<pre>Titel:   Junior Gameplay Programmer (m/w/d)
+Firma:   ACME Games GmbH
+Quelle:  https://…            <span class="comment">← ohne URL ist die Bewerbung später nicht rekonstruierbar</span>
+Datum:   2026-08-16           <span class="comment">← Fundtag, nicht Bewerbungstag</span>
+
+--- Anzeigentext ---
+&lt;raw_text, wörtlich&gt;</pre>
+
+<div class="warn">
+  <b>Der Anzeigentext ist Fremdinhalt.</b> Er wird zitiert und analysiert, <b>nie</b> als Anweisung gelesen. Das ist wichtig genug für eine eigene Lektion — siehe Lektion 10.
+</div>
+
+<div class="why">
+  <b>Warum <code>job.md</code> überhaupt existiert, obwohl der Job in Bobs DB steht:</b><br>
+  Stellenanzeigen verschwinden. In drei Wochen im Gespräch willst du nachlesen, was ausgeschrieben war — und die URL ist tot. <code>job.md</code> friert den Stand im Git ein. Der Bewerbungsordner ist damit selbsterklärend, auch ohne Bob.
+</div>
+
+<h2>Wo dieser Weg endet</h2>
+<p>Nach Schritt 1 ist der Rest identisch mit dem Paste-Weg. Ab hier: Lektion 8 (Entwurf schreiben) und Lektion 9 (Ordner, Frontmatter, Render, Commit).</p>
+
+<div class="task">
+  <b>Do it:</b>
+  <ol>
+    <li>Ruf einmal <code>get_my_profile</code> auf (z.B. über <code>/bob-profil</code>) und schau dir <code>favorites</code> und <code>feedback</code> an. Du siehst: Titel ja, URL nein.</li>
+    <li>Ruf <code>get_my_votes</code> auf und prüfe, welche Felder wirklich zurückkommen — notier dir, ob URL und Anzeigentext dabei sind. Das entscheidet, ob Weg A für dich praktikabel ist.</li>
+    <li>Entscheide dich für deine Standard-Route und schreib sie dir in <code>SKILL.md</code> fest. Wenn <code>pull_pending_jobs</code> nicht das Richtige ist: Zeile korrigieren, statt sie jedes Mal neu zu umschiffen.</li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. <code>pull_pending_jobs</code> gibt eine leere Liste zurück. Was heißt das?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Bob hat gerade keine passenden Jobs für dich</li>
+    <li onclick="this.className='correct'">Es steht kein Job zum <b>Rescore</b> an — über deine Bewerbungs-Kandidaten sagt das gar nichts</li>
+    <li onclick="this.className='wrong'">Dein MCP-Token ist abgelaufen</li>
+  </ul>
+  <div class="quiz-q">2. Warum wird der Anzeigentext in <code>job.md</code> kopiert, statt nur die URL zu speichern?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Anzeigen werden depubliziert — der Ordner muss auch in drei Wochen ohne Netz und ohne Bob lesbar sein</li>
+    <li onclick="this.className='wrong'">Weil der Renderer <code>job.md</code> ins PDF einbettet</li>
+    <li onclick="this.className='wrong'">Aus Lizenzgründen</li>
+  </ul>
+  <div class="quiz-q">3. Warum wählt der Skill den Job per Dialog statt automatisch nach höchstem Score?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Weil der Score technisch unzuverlässig ist</li>
+    <li onclick="this.className='correct'">Weil der Score vorsortiert, aber die Bewerbungsentscheidung von Faktoren abhängt, die nicht in der DB stehen</li>
+    <li onclick="this.className='wrong'">Weil AskUserQuestion die einzige Möglichkeit ist, MCP-Daten anzuzeigen</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li>Weg A holt den Job aus Bob; alles ab <code>job.md</code> ist identisch mit Weg B.</li>
+    <li><code>pull_pending_jobs</code> = Rescore-Queue, <b>nicht</b> Bewerbungsliste — der Skill-Text ist an dieser Stelle ungenau.</li>
+    <li><code>get_my_votes</code> liefert 👍-Jobs mit Kontext; <code>get_my_profile.favorites</code> nur Titel.</li>
+    <li>Job-Auswahl bleibt eine Dialog-Entscheidung, keine Score-Automatik.</li>
+    <li><code>job.md</code> friert Titel, Firma, URL, Datum und Anzeigentext im Git ein — Anzeigen verschwinden.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="08-anschreiben-paste.html">Lektion 8 — Anschreiben aus eingefügtem Text</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 2: /bewerbung setup</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .step { display:flex; gap:14px; margin:12px 0; align-items:flex-start; }
+  .step-num { background:var(--accent); color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .step-body { flex:1; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>/bewerbung setup</h1>
+<div class="subtitle">Lektion 2 von 10 · Die TODO-Felder füllen — zweisprachig, in einem Durchgang</div>
+
+<h2>Was der Befehl macht</h2>
+<p><code>/bewerbung setup</code> ist ein <strong>Interview</strong>. Claude liest <code>profil/master.md</code>, sammelt alle Felder mit dem Wert <code>TODO</code>, fragt sie gebündelt ab (max. 4 Fragen pro Dialog), schreibt das Ergebnis ins Frontmatter, macht einen Probe-Render und committet.</p>
+
+<div class="why">
+  <b>Warum ein Interview und kein Formular?</b><br>
+  Weil die Felder unterschiedlich schwer sind. <code>telefon</code> ist Diktat. <code>profil.de</code> ist ein 3-Zeilen-Text, der deinen Quereinstieg als Stärke erzählen muss — dafür braucht es Rückfragen und Varianten. Ein Interview kann zwischen beiden Modi wechseln, ein Formular nicht.
+</div>
+
+<h2>Ablauf</h2>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>TODOs sammeln</h3>
+    <p>Claude liest das Frontmatter und listet jedes Feld auf, dessen Wert <code>TODO</code> ist oder mit <code>TODO —</code> beginnt. Aktueller Stand deines Repos: praktisch alles.</p>
+    <pre><span class="comment"># selbst nachzählen</span>
+grep -n TODO profil/master.md</pre>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Gebündelt fragen — DE und EN immer zusammen</h3>
+    <p>Die Regel im Skill: <em>„DE+EN immer zusammen erheben, EN notfalls selbst übersetzen und zur Bestätigung zeigen."</em></p>
+    <div class="warn">
+      <b>Warum das nicht optional ist:</b> Der Filter <code>tr()</code> fällt bei fehlendem <code>en:</code> <strong>still</strong> auf <code>de:</code> zurück. Kein Fehler, keine Warnung — dein englischer CV hat dann einfach einen deutschen Absatz mittendrin, und du merkst es erst, wenn ein Recruiter es merkt.
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Frontmatter schreiben (Edit tool, nicht neu generieren)</h3>
+    <p>Der Skill schreibt mit dem Edit-Tool in die bestehende Datei — die Struktur bleibt, nur Werte werden ersetzt. Dein Notizblock unter dem zweiten <code>---</code> bleibt unangetastet.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>Probe-Render</h3>
+    <pre>python3 scripts/render.py cv --lang de</pre>
+    <div class="why"><b>Warum sofort rendern?</b> Ein YAML-Tippfehler bleibt in der Datei unsichtbar, aber <code>load_front_matter()</code> stirbt sofort. Der Probe-Render ist der Beweis, dass das Frontmatter noch parsebar ist — vor dem Commit, nicht danach.</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h3>Commit</h3>
+    <p>Erst wenn der Render durchläuft. Damit ist jeder committete Stand von <code>master.md</code> garantiert renderbar.</p>
+  </div>
+</div>
+
+<h2>Die Feldtypen, die du kennen musst</h2>
+
+<table>
+  <tr><th>Muster</th><th>Beispiel aus master.md</th><th>Regel</th></tr>
+  <tr><td>Skalar</td><td><code>name: Max Mustermann</code></td><td>sprachneutral — nie <code>{de:,en:}</code></td></tr>
+  <tr><td>Übersetzbar</td><td><code>rolle: {de: …, en: …}</code></td><td>immer beide Keys</td></tr>
+  <tr><td>Liste von Strings</td><td><code>chips: ["Unity (2 J)", "C# (2 J)"]</code></td><td>sprachneutral, weil Tech-Namen</td></tr>
+  <tr><td>Übersetzte Liste</td><td><code>punkte: {de: [...], en: [...]}</code></td><td><b>Dict von Listen</b>, nicht Liste von Dicts</td></tr>
+  <tr><td>Liste von Objekten</td><td><code>erfahrung: - {zeitraum, titel, org, punkte}</code></td><td>Reihenfolge = Reihenfolge im CV</td></tr>
+</table>
+
+<div class="warn">
+  <b>Die häufigste Verwechslung:</b> <code>punkte</code> ist ein Dict mit Listen drin, nicht eine Liste mit Dicts.
+  <pre><span class="val">richtig:</span>  punkte: {de: ["Feature X gebaut"], en: ["Built feature X"]}
+<span class="bad">falsch:</span>   punkte: [{de: "Feature X gebaut", en: "Built feature X"}]</pre>
+  Das Template macht <code>{% for pt in j.punkte|tr %}</code> — <code>tr()</code> muss also eine <em>Liste</em> zurückgeben. Bei der falschen Form iteriert Jinja über die Dicts und rendert Python-Repr-Müll in dein PDF.
+</div>
+
+<h2>Der Spielerpfad — das einzige Feld mit Semantik</h2>
+<pre>spielerpfad:
+  - {label: {de: Sportwissenschaft, en: Sports Science}, <span class="key">status</span>: <span class="val">done</span>}
+  - {label: {de: "Unity/C# (2 J)", en: "Unity/C# (2 yrs)"}, <span class="key">status</span>: <span class="val">done</span>}
+  - {label: {de: AI + Tools, en: AI + Tools}, <span class="key">status</span>: <span class="val">current</span>}</pre>
+<p>Das rendert als Punktkette im Kopf von CV <em>und</em> Anschreiben. <code>status: current</code> bekommt in <code>cv.css</code> eine eigene Regel — größerer Kreis, Amber-Rand, heller Kern. Alle anderen sind gefüllte Petrol-Punkte.</p>
+<div class="why">
+  <b>Warum das inhaltlich zählt:</b> Der Pfad ist die visuelle Umsetzung der Skill-Regel <em>„Quereinstieg als Progression (Spielerpfad), nicht als Entschuldigung"</em>. Sportwissenschaft ist kein Umweg, sondern Node 1. Setze <code>current</code> auf genau <strong>einen</strong> Eintrag — den, in dem du gerade steckst.
+</div>
+
+<h2>YAML-Fallen im Frontmatter</h2>
+<ul>
+  <li><code>telefon: 0123 456</code> → YAML macht daraus keinen String-Fehler, aber führende Null geht bei manchen Formen verloren. <strong>Immer quoten:</strong> <code>telefon: "0123 456"</code>.</li>
+  <li>Doppelpunkt im Text (<code>outcome: Bob: findet Jobs</code>) → Parser-Fehler. Quoten.</li>
+  <li>Zeitraum mit Gedankenstrich: <code>zeitraum: "2024–heute"</code> — quoten, sonst interpretiert YAML je nach Zeichen anders.</li>
+  <li>Kein Tab-Zeichen zum Einrücken. YAML verbietet Tabs, der Fehler ist kryptisch.</li>
+</ul>
+
+<div class="task">
+  <b>Do it (der eigentliche Erstlauf):</b>
+  <ol>
+    <li>Starte <code>/bewerbung setup</code> im Repo.</li>
+    <li>Halte für die Prosa-Felder (<code>profil.de</code>, <code>projekte[].outcome</code>, <code>erfahrung[].punkte</code>) Rohmaterial bereit — schreib es vorher in den Notizblock unter dem zweiten <code>---</code>.</li>
+    <li>Formuliere <code>punkte</code> als <em>Ergebnis</em>, nicht als Tätigkeit: „Build-Zeit von 8 auf 2 min gesenkt" statt „zuständig für Builds".</li>
+    <li>Nach dem Lauf: <code>grep -c TODO profil/master.md</code> muss <code>0</code> liefern.</li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Du füllst <code>profil:</code> nur mit <code>de:</code> und lässt <code>en:</code> weg. Was passiert beim <code>--lang en</code>-Render?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Der Renderer bricht mit „fehlender Key en" ab</li>
+    <li onclick="this.className='correct'">Das PDF entsteht mit dem <b>deutschen</b> Text an der Stelle — still, ohne Warnung</li>
+    <li onclick="this.className='wrong'">Das Feld bleibt im englischen CV leer</li>
+  </ul>
+  <div class="quiz-q">2. Welche Schreibweise ist für <code>punkte</code> korrekt?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'"><code>punkte: {de: ["…"], en: ["…"]}</code> — Dict von Listen</li>
+    <li onclick="this.className='wrong'"><code>punkte: [{de: "…", en: "…"}]</code> — Liste von Dicts</li>
+    <li onclick="this.className='wrong'">Beide funktionieren, das Template fängt es ab</li>
+  </ul>
+  <div class="quiz-q">3. Warum rendert setup <em>vor</em> dem Commit?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Damit die PDFs mit im Commit landen</li>
+    <li onclick="this.className='correct'">Weil der Render der einzige Test ist, ob das YAML noch parsebar ist — jeder committete Stand bleibt so renderbar</li>
+    <li onclick="this.className='wrong'">Weil Chrome die Datei sonst sperrt</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li><code>setup</code> = TODOs sammeln → gebündelt fragen → Edit ins Frontmatter → Probe-Render → Commit.</li>
+    <li>DE und EN immer im selben Zug; fehlendes <code>en:</code> fällt <b>still</b> auf Deutsch zurück.</li>
+    <li><code>punkte</code> ist ein Dict von Listen — die eine Form, die man leicht falsch schreibt.</li>
+    <li><code>spielerpfad</code> mit genau einem <code>status: current</code> erzählt den Quereinstieg als Progression.</li>
+    <li>Strings mit Doppelpunkt, führender Null oder Gedankenstrich quoten.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="03-cv-cli.html">Lektion 3 — CV rendern</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

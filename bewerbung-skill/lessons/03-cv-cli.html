@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 3: /bewerbung cv — die CLI beherrschen</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>/bewerbung cv</h1>
+<div class="subtitle">Lektion 3 von 10 · Die drei Flags von <code>render.py cv</code> und wo die PDFs landen</div>
+
+<h2>Der Standardbefehl</h2>
+<pre>cd /root/projekte/bewerbung && \
+  python3 scripts/render.py cv --lang de && \
+  python3 scripts/render.py cv --lang en</pre>
+<p>Ergebnis: <code>out/cv-de.pdf</code> und <code>out/cv-en.pdf</code>. <code>/bewerbung cv</code> ohne Sprachargument rendert <strong>beide</strong> — das ist der Default des Skills, nicht des Scripts.</p>
+
+<div class="warn">
+  <b>Unterschied merken:</b> <code>/bewerbung cv</code> (Skill, Default = beide Sprachen) ≠ <code>render.py cv</code> (Script, Default = <code>--lang de</code>). Wenn du das Script direkt aufrufst und das Flag vergisst, bekommst du nur Deutsch.
+</div>
+
+<h2>Alle Flags</h2>
+<table>
+  <tr><th>Flag</th><th>Default</th><th>Wofür</th></tr>
+  <tr><td><code>--lang de|en</code></td><td><code>de</code></td><td>steuert den <code>tr</code>-Filter <b>und</b> das <code>lang</code>-Attribut im HTML</td></tr>
+  <tr><td><code>--profil PFAD</code></td><td><code>profil/master.md</code></td><td>anderes Profil rendern (z.B. eine Variante für eine Branche)</td></tr>
+  <tr><td><code>--out PFAD</code></td><td><code>out/cv-&lt;lang&gt;.pdf</code></td><td>Zielpfad; Verzeichnisse werden automatisch angelegt</td></tr>
+</table>
+
+<div class="why">
+  <b>Warum <code>--out</code> der wichtigste Flag ist:</b><br>
+  Für eine konkrete Bewerbung soll der CV <em>im Bewerbungsordner</em> liegen, nicht in <code>out/</code>. Sonst überschreibt der nächste generische Render deinen abgeschickten Stand, und du kannst später nicht mehr rekonstruieren, welche Version bei welcher Firma gelandet ist.
+  <pre>python3 scripts/render.py cv --lang de \
+  --out bewerbungen/2026-08-acme/out/cv-de.pdf</pre>
+  <code>html_to_pdf()</code> macht <code>out_pdf.parent.mkdir(parents=True, exist_ok=True)</code> — du musst den Ordner nicht vorher anlegen.
+</div>
+
+<h2>Was das Script ausgibt</h2>
+<pre>$ python3 scripts/render.py cv --lang de
+/root/projekte/bewerbung/out/cv-de.pdf</pre>
+<p>Genau eine Zeile: der geschriebene Pfad. Das ist ein <code>print()</code> am Ende von <code>cmd_cv()</code>. Nützlich in Pipelines: <code>xdg-open "$(python3 scripts/render.py cv --lang de)"</code>.</p>
+
+<h2>Die drei Fehlerbilder</h2>
+
+<h3>1. Frontmatter kaputt</h3>
+<pre class="bad">Kein YAML-Frontmatter in profil/master.md</pre>
+<p><code>load_front_matter()</code> matcht mit Regex <code>\A---\n…\n---\n</code>. Ursachen: Die Datei beginnt nicht mit <code>---</code> in Zeile 1, oder der schließende Marker fehlt / hat Leerzeichen davor.</p>
+
+<h3>2. YAML-Syntaxfehler</h3>
+<pre class="bad">yaml.scanner.ScannerError: mapping values are not allowed here</pre>
+<p>Kommt aus <code>yaml.safe_load()</code>, mit Zeilennummer. Fast immer: ungequoteter Doppelpunkt im Text oder ein Tab zum Einrücken.</p>
+
+<h3>3. Chrome-Render fehlgeschlagen</h3>
+<pre class="bad">Chrome-Render fehlgeschlagen: &lt;stderr von chrome&gt;</pre>
+<p>Der Check ist <code>returncode != 0 or not out_pdf.exists()</code>. Prüfe: Ist <code>google-chrome</code> im PATH? Der Konstante <code>CHROME = "google-chrome"</code> ist hart im Script — auf einer Maschine mit nur <code>chromium</code> musst du dort ändern oder einen Symlink setzen.</p>
+
+<div class="warn">
+  <b>Kein Fehlerbild, aber schlimmer:</b> Der Render <em>gelingt</em> und schneidet Inhalt ab. Dazu Lektion 5 — merk dir vorerst: <b>immer ins PDF gucken</b>, nicht nur auf den Exit-Code.
+</div>
+
+<h2>Der Test als Sicherheitsnetz</h2>
+<pre>python3 -m pytest scripts/test_render.py</pre>
+<p><code>test_render.py</code> baut sich in <code>tmp_path</code> ein eigenes Mini-Profil (Fixture <code>PROFIL_FIXTURE</code>) und rendert damit. Es fasst dein echtes <code>master.md</code> nicht an.</p>
+<div class="why">
+  <b>Was der Test dir sagt und was nicht:</b><br>
+  Er beweist, dass die Pipeline funktioniert (Jinja + Chrome + Templates) — also: „nicht meine Templates sind kaputt". Er beweist <em>nicht</em>, dass dein Profil in Ordnung ist. Nach einem Template-Umbau: Test laufen lassen. Nach einer Datenänderung: PDF anschauen.
+</div>
+
+<div class="task">
+  <b>Do it:</b>
+  <ol>
+    <li>Beide Sprachen rendern und die PDFs nebeneinander öffnen. Suche gezielt nach Stellen, wo im englischen CV Deutsch steht — das sind fehlende <code>en:</code>-Keys.</li>
+    <li>Einmal absichtlich kaputt machen: entferne das schließende <code>---</code> in <code>master.md</code>, rendere, lies die Fehlermeldung, stelle es wieder her. Du sollst den Text einmal gesehen haben.</li>
+    <li>Test laufen lassen: <code>python3 -m pytest scripts/test_render.py -q</code></li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Du willst den CV in <code>bewerbungen/2026-08-acme/out/</code> haben. Was musst du vorher anlegen?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Nichts — <code>html_to_pdf()</code> legt die Elternverzeichnisse selbst an</li>
+    <li onclick="this.className='wrong'">Den <code>out/</code>-Unterordner, sonst schlägt der Schreibvorgang fehl</li>
+    <li onclick="this.className='wrong'">Ein leeres <code>cv-de.pdf</code> als Platzhalter</li>
+  </ul>
+  <div class="quiz-q">2. <code>python3 scripts/render.py cv</code> ohne weitere Flags erzeugt …</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">beide Sprachen, wie <code>/bewerbung cv</code></li>
+    <li onclick="this.className='correct'">nur <code>out/cv-de.pdf</code> — <code>--lang</code> hat Default <code>de</code></li>
+    <li onclick="this.className='wrong'">einen Fehler, weil <code>--lang</code> Pflicht ist</li>
+  </ul>
+  <div class="quiz-q">3. <code>pytest scripts/test_render.py</code> ist grün, aber dein CV-PDF ist leer. Was folgt daraus?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Der Test ist falsch geschrieben</li>
+    <li onclick="this.className='correct'">Die Pipeline ist intakt — der Fehler liegt in deinen Daten, denn der Test nutzt seine eigene Fixture statt <code>master.md</code></li>
+    <li onclick="this.className='wrong'">Chrome ist nicht installiert</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li><code>render.py cv</code> kennt drei Flags: <code>--lang</code>, <code>--profil</code>, <code>--out</code>.</li>
+    <li>Skill-Default = beide Sprachen; Script-Default = nur <code>de</code>.</li>
+    <li><code>--out</code> in den Bewerbungsordner schreiben, damit abgeschickte Stände nicht überschrieben werden; Ordner entstehen automatisch.</li>
+    <li>Drei Fehlermeldungen erkennen: „Kein YAML-Frontmatter", <code>ScannerError</code>, „Chrome-Render fehlgeschlagen".</li>
+    <li>Der pytest-Smoke prüft die Pipeline, nicht deine Daten.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="04-renderer-internals.html">Lektion 4 — Renderer-Internals</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

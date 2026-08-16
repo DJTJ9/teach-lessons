@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 4: Renderer-Internals — tr(), autoescape, Chrome</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>Renderer-Internals</h1>
+<div class="subtitle">Lektion 4 von 10 · 92 Zeilen render.py, fünf Funktionen — und was jede dir antun kann</div>
+
+<h2>Die fünf Funktionen</h2>
+<table>
+  <tr><th>Funktion</th><th>Aufgabe</th><th>Failure-Modus</th></tr>
+  <tr><td><code>load_front_matter()</code></td><td>Regex trennt YAML vom Body</td><td><code>sys.exit</code> bei fehlendem Marker</td></tr>
+  <tr><td><code>tr()</code></td><td>wählt <code>de</code>/<code>en</code> aus einem Dict</td><td><b>stiller</b> Fallback auf <code>de</code></td></tr>
+  <tr><td><code>render_html()</code></td><td>Jinja2-Env + Filter + Template</td><td><code>UndefinedError</code> bei fehlendem Key</td></tr>
+  <tr><td><code>paragraphs()</code></td><td>splittet Anschreiben-Body an Leerzeilen</td><td>vergessene Leerzeile ⇒ Absätze kleben</td></tr>
+  <tr><td><code>html_to_pdf()</code></td><td>Tempfile + Chrome-Subprozess</td><td><code>sys.exit</code> bei Exit≠0 oder fehlender Datei</td></tr>
+</table>
+
+<h2>1. tr() — der Übersetzungsfilter</h2>
+<pre>def tr(value, lang):
+    if isinstance(value, dict) and (<span class="val">"de" in value or "en" in value</span>):
+        return value.get(lang, <span class="key">value.get("de", "")</span>)
+    return value</pre>
+
+<p>Drei Verhaltensweisen in vier Zeilen:</p>
+<table>
+  <tr><th>Eingabe</th><th><code>--lang en</code> liefert</th></tr>
+  <tr><td><code>{de: "Hallo", en: "Hi"}</code></td><td><code>Hi</code></td></tr>
+  <tr><td><code>{de: "Hallo"}</code> (kein <code>en</code>)</td><td><code>Hallo</code> ← <b>stiller Fallback</b></td></tr>
+  <tr><td><code>"Python · Git"</code> (kein Dict)</td><td><code>Python · Git</code> unverändert durchgereicht</td></tr>
+</table>
+
+<div class="why">
+  <b>Warum der Passthrough clever ist:</b> Du musst <em>nicht</em> jedes Feld zweisprachig anlegen. <code>name</code>, <code>tech</code>, <code>chips</code>, URLs bleiben einfache Strings, und <code>|tr</code> im Template stört nicht. Nur wo du wirklich übersetzt, machst du ein Dict daraus.
+</div>
+
+<div class="warn">
+  <b>Der Preis:</b> Ein Tippfehler im Key — <code>{de: …, eng: …}</code> — ist syntaktisch gültiges YAML und ein gültiges Dict. <code>tr()</code> findet kein <code>en</code>, nimmt <code>de</code>, und dein englischer CV ist an der Stelle deutsch. <b>Kein Fehler, keine Warnung.</b> Deshalb: englisches PDF nach jedem Setup einmal komplett durchlesen.
+</div>
+
+<h3>Wie der Filter ins Template kommt</h3>
+<pre>env.filters[<span class="val">"tr"</span>] = lambda v: tr(v, ctx[<span class="val">"lang"</span>])</pre>
+<p>Die Sprache steckt per Closure im Filter — deshalb schreibt das Template nur <code>{{ d.rolle|tr }}</code> und muss die Sprache nie durchreichen. Ein Render-Aufruf = eine Sprache; für zwei Sprachen läuft das Script zweimal.</p>
+
+<h2>2. autoescape=True</h2>
+<pre>env = Environment(loader=FileSystemLoader(TEMPLATES), <span class="key">autoescape=True</span>)</pre>
+<p>Jeder Wert aus deinem YAML wird HTML-escaped, bevor er im Template landet.</p>
+<table>
+  <tr><th>Du schreibst in master.md</th><th>Im PDF steht</th></tr>
+  <tr><td><code>C&amp;A</code></td><td><code>C&amp;A</code> ✅ (intern <code>&amp;amp;</code>)</td></tr>
+  <tr><td><code>&lt;b&gt;Unity&lt;/b&gt;</code></td><td>wörtlich <code>&lt;b&gt;Unity&lt;/b&gt;</code>, <b>nicht</b> fett</td></tr>
+</table>
+<div class="why">
+  <b>Warum das richtig so ist:</b> Ein Anschreiben-Body kann Text aus einer gescrapten Anzeige enthalten (Lektion 10). Ohne Autoescape wäre eine Stellenanzeige mit HTML darin in der Lage, dein Layout zu zerlegen. Der Preis: Du kannst Text nicht per HTML formatieren. Formatierung gehört ins CSS, nicht in die Daten.
+</div>
+
+<h2>3. paragraphs() — die Absatzregel</h2>
+<pre>def paragraphs(body):
+    return [p.strip() for p in re.split(r"\n\s*\n", body) if p.strip()]</pre>
+<p>Split an <strong>Leerzeile</strong>. Jeder Block wird ein <code>&lt;p&gt;</code>. Ein einzelner Zeilenumbruch trennt nicht — der Text landet im selben Absatz und wird vom Browser umgebrochen wie normaler Fließtext.</p>
+<pre><span class="comment"># zwei Absätze</span>
+Sehr geehrte Damen und Herren-Text.
+
+Zweiter Absatz.
+
+<span class="comment"># EIN Absatz (einfacher Umbruch zählt nicht)</span>
+Sehr geehrte Damen und Herren-Text.
+Zweiter Absatz.</pre>
+
+<h2>4. html_to_pdf() — der Chrome-Aufruf</h2>
+<pre>cmd = ["google-chrome", <span class="key">"--headless=new"</span>, <span class="key">"--no-sandbox"</span>, "--disable-gpu",
+       <span class="key">"--no-pdf-header-footer"</span>, f"--print-to-pdf={out_pdf}", f"file://{tmp}"]</pre>
+<table>
+  <tr><th>Flag</th><th>Warum</th></tr>
+  <tr><td><code>--headless=new</code></td><td>der aktuelle Headless-Modus; der alte konnte kein sauberes print-to-pdf</td></tr>
+  <tr><td><code>--no-sandbox</code></td><td>nötig als root auf dem Server. Auf einem Desktop-Account wäre es unnötig.</td></tr>
+  <tr><td><code>--no-pdf-header-footer</code></td><td>ohne das druckt Chrome Dateiname, URL, Datum und Seitenzahl in die Ränder — auf einem CV ein Killer</td></tr>
+  <tr><td><code>file://{tmp}</code></td><td>der Tempfile mit dem gerenderten HTML; wird danach mit <code>unlink(missing_ok=True)</code> entfernt</td></tr>
+</table>
+
+<div class="why">
+  <b>Warum das HTML in einen Tempfile muss:</b> Chrome braucht eine URL, keinen String. Und weil der Tempfile irgendwo in <code>/tmp</code> liegt, würde <code>&lt;link href="cv.css"&gt;</code> ins Leere zeigen. Deshalb setzt jedes Template <code>&lt;base href="{{ base }}"&gt;</code> mit <code>TEMPLATES.as_uri() + "/"</code> — damit CSS und Fonts relativ zum <code>templates/</code>-Ordner aufgelöst werden. Nimm das <code>&lt;base&gt;</code> raus und du bekommst ein ungestyltes PDF.
+</div>
+
+<p>Timeout: 60 Sekunden. Erfolgsprüfung: <code>returncode == 0</code> <b>und</b> die Datei existiert — beides, weil Chrome gelegentlich mit 0 endet, ohne geschrieben zu haben.</p>
+
+<h2>5. Was bei fehlendem Feld passiert</h2>
+<p>Jinja2 läuft hier im Default-Modus (kein <code>StrictUndefined</code>). Das heißt:</p>
+<ul>
+  <li><code>{{ d.telefon }}</code> bei fehlendem Key → <strong>leerer String</strong>, kein Fehler.</li>
+  <li><code>{% for p in d.projekte %}</code> bei fehlendem <code>projekte</code> → <code>UndefinedError: '…' is undefined</code>, weil über Undefined nicht iteriert werden kann.</li>
+</ul>
+<p>Praktisch: Fehlende Skalare verschwinden lautlos, fehlende Listen krachen. Zweite gute Nachricht, erste schlechte.</p>
+
+<div class="task">
+  <b>Do it (Experiment, danach zurücksetzen):</b>
+  <ol>
+    <li>Schreib in <code>master.md</code> testweise <code>rolle: {de: Games Programmer, <b>eng</b>: Games Dev}</code>, rendere <code>--lang en</code>. Ergebnis: „Games Programmer". Das ist der stille Fallback, live gesehen.</li>
+    <li>Setz probeweise <code>tech: "&lt;b&gt;Unity&lt;/b&gt; · C#"</code> und rendere. Die Tags stehen wörtlich im PDF — Autoescape in Aktion.</li>
+    <li>Beides zurücksetzen.</li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. <code>tech: "Python · Git"</code> ist kein Dict. Was macht <code>{{ p.tech|tr }}</code>?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Gibt den String unverändert zurück — <code>tr()</code> greift nur bei Dicts mit <code>de</code>/<code>en</code></li>
+    <li onclick="this.className='wrong'">Wirft einen TypeError</li>
+    <li onclick="this.className='wrong'">Gibt einen leeren String zurück</li>
+  </ul>
+  <div class="quiz-q">2. Du löschst <code>&lt;base href="{{ base }}"&gt;</code> aus <code>cv.html.j2</code>. Folge?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Chrome bricht mit Exit-Code 1 ab</li>
+    <li onclick="this.className='correct'">Das PDF entsteht, aber ohne CSS und Fonts — die relativen Pfade werden gegen <code>/tmp</code> aufgelöst</li>
+    <li onclick="this.className='wrong'">Nichts, <code>base</code> ist nur Doku</li>
+  </ul>
+  <div class="quiz-q">3. Im Anschreiben stehen zwei Sätze untereinander ohne Leerzeile dazwischen. Wie viele <code>&lt;p&gt;</code> entstehen?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Eines — <code>paragraphs()</code> splittet nur an Leerzeilen</li>
+    <li onclick="this.className='wrong'">Zwei — jeder Zeilenumbruch ist ein Absatz</li>
+    <li onclick="this.className='wrong'">Keines, der Body wird verworfen</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li><code>tr()</code>: Dict mit <code>de</code>/<code>en</code> → Sprache wählen, sonst Passthrough; fehlendes <code>en</code> fällt <b>still</b> auf <code>de</code>.</li>
+    <li><code>autoescape=True</code>: HTML in Daten wird wörtlich gedruckt — Schutz gegen fremden Anzeigentext, Preis: keine Inline-Formatierung.</li>
+    <li><code>paragraphs()</code>: Leerzeile = neuer Absatz, einfacher Umbruch nicht.</li>
+    <li>Chrome-Flags: <code>--headless=new</code>, <code>--no-sandbox</code>, <code>--no-pdf-header-footer</code>; Erfolg = Exit 0 <b>und</b> Datei existiert.</li>
+    <li><code>&lt;base href&gt;</code> ist die Brücke vom Tempfile zu CSS/Fonts — nicht entfernen.</li>
+    <li>Fehlender Skalar → leer; fehlende Liste → <code>UndefinedError</code>.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="05-templates-design.html">Lektion 5 — Templates &amp; Design-Iteration</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet: /bewerbung</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:14.5px; line-height:1.65; max-width:960px; margin:0 auto; padding:32px 24px 64px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:4px; }
+  .subtitle { color:var(--muted); font-size:13px; margin-bottom:28px; }
+  h2 { font-size:15px; color:var(--accent2); margin:30px 0 10px; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--border); padding-bottom:5px; }
+  h3 { font-size:13.5px; color:var(--accent3); margin:18px 0 6px; }
+  p { margin-bottom:10px; }
+  ul, ol { padding-left:20px; margin-bottom:10px; }
+  li { margin:4px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 5px; border-radius:4px; font-size:12.5px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:'Fira Code',monospace; font-size:12.5px; line-height:1.55; overflow-x:auto; margin:10px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:13.5px; }
+  th, td { border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:12px; text-transform:uppercase; letter-spacing:0.5px; }
+  .trap { background:#2a1a1a; border-left:4px solid var(--red); padding:12px 16px; border-radius:0 8px 8px 0; margin:12px 0; }
+  .trap b { color:var(--red); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:760px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+  .card h3 { margin-top:0; }
+  .flow { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:'Fira Code',monospace; font-size:12.5px; line-height:1.9; color:#c9d1d9; }
+  .lessons { columns:2; column-gap:24px; font-size:13.5px; }
+  @media (max-width:760px) { .lessons { columns:1; } }
+  .lessons a { color:var(--accent2); text-decoration:none; }
+  .lessons div { break-inside:avoid; margin:3px 0; }
+</style>
+</head>
+<body>
+
+<h1>/bewerbung — Cheat Sheet</h1>
+<div class="subtitle">Repo <code>/root/projekte/bewerbung</code> · Renderer <code>python3 scripts/render.py</code> · Daten <code>profil/master.md</code></div>
+
+<h2>Routing</h2>
+<table>
+  <tr><th>Aufruf</th><th>Tut</th><th>Ergebnis</th></tr>
+  <tr><td><code>/bewerbung setup</code></td><td>Interview über alle <code>TODO</code>-Felder, DE+EN gebündelt</td><td><code>profil/master.md</code> gefüllt, Probe-Render, Commit</td></tr>
+  <tr><td><code>/bewerbung cv [de|en]</code></td><td>CV rendern (ohne Argument: <b>beide</b>)</td><td><code>out/cv-de.pdf</code>, <code>out/cv-en.pdf</code></td></tr>
+  <tr><td><code>/bewerbung anschreiben [&lt;job&gt;]</code></td><td>Job holen → Ordner → Entwurf → Render</td><td><code>bewerbungen/YYYY-MM-&lt;firma&gt;/</code> komplett</td></tr>
+  <tr><td><code>/bewerbung portfolio</code></td><td>Showcases kuratieren, <code>projekte:</code> angleichen</td><td><code>profil/portfolio.md</code> + neuer CV</td></tr>
+</table>
+
+<h2>CLI</h2>
+<pre>cd /root/projekte/bewerbung
+
+<span class="comment"># CV, beide Sprachen</span>
+python3 scripts/render.py cv --lang de
+python3 scripts/render.py cv --lang en
+
+<span class="comment"># CV in einen Bewerbungsordner (Ordner wird angelegt)</span>
+python3 scripts/render.py cv --lang de --out bewerbungen/2026-08-acme/out/cv-de.pdf
+
+<span class="comment"># Anschreiben — Sprache kommt aus dem Frontmatter, NICHT per Flag</span>
+python3 scripts/render.py anschreiben bewerbungen/2026-08-acme/anschreiben-de.md
+
+<span class="comment"># Tests nach Template-Änderungen</span>
+python3 -m pytest scripts/test_render.py -q</pre>
+
+<table>
+  <tr><th>Subcommand</th><th>Flags</th><th>Default-Output</th></tr>
+  <tr><td><code>cv</code></td><td><code>--lang de|en</code> · <code>--profil</code> · <code>--out</code></td><td><code>out/cv-&lt;lang&gt;.pdf</code></td></tr>
+  <tr><td><code>anschreiben &lt;datei.md&gt;</code></td><td><code>--profil</code> · <code>--out</code> &nbsp;<b>(kein <code>--lang</code>)</b></td><td><code>&lt;ordner der md&gt;/out/anschreiben-&lt;lang&gt;.pdf</code></td></tr>
+</table>
+
+<h2>Pipeline</h2>
+<div class="flow">
+profil/master.md ──<span class="comment">load_front_matter()</span>──▶ dict<br>
+&nbsp;&nbsp;&nbsp;&nbsp;└──<span class="comment">render_html() · Jinja2 · Filter |tr · autoescape=True</span>──▶ HTML (+&lt;base href&gt;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──<span class="comment">html_to_pdf() · Chrome --headless=new --print-to-pdf</span>──▶ A4-PDF
+</div>
+
+<h2>Die sechs Fallen</h2>
+<div class="trap"><b>1 · CV ist hart einseitig.</b> <code>cv.css</code>: <code>height:296mm; overflow:hidden</code> → Überhang wird <b>still abgeschnitten</b>, kein Fehler, keine zweite Seite. Nach jeder Inhaltserweiterung ins PDF schauen.</div>
+<div class="trap"><b>2 · Fehlendes <code>en:</code> fällt still auf <code>de:</code> zurück.</b> Auch ein vertippter Key (<code>eng:</code>) tut das. Englisches PDF einmal komplett lesen.</div>
+<div class="trap"><b>3 · <code>punkte</code> ist ein Dict von Listen</b>, nicht Liste von Dicts: <code>{de: [...], en: [...]}</code>.</div>
+<div class="trap"><b>4 · <code>empfaenger</code> muss eine Liste sein.</b> Als String iteriert Jinja zeichenweise — jeder Buchstabe eine Adresszeile.</div>
+<div class="trap"><b>5 · Anschreiben-Sprache steht im Frontmatter</b> (<code>lang: en</code>). Es gibt kein <code>--lang</code> fürs Subcommand.</div>
+<div class="trap"><b>6 · CV ohne <code>--out</code></b> landet im Repo-Root und überschreibt den generischen Stand statt im Bewerbungsordner zu liegen.</div>
+
+<h2 style="margin-top:34px;">Datenmodell <code>profil/master.md</code></h2>
+<pre><span class="key">name</span>: Vorname Nachname            <span class="comment">Skalar, sprachneutral</span>
+<span class="key">rolle</span>: {de: …, en: …}            <span class="comment">übersetzbar</span>
+<span class="key">kontakt</span>: {email, telefon, ort, links: [{label, url}]}
+<span class="key">spielerpfad</span>: [{label: {de,en}, status: done|current}]   <span class="comment">genau EIN current</span>
+<span class="key">profil</span>: {de: …, en: …}           <span class="comment">3 Zeilen</span>
+<span class="key">projekte</span>: [{titel, outcome: {de,en}, tech, link}]      <span class="comment">3–4, Reihenfolge = Stärke</span>
+<span class="key">skills</span>: [{gruppe: {de,en}, chips: [str]}]
+<span class="key">erfahrung</span>: [{zeitraum, titel: {de,en}, org, punkte: {de: [], en: []}}]
+<span class="key">sprachen</span>: [{name: {de,en}, level: {de,en}}]
+<span class="key">ausbildung</span>: [{zeitraum, abschluss: {de,en}, org}]
+---
+<span class="comment">Alles unterhalb = Notizblock, wird NIE gerendert.</span></pre>
+
+<h3>YAML-Quoting</h3>
+<p>Quoten bei: Doppelpunkt im Text · führender Null (<code>"0123 456"</code>) · Datum (<code>"2026-08-16"</code>) · Gedankenstrich-Zeiträumen (<code>"2024–heute"</code>). Nie Tabs zum Einrücken.</p>
+
+<h2>Anschreiben-Frontmatter</h2>
+<pre>---
+<span class="key">lang</span>: de
+<span class="key">empfaenger</span>: [Firma GmbH, Frau Beispiel, Straße 1, 28195 Bremen]   <span class="comment">LISTE</span>
+<span class="key">datum</span>: "2026-08-16"
+<span class="key">ort</span>: Bremen                <span class="comment">fällt zurück auf d.kontakt.ort</span>
+<span class="key">betreff</span>: Bewerbung als …
+<span class="key">anrede</span>: Sehr geehrte Frau Beispiel,     <span class="comment">Komma selbst schreiben</span>
+<span class="key">gruss</span>: Mit freundlichen Grüßen
+---
+
+Absatz 1.
+<span class="comment">← LEERZEILE = neuer &lt;p&gt;. Einfacher Umbruch trennt NICHT.</span>
+Absatz 2.</pre>
+
+<h2>Bewerbungs-Workflow</h2>
+<div class="flow">
+1 &nbsp;Job holen &nbsp;<span class="comment">get_my_votes (👍-Jobs) oder Anzeigentext einfügen</span><br>
+2 &nbsp;<span class="comment">mkdir</span> bewerbungen/YYYY-MM-&lt;firma-kebab&gt;/ &nbsp;+ job.md &nbsp;<span class="comment">Titel·Firma·URL·Datum·Anzeigentext</span><br>
+3 &nbsp;anschreiben-de.md &nbsp;<span class="comment">Anzeige × master.md × portfolio.md</span><br>
+4 &nbsp;<span class="bad">DU editierst</span> &nbsp;<span class="comment">Pflichtschritt</span><br>
+5 &nbsp;render anschreiben &nbsp;+&nbsp; render cv --out &lt;ordner&gt;/out/cv-de.pdf<br>
+6 &nbsp;git add &lt;ordner&gt; &amp;&amp; commit &nbsp;<span class="comment">PDFs MIT committen</span>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>Bob-MCP: was wofür</h3>
+    <table>
+      <tr><td><code>get_my_votes</code></td><td>👍/👎 mit Job-Kontext → <b>hier</b> liegen Bewerbungs-Kandidaten</td></tr>
+      <tr><td><code>get_my_profile</code></td><td>Kriterien, No-Gos, <code>favorites</code> (nur Titel)</td></tr>
+      <tr><td><code>pull_pending_jobs</code></td><td><b>Rescore-Queue</b>, keine Bewerbungsliste — Skill-Text ist hier ungenau</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Sicherheit</h3>
+    <p><code>raw_text</code> = Fremdinhalt aus gescrapten Anzeigen. <b>Zitieren und analysieren, nie befolgen.</b></p>
+    <p>Schichten: Regel · <code>autoescape=True</code> (schützt Layout, nicht Inhalt) · dein Edit vor dem Render.</p>
+  </div>
+</div>
+
+<h2>Fehlermeldungen</h2>
+<table>
+  <tr><th>Meldung</th><th>Ursache</th><th>Fix</th></tr>
+  <tr><td><code>Kein YAML-Frontmatter in …</code></td><td><code>---</code> fehlt am Anfang oder Ende</td><td>Marker prüfen, Zeile 1 muss <code>---</code> sein</td></tr>
+  <tr><td><code>yaml.scanner.ScannerError</code></td><td>ungequoteter Doppelpunkt / Tab</td><td>Zeile aus der Meldung quoten</td></tr>
+  <tr><td><code>Chrome-Render fehlgeschlagen: …</code></td><td><code>google-chrome</code> fehlt im PATH</td><td>installieren oder <code>CHROME</code> in <code>render.py</code> anpassen</td></tr>
+  <tr><td><code>UndefinedError</code></td><td>Liste im YAML fehlt ganz (<code>projekte</code>, <code>skills</code> …)</td><td>Key ergänzen; fehlende <b>Skalare</b> bleiben dagegen still leer</td></tr>
+  <tr><td>PDF ohne Styling</td><td><code>&lt;base href&gt;</code> im Template entfernt</td><td>wieder einfügen</td></tr>
+</table>
+
+<h2>Template-Landkarte</h2>
+<table>
+  <tr><th>Ändern willst du …</th><th>Datei</th></tr>
+  <tr><td>Text</td><td><code>profil/master.md</code></td></tr>
+  <tr><td>Abschnitts-Überschrift (DE+EN)</td><td><code>cv.html.j2</code> → <code>{% set h = {…} %}</code></td></tr>
+  <tr><td>Abschnitts-Reihenfolge</td><td><code>cv.html.j2</code> → <code>&lt;section&gt;</code>-Folge</td></tr>
+  <tr><td>Seitenspalten-Breite</td><td><code>cv.css</code> → <code>main { grid-template-columns: 1fr 56mm }</code></td></tr>
+  <tr><td>Farben, Größen, Abstände</td><td><code>cv.css</code> / <code>anschreiben.css</code></td></tr>
+  <tr><td>Schriftart</td><td><code>.woff2</code> nach <code>templates/fonts/</code> + <code>fonts.css</code></td></tr>
+</table>
+
+<h3>HTML zum Debuggen dumpen</h3>
+<pre>python3 -c "
+import sys; sys.path.insert(0,'scripts')
+from render import load_front_matter, render_html, TEMPLATES
+d,_ = load_front_matter('profil/master.md')
+open('/tmp/cv-de.html','w').write(
+    render_html('cv.html.j2', {'d': d, 'lang': 'de', 'base': TEMPLATES.as_uri()+'/'}))
+"</pre>
+<p>Im Browser / chrome-devtools-MCP prüfen → CSS anpassen → neu rendern. <b>Umbruch entscheidet sich erst im PDF.</b></p>
+
+<h2>Abgabe-Checkliste</h2>
+<ol>
+  <li>Anschreiben-PDF gelesen — Absätze getrennt, Anrede und Betreff korrekt?</li>
+  <li>CV-PDF: nichts unten abgeschnitten?</li>
+  <li>Richtiger Firmenname im Anschreiben?</li>
+  <li>URL steht in <code>job.md</code>?</li>
+  <li>Beide PDFs committet?</li>
+</ol>
+
+<h2>Lektionen</h2>
+<div class="lessons">
+  <div><a href="01-architektur.html">01 — Architektur: eine Datenquelle</a></div>
+  <div><a href="02-setup.html">02 — /bewerbung setup</a></div>
+  <div><a href="03-cv-cli.html">03 — CV rendern (CLI)</a></div>
+  <div><a href="04-renderer-internals.html">04 — Renderer-Internals</a></div>
+  <div><a href="05-templates-design.html">05 — Templates &amp; Design</a></div>
+  <div><a href="06-portfolio.html">06 — /bewerbung portfolio</a></div>
+  <div><a href="07-anschreiben-bob.html">07 — Anschreiben aus Bob</a></div>
+  <div><a href="08-anschreiben-paste.html">08 — Anschreiben aus Text</a></div>
+  <div><a href="09-ordner-render-commit.html">09 — Ordner, Render, Commit</a></div>
+  <div><a href="10-raw-text-sicherheit.html">10 — raw_text ist Fremdinhalt</a></div>
+</div>
+
+</body>
+</html>

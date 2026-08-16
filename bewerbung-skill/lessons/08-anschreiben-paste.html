@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 8: Anschreiben aus eingefügtem Text</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>Anschreiben aus eingefügtem Text</h1>
+<div class="subtitle">Lektion 8 von 10 · Weg B — und wie ein Entwurf entsteht, der nicht nach Vorlage klingt</div>
+
+<h2>Der Einstieg</h2>
+<pre>/bewerbung anschreiben
+
+&lt;dann die komplette Anzeige einfügen&gt;</pre>
+<p>Kein MCP, keine DB. Du kopierst die Anzeige von der Karriereseite, aus der Mail oder aus dem Bob-Chat. Dieser Weg funktioniert für <b>jede</b> Quelle — auch für Initiativbewerbungen, wo es gar keine Anzeige gibt (dann fütterst du stattdessen die Über-uns-Seite).</p>
+
+<div class="why">
+  <b>Warum Weg B der Standard sein sollte:</b> Er hat keine Abhängigkeiten. Kein MCP-Token, kein Server, keine Tool-Semantik, die sich ändern kann (siehe Lektion 7). Weg A spart dir das Kopieren — mehr nicht.
+</div>
+
+<h2>Was Claude aus dem Text ziehen muss</h2>
+<table>
+  <tr><th>Für</th><th>Feld</th><th>Wenn es fehlt</th></tr>
+  <tr><td>Ordnername</td><td>Firma</td><td>nachfragen — der Name steckt im Pfad</td></tr>
+  <tr><td><code>job.md</code></td><td>Titel, Quelle/URL, Datum</td><td>URL selbst mitliefern; sie steht selten im Fließtext</td></tr>
+  <tr><td><code>empfaenger[]</code></td><td>Firma + Adresse, ggf. Ansprechpartner</td><td>nur Firma + Ort ist zulässig</td></tr>
+  <tr><td><code>anrede</code></td><td>Name des Ansprechpartners</td><td>„Sehr geehrte Damen und Herren,"</td></tr>
+  <tr><td>Argumentation</td><td>3–5 konkrete Anforderungen</td><td>ohne die wird das Anschreiben generisch</td></tr>
+</table>
+
+<div class="warn">
+  <b>Beim Kopieren gehen Dinge verloren:</b> Die URL steht im Browser, nicht im Text. Der Ansprechpartner steht oft nur im Kontaktkasten am Seitenende, den man beim Markieren übersieht. Beides <b>bewusst</b> mitgeben — nachträglich ist der Tab zu.
+</div>
+
+<h2>Die Formel für den Entwurf</h2>
+<pre>Anforderungen der Anzeige  ×  master.md  ×  portfolio.md-Storys</pre>
+<p>Alle drei Faktoren. Fällt einer weg, kippt der Text:</p>
+<ul>
+  <li>nur Anzeige + Profil → Aufzählung deines CVs in Prosa, kein Beleg</li>
+  <li>nur Anzeige + Storys → nette Projekte ohne Bezug zu deinem Werdegang</li>
+  <li>nur Profil + Storys → dasselbe Anschreiben für jede Firma; genau das erkennt jeder Recruiter</li>
+</ul>
+
+<h3>Ein Absatz nach der Formel</h3>
+<pre><span class="comment">Anzeige:  „Erfahrung mit Unity und Gameplay-Systemen"</span>
+<span class="comment">master.md: Unity/C# (2 J)</span>
+<span class="comment">portfolio: Third-Person-Prototyp mit eigener State Machine, spielbar (Link)</span>
+
+→ „Gameplay-Systeme habe ich in Unity gebaut, nicht nur benutzt: Für
+   &lt;Projekt&gt; habe ich den Character-Controller als eigene State Machine
+   implementiert — spielbar unter &lt;Link&gt;."</pre>
+<p>Muster: <em>Anforderung aufgreifen → konkrete Umsetzung → anklickbarer Beleg.</em> Keine Adjektive („leidenschaftlich", „hochmotiviert"), keine Absichtserklärungen.</p>
+
+<h2>Die Quereinstiegs-Regel</h2>
+<p>Aus <code>SKILL.md</code>: <em>„Quereinstieg als Progression (Spielerpfad), nicht als Entschuldigung."</em></p>
+<table>
+  <tr><th>Entschuldigung</th><th>Progression</th></tr>
+  <tr><td>„Auch wenn ich keinen Informatik-Abschluss habe …"</td><td>„Aus der Sportwissenschaft bringe ich mit, wie man Bewegung analysiert — das ist die Frage, die ich jetzt in Unity beantworte."</td></tr>
+  <tr><td>„Ich bin Quereinsteiger, aber lernbereit."</td><td>„In zwei Jahren Unity/C# habe ich &lt;X&gt; gebaut; der nächste Schritt ist &lt;Y&gt; im Team."</td></tr>
+</table>
+<div class="why">
+  <b>Warum das mehr als Rhetorik ist:</b> Es ist derselbe Gedanke wie der <code>spielerpfad</code> im CV-Kopf. Jeder Node ist erledigt oder aktuell, keiner ist ein Fehler. Wenn Anschreiben und CV dieselbe Geschichte in zwei Medien erzählen, wirkt die Bewerbung wie ein Stück — und du musst im Gespräch nichts zurechtbiegen.
+</div>
+
+<h2>Länge und Aufbau</h2>
+<p><code>anschreiben.css</code> hat <b>keine</b> harte Höhenbegrenzung wie der CV — zu viel Text erzeugt hier eine zweite Seite statt eines Beschnitts. Trotzdem: <b>eine Seite</b>. Vier bis fünf Absätze:</p>
+<ol>
+  <li>Einstieg: worauf du dich beziehst, in einem Satz — kein „hiermit bewerbe ich mich"</li>
+  <li>stärkstes Match zur Hauptanforderung, mit Beleg</li>
+  <li>zweites Match / Quereinstieg als Progression</li>
+  <li>warum diese Firma (etwas aus der Anzeige aufgreifen, das nicht in jeder Anzeige steht)</li>
+  <li>Schluss: Verfügbarkeit, Gesprächswunsch</li>
+</ol>
+<div class="warn">
+  <b>Absatztrennung:</b> Absätze im Body werden an <b>Leerzeilen</b> getrennt (<code>paragraphs()</code>, Lektion 4). Ein einfacher Umbruch klebt die Sätze zusammen — im Editor sieht es getrennt aus, im PDF nicht.
+</div>
+
+<h2>Du editierst — das ist ein Schritt, kein Höflichkeitsangebot</h2>
+<p>Der Skill sagt ausdrücklich: <em>„User editiert → dann rendern."</em> Der Entwurf ist ein Entwurf. Prüfe vor dem Render mindestens:</p>
+<ul>
+  <li>Stimmt jede Tatsachenbehauptung? (Zeiträume, Projektumfang, Tech)</li>
+  <li>Klingt ein Satz nach Textbaustein? Streichen.</li>
+  <li>Ist der Firmenbezug austauschbar? Dann ist Absatz 4 wertlos.</li>
+  <li>Steht mindestens ein anklickbarer Beleg drin?</li>
+</ul>
+
+<div class="task">
+  <b>Do it (deine erste echte Bewerbung):</b>
+  <ol>
+    <li>Such dir eine reale Anzeige, die dich interessiert.</li>
+    <li><code>/bewerbung anschreiben</code>, Text einfügen — <b>plus URL und Ansprechpartner separat</b>.</li>
+    <li>Markiere im Entwurf jeden Satz, der auch in einer Bewerbung an eine andere Firma stehen könnte. Ziel: höchstens Einstieg und Schluss.</li>
+    <li>Erst danach rendern (Lektion 9).</li>
+  </ol>
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Du fügst nur den Anzeigentext ein, sonst nichts. Welches Feld in <code>job.md</code> bleibt fast sicher leer?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Quelle/URL — die steht im Browser, nicht im kopierten Text</li>
+    <li onclick="this.className='wrong'">Titel</li>
+    <li onclick="this.className='wrong'">Datum</li>
+  </ul>
+  <div class="quiz-q">2. Welcher Faktor der Formel fehlt, wenn ein Anschreiben deinen CV in Prosa nacherzählt?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Die Anzeige</li>
+    <li onclick="this.className='correct'">Die Portfolio-Storys — es fehlt der konkrete, belegbare Fall</li>
+    <li onclick="this.className='wrong'"><code>master.md</code></li>
+  </ul>
+  <div class="quiz-q">3. Zu viel Text im Anschreiben führt zu …</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">einer zweiten PDF-Seite — anders als beim CV wird hier nichts abgeschnitten</li>
+    <li onclick="this.className='wrong'">stillem Beschnitt wie beim CV</li>
+    <li onclick="this.className='wrong'">einem Render-Fehler</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li>Weg B braucht keine Infrastruktur und funktioniert für jede Quelle — auch für Initiativbewerbungen.</li>
+    <li>URL und Ansprechpartner beim Einfügen bewusst mitliefern; sie fehlen im kopierten Text.</li>
+    <li>Formel: Anzeige × <code>master.md</code> × <code>portfolio.md</code> — fällt ein Faktor weg, kippt der Text.</li>
+    <li>Quereinstieg als Progression formulieren, gleiche Geschichte wie der <code>spielerpfad</code> im CV.</li>
+    <li>Absätze durch <b>Leerzeilen</b> trennen; Anschreiben darf umbrechen, wird aber nicht länger als eine Seite.</li>
+    <li>Der Edit-Schritt vor dem Render ist Pflicht, nicht Kür.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="09-ordner-render-commit.html">Lektion 9 — Ordner, Frontmatter, Render, Commit</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

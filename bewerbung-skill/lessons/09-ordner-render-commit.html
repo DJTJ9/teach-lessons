@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 9: Bewerbungsordner, Frontmatter, Render, Commit</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  pre .bad { color:var(--red); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .file-tree { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; }
+  .file-tree .dir { color:var(--accent3); }
+  .file-tree .file { color:var(--accent2); }
+  .file-tree .note { color:var(--muted); font-size:11px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>Ordner, Frontmatter, Render, Commit</h1>
+<div class="subtitle">Lektion 9 von 10 · Vom Entwurf zum abgabefertigen Ordner</div>
+
+<h2>Der Bewerbungsordner</h2>
+<div class="file-tree">
+  <div><span class="dir">bewerbungen/2026-08-acme-games/</span> &nbsp;<span class="note">YYYY-MM-&lt;firma-kebab&gt;</span></div>
+  <div>&nbsp;&nbsp;<span class="file">job.md</span> &nbsp;<span class="note">Titel · Firma · Quelle/URL · Datum · Anzeigentext</span></div>
+  <div>&nbsp;&nbsp;<span class="file">anschreiben-de.md</span> &nbsp;<span class="note">Frontmatter + Absätze</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">out/</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">anschreiben-de.pdf</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">cv-de.pdf</span> &nbsp;<span class="note">Kopie des CV-Stands zum Bewerbungszeitpunkt</span></div>
+</div>
+
+<div class="why">
+  <b>Warum Datum im Ordnernamen und Firma in Kebab-Case?</b><br>
+  <code>2026-08-acme-games</code> sortiert chronologisch von selbst und ist gleichzeitig durchsuchbar (<code>ls bewerbungen | grep acme</code>). Kein Leerzeichen, kein Umlaut, keine Klammer — der Pfad taucht in Shell-Befehlen auf und soll nie gequotet werden müssen.
+</div>
+
+<h2>Das Anschreiben-Frontmatter</h2>
+<pre>---
+<span class="key">lang</span>: de
+<span class="key">empfaenger</span>:
+  - ACME Games GmbH
+  - Frau Beispiel
+  - Musterstraße 1
+  - 28195 Bremen
+<span class="key">datum</span>: "2026-08-16"
+<span class="key">ort</span>: Bremen
+<span class="key">betreff</span>: Bewerbung als Junior Gameplay Programmer (m/w/d)
+<span class="key">anrede</span>: Sehr geehrte Frau Beispiel,
+<span class="key">gruss</span>: Mit freundlichen Grüßen
+---
+
+Erster Absatz.
+
+Zweiter Absatz.</pre>
+
+<table>
+  <tr><th>Feld</th><th>Typ</th><th>Landet im PDF als</th></tr>
+  <tr><td><code>lang</code></td><td>String</td><td>steuert <code>tr()</code> <b>und</b> den Default-Dateinamen</td></tr>
+  <tr><td><code>empfaenger</code></td><td><b>Liste</b></td><td>je Element eine <code>&lt;div&gt;</code>-Zeile im Adressblock</td></tr>
+  <tr><td><code>ort</code>, <code>datum</code></td><td>String</td><td><code>{{ ort }}, {{ datum }}</code> — <code>ort</code> fällt auf <code>d.kontakt.ort</code> zurück</td></tr>
+  <tr><td><code>betreff</code></td><td>String</td><td>fette Betreffzeile</td></tr>
+  <tr><td><code>anrede</code>, <code>gruss</code></td><td>String</td><td>eigene Absätze — <b>Komma selbst schreiben</b></td></tr>
+</table>
+
+<div class="warn">
+  <b>Drei Frontmatter-Fallen:</b>
+  <ul>
+    <li><code>empfaenger</code> muss eine <b>Liste</b> sein. Ein einzelner String wird von <code>{% for zeile in m.empfaenger %}</code> zeichenweise durchlaufen — jeder Buchstabe eine Zeile.</li>
+    <li><code>lang</code> steht <b>nur</b> hier. <code>render.py anschreiben</code> hat kein <code>--lang</code>-Flag: <code>lang = meta.get("lang", "de")</code>. Ein englisches Anschreiben entsteht durch <code>lang: en</code> in der Datei, nicht durch ein CLI-Argument.</li>
+    <li><code>datum: 2026-08-16</code> ohne Quotes wird von YAML zu einem <code>date</code>-Objekt und im PDF als <code>2026-08-16</code> gedruckt. Willst du „16. August 2026", schreib es als gequoteten String.</li>
+  </ul>
+</div>
+
+<div class="why">
+  <b>Warum die Sprache im Dokument steht und nicht im Aufruf:</b> Ein Anschreiben <em>ist</em> in einer Sprache verfasst — anders als der CV, der aus denselben Daten in zwei Sprachen entsteht. Es gibt keinen sinnvollen Grund, denselben deutschen Text „auf Englisch zu rendern". Also gehört die Angabe zum Text, und du kannst sie nicht versehentlich falsch aufrufen.
+</div>
+
+<h2>Rendern — beide Dokumente in denselben Ordner</h2>
+<pre>cd /root/projekte/bewerbung
+
+python3 scripts/render.py anschreiben bewerbungen/2026-08-acme-games/anschreiben-de.md
+<span class="comment"># → bewerbungen/2026-08-acme-games/out/anschreiben-de.pdf   (Default: &lt;md-ordner&gt;/out/)</span>
+
+python3 scripts/render.py cv --lang de \
+  --out bewerbungen/2026-08-acme-games/out/cv-de.pdf
+<span class="comment"># → ohne --out landet der CV in out/cv-de.pdf und überschreibt den generischen Stand</span></pre>
+
+<p>Beachte die Asymmetrie: Das <b>Anschreiben</b> landet automatisch im richtigen Ordner (Default ist relativ zur <code>.md</code>-Datei). Der <b>CV</b> braucht <code>--out</code>, weil sein Default am Repo hängt.</p>
+
+<h2>Commit — mit PDFs</h2>
+<pre>git -C /root/projekte/bewerbung add bewerbungen/2026-08-acme-games
+git -C /root/projekte/bewerbung commit -m "feat(bewerbung): Bewerbung ACME Games"</pre>
+
+<div class="why">
+  <b>Warum generierte Dateien hier ins Git gehören:</b><br>
+  Normalerweise committet man keine Build-Artefakte — sie sind aus der Quelle reproduzierbar. Hier nicht: In sechs Wochen hat sich <code>master.md</code> geändert. Ein Re-Render erzeugt dann <em>einen anderen CV</em> als den, den ACME bekommen hat. Das PDF ist der einzige Zeuge dessen, was du tatsächlich verschickt hast — und im Gespräch willst du genau dieses Dokument vor dir haben. Der Skill sagt darum ausdrücklich: „Output-PDFs MIT committen".
+</div>
+
+<div class="warn">
+  <b>Prüf einmal, dass <code>.gitignore</code> nicht dagegen arbeitet:</b>
+  <pre>git -C /root/projekte/bewerbung check-ignore -v bewerbungen/2026-08-acme-games/out/cv-de.pdf</pre>
+  Keine Ausgabe = die Datei wird getrackt. Kommt eine Regel zurück, greift ein <code>*.pdf</code>- oder <code>out/</code>-Muster und du müsstest mit <code>git add -f</code> arbeiten oder die Regel anpassen.
+</div>
+
+<h2>Die Abgabe-Checkliste</h2>
+<ol>
+  <li>Anschreiben-PDF gelesen — Absätze getrennt? Anrede stimmt? Betreff korrekt?</li>
+  <li>CV-PDF geprüft — nichts abgeschnitten (Lektion 5), Kontaktdaten aktuell.</li>
+  <li>Firmenname im Anschreiben ist der richtige. (Der klassische Copy-Paste-Unfall.)</li>
+  <li><code>job.md</code> enthält die URL.</li>
+  <li>Beide PDFs committet.</li>
+</ol>
+
+<div class="task">
+  <b>Do it:</b> Leg den Ordner für deine Bewerbung aus Lektion 8 vollständig an, rendere beide PDFs hinein, geh die Checkliste durch und committe. Danach:
+  <pre>ls -R bewerbungen/</pre>
+  Der Baum soll exakt wie oben aussehen.
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Wie renderst du ein englisches Anschreiben?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'"><code>render.py anschreiben datei.md --lang en</code></li>
+    <li onclick="this.className='correct'"><code>lang: en</code> ins Frontmatter der <code>.md</code> — das Subcommand hat kein <code>--lang</code></li>
+    <li onclick="this.className='wrong'">Über <code>--profil profil/master-en.md</code></li>
+  </ul>
+  <div class="quiz-q">2. Du renderst den CV ohne <code>--out</code>, während du an einer Bewerbung arbeitest. Was passiert?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Er landet in <code>out/cv-de.pdf</code> im Repo-Root — im Bewerbungsordner fehlt der CV</li>
+    <li onclick="this.className='wrong'">Er landet neben der <code>anschreiben-de.md</code></li>
+    <li onclick="this.className='wrong'">Der Befehl bricht ab, weil das Ziel mehrdeutig ist</li>
+  </ul>
+  <div class="quiz-q">3. Warum werden die PDFs committet, obwohl sie generiert sind?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Damit man sie ohne Chrome öffnen kann</li>
+    <li onclick="this.className='correct'">Weil ein Re-Render nach einer <code>master.md</code>-Änderung ein <b>anderes</b> Dokument erzeugt — nur das committete PDF belegt, was verschickt wurde</li>
+    <li onclick="this.className='wrong'">Weil Git sonst den Ordner als leer betrachtet</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li>Ordnerschema <code>bewerbungen/YYYY-MM-&lt;firma-kebab&gt;/</code> mit <code>job.md</code>, <code>anschreiben-de.md</code>, <code>out/</code>.</li>
+    <li>Frontmatter-Pflichtfelder: <code>lang, empfaenger[], datum, ort, betreff, anrede, gruss</code>; <code>empfaenger</code> ist eine Liste, <code>datum</code> quoten.</li>
+    <li>Sprache des Anschreibens kommt aus <code>lang:</code>, nicht aus einem Flag.</li>
+    <li>Anschreiben landet per Default im Ordner, der CV braucht <code>--out</code>.</li>
+    <li>PDFs werden mitcommittet — sie sind der Beleg für den verschickten Stand.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="10-raw-text-sicherheit.html">Lektion 10 — raw_text ist Fremdinhalt</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>

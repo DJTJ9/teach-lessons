@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lektion 1: Architektur — master.md ist die einzige Quelle</title>
+<style>
+  :root { --bg:#0f1117; --surface:#1a1d27; --border:#2a2d3e; --accent:#7c6af5; --accent2:#4ecdc4; --accent3:#f7b731; --text:#e8eaf0; --muted:#8890a4; --code-bg:#12151f; --green:#51cf66; --red:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; font-size:15px; line-height:1.7; max-width:820px; margin:0 auto; padding:32px 24px; }
+  h1 { font-size:26px; color:var(--accent); margin-bottom:6px; }
+  .subtitle { color:var(--muted); font-size:14px; margin-bottom:32px; }
+  h2 { font-size:16px; color:var(--accent2); margin:32px 0 12px; text-transform:uppercase; letter-spacing:1px; }
+  h3 { font-size:14px; color:var(--accent3); margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { padding-left:20px; margin-bottom:12px; }
+  li { margin:5px 0; }
+  code { font-family:'Fira Code',monospace; background:var(--code-bg); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent2); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:'Fira Code',monospace; font-size:13px; line-height:1.6; overflow-x:auto; margin:12px 0; color:#c9d1d9; }
+  pre .comment { color:var(--muted); }
+  pre .key { color:var(--accent3); }
+  pre .val { color:var(--green); }
+  .why { background:#1a1a2e; border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .why b { color:var(--accent); }
+  .warn { background:#2a1a1a; border-left:4px solid var(--red); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .warn b { color:var(--red); }
+  .task { background:#12301a; border-left:4px solid var(--green); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0; }
+  .task b { color:var(--green); }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td { border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--surface); color:var(--accent3); font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+  .file-tree { background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; font-family:monospace; font-size:13px; line-height:2; }
+  .file-tree .dir { color:var(--accent3); }
+  .file-tree .file { color:var(--accent2); }
+  .file-tree .note { color:var(--muted); font-size:11px; }
+  .quiz { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .quiz h2 { margin-top:0; }
+  .quiz-q { margin:16px 0 8px; font-weight:600; }
+  .quiz-opts { list-style:none; padding-left:0; }
+  .quiz-opts li { padding:8px 12px; margin:4px 0; border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .quiz-opts li:hover { background:var(--border); }
+  .quiz-opts li.correct { background:#12301a; border-color:var(--green); color:var(--green); }
+  .quiz-opts li.wrong { background:#301212; border-color:var(--red); color:var(--red); }
+  .summary { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:32px; }
+  .nav { margin-top:32px; padding-top:16px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); }
+  .nav a { color:var(--accent2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>Architektur</h1>
+<div class="subtitle">Lektion 1 von 10 · Warum es nur <em>eine</em> Datenquelle gibt</div>
+
+<h2>Das eine Konzept</h2>
+<p><code>profil/master.md</code> ist die <strong>einzige</strong> Stelle, an der deine Bewerbungsdaten stehen. CV-DE, CV-EN und jedes Anschreiben lesen aus derselben Datei. Es gibt keine zweite Kopie, die veralten könnte.</p>
+
+<div class="why">
+  <b>Warum das der Kern ist:</b><br>
+  Der klassische Bewerbungs-Failure ist Drift: Du änderst die Telefonnummer im deutschen CV, vergisst den englischen, und schickst eine Bewerbung mit toter Nummer raus. Wenn beide Sprachen aus <em>einem</em> YAML-Block gerendert werden, ist Drift strukturell unmöglich — es gibt nichts, was auseinanderlaufen könnte.
+</div>
+
+<h2>Die vier Schichten</h2>
+
+<div class="file-tree">
+  <div><span class="dir">/root/projekte/bewerbung/</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">profil/</span> &nbsp;<span class="note">← DATEN</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">master.md</span> &nbsp;<span class="note">YAML-Frontmatter: alles, was im CV steht</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">portfolio.md</span> &nbsp;<span class="note">3–4 Showcases + Storys fürs Anschreiben</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">templates/</span> &nbsp;<span class="note">← FORM</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">cv.html.j2 · cv.css</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">anschreiben.html.j2 · anschreiben.css</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">fonts/</span> &nbsp;<span class="note">.woff2 lokal — kein CDN, offline-fest</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">scripts/</span> &nbsp;<span class="note">← MASCHINE</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">render.py</span> &nbsp;<span class="note">92 Zeilen: YAML → Jinja2 → Chrome → PDF</span></div>
+  <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">test_render.py</span> &nbsp;<span class="note">pytest-Smoke, eigene Fixture</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">bewerbungen/</span> &nbsp;<span class="note">← ARTEFAKTE (pro Job ein Ordner)</span></div>
+  <div>&nbsp;&nbsp;<span class="dir">out/</span> &nbsp;<span class="note">generische CV-PDFs ohne Job-Bezug</span></div>
+</div>
+
+<p>Die Trennung ist streng: <strong>Daten</strong> wissen nichts über Layout. <strong>Templates</strong> enthalten keine Inhalte. <strong>render.py</strong> kennt weder deinen Namen noch die Farben — es verheiratet nur beides.</p>
+
+<h2>Der Datenfluss</h2>
+
+<pre>profil/master.md
+   │  <span class="comment">load_front_matter()  — Regex trennt ---YAML--- vom Rest</span>
+   ▼
+ dict d
+   │  <span class="comment">render_html()  — Jinja2 füllt cv.html.j2, Filter |tr wählt Sprache</span>
+   ▼
+ HTML-String  (+ &lt;base href="file:///…/templates/"&gt; → CSS und Fonts laden lokal)
+   │  <span class="comment">html_to_pdf()  — Tempfile + Chrome headless --print-to-pdf</span>
+   ▼
+out/cv-de.pdf</pre>
+
+<div class="why">
+  <b>Warum Chrome statt einer PDF-Bibliothek?</b><br>
+  Weil du dann in echtem CSS layoutest und das Ergebnis im Browser live prüfen kannst. Eine PDF-Lib (reportlab &amp; Co.) hätte eine eigene Layout-Sprache, die du nirgends sonst verwenden kannst. Preis dafür: Chrome muss installiert sein, und der Aufruf ist ein Subprozess mit <code>--no-sandbox</code>.
+</div>
+
+<h2>Was im Markdown-Body steht, wird nie gerendert</h2>
+<p><code>load_front_matter()</code> gibt zwei Dinge zurück: das geparste YAML <em>und</em> den Text darunter. Für den CV wird der Body weggeworfen (<code>data, _ = load_front_matter(...)</code>). Deshalb ist der Bereich unter dem zweiten <code>---</code> in <code>master.md</code> ein freier Notizblock: Rohmaterial, verworfene Formulierungen, Varianten.</p>
+
+<div class="warn">
+  <b>Ausnahme Anschreiben:</b> Dort ist der Body die Nutzlast. <code>cmd_anschreiben()</code> nimmt <code>meta, body</code> — das Frontmatter liefert Empfänger/Betreff/Datum, der Body die Absätze. Gleiche Datei-Form, umgekehrte Gewichtung.
+</div>
+
+<h2>Die vier Befehle in einer Zeile</h2>
+<table>
+  <tr><th>Befehl</th><th>Berührt</th><th>Wie oft</th></tr>
+  <tr><td><code>/bewerbung setup</code></td><td><code>profil/master.md</code></td><td>einmal, dann bei Änderungen</td></tr>
+  <tr><td><code>/bewerbung cv [de|en]</code></td><td><code>out/*.pdf</code></td><td>nach jeder Datenänderung</td></tr>
+  <tr><td><code>/bewerbung anschreiben [job]</code></td><td><code>bewerbungen/&lt;dir&gt;/</code></td><td>pro Job einmal</td></tr>
+  <tr><td><code>/bewerbung portfolio</code></td><td><code>profil/portfolio.md</code> + <code>projekte:</code></td><td>selten, wenn neues Projekt fertig</td></tr>
+</table>
+
+<div class="task">
+  <b>Do it:</b> Öffne <code>/root/projekte/bewerbung/profil/master.md</code> und zähle die <code>TODO</code>-Vorkommen:
+  <pre>cd /root/projekte/bewerbung && grep -c TODO profil/master.md</pre>
+  Das ist deine Arbeitsliste für Lektion 2. Öffne danach <code>out/cv-de.pdf</code> — du siehst dasselbe Layout, nur mit „TODO" gefüllt. Form steht, Inhalt fehlt.
+</div>
+
+<div class="quiz">
+  <h2>Check</h2>
+  <div class="quiz-q">1. Du änderst deine E-Mail-Adresse. Wie viele Dateien musst du anfassen, damit CV-DE, CV-EN und alle künftigen Anschreiben stimmen?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Drei — je eine pro Ausgabe</li>
+    <li onclick="this.className='correct'">Eine — <code>profil/master.md</code>, dann neu rendern</li>
+    <li onclick="this.className='wrong'">Zwei — master.md und die Templates</li>
+  </ul>
+  <div class="quiz-q">2. Was passiert mit Text, den du unter das zweite <code>---</code> in master.md schreibst?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='wrong'">Er erscheint als Fließtext am Ende des CV</li>
+    <li onclick="this.className='correct'">Nichts — <code>cmd_cv()</code> verwirft den Body, es ist reiner Notizraum</li>
+    <li onclick="this.className='wrong'">Der Renderer bricht mit einem YAML-Fehler ab</li>
+  </ul>
+  <div class="quiz-q">3. Warum liegen die Schriftarten als <code>.woff2</code> im Repo statt per Google-Fonts-Link?</div>
+  <ul class="quiz-opts">
+    <li onclick="this.className='correct'">Chrome rendert die Datei über <code>file://</code> — ein CDN-Font wäre bei fehlendem Netz still weg und das PDF sähe anders aus</li>
+    <li onclick="this.className='wrong'">Google Fonts erlaubt keine PDF-Einbettung</li>
+    <li onclick="this.className='wrong'">woff2 ist die einzige Schriftart, die Jinja2 versteht</li>
+  </ul>
+</div>
+
+<div class="summary">
+  <h2>Gelernt</h2>
+  <ul>
+    <li><code>profil/master.md</code> ist Single Source of Truth — DE und EN kommen aus <em>demselben</em> YAML.</li>
+    <li>Vier Schichten: Daten (<code>profil/</code>) · Form (<code>templates/</code>) · Maschine (<code>scripts/render.py</code>) · Artefakte (<code>bewerbungen/</code>).</li>
+    <li>Pipeline: YAML → Jinja2 → HTML → Chrome headless → A4-PDF.</li>
+    <li>Markdown-Body ist beim CV Notizraum, beim Anschreiben die Nutzlast.</li>
+    <li>Fonts liegen lokal, damit das PDF offline reproduzierbar bleibt.</li>
+  </ul>
+</div>
+
+<div class="nav">Nächste: <a href="02-setup.html">Lektion 2 — /bewerbung setup</a> · <a href="00-cheatsheet.html">Cheat Sheet</a></div>
+
+</body>
+</html>
