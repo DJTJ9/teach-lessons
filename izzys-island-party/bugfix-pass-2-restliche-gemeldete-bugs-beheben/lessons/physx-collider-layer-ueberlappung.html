@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>PhysX Collider-Layer-Überlappung</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.6em; border-bottom: 3px solid #4a7; padding-bottom: 10px; }
+  h2 { font-size: 1.2em; color: #2a6; margin-top: 2em; }
+  code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+  pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  .box { background: #eef7f0; border-left: 4px solid #4a7; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .warn { background: #fff3e0; border-left: 4px solid #e08a2a; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #fff; border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 2em 0; }
+  .quiz label { display: block; padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px 0; }
+  .quiz label:hover { background: #f0f0f0; }
+  #result { margin-top: 12px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+  .correct { background: #d4f4dd; color: #1a5c2a; }
+  .wrong { background: #fde2e2; color: #8a1f1f; }
+  .cite { font-size: 0.85em; color: #666; }
+  .summary { background: #fff8e1; border: 2px solid #f0c040; border-radius: 10px; padding: 16px; margin-top: 2em; }
+</style>
+</head>
+<body>
+
+<h1>PhysX Collider-Layer-Überlappung</h1>
+
+<p>Der Minigolf-Ball sprang gelegentlich unerklärlich in die Luft. Die Diagnose dieser Session fand eine <strong>teilweise</strong> Ursache — eine vollständige Lektion über die gefundene Mechanik, auch wenn der Bug am Ende nicht komplett gelöst wurde.</p>
+
+<h2>Das Konzept: Zwei Collider am selben Ort = zwei Meinungen über den Kontakt</h2>
+
+<p>PhysX löst pro Physik-Schritt für jedes Collider-Paar, das sich berührt oder überlappt, einen <strong>Contact</strong> mit Normale, Eindringtiefe (<em>penetration</em>) und Korrektur-Impuls auf. Liegen <strong>zwei unabhängige, nicht identische Collider</strong> am selben Ort, berechnet PhysX zwei getrennte Contacts — mit potenziell leicht unterschiedlicher Normale oder Eindringtiefe. Das Ergebnis: widersprüchliche Korrekturkräfte in derselben Physik-Runde.</p>
+
+<div class="box">
+<strong>Live-Befund in dieser Session:</strong> Jedes Track-Piece in Minigolf Mayhem hatte bereits vollständige Boden-Abdeckung über einen <code>MeshCollider</code> + mehrere <code>BoxCollider</code>-Kinder. Zusätzlich existierte ein separater <code>"Track Surface Colliders"</code>-Container mit eigenen flachen <code>BoxCollider</code>s über denselben Bereichen — auf einem <em>anderen</em> Physics-Layer (<code>Default</code> statt <code>Ground</code>), aber die Physics-Collision-Matrix erlaubte Kollision mit <strong>beiden</strong> Layern gleichzeitig.
+</div>
+
+<h2>Wie man das findet: Collider-Overlap per Code scannen</h2>
+
+<p>Statt im Editor einzelne Collider manuell zu vergleichen, lässt sich das programmatisch prüfen (hier via Unity-Editor-Bridge <code>execute_code</code>):</p>
+
+<pre>var colliders = FindObjectsByType&lt;Collider&gt;(FindObjectsSortMode.None)
+    .Where(c => !c.isTrigger && c.GetComponentInParent&lt;Rigidbody&gt;() == null)
+    .ToArray();
+
+for (int i = 0; i &lt; colliders.Length; i++)
+for (int j = i + 1; j &lt; colliders.Length; j++)
+{
+    var a = colliders[i].bounds;
+    var b = colliders[j].bounds;
+    if (!a.Intersects(b)) continue;
+    // echte Überlappungstiefe berechnen, nicht nur "berühren sich"
+    var min = Vector3.Max(a.min, b.min);
+    var max = Vector3.Min(a.max, b.max);
+    if (min.x >= max.x || min.y >= max.y || min.z >= max.z) continue;
+    // -> Fund: zwei Collider überlappen echt, nicht nur an der Kante
+}</pre>
+
+<div class="warn">
+<strong>Fallstrick:</strong> Ein reiner <code>Bounds.Intersects()</code>-Check zählt auch <em>Berührung</em> (zwei Kacheln liegen Kante an Kante, Überlappung = 0) als Treffer. Das führte in dieser Session zu einer falschen Spur — eine "19-Meter-Naht" zwischen zwei Track-Pieces sah dramatisch aus, war bei genauer Tiefenberechnung aber nur ein normaler 0.2m-Berührungsrand. Erst die <strong>echte Schnittmenge</strong> (<code>min &lt; max</code> auf allen drei Achsen) unterscheidet "berührt sich" von "überlappt wirklich".
+</div>
+
+<h2>Was half — und was nicht vollständig</h2>
+
+<p>Das Deaktivieren des redundanten <code>"Track Surface Colliders"</code>-Containers brachte spürbare Besserung, löste den Pop aber nicht vollständig. Ein Live-Capture (temporäre <code>Debug.Log</code>-Hooks in <code>FixedUpdate</code>/<code>OnCollisionStay</code>, nach der Diagnose wieder entfernt) zeigte: der Ball wurde bei mind. einem Vorfall auf über 14 Einheiten Höhe geschleudert — kein Jitter, ein echter, großer Impuls, korreliert mit der <code>Shoot()</code>-Methode. Die vollständige Ursache blieb für eine Folge-Session offen.</p>
+
+<div class="box">
+<strong>Merksatz:</strong> Nicht jeder "Objekt fliegt durch die Luft"-Bug ist ein Collider-Problem — manchmal ist es ein regulärer Spiel-Impuls (hier: ein Schuss-Mechanismus), der stärker oder häufiger auslöst als erwartet. Collider-Überlappung und Impuls-Mechaniken sind zwei <em>getrennte</em> Verdächtige, die beide geprüft werden müssen.
+</div>
+
+<div class="quiz">
+<strong>Quiz:</strong> Zwei Boden-Collider liegen exakt Kante an Kante (keine echte Überlappung, nur Berührung). Verursacht das typischerweise PhysX-Jitter?
+
+<form id="q1">
+  <label><input type="radio" name="q1" value="a"> Ja, immer — zwei Collider am selben Ort sind grundsätzlich ein Problem</label>
+  <label><input type="radio" name="q1" value="b"> Nein, reine Berührung (Überlappungstiefe = 0) ist normal und meist harmlos — erst echte Interpenetration verursacht widersprüchliche Contacts</label>
+</form>
+<div id="result"></div>
+</div>
+
+<script>
+document.querySelectorAll('#q1 input').forEach(el => el.addEventListener('change', () => {
+  const r = document.getElementById('result');
+  r.style.display = 'block';
+  if (el.value === 'b') {
+    r.textContent = '✅ Richtig — genau das war die Lehre aus der fälschlich verdächtigten "19-Meter-Naht" in dieser Session.';
+    r.className = 'correct';
+  } else {
+    r.textContent = '❌ Reine Berührung ist normales, erwartetes Level-Design (Kacheln, die aneinander anschließen). Erst eine echte dreidimensionale Schnittmenge ist verdächtig.';
+    r.className = 'wrong';
+  }
+}));
+</script>
+
+<p class="cite">Quelle: <a href="https://docs.unity3d.com/Manual/LayerBasedCollision.html">Unity Manual — Layer-basierte Kollision</a></p>
+
+<div class="summary">
+<strong>Zusammenfassung:</strong> Zwei unabhängige Collider am selben Ort erzeugen zwei getrennte PhysX-Contacts, die sich widersprechen können. Collider-Überlappungen lassen sich per Code systematisch scannen — aber nur echte Interpenetration (Schnittmenge &gt; 0 auf allen Achsen) ist verdächtig, reine Berührung ist normal. Nicht jeder "Objekt fliegt"-Bug ist ein Collider-Problem — Impuls-Mechaniken (Shoot/Move) gehören als eigener Verdächtiger auf die Liste.
+</div>
+
+</body>
+</html>

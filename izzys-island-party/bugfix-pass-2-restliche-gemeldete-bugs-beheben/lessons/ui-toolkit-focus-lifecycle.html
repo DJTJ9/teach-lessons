@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>UI Toolkit Fokus-Lifecycle</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.6em; border-bottom: 3px solid #4a7; padding-bottom: 10px; }
+  h2 { font-size: 1.2em; color: #2a6; margin-top: 2em; }
+  code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+  pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  .box { background: #eef7f0; border-left: 4px solid #4a7; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #fff; border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 2em 0; }
+  .quiz label { display: block; padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px 0; }
+  .quiz label:hover { background: #f0f0f0; }
+  #result { margin-top: 12px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+  .correct { background: #d4f4dd; color: #1a5c2a; }
+  .wrong { background: #fde2e2; color: #8a1f1f; }
+  .cite { font-size: 0.85em; color: #666; }
+  .summary { background: #fff8e1; border: 2px solid #f0c040; border-radius: 10px; padding: 16px; margin-top: 2em; }
+</style>
+</head>
+<body>
+
+<h1>UI Toolkit Fokus-Lifecycle</h1>
+
+<p>Zwei Bugs in dieser Session drehten sich um denselben Mechanismus: wer in UI Toolkit gerade "fokussiert" ist, und was passiert, wenn dieser Fokus verschwindet oder wechselt. Main-Menu-Enter-Doppelfeuer und der End-Screen/Pause-Menu-Konflikt sind beide Spielarten davon.</p>
+
+<h2>Das Konzept: Es gibt immer höchstens EIN fokussiertes Element</h2>
+
+<p>UI Toolkit verwaltet pro <code>Panel</code> einen <code>FocusController</code> mit genau einem <code>focusedElement</code> (oder <code>null</code>). Tastatur-Submit, Gamepad-Submit und Navigation (Pfeiltasten/Stick) wirken <strong>immer auf dieses eine Element</strong> — nicht auf "was gerade sichtbar ist".</p>
+
+<div class="box">
+<strong>Wichtige Events:</strong>
+<ul>
+<li><code>FocusInEvent</code> / <code>FocusOutEvent</code> — Fokus kommt an / geht weg von einem Element</li>
+<li><code>NavigationSubmitEvent</code> — Submit-Taste (Enter/Gamepad-A) auf dem fokussierten Element</li>
+<li><code>NavigationCancelEvent</code> — Cancel-Taste (Escape/Gamepad-B), bubbled wie Submit</li>
+<li><code>NavigationMoveEvent</code> — Richtungsnavigation zwischen fokussierbaren Elementen</li>
+</ul>
+</div>
+
+<h2>Fall 1: Main-Menu-Enter-Doppelfeuer</h2>
+
+<p>Ein Enter-Druck löste manchmal sofort einen Level-Load aus — nicht nur den Player-Hub öffnete. Root Cause: <code>FocusButton()</code> verzögerte das eigentliche <code>.Focus()</code> um zwei Frames per Coroutine:</p>
+
+<pre>private IEnumerator FocusButtonCoroutine(VisualElement _button)
+{
+    yield return null;
+    yield return null;
+    _button.Focus();   // erst hier wirklich fokussiert
+}</pre>
+
+<p>In diesem 2-Frame-Fenster war <strong>kein</strong> Element fokussiert (oder noch das alte, bereits versteckte). Ein Navigation-Event in genau diesem Fenster konnte auf dem nächstbesten sichtbaren fokussierbaren Element landen — nicht auf dem beabsichtigten Ziel.</p>
+
+<p>Der bestehende Fix (<code>m_navigationLocked</code>-Flag, das <code>LoadGameScene()</code> währenddessen blockt) hat sich in dieser Session bei Live-Tests (kurzer und langer Enter-Druck, Keyboard) bestätigt als ausreichend erwiesen.</p>
+
+<h2>Fall 2: End-Screen/Pause-Menu-Konflikt</h2>
+
+<p>Nach Spielende verlor der End-Screen manchmal den Fokus komplett (<code>focusedElement == null</code>) — z.B. durch einen Klick auf einen nicht-fokussierbaren Bereich (Video-Vorschau). Ohne Fokus feuert kein Submit mehr, der Continue-Button wird über Tastatur/Gamepad unerreichbar.</p>
+
+<p>Die bestehende Recovery-Logik fängt das global ab:</p>
+
+<pre>private void OnMenuFocusOut(FocusOutEvent _evt)
+{
+    if (_evt.relatedTarget != null) return;       // Fokus ging zu einem ANDEREN Element — nichts tun
+    if (m_lastFocusedElement == null) return;
+
+    root.schedule.Execute(() => {
+        if (root.panel.focusController.focusedElement == null)
+            m_lastFocusedElement.Focus();          // nichts fokussiert? zurück zum letzten bekannten Element
+    });
+}</pre>
+
+<p>Der eigentliche <strong>neue</strong> Bug war ein anderer: <code>ShowPauseMenu()</code> (an die Escape-Taste gebunden) hatte keinen Guard gegen "End-Screen ist bereits offen" — Escape öffnete das Pausenmenü <em>zusätzlich</em>, unabhängig vom aktuellen UI-Zustand. Zwei Root-VisualElements wurden gleichzeitig sichtbar und kämpften um Darstellung.</p>
+
+<pre>public void ShowPauseMenu()
+{
+    if (resultsScreen.style.display == DisplayStyle.Flex)
+    {
+        FocusButton(resultScreenContinueButton);   // Fokus wiederherstellen statt Pause öffnen
+        return;
+    }
+    if (endScreenUI.style.display == DisplayStyle.Flex)
+    {
+        FocusButton(endScreenRestartButton);
+        return;
+    }
+    pauseMenu.style.display = DisplayStyle.Flex;
+    FocusButton(pauseMenuResumeButton);
+    FreezeTimeScale();
+}</pre>
+
+<div class="box">
+<strong>Merksatz:</strong> Jeder global gebundene Input (Escape, Pause-Button) braucht einen expliziten Check, <em>welcher</em> UI-Zustand gerade aktiv ist — sonst wirkt er blind "über" allem, was schon offen ist.
+</div>
+
+<div class="quiz">
+<strong>Quiz:</strong> Ein Button wird per <code>style.display = DisplayStyle.None</code> versteckt, während er fokussiert war. Was passiert mit dem Fokus?
+
+<form id="q1">
+  <label><input type="radio" name="q1" value="a"> Er bleibt auf dem (jetzt unsichtbaren) Button stehen</label>
+  <label><input type="radio" name="q1" value="b"> Er geht verloren (null) oder wandert zum nächsten fokussierbaren Element — nicht garantiert vorhersehbar</label>
+  <label><input type="radio" name="q1" value="c"> Unity wirft automatisch eine Exception</label>
+</form>
+<div id="result"></div>
+</div>
+
+<script>
+document.querySelectorAll('#q1 input').forEach(el => el.addEventListener('change', () => {
+  const r = document.getElementById('result');
+  r.style.display = 'block';
+  if (el.value === 'b') {
+    r.textContent = '✅ Richtig — genau das ist die Fehlerquelle in beiden Fällen dieser Lektion. Deshalb braucht jeder Menüwechsel einen expliziten FocusButton()-Aufruf auf das neue Ziel.';
+    r.className = 'correct';
+  } else {
+    r.textContent = '❌ Ein unsichtbares Element kann nicht fokussiert bleiben — der Fokus wird vom FocusController neu vergeben, oft unvorhersehbar.';
+    r.className = 'wrong';
+  }
+}));
+</script>
+
+<p class="cite">Quelle: <a href="https://docs.unity3d.com/Manual/UIE-Focus.html">Unity Manual — UI Toolkit Focus</a></p>
+
+<div class="summary">
+<strong>Zusammenfassung:</strong> UI Toolkit hat global genau ein fokussiertes Element. Wird es versteckt oder verschwindet der Fokus durch einen Klick ins Leere, braucht es explizite Recovery (<code>FocusOutEvent</code> + letztes bekanntes Element) und jeder global gebundene Input muss prüfen, welcher UI-Zustand gerade aktiv ist, bevor er einen neuen öffnet.
+</div>
+
+</body>
+</html>

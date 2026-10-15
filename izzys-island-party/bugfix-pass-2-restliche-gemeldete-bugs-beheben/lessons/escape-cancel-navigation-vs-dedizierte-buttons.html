@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Escape/Cancel-Navigation vs. dedizierte Buttons</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.6em; border-bottom: 3px solid #4a7; padding-bottom: 10px; }
+  h2 { font-size: 1.2em; color: #2a6; margin-top: 2em; }
+  code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+  pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  .box { background: #eef7f0; border-left: 4px solid #4a7; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #fff; border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 2em 0; }
+  .quiz label { display: block; padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px 0; }
+  .quiz label:hover { background: #f0f0f0; }
+  #result { margin-top: 12px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+  .correct { background: #d4f4dd; color: #1a5c2a; }
+  .wrong { background: #fde2e2; color: #8a1f1f; }
+  .cite { font-size: 0.85em; color: #666; }
+  .summary { background: #fff8e1; border: 2px solid #f0c040; border-radius: 10px; padding: 16px; margin-top: 2em; }
+</style>
+</head>
+<body>
+
+<h1>Escape/Cancel-Navigation vs. dedizierte Buttons</h1>
+
+<p>Der Controller-Select-Screen hatte einen "Zurück"-Button, der zwar funktionierte, aber schlecht aussah und andere UI überlappte. Diese Lektion ist eigentlich eine UX-Entscheidung mit einer Code-Konsequenz: wann reicht ein unsichtbares Cancel-Event, und wann braucht es einen echten Button?</p>
+
+<h2>Das Konzept: Zwei Wege zu "zurück"</h2>
+
+<p>UI Toolkit bietet für "zurück/abbrechen" zwei unabhängige Mechanismen:</p>
+
+<ul>
+<li><strong>Dedizierter Button</strong> — sichtbares <code>Button</code>-Element mit <code>.clicked</code>-Handler. Klar erreichbar per Maus, aber nimmt Platz im Layout ein und muss positioniert werden.</li>
+<li><strong><code>NavigationCancelEvent</code></strong> — ein globales, unsichtbares Event, das bei Escape (Keyboard) oder der Cancel-Taste (Gamepad, meist B/Kreis) auf dem fokussierten Element bubbelt. Braucht keinen UI-Platz.</li>
+</ul>
+
+<div class="box">
+<strong>Entscheidend:</strong> Beide Mechanismen können denselben Code-Pfad aufrufen — sie schließen sich nicht aus. Die Frage ist nicht "welcher Mechanismus", sondern "braucht dieser Screen überhaupt einen sichtbaren Button, oder reicht die unsichtbare Variante?"
+</div>
+
+<h2>Der konkrete Fall</h2>
+
+<p>In <code>GameMenuEvents.cs</code> existierte bereits <strong>vor</strong> dieser Session ein Cancel-Pfad:</p>
+
+<pre>root.RegisterCallback&lt;NavigationCancelEvent&gt;(OnControllerSelectionCancel);
+
+private void OnControllerSelectionCancel(NavigationCancelEvent _evt)
+{
+    if (controllerSelectionMenu.style.display != DisplayStyle.Flex) return;
+    _evt.StopPropagation();
+    OnControllerSelectionBack();
+}</pre>
+
+<p>Ein früherer Fix-Versuch hatte <em>zusätzlich</em> einen sichtbaren <code>controllerSelectionBackButton</code> eingeführt — technisch funktionsfähig, aber visuell unerwünscht (überlappte andere UI, saß mitten im Screen). Der Nutzer wollte explizit <strong>keinen</strong> Button, sondern reine Escape/Cancel-Navigation.</p>
+
+<p>Der Fix war deshalb kein neuer Code, sondern <strong>Rückbau</strong>: Feld, Binding, Click-Handler und alle <code>style.display</code>-Toggles für den Button entfernt — der bereits vorhandene, unsichtbare Cancel-Pfad blieb unverändert der einzige Rückweg.</p>
+
+<div class="box">
+<strong>Merksatz:</strong> Bevor ein neuer UI-Mechanismus für "zurück" gebaut wird, prüfen, ob nicht längst ein unsichtbarer Navigation-Event-Pfad existiert, der nur falsch wahrgenommen wurde (hier: als "nicht vorhanden", weil nie mit Gamepad-Cancel getestet). Das spart nicht nur Code, sondern auch ein Layout-Problem.
+</div>
+
+<h2>Wann braucht es trotzdem einen sichtbaren Button?</h2>
+
+<p>Wenn der Screen auch per <strong>Maus ohne Tastatur/Gamepad</strong> bedienbar sein muss, UND kein anderes sichtbares Element "zurück" signalisiert. In diesem Fall gibt es keine Maus-Bedienung für den Controller-Select-Screen (reine Controller-/Keyboard-Interaktion vor dem eigentlichen Spielstart) — der unsichtbare Cancel-Pfad allein reicht aus.</p>
+
+<div class="quiz">
+<strong>Quiz:</strong> Ein neuer Settings-Screen soll auch mit der Maus vollständig bedienbar sein, inklusive Verlassen ohne Tastatur. Reicht <code>NavigationCancelEvent</code> allein?
+
+<form id="q1">
+  <label><input type="radio" name="q1" value="a"> Ja, Cancel-Events decken auch Maus-Interaktion ab</label>
+  <label><input type="radio" name="q1" value="b"> Nein — NavigationCancelEvent reagiert nur auf Keyboard/Gamepad-Cancel-Input, eine reine Maus-Bedienung braucht zusätzlich einen klickbaren Button</label>
+</form>
+<div id="result"></div>
+</div>
+
+<script>
+document.querySelectorAll('#q1 input').forEach(el => el.addEventListener('change', () => {
+  const r = document.getElementById('result');
+  r.style.display = 'block';
+  if (el.value === 'b') {
+    r.textContent = '✅ Richtig — der Controller-Select-Screen in dieser Session kam ohne Button aus, weil er NIE per Maus bedient wird. Ein maus-bedienbarer Screen braucht den sichtbaren Button zusätzlich.';
+    r.className = 'correct';
+  } else {
+    r.textContent = '❌ NavigationCancelEvent ist ein Keyboard-/Gamepad-Mechanismus. Für reine Maus-Bedienung bleibt ein sichtbarer, klickbarer Button nötig.';
+    r.className = 'wrong';
+  }
+}));
+</script>
+
+<p class="cite">Quelle: <a href="https://docs.unity3d.com/Manual/UIE-Focus.html">Unity Manual — UI Toolkit Focus &amp; Navigation Events</a></p>
+
+<div class="summary">
+<strong>Zusammenfassung:</strong> "Zurück" lässt sich per sichtbarem Button oder per unsichtbarem <code>NavigationCancelEvent</code> lösen — beide können denselben Code aufrufen. Die Wahl hängt davon ab, ob der Screen auch per Maus bedienbar sein muss. Vor einem neuen Rückweg-Mechanismus immer erst prüfen, ob nicht schon ein unsichtbarer Pfad existiert.
+</div>
+
+</body>
+</html>

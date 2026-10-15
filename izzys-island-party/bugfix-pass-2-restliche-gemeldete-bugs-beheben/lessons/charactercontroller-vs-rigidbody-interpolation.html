@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>CharacterController vs. Rigidbody-Interpolation</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.6em; border-bottom: 3px solid #4a7; padding-bottom: 10px; }
+  h2 { font-size: 1.2em; color: #2a6; margin-top: 2em; }
+  code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+  pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  .box { background: #eef7f0; border-left: 4px solid #4a7; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #fff; border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 2em 0; }
+  .quiz label { display: block; padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px 0; }
+  .quiz label:hover { background: #f0f0f0; }
+  #result { margin-top: 12px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+  .correct { background: #d4f4dd; color: #1a5c2a; }
+  .wrong { background: #fde2e2; color: #8a1f1f; }
+  .cite { font-size: 0.85em; color: #666; }
+  .summary { background: #fff8e1; border: 2px solid #f0c040; border-radius: 10px; padding: 16px; margin-top: 2em; }
+</style>
+</head>
+<body>
+
+<h1>CharacterController vs. Rigidbody-Interpolation</h1>
+
+<p>Der Bowling-Ball in Izzy's Island Party zitterte beim Steuern — auch nachdem der <code>isKinematic</code>-Fix aus Pass 2 Batch 2 das Grundproblem (Rigidbody und CharacterController schreiben gleichzeitig auf den Transform) behoben hatte. Rest-Jitter blieb. Diese Lektion erklärt, warum.</p>
+
+<h2>Das Konzept: Fester Physik-Tick vs. variable Bildrate</h2>
+
+<p>Unity läuft zwei getrennte Taktraten gleichzeitig:</p>
+<ul>
+  <li><strong>Rendering</strong> — läuft mit variabler Bildrate (z.B. 60, 144, 240 Hz, je nach Monitor/Last). Jeder Renderframe ruft <code>Update()</code> einmal auf.</li>
+  <li><strong>Physik</strong> — läuft mit fester Taktrate (<code>Time.fixedDeltaTime</code>, Standard 0.02s = 50 Hz). Jeder Physik-Tick ruft <code>FixedUpdate()</code> auf.</li>
+</ul>
+
+<p>Bei 144 Hz Rendering und 50 Hz Physik passiert <code>FixedUpdate()</code> nur bei <em>manchen</em> Renderframes. Bewegt sich ein Objekt ausschließlich in <code>FixedUpdate()</code>, "springt" seine Position zwischen Physik-Ticks — sie bleibt für mehrere Renderframes identisch, dann macht sie einen Sprung zum nächsten Tick.</p>
+
+<div class="box">
+<strong>Rigidbody löst das selbst:</strong> Mit <code>Rigidbody.interpolation = Interpolate</code> rendert Unity die Position zwischen zwei Physik-Ticks sanft interpoliert — der Sprung wird unsichtbar, obwohl die eigentliche Physik-Berechnung weiterhin nur 50x/Sekunde läuft.
+</div>
+
+<h2>Die Lücke: CharacterController hat das nicht</h2>
+
+<p><code>CharacterController</code> ist <strong>kein</strong> physikgetriebenes Objekt im PhysX-Sinn. <code>controller.Move(delta)</code> ist ein sofortiger, kinematischer "Sweep" — Unity bewegt den Transform direkt und synchron, es gibt keinen Interpolations-Mechanismus wie bei Rigidbody.</p>
+
+<p>Der Bug in <code>PlayerControllerBowlingBattle.cs</code>:</p>
+
+<pre>// VORHER — lief mit fester Physik-Taktung (50 Hz), aber ohne Interpolation
+private void FixedUpdate()
+{
+    if (controller.enabled) Movement();   // ruft controller.Move() auf
+}</pre>
+
+<p>Weil <code>Move()</code> nur 50x/Sekunde ausgeführt wurde und dabei <strong>kein</strong> Interpolationsmechanismus griff, blieb die sichtbare Ballposition zwischen den Ticks stehen und "sprang" — genau das Jitter-Muster, das beim Steuern auffiel.</p>
+
+<h2>Der Fix</h2>
+
+<pre>// NACHHER — läuft mit jedem Renderframe, Time.deltaTime kompensiert die variable Bildrate
+private void Update()
+{
+    if (controller.enabled) Movement();
+}</pre>
+
+<p>Da <code>StartPositionMovement()</code> bereits <code>move * Time.deltaTime</code> verwendete (nicht <code>fixedDeltaTime</code>), war die Bewegungsberechnung selbst schon framerate-unabhängig korrekt — das einzige Problem war die <em>Aufruf-Frequenz</em>. Verschieben nach <code>Update()</code> genügte.</p>
+
+<div class="box">
+<strong>Merksatz:</strong> <code>CharacterController.Move()</code> gehört grundsätzlich in <code>Update()</code>, nicht in <code>FixedUpdate()</code> — es sei denn, die Bewegung muss exakt mit anderer Physik (Rigidbody-Kollisionen in derselben Szene) synchron sein, was bei reiner Charakter-Steuerung fast nie der Fall ist.
+</div>
+
+<div class="quiz">
+<strong>Quiz:</strong> Ein Rigidbody-gesteuertes Objekt (kein CharacterController) zittert leicht bei hoher Bildrate. Was ist der naheliegendste erste Check?
+
+<form id="q1">
+  <label><input type="radio" name="q1" value="a"> Interpolation-Mode des Rigidbody prüfen (None → Interpolate)</label>
+  <label><input type="radio" name="q1" value="b"> AddForce() in Update() statt FixedUpdate() aufrufen</label>
+  <label><input type="radio" name="q1" value="c"> Time.fixedDeltaTime auf 0 setzen</label>
+</form>
+<div id="result"></div>
+</div>
+
+<script>
+document.querySelectorAll('#q1 input').forEach(el => el.addEventListener('change', () => {
+  const r = document.getElementById('result');
+  r.style.display = 'block';
+  if (el.value === 'a') {
+    r.textContent = '✅ Richtig — Rigidbody hat genau dafür den Interpolation-Modus. AddForce()/Physik-Code gehört weiterhin in FixedUpdate.';
+    r.className = 'correct';
+  } else {
+    r.textContent = '❌ Physik-Code (AddForce etc.) bleibt in FixedUpdate — nur das Rendering braucht Interpolation, nicht die Berechnung selbst.';
+    r.className = 'wrong';
+  }
+}));
+</script>
+
+<p class="cite">Quellen: <a href="https://docs.unity3d.com/Manual/class-Rigidbody.html">Unity Manual — Rigidbody</a>, <a href="https://docs.unity3d.com/Manual/class-CharacterController.html">Unity Manual — CharacterController</a></p>
+
+<div class="summary">
+<strong>Zusammenfassung:</strong> Physik läuft mit fester Taktrate, Rendering mit variabler. Rigidbody kann die Lücke durch Interpolation unsichtbar machen — CharacterController kann das nicht, weil es kein PhysX-Objekt ist. Deshalb gehört <code>CharacterController.Move()</code> in <code>Update()</code>, damit es mit jedem Renderframe sauber mitläuft.
+</div>
+
+</body>
+</html>

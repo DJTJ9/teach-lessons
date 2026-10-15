@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Root-Cause-Diagnose mit Live-Editor-Tooling</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1a1a1a; background: #fafafa; }
+  h1 { font-size: 1.6em; border-bottom: 3px solid #4a7; padding-bottom: 10px; }
+  h2 { font-size: 1.2em; color: #2a6; margin-top: 2em; }
+  code { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+  pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  .box { background: #eef7f0; border-left: 4px solid #4a7; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .warn { background: #fff3e0; border-left: 4px solid #e08a2a; padding: 12px 16px; margin: 1em 0; border-radius: 0 6px 6px 0; }
+  .quiz { background: #fff; border: 2px solid #ddd; border-radius: 10px; padding: 20px; margin: 2em 0; }
+  .quiz label { display: block; padding: 8px; border-radius: 6px; cursor: pointer; margin: 4px 0; }
+  .quiz label:hover { background: #f0f0f0; }
+  #result { margin-top: 12px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+  .correct { background: #d4f4dd; color: #1a5c2a; }
+  .wrong { background: #fde2e2; color: #8a1f1f; }
+  .cite { font-size: 0.85em; color: #666; }
+  .summary { background: #fff8e1; border: 2px solid #f0c040; border-radius: 10px; padding: 16px; margin-top: 2em; }
+</style>
+</head>
+<body>
+
+<h1>Root-Cause-Diagnose mit Live-Editor-Tooling</h1>
+
+<p>Diese Session nutzte eine Unity-Editor-Bridge (MCP for Unity), um Hypothesen direkt am laufenden Editor zu prüfen, statt zu raten. Diese Lektion fasst die Methodik zusammen — unabhängig vom konkreten Werkzeug.</p>
+
+<h2>Das Prinzip: Beweis vor Fix</h2>
+
+<p>Der <code>systematic-debugging</code>-Ansatz dieser Session folgte vier Phasen, die sich durch alle fünf Bugs ziehen:</p>
+
+<ol>
+<li><strong>Root-Cause-Untersuchung</strong> — Evidenz sammeln, bevor irgendein Fix versucht wird</li>
+<li><strong>Pattern-Analyse</strong> — funktionierenden Code mit kaputtem vergleichen</li>
+<li><strong>Hypothese + minimaler Test</strong> — eine Vermutung, eine kleine Änderung, verifizieren</li>
+<li><strong>Implementierung</strong> — erst nach bestätigter Ursache</li>
+</ol>
+
+<h2>Werkzeug 1: Temporäre Instrumentierung statt Raten</h2>
+
+<p>Beim Main-Menu-Enter-Bug halfen keine Vermutungen — stattdessen wurden <strong>temporäre</strong> <code>Debug.Log</code>-Aufrufe an genau den Stellen eingefügt, an denen die Hypothese prüfbar war (Fokus-Wechsel, Submit-Events, Lock-Zustand):</p>
+
+<pre>root.RegisterCallback&lt;NavigationSubmitEvent&gt;(_evt =>
+    Debug.Log($"[DBG f{Time.frameCount}] NavigationSubmit: {(_evt.target as VisualElement)?.name}"),
+    TrickleDown.TrickleDown);</pre>
+
+<div class="box">
+<strong>Wichtig:</strong> Diese Logs wurden nach der Diagnose <strong>vollständig entfernt</strong> — Instrumentierung ist ein Werkzeug für die Untersuchung, kein Teil des fertigen Codes.
+</div>
+
+<h2>Werkzeug 2: Live-Abfragen statt Annahmen über den Projektzustand</h2>
+
+<p>Statt zu vermuten, ob zwei Collider sich überlappen, wurde das direkt im laufenden Editor berechnet (<code>execute_code</code> gegen den offenen Editor, kein Batchmode-Neustart nötig):</p>
+
+<pre>var cols = prefab.GetComponentInChildren&lt;SphereCollider&gt;(true);
+// ... tatsächliche Werte aus der laufenden Szene lesen, nicht aus dem Code raten</pre>
+
+<p>Das deckte z.B. auf, dass der Ball gleichzeitig mit <code>Ground</code>- <strong>und</strong> <code>Default</code>-Layer kollidiert — eine Information, die aus dem C#-Code allein nicht ersichtlich war (sie steckt in der Physics-Collision-Matrix, einer Projekteinstellung).</p>
+
+<h2>Werkzeug 3: Live-Capture während echter Reproduktion</h2>
+
+<p>Für den Minigolf-Pop wurde ein zeitlich begrenztes Capture gebaut: ein Schwellwert-Trigger loggt nur, wenn etwas Ungewöhnliches passiert (<code>velY-Sprung &gt; 1.5</code>), um die Logmenge beherrschbar zu halten:</p>
+
+<pre>if (velY - m_dbgLastVelY > 1.5f || velY > 3f)
+    Debug.Log($"[POPDBG f{Time.frameCount}] velY={velY:F2} ...");</pre>
+
+<div class="warn">
+<strong>Gelernte Grenze:</strong> Der Unity-Console-Puffer behält nur eine begrenzte Anzahl Einträge. Bei Verzögerung zwischen Repro und Auslesen kann der <em>exakte</em> Auslöser-Frame bereits aus dem Puffer verdrängt sein — nur der Ausklang (z.B. der abklingende Fallflug) bleibt sichtbar. Für enge Zeitfenster hilft: Console direkt vor dem Repro-Versuch leeren, sofort danach auslesen.
+</div>
+
+<h2>Wann aufhören: Budget und Architektur-Grenze</h2>
+
+<p>Der <code>systematic-debugging</code>-Skill nennt explizit eine Grenze: nach drei gescheiterten Fix-Versuchen für denselben Bug ist die nächste Frage nicht "noch ein Fix", sondern "ist das die richtige Architektur, oder rätseln wir am Symptom?" — eine Entscheidung für den Menschen, nicht für weiteres Raten.</p>
+
+<p>Beim Minigolf-Pop traf das zu: Collider-Fix (Besserung, nicht vollständig), Seam-Analyse (falsche Spur entkräftet), Live-Capture (neue Spur gefunden, aber Zeitfenster verpasst) — drei Runden mit sinkendem Grenzertrag. Die richtige Reaktion war, das Ergebnis klar zu dokumentieren und die Entscheidung (weiter graben vs. für eine Folge-Session vormerken) dem Nutzer zu überlassen, statt unbegrenzt weiterzusuchen.</p>
+
+<div class="quiz">
+<strong>Quiz:</strong> Ein Bug ist nach zwei verschiedenen Fix-Versuchen immer noch nicht vollständig gelöst, jeder Versuch deckte aber eine neue Teilursache auf. Was ist laut dieser Methodik der richtige nächste Schritt?
+
+<form id="q1">
+  <label><input type="radio" name="q1" value="a"> Sofort einen dritten Fix ausprobieren, ohne Rückfrage</label>
+  <label><input type="radio" name="q1" value="b"> Befund dokumentieren (was wurde geprüft, was gefunden, was offen) und die Entscheidung über das weitere Vorgehen explizit stellen</label>
+</form>
+<div id="result"></div>
+</div>
+
+<script>
+document.querySelectorAll('#q1 input').forEach(el => el.addEventListener('change', () => {
+  const r = document.getElementById('result');
+  r.style.display = 'block';
+  if (el.value === 'b') {
+    r.textContent = '✅ Richtig — genauso wurde beim Minigolf-Pop in dieser Session verfahren: Diagnose-Stand klar ins Playtest-Log geschrieben, Entscheidung (jetzt weiter vs. Folge-Session) explizit gestellt.';
+    r.className = 'correct';
+  } else {
+    r.textContent = '❌ Nach mehreren Fix-Versuchen ohne vollständige Lösung ist "einfach nochmal probieren" genau das Muster, das die Methodik verhindern soll — Kosten/Nutzen und Architektur-Frage gehören zur Rückfrage.';
+    r.className = 'wrong';
+  }
+}));
+</script>
+
+<p class="cite">Quelle: <code>superpowers:systematic-debugging</code>-Skill (Phase 4.5 — Architektur-Frage nach 3+ gescheiterten Fixes)</p>
+
+<div class="summary">
+<strong>Zusammenfassung:</strong> Temporäre Instrumentierung (Logs, Live-Abfragen am laufenden Editor, zeitlich begrenzte Captures) ersetzt Raten durch Beweis — und wird nach der Diagnose wieder entfernt. Live-Tooling hat eigene Grenzen (Console-Puffer, Zeitfenster). Nach mehreren erfolglosen Fix-Versuchen ist Dokumentieren + Rückfrage der richtige nächste Schritt, nicht ein weiterer Rateversuch.
+</div>
+
+</body>
+</html>
